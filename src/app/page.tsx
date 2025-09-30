@@ -2,7 +2,7 @@ import { RealTimeSection } from "@/components/RealTimeSection";
 
 export const Home = () => {
     return (
-        <div>
+        <div className="min-h-screen">
             <RealTimeSection />
         </div>
     );

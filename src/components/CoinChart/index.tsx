@@ -24,7 +24,7 @@ export default function CoinChart({
 
         const chart = createChart(el, {
             width: el.clientWidth,
-            height: 150,
+            height: 120,
             layout: { background: { color: "#fff" }, textColor: "#111" },
             grid: {
                 vertLines: { color: "#eee" },
@@ -101,5 +101,5 @@ export default function CoinChart({
         };
     }, [symbol, interval, historyLimit]);
 
-    return <div ref={containerRef} className="w-full h-35" />;
+    return <div ref={containerRef} className="w-full h-full rounded-2xl overflow-hidden" />;
 }
