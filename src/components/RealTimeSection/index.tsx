@@ -13,6 +13,14 @@ export const RealTimeSection = () => {
             <div className="w-100 border-1 h-30 rounded-2xl">
                 <CoinChart />
             </div>
+            <div className="flex flex-col gap-5 ">
+                <button className="border rounded-2xl w-30 h-10 cursor-pointer">
+                    <span className="text-sm">카톡 로그인</span>
+                </button>
+                <button className="border rounded-2xl w-30 h-10 cursor-pointer">
+                    <span className="text-sm">일반 로그인</span>
+                </button>
+            </div>
         </div>
     );
 };
