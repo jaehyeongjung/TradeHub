@@ -8,12 +8,8 @@ export const DashBoard = () => {
                         <div className="w-full bg-pink-300">
                             https://coinpannews.com/ 오른쪽에 index 처럼 News랑
                             게시글 버튼으로 골라서 책갈피느낌 그리고
-                            실시간채팅에 챗봇하나심어둬도 재밌을듯 x /
-                            투표기능이 재밌겠다 ㅋㅋㅋ 1일마다 갱신인데 long?
-                            short? 로그인 ㅈ버튼쪽에 실시간 바이낸스 롱/숏
-                            포지션비율도 ㄱㄱ 아... 실시간채팅 닉네임이
-                            현재포지션 long/short 배율 까지 ㅋㅋㅋ 대박이다이거
-                            서로 조롱
+            
+         
                         </div>
                     </div>
                 </div>
@@ -46,7 +42,7 @@ export const DashBoard = () => {
                     <div className="bg-emerald-300 h-full flex gap-20">
                         <div className="w-40 h-full bg-amber-300">ㅇ</div>
                         <div className="w-full bg-pink-300">
-                            업비트에서도 웻소켓으로 제공해주네 원화 ㅆㄱㄴ
+                            업비트에서도 웻소켓으로 제공해주네 원화 가능
                         </div>
                     </div>
                 </div>
