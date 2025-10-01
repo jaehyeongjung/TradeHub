@@ -2,35 +2,27 @@
 
 import { useEffect, useState } from "react";
 
-interface CoinPriceBoxProps {
-  symbol: string; 
-}
-
-export const CoinPriceBox = ({ symbol }: CoinPriceBoxProps) => {
-  const [price, setPrice] = useState<string>("");
+export const CoinPriceBox = ({ symbol }: { symbol: string }) => {
+  const [price, setPrice] = useState<string | null>(null);
 
   useEffect(() => {
     const ws = new WebSocket(
-      `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@ticker`
+      `wss://stream.binance.com:9443/ws/${symbol}@ticker`
     );
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      setPrice(parseFloat(data.c).toFixed(2)); // current price
-    };
-
-    ws.onerror = (err) => {
-      console.error("WebSocket error:", err);
+      setPrice(parseFloat(data.c).toFixed(2));
     };
 
     return () => ws.close();
-  }, [symbol]); // symbol이 바뀌면 새로 연결
-  
+  }, [symbol]);
+
   return (
-    <div className="border rounded-lg p-4 shadow-md text-center">
-      <h2 className="text-lg font-bold">{symbol.toUpperCase()}</h2>
-      <p className="text-2xl font-mono mt-2">
-        {price ? `$${price}` : "Loading..."}
+    <div className="w-[120px] h-[80px] border rounded-lg shadow-md flex flex-col justify-center items-center">
+      <h2 className="text-sm font-bold">{symbol.toUpperCase()}</h2>
+      <p className="text-lg font-mono">
+        {price ? `$${price}` : ""}
       </p>
     </div>
   );
