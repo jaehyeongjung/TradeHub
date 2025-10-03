@@ -148,7 +148,10 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                         placeholder="메시지..."
                         maxLength={2000}
                     />
-                    <button onClick={send} className="px-4 py-2 rounded border bg-neutral-900 text-emerald-800">
+                    <button
+                        onClick={send}
+                        className="px-4 py-2 rounded border bg-neutral-900 text-emerald-800"
+                    >
                         Send
                     </button>
                 </div>

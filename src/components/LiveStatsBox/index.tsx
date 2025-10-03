@@ -111,7 +111,9 @@ export default function LiveStatsBox() {
         <div className="flex items-center gap-3 rounded-xl border p-3 shadow-sm justify-center bg-neutral-900">
             <span className="text-xs flex flex-col ml-1 whitespace-nowrap">
                 <b className="text-gray-300">오늘 방문자</b>
-                <b className="text-gray-300">{todayVisitors.toLocaleString()}명</b>
+                <b className="text-gray-300">
+                    {todayVisitors.toLocaleString()}명
+                </b>
             </span>
             <span className="text-gray-300">|</span>
             <span className="text-xs flex flex-col whitespace-nowrap text-gray-300">
