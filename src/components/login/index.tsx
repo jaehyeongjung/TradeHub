@@ -68,14 +68,14 @@ export default function AuthBox() {
             }}
         >
             <input
-                className="border px-2 py-1 w-full rounded-2xl text-gray-200 "
-                placeholder="  email"
+                className="border pl-4 py-1 w-full rounded-2xl text-gray-200 "
+                placeholder="email"
                 value={email}
                 onChange={(e) => setE(e.target.value)}
             />
             <input
-                className="border px-2 py-1 w-full rounded-2xl text-gray-200"
-                placeholder="  password"
+                className="border pl-4 py-1 w-full rounded-2xl text-gray-200"
+                placeholder="password"
                 type="password"
                 value={pw}
                 onChange={(e) => setP(e.target.value)}
