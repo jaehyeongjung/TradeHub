@@ -38,7 +38,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
         .from("messages")
         .select("id, content, created_at, user_id, room_id")
         .eq("room_id", roomId)
-        .order("created_at", { ascending: true })
+        .order("created_at", { ascending: false })
         .limit(300);
       if (!cancelled && !error && data) {
         setMsgs(data as Msg[]);
