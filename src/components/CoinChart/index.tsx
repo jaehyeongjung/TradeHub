@@ -24,14 +24,17 @@ export default function CoinChart({
 
         const chart = createChart(el, {
             width: el.clientWidth,
-            height: el.clientHeight, // 부모에서 고정 높이 주니까 그대로 반영됨
-            layout: { background: { color: "#fff" }, textColor: "#111" },
-            grid: {
-                vertLines: { color: "#eee" },
-                horzLines: { color: "#eee" },
+            height: el.clientHeight,
+            layout: {
+                background: { color: "#171717" }, // 완전 블랙 배경
+                textColor: "#E5E5E5", // 기본 텍스트는 밝은 회색
             },
-            rightPriceScale: { borderColor: "#e0e0e0" },
-            timeScale: { borderColor: "#e0e0e0" },
+            grid: {
+                vertLines: { color: "#1F1F1F" }, // 세로 라인 (거의 안 보이게)
+                horzLines: { color: "#1F1F1F" }, // 가로 라인
+            },
+            rightPriceScale: { borderColor: "#2A2A2A" }, // 가격 스케일 구분선
+            timeScale: { borderColor: "#2A2A2A" }, // 시간축 구분선
         });
 
         chart.timeScale().applyOptions({
@@ -104,7 +107,7 @@ export default function CoinChart({
     return (
         <div
             ref={containerRef}
-            className="w-full min-w-55 min-h-30 rounded-2xl overflow-hidden border bg-white"
+            className="w-full min-w-55 min-h-30 rounded-2xl overflow-hidden border"
         />
     );
 }

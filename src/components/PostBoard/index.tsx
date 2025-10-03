@@ -132,7 +132,7 @@ export default function PostSection() {
                 <div className="flex-1 overflow-auto">
                     <button
                         onClick={() => setMode("write")}
-                        className="mb-3 border rounded px-3 py-1 bg-blue-600 text-white"
+                        className="mb-3 border rounded px-3 py-1 bg-black text-gray-100"
                     >
                         글쓰기
                     </button>
@@ -140,7 +140,7 @@ export default function PostSection() {
                     {posts.map((p) => (
                         <div
                             key={p.id}
-                            className="flex items-start border rounded p-3 mb-3 bg-gray-50 hover:bg-gray-100 cursor-pointer"
+                            className="flex items-start border rounded p-3 mb-3 bg-neutral-900 hover:bg-gray-100 cursor-pointer"
                             onClick={() => {
                                 setSelected(p);
                                 setMode("detail");
@@ -148,10 +148,10 @@ export default function PostSection() {
                         >
                             <Thumb url={p.image_url} />
                             <div className="flex-1 min-w-0">
-                                <h3 className="font-bold text-sm truncate">
+                                <h3 className="font-bold text-sm truncate text-gray-100">
                                     {p.title}
                                 </h3>
-                                <p className="text-xs text-gray-700 line-clamp-2">
+                                <p className="text-xs text-gray-100 line-clamp-2">
                                     {p.body}
                                 </p>
                                 <p className="text-[10px] text-gray-500 mt-1">
