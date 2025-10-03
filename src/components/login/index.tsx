@@ -44,11 +44,15 @@ export default function AuthBox() {
 
     if (user) {
         return (
-            <div className="space-y-2">
+            <div className="space-y-2 border-2 p-3.5 h-34 rounded-xl min-w-58.5 flex flex-col justify-center">
                 <p>
-                    로그인됨: <b>{user.email}</b>
+                    환영합니다 <b>{user.email}</b>
+                    <b> 님</b>
                 </p>
-                <button className="border px-3 py-1" onClick={signOut}>
+                <button
+                    className="border px-3 py-1 rounded-2xl"
+                    onClick={signOut}
+                >
                     Sign out
                 </button>
             </div>
