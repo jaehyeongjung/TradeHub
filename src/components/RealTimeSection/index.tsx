@@ -4,7 +4,7 @@ import LongShortRatioBox from "@/components/LongShortRatioBox";
 
 export const RealTimeSection = () => {
     return (
-        <div className="font-sans flex gap-5 min-h-35 mt-5 mx-auto bg-neutral-950 items-center w-full min-w-305  border-2  rounded-2xl ">
+        <div className="font-sans flex gap-5 min-h-35 mt-5 mx-auto bg-neutral-950 items-center w-full min-w-305  border-2 rounded-2xl ">
             <div className="flex gap-3 ml-6 w-full  ">
                 <CoinPriceBox symbol="btcusdt" />
                 <CoinPriceBox symbol="ethusdt" />
