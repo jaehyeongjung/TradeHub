@@ -14,7 +14,7 @@ export const DashBoard = () => {
             <div className="flex flex-col gap-5 min-w-57">
                 <AuthBox />
                 <LiveStatsBox />
-                <EconomicCalendar />
+
                 <FearGreedWidget />
             </div>
             <div className="min-w-75 border-2 rounded-2xl flex flex-col items-center gap-3 h-[calc(100vh-200px)] bg-neutral-950">
