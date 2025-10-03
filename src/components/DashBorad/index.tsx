@@ -3,6 +3,7 @@ import AuthBox from "../login";
 import PostBoard from "../PostBoard";
 import LiveStatsBox from "../LiveStatsBox";
 import FearGreedWidget from "../Greed";
+import YouTubeSeamlessPlayer from "@/components/YouTubeBGMPlayer"; // 경로에 맞게 수정
 
 export const DashBoard = () => {
     return (
@@ -14,7 +15,11 @@ export const DashBoard = () => {
                 <AuthBox />
                 <LiveStatsBox />
                 <FearGreedWidget />
+                <YouTubeSeamlessPlayer
+                    videoId="j23SO29LNWE" // 사용자가 요청한 영상 ID
+                />
             </div>
+
             <div className="min-w-75 border-2 rounded-2xl flex flex-col items-center gap-3 h-[calc(100vh-200px)] bg-neutral-950">
                 <Chat />
             </div>

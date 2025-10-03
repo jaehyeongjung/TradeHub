@@ -3,7 +3,7 @@ import { DashBoard } from "@/components/DashBorad";
 
 export const Home = () => {
     return (
-        <div className="min-h-screen flex flex-col px-5 bg-black">
+        <div className="min-h-screen flex flex-col px-5 bg-black min-w-310">
             <RealTimeSection />
             <DashBoard />
         </div>

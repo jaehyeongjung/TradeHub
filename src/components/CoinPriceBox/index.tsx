@@ -8,15 +8,15 @@ type Props = { boxId: string; defaultSymbol?: string };
 
 export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
     // defaultSymbol은 props로 넘어오지만, 내부 상태는 소문자로 유지
-    const initialSymbol = defaultSymbol.toLowerCase(); 
+    const initialSymbol = defaultSymbol.toLowerCase();
 
     const [symbol, setSymbol] = useState(initialSymbol);
     const [price, setPrice] = useState<number | null>(null);
     const [pct, setPct] = useState<number | null>(null);
     const [open, setOpen] = useState(false);
-    
+
     // userId 상태는 로그인 여부와 현재 사용자 ID를 추적합니다.
-    const [userId, setUserId] = useState<string | null>(null); 
+    const [userId, setUserId] = useState<string | null>(null);
 
     // --- 레이스 방지용 ---
     const wsRef = useRef<WebSocket | null>(null);
@@ -36,36 +36,38 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
     // ********** 핵심 수정된 부분: 심볼 로드 및 로그인 상태 관리 **********
     useEffect(() => {
         // 1. 세션 변경 감지 리스너 설정
-        const { data: sub } = supabase.auth.onAuthStateChange(async (_e, session) => {
-            const uid = session?.user?.id ?? null;
-            setUserId(uid); // 유저 ID 업데이트 (로그인/로그아웃 즉시 반영)
+        const { data: sub } = supabase.auth.onAuthStateChange(
+            async (_e, session) => {
+                const uid = session?.user?.id ?? null;
+                setUserId(uid); // 유저 ID 업데이트 (로그인/로그아웃 즉시 반영)
 
-            if (uid) {
-                // 로그인 상태: DB에서 커스텀 값 로드
-                const { data: row } = await supabase
-                    .from("user_symbol_prefs")
-                    .select("symbol")
-                    .eq("user_id", uid)
-                    .eq("box_id", boxId)
-                    .maybeSingle();
-                
-                // DB에 저장된 값이 있으면 적용, 없으면 디폴트 심볼로 설정
-                if (row?.symbol) {
-                    setSymbol(row.symbol.toLowerCase());
+                if (uid) {
+                    // 로그인 상태: DB에서 커스텀 값 로드
+                    const { data: row } = await supabase
+                        .from("user_symbol_prefs")
+                        .select("symbol")
+                        .eq("user_id", uid)
+                        .eq("box_id", boxId)
+                        .maybeSingle();
+
+                    // DB에 저장된 값이 있으면 적용, 없으면 디폴트 심볼로 설정
+                    if (row?.symbol) {
+                        setSymbol(row.symbol.toLowerCase());
+                    } else {
+                        setSymbol(initialSymbol);
+                    }
                 } else {
-                    setSymbol(initialSymbol); 
-                }
-            } else {
-                // 로그아웃 상태: 로컬 스토리지 확인 후, 없으면 디폴트값 적용
-                const loc = localStorage.getItem(`coin_box:${boxId}`);
-                if (loc) {
-                    setSymbol(loc);
-                } else {
-                    // ⭐️ 로컬에도 값이 없으면 디폴트 심볼로 설정 (로그아웃 시 초기화)
-                    setSymbol(initialSymbol); 
+                    // 로그아웃 상태: 로컬 스토리지 확인 후, 없으면 디폴트값 적용
+                    const loc = localStorage.getItem(`coin_box:${boxId}`);
+                    if (loc) {
+                        setSymbol(loc);
+                    } else {
+                        // ⭐️ 로컬에도 값이 없으면 디폴트 심볼로 설정 (로그아웃 시 초기화)
+                        setSymbol(initialSymbol);
+                    }
                 }
             }
-        });
+        );
 
         // 2. 초기 로드 시점의 세션 정보 처리 (onAuthStateChange가 비동기라 필요)
         (async () => {
@@ -164,9 +166,9 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
 
     const saveSymbol = async (next: string) => {
         const s = next.toLowerCase();
-        
-        // ⭐️ 심볼을 즉시 업데이트 (UI 및 웹소켓 트리거)
-        setSymbol(s); 
+
+        // 심볼을 즉시 업데이트 (UI 및 웹소켓 트리거)
+        setSymbol(s);
 
         if (userId) {
             // 로그인 상태: DB에 저장 (커스텀 값)
@@ -175,9 +177,9 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
                 .upsert([{ user_id: userId, box_id: boxId, symbol: s }], {
                     onConflict: "user_id,box_id",
                 });
-            
-            // ⭐️ 로그인 상태에서 로컬 스토리지에 남아있는 값이 있으면 충돌 방지를 위해 삭제하는 것이 좋습니다.
-            // localStorage.removeItem(`coin_box:${boxId}`); 
+
+            // 로그인 상태에서 로컬 스토리지에 남아있는 값이 있으면 충돌 방지를 위해 삭제하는 것이 좋습니다.
+            // localStorage.removeItem(`coin_box:${boxId}`);
         } else {
             // 로그아웃 상태: 로컬 스토리지에 저장 (임시 값)
             localStorage.setItem(`coin_box:${boxId}`, s);
