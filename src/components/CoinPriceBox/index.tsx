@@ -19,7 +19,7 @@ export const CoinPriceBox = ({ symbol }: { symbol: string }) => {
   }, [symbol]);
 
   return (
-    <div className="w-[120px] h-[80px] border rounded-lg shadow-md flex flex-col justify-center items-center">
+    <div className="min-w-30 w-full h-[110px] border rounded-lg shadow-md flex flex-col justify-center items-center">
       <h2 className="text-sm font-bold">{symbol.toUpperCase()}</h2>
       <p className="text-lg font-mono">
         {price ? `$${price}` : ""}

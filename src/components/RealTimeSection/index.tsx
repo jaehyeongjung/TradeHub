@@ -4,23 +4,20 @@ import LongShortRatioBox from "@/components/LongShortRatioBox";
 
 export const RealTimeSection = () => {
     return (
-        <div className="font-sans flex gap-5 h-35 mt-5 ml-5 items-center w-350 bg-gray-100 border-2 rounded-2xl">
-            <div className="flex gap-3 h-25 ml-6">
+        <div className="font-sans flex gap-5 min-h-35 mt-5 mx-auto items-center w-full min-w-310 bg-gray-100 border-2 rounded-2xl ">
+            <div className="flex gap-3 ml-6 w-full">
                 <CoinPriceBox symbol="btcusdt" />
                 <CoinPriceBox symbol="ethusdt" />
                 <CoinPriceBox symbol="xrpusdt" />
                 <CoinPriceBox symbol="solusdt" />
             </div>
             <CoinChart />
-            <div className="flex gap-4">
-                {/* 전체 계정 비율 (5m) */}
+            <div className="flex gap-4 w-full mr-5">
                 <LongShortRatioBox
                     symbol="BTCUSDT"
                     source="global"
                     period="5m"
                 />
-
-                {/* 상위 트레이더 포지션 비율 (15m) */}
                 <LongShortRatioBox
                     symbol="BTCUSDT"
                     source="top-trader"

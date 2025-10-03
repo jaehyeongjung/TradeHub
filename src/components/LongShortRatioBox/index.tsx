@@ -114,7 +114,7 @@ export default function LongShortRatioBox({
   }, [symbol, period, source, pollMs]);
 
   return (
-    <div className="w-[240px] h-[120px] border rounded-lg shadow-sm p-3 bg-white">
+    <div className="min-w-45 w-full h-[120px] border rounded-lg shadow-sm p-3 bg-white">
       <div className="flex items-center justify-between mb-1">
         <div className="font-semibold text-sm">{symbol}</div>
         <div className="text-[11px] text-gray-500">
