@@ -57,35 +57,42 @@ export default function AuthBox() {
 
     return (
         <form
-            className="space-y-2"
+            className="space-y-2 border-2 p-2 h-34 rounded-xl"
             onSubmit={(e) => {
                 e.preventDefault();
                 signIn();
             }}
         >
             <input
-                className="border px-2 py-1 w-full"
-                placeholder="email"
+                className="border px-2 py-1 w-full rounded-2xl "
+                placeholder="  email"
                 value={email}
                 onChange={(e) => setE(e.target.value)}
             />
             <input
-                className="border px-2 py-1 w-full"
-                placeholder="password"
+                className="border px-2 py-1 w-full rounded-2xl"
+                placeholder="  password"
                 type="password"
                 value={pw}
                 onChange={(e) => setP(e.target.value)}
             />
             <div className="flex gap-2">
-                <button type="submit" className="border px-3 py-1 w-full">
-                    <span className="text-xs whitespace-nowrap xl:text-lg">Sign in</span>
+                <button
+                    type="submit"
+                    className="border px-3 py-1 w-full rounded-2xl"
+                >
+                    <span className="text-xs whitespace-nowrap xl:text-sm ">
+                        Sign in
+                    </span>
                 </button>
                 <button
                     type="button"
-                    className="border px-3 py-1 w-full"
+                    className="border px-3 py-1 w-full rounded-2xl"
                     onClick={signUp}
                 >
-                    <span className="text-xs whitespace-nowrap xl:text-lg">Sign up</span>
+                    <span className="text-xs whitespace-nowrap xl:text-sm">
+                        Sign up
+                    </span>
                 </button>
             </div>
             {err && <p className="text-red-600 text-sm">{err}</p>}
