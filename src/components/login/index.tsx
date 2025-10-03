@@ -44,7 +44,7 @@ export default function AuthBox() {
 
     if (user) {
         return (
-            <div className="space-y-2 border-2 p-3.5 h-34 rounded-xl min-w-58.5 flex flex-col justify-center">
+            <div className="space-y-2 border-2 p-3.5 h-34 rounded-xl  flex flex-col justify-center">
                 <p>
                     환영합니다 <b>{user.email}</b>
                     <b> 님</b>
