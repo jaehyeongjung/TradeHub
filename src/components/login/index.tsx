@@ -99,7 +99,7 @@ export default function AuthBox() {
                     </span>
                 </button>
             </div>
-            {err && <p className="text-red-600 text-sm">{err}</p>}
+            {err && <p className="text-red-600 text-xs">{err}</p>}
         </form>
     );
 }
