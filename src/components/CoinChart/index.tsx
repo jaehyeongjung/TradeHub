@@ -107,7 +107,7 @@ export default function CoinChart({
     return (
         <div
             ref={containerRef}
-            className="w-full min-w-55 min-h-30 rounded-2xl overflow-hidden border"
+            className="cursor-pointer w-full min-w-55 min-h-30 rounded-2xl overflow-hidden border"
         />
     );
 }

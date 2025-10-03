@@ -50,7 +50,7 @@ export default function AuthBox() {
                     <b> 님</b>
                 </p>
                 <button
-                    className="border px-3 py-1 rounded-2xl text-gray-200"
+                    className="border px-3 py-1 rounded-2xl text-gray-200 cursor-pointer"
                     onClick={signOut}
                 >
                     Sign out

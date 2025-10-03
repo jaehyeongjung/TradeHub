@@ -43,6 +43,14 @@ function isRatioRowArray(x: unknown): x is RatioRow[] {
     );
 }
 
+// 툴팁에 표시될 설명 맵
+const DESCRIPTION_MAP: Record<Source, string> = {
+    global: "바이낸스 모든 계정의 롱/숏 비율,<br />시장 전체의 심리를 나타냅니다.",
+    "top-trader":
+        "바이낸스 상위 10% 트레이더들의 롱/숏 비율,<br /> 전문 투자자들의 심리를 반영합니다.",
+    taker: "테이커(시장가 주문) 매수/매도 비율, 현재 시장의 즉각적인 공격적인 주문 심리를 나타냅니다.",
+};
+
 export default function LongShortRatioBox({
     symbol = "BTCUSDT",
     period = "5m",
@@ -54,6 +62,9 @@ export default function LongShortRatioBox({
     const [longPct, setLongPct] = useState<number | null>(null);
     const [shortPct, setShortPct] = useState<number | null>(null);
     const [ts, setTs] = useState<number | null>(null);
+
+    // ⭐️ 툴팁 상태 추가
+    const [isHovered, setIsHovered] = useState(false);
 
     const endpoint = useMemo<string>(() => {
         switch (source) {
@@ -68,6 +79,7 @@ export default function LongShortRatioBox({
         }
     }, [source]);
 
+    // ... (fetchRatio 함수는 변경 없음) ...
     async function fetchRatio(): Promise<void> {
         try {
             setErr(null);
@@ -122,8 +134,15 @@ export default function LongShortRatioBox({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [symbol, period, source, pollMs]);
 
+    const description = DESCRIPTION_MAP[source];
+
     return (
-        <div className="min-w-45 w-full min-h-30  border rounded-lg shadow-sm p-3  bg-neutral-900">
+        // ⭐️ 컨테이너에 relative와 마우스 이벤트 핸들러 추가
+        <div
+            className="relative min-w-45 w-full min-h-30 border rounded-lg shadow-sm p-3 cursor-pointer bg-neutral-900"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
             <div className="flex items-center justify-between mb-1">
                 <div className="font-semibold text-sm text-gray-100">
                     {symbol}
@@ -170,6 +189,18 @@ export default function LongShortRatioBox({
                         {ts ? new Date(ts).toLocaleString() : ""}
                     </div>
                 </>
+            )}
+
+            {isHovered && (
+                <div className="absolute left-1/2 top-[calc(100%+8px)] z-50 w-64 -translate-x-1/2 rounded-lg bg-gray-700 p-3 text-xs text-white shadow-xl pointer-events-none">
+                    <p className="font-bold mb-1">지표 설명 ({source})</p>
+
+                    {/*  dangerouslySetInnerHTML을 사용하여 <br />이 작동하도록 수정 */}
+                    <p dangerouslySetInnerHTML={{ __html: description }} />
+
+                    {/* 툴팁 위쪽 꼬리 (Tail) */}
+                    <div className="absolute left-1/2 translate-x-[-50%] top-[-5px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-l-transparent border-r-transparent border-b-gray-700" />
+                </div>
             )}
         </div>
     );

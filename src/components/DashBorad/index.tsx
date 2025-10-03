@@ -2,7 +2,6 @@ import Chat from "../Chat";
 import AuthBox from "../login";
 import PostBoard from "../PostBoard";
 import LiveStatsBox from "../LiveStatsBox";
-import EconomicCalendar from "@/components/EconomicCalendar";
 import FearGreedWidget from "../Greed";
 
 export const DashBoard = () => {
@@ -14,7 +13,6 @@ export const DashBoard = () => {
             <div className="flex flex-col gap-5 min-w-57">
                 <AuthBox />
                 <LiveStatsBox />
-
                 <FearGreedWidget />
             </div>
             <div className="min-w-75 border-2 rounded-2xl flex flex-col items-center gap-3 h-[calc(100vh-200px)] bg-neutral-950">
