@@ -151,10 +151,6 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                     const newMsg = payload.new as Msg;
                     if (!newMsg?.id) return;
 
-                    // ✅ 변경점: '내 메시지 무시' 조건을 제거했습니다.
-                    //    NewsPanel에서 내가 보낸 메시지도 실시간으로 보이게 하려면
-                    //    아래 ID 중복 체크만으로 충분합니다.
-
                     setMsgs((prev) => {
                         if (prev.some((m) => m.id === newMsg.id)) return prev; // 중복 방지
                         const next = [...prev, newMsg];

@@ -29,10 +29,10 @@ function getFeedUrls(): FeedUrl[] {
         .filter((s) => s.length > 0);
 
     const defaults: string[] = [
-        "https://www.coindeskkorea.com/rss/allArticle.xml",
-        "https://www.tokenpost.kr/rss",
+        //"https://www.coindeskkorea.com/rss/allArticle.xml",
+        // "https://www.tokenpost.kr/rss",
         "https://www.blockmedia.co.kr/feed",
-        "https://kr.cointelegraph.com/rss",
+        // "https://kr.cointelegraph.com/rss",
     ];
 
     const src = list.length ? list : defaults;
