@@ -169,7 +169,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
         })();
     }, [roomId]);
 
-    // realtime messages
+    /// realtime messages
     useEffect(() => {
         const channelName = `room:${roomId}`;
         supabase
@@ -190,11 +190,10 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                 (payload) => {
                     const newMsg = payload.new as Msg;
                     if (!newMsg?.id) return;
-                    // 내가 방금 보낸 건 로컬 에코로 이미 반영됨
-                    if (newMsg.user_id === userIdRef.current) return;
 
+                    // ✅ 내 메시지도 포함해서 바로 붙이기 (중복만 방지)
                     setMsgs((prev) => {
-                        if (prev.some((m) => m.id === newMsg.id)) return prev; // 중복 방지
+                        if (prev.some((m) => m.id === newMsg.id)) return prev;
                         const next = [...prev, newMsg];
                         scrollToBottom();
                         return next;
