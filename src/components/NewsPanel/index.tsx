@@ -108,24 +108,30 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
                             표시할 뉴스가 없습니다.
                         </div>
                     ) : (
+                        // src/components/NewsPanel/index.tsx (렌더 부분만 교체)
                         <ul className="space-y-2">
                             {news.map((n) => (
                                 <li
                                     key={n.id}
                                     className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2"
                                 >
-                                    <div className="flex items-start justify-between gap-3">
-                                        <div className="min-w-0">
+                                    {/* 모바일: 세로로 쌓임 / md 이상: 좌우 배치 */}
+                                    <div className="md:flex md:items-start md:justify-between md:gap-3">
+                                        {/* 왼쪽(내용) */}
+                                        <div className="min-w-0 md:flex-1">
                                             <div className="text-xs text-neutral-400">
                                                 [{n.source}]
                                             </div>
+
+                                            {/* 제목은 모바일에서 2줄까지, md 이상은 한 줄 말줄임 */}
                                             <button
-                                                className="block w-full text-left truncate text-sm text-neutral-100 hover:underline"
+                                                className="block w-full text-left text-sm text-neutral-100 hover:underline line-clamp-2 md:line-clamp-1"
                                                 title={n.title}
                                                 onClick={() => openViewer(n)}
                                             >
                                                 {n.title}
                                             </button>
+
                                             <div className="mt-1 flex flex-wrap gap-1 items-center">
                                                 {(n.symbols ?? [])
                                                     .slice(0, 4)
@@ -147,9 +153,10 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
                                             </div>
                                         </div>
 
-                                        <div className="flex shrink-0 flex-col gap-1">
+                                        {/* 오른쪽(버튼영역) – 모바일에서는 아래로 내려오며 가로 100% */}
+                                        <div className="mt-2 md:mt-0 md:ml-3 w-full md:w-auto flex gap-1 md:shrink-0">
                                             <button
-                                                className="rounded cursor-pointer bg-neutral-800 px-2 py-1 text-[11px] text-neutral-200 hover:bg-neutral-700"
+                                                className="flex-1 md:flex-none rounded cursor-pointer bg-neutral-800 px-2 py-1 text-[11px] text-neutral-200 hover:bg-neutral-700"
                                                 onClick={() => openViewer(n)}
                                             >
                                                 열기
@@ -157,7 +164,7 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
                                             <button
                                                 disabled={!userId}
                                                 onClick={() => shareToChat(n)}
-                                                className={`rounded px-2 py-1 cursor-pointer text-[11px] ${
+                                                className={`flex-1 md:flex-none rounded px-2 py-1 text-[11px] ${
                                                     userId
                                                         ? "bg-emerald-600 text-white hover:bg-emerald-500"
                                                         : "bg-neutral-700 text-neutral-400 cursor-not-allowed"

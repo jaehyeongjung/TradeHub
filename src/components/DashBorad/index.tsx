@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 import Chat from "../Chat";
 import AuthBox from "../login";
 import PostBoard, { PostBoardHandle } from "../PostBoard";
@@ -9,9 +11,32 @@ import FearGreedWidget from "../Greed";
 import YouTubeSeamlessPlayer from "@/components/YouTubeBGMPlayer";
 import NewsPanel from "../NewsPanel";
 
+type TabKey = "board" | "news";
+
 export const DashBoard = () => {
-    const [tab, setTab] = useState<"board" | "news">("board");
     const postRef = useRef<PostBoardHandle>(null);
+
+    const router = useRouter();
+
+    const pathname = usePathname() ?? "/"; // string 보장
+    const sp = useSearchParams(); // ReadonlyURLSearchParams | null
+    const paramsForRead = sp ?? new URLSearchParams(); // 읽기용 대체
+    const paramsForWrite = new URLSearchParams(sp?.toString() ?? ""); // 쓰기용 복사본
+
+    // 현재 탭 (기본 board)
+    const activeTab: TabKey =
+        paramsForRead.get("tab") === "news" ? "news" : "board";
+
+    const switchTab = (next: TabKey) => {
+        if (next === "board") {
+            paramsForWrite.delete("tab"); // 기본 탭이면 제거해서 URL 깔끔하게
+        } else {
+            paramsForWrite.set("tab", "news");
+        }
+        const qs = paramsForWrite.toString();
+
+        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    };
 
     return (
         <div className="flex gap-5 mt-5 min-h-130 h-[calc(100vh-200px)]">
@@ -19,12 +44,11 @@ export const DashBoard = () => {
             <div className="min-w-163 w-full h-full border-2 rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950">
                 {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
                 <div className="flex items-center gap-2">
-                    {/* 탭 버튼 묶음 */}
                     <div className="inline-flex items-center rounded-lg bg-neutral-800 p-1 ml-3">
                         <button
-                            onClick={() => setTab("board")}
+                            onClick={() => switchTab("board")}
                             className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition ${
-                                tab === "board"
+                                activeTab === "board"
                                     ? "bg-neutral-700 text-white"
                                     : "text-neutral-300 hover:text-white"
                             }`}
@@ -32,9 +56,9 @@ export const DashBoard = () => {
                             게시판
                         </button>
                         <button
-                            onClick={() => setTab("news")}
+                            onClick={() => switchTab("news")}
                             className={`px-3 py-1.5 text-sm rounded-md transition cursor-pointer ${
-                                tab === "news"
+                                activeTab === "news"
                                     ? "bg-neutral-700 text-white"
                                     : "text-neutral-300 hover:text-white"
                             }`}
@@ -43,9 +67,8 @@ export const DashBoard = () => {
                         </button>
                     </div>
 
-                    {/* 우측 정렬 영역 */}
                     <div className="ml-auto">
-                        {tab === "board" && (
+                        {activeTab === "board" && (
                             <button
                                 onClick={() => postRef.current?.openWrite()}
                                 className="border rounded px-3 py-1 bg-black text-xs mr-3 text-gray-100 hover:bg-neutral-800 cursor-pointer"
@@ -56,10 +79,8 @@ export const DashBoard = () => {
                     </div>
                 </div>
 
-                {/* 탭 콘텐츠 */}
                 <div className="flex-1 min-h-0">
-                    {tab === "board" ? (
-                        // 내부 버튼은 숨김 (showInternalWriteButton 생략/false)
+                    {activeTab === "board" ? (
                         <PostBoard ref={postRef} />
                     ) : (
                         <NewsPanel roomId="lobby" />
@@ -67,7 +88,6 @@ export const DashBoard = () => {
                 </div>
             </div>
 
-            {/* 가운데: 로그인/지표/위젯 */}
             <div className="flex flex-col gap-5 min-w-57">
                 <AuthBox />
                 <LiveStatsBox />
@@ -75,7 +95,6 @@ export const DashBoard = () => {
                 <YouTubeSeamlessPlayer videoId="j23SO29LNWE" />
             </div>
 
-            {/* 오른쪽: 채팅 */}
             <div className="min-w-75 border-2 rounded-2xl flex flex-col items-center gap-3 h-[calc(100vh-200px)] bg-neutral-950">
                 <Chat />
             </div>
