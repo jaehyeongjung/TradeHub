@@ -150,10 +150,13 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                 (payload) => {
                     const newMsg = payload.new as Msg;
                     if (!newMsg?.id) return;
-                    if (newMsg.user_id === userIdRef.current) return;
+
+                    // ✅ 변경점: '내 메시지 무시' 조건을 제거했습니다.
+                    //    NewsPanel에서 내가 보낸 메시지도 실시간으로 보이게 하려면
+                    //    아래 ID 중복 체크만으로 충분합니다.
 
                     setMsgs((prev) => {
-                        if (prev.some((m) => m.id === newMsg.id)) return prev;
+                        if (prev.some((m) => m.id === newMsg.id)) return prev; // 중복 방지
                         const next = [...prev, newMsg];
                         scrollToBottom();
                         return next;
@@ -337,21 +340,13 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
             <style
                 dangerouslySetInnerHTML={{
                     __html: `
-                    /* Scrollbar Hide Fix: 모든 브라우저에서 스크롤바를 강제로 숨깁니다. */
-                    .scrollbar-hide::-webkit-scrollbar {
-                        width: 0 !important;
-                        height: 0 !important;
-                        display: none;
-                    }
-                    .scrollbar-hide {
-                        scrollbar-width: none; /* Firefox */
-                        -ms-overflow-style: none;  /* IE and Edge */
-                    }
-                `,
+            .scrollbar-hide::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none; }
+            .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+          `,
                 }}
             />
             <div className="h-full flex flex-col p-3 text-white ">
-                {/* 헤더: 항상 보이게 유지 (로그아웃 시 버튼 비활성화) */}
+                {/* 헤더 */}
                 <div className="mb-3 rounded-xl border border-neutral-700 bg-neutral-900/80 p-3 space-y-2 shadow-lg">
                     <div className="flex justify-between items-center text-[12px]">
                         <div>
@@ -383,7 +378,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                         </div>
                     </div>
 
-                    {/* 게이지: 레드 전체 바 + 그린 오버레이 (overflow-hidden으로 깔끔) */}
+                    {/* 게이지 */}
                     <div className="relative w-full h-[10px] rounded-full overflow-hidden">
                         <div className="absolute inset-0 bg-red-600" />
                         <motion.div
@@ -397,7 +392,6 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                         )}
                     </div>
 
-                    {/* 선택 버튼: 로그인 전 비활성화, 선택 후 숨김 */}
                     {!myChoice && (
                         <div className="flex gap-2 pt-1">
                             <motion.button
@@ -430,7 +424,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                     )}
                 </div>
 
-                {/* 메시지 리스트 (스크롤바 숨김 적용) */}
+                {/* 메시지 리스트 */}
                 <div
                     ref={listRef}
                     className="flex-1 min-h-0 overflow-y-auto space-y-2 pr-1 pb-2 scrollbar-hide"
@@ -480,7 +474,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                     )}
                 </div>
 
-                {/* 입력바 (그대로) */}
+                {/* 입력바 */}
                 <div className="border-t border-neutral-800 pt-1">
                     <div className="flex gap-2">
                         <input

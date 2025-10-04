@@ -1,8 +1,14 @@
 "use client";
+
+import React, {
+    useEffect,
+    useState,
+    forwardRef,
+    useImperativeHandle,
+} from "react";
 import { supabase } from "@/lib/supabase-browser";
 import WriteForm from "@/components/WriteForm";
 import Comments from "@/components/Comment";
-import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 
 type Post = {
@@ -14,7 +20,7 @@ type Post = {
     created_at: string;
 };
 
-// Custom Modal Component (for alerts/confirms, used here to replace alert/confirm)
+// Custom Modal Component
 const CustomModal: React.FC<{
     message: string;
     onConfirm: () => void;
@@ -50,7 +56,21 @@ const CustomModal: React.FC<{
     </div>
 );
 
-export default function PostSection() {
+// 부모가 호출할 수 있는 메서드 타입
+export type PostBoardHandle = {
+    openWrite: () => void;
+    backToList: () => void;
+};
+
+type Props = {
+    /** 내부에 예전처럼 '글쓰기' 버튼을 보여주고 싶을 때만 true */
+    showInternalWriteButton?: boolean;
+};
+
+const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
+    { showInternalWriteButton = false },
+    ref
+) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [mode, setMode] = useState<"list" | "write" | "detail" | "edit">(
         "list"
@@ -62,6 +82,16 @@ export default function PostSection() {
         isConfirm: boolean;
         onConfirm?: () => void;
     } | null>(null);
+
+    // 부모에서 openWrite()/backToList() 호출 가능
+    useImperativeHandle(
+        ref,
+        () => ({
+            openWrite: () => setMode("write"),
+            backToList: () => setMode("list"),
+        }),
+        []
+    );
 
     // 로그인 세션 + 구독
     useEffect(() => {
@@ -158,16 +188,16 @@ export default function PostSection() {
         });
     };
 
-    // 썸네일 이미지 (목록)
+    // 썸네일 (목록)
     const Thumb = ({ url }: { url?: string | null }) =>
         url ? (
             <Image
                 src={url}
                 alt="thumb"
-                width={96} // w-24
-                height={96} // h-24
+                width={96}
+                height={96}
                 className="object-cover rounded mr-3 flex-shrink-0"
-                unoptimized // Supabase public URL은 최적화 제외 필요
+                unoptimized
             />
         ) : null;
 
@@ -186,21 +216,12 @@ export default function PostSection() {
 
     return (
         <>
-            {/* Scrollbar Hide CSS Fix: PostSection 전체에 적용 */}
             <style
                 dangerouslySetInnerHTML={{
                     __html: `
-                    /* Scrollbar Hide Fix: 모든 브라우저에서 스크롤바를 강제로 숨깁니다. */
-                    .scrollbar-hide::-webkit-scrollbar {
-                        width: 0 !important;
-                        height: 0 !important;
-                        display: none;
-                    }
-                    .scrollbar-hide {
-                        scrollbar-width: none; /* Firefox */
-                        -ms-overflow-style: none;  /* IE and Edge */
-                    }
-                `,
+          .scrollbar-hide::-webkit-scrollbar{width:0!important;height:0!important;display:none}
+          .scrollbar-hide{scrollbar-width:none;-ms-overflow-style:none}
+        `,
                 }}
             />
 
@@ -208,12 +229,15 @@ export default function PostSection() {
                 {/* 목록 */}
                 {mode === "list" && (
                     <div className="flex-1 overflow-auto scrollbar-hide">
-                        <button
-                            onClick={() => setMode("write")}
-                            className="mb-3 border rounded px-3 py-1 bg-black text-gray-100"
-                        >
-                            글쓰기
-                        </button>
+                        {/* 내부 글쓰기 버튼은 기본 숨김 (부모에서 우측 상단 버튼 사용) */}
+                        {showInternalWriteButton && (
+                            <button
+                                onClick={() => setMode("write")}
+                                className="mb-3 border rounded px-3 py-1 bg-black text-gray-100 cursor-pointer"
+                            >
+                                글쓰기
+                            </button>
+                        )}
 
                         {posts.map((p) => (
                             <div
@@ -316,7 +340,7 @@ export default function PostSection() {
                 )}
             </div>
 
-            {/* Custom Modal 렌더링 */}
+            {/* Custom Modal */}
             {modal && (
                 <CustomModal
                     message={modal.message}
@@ -327,4 +351,6 @@ export default function PostSection() {
             )}
         </>
     );
-}
+});
+
+export default PostBoard;

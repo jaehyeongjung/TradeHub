@@ -41,15 +41,15 @@ export default function WriteForm({
     };
 
     return (
-        <div className="border rounded-xl p-3 bg-white space-y-2">
+        <div className="border rounded-xl p-3 bg-neutral-900 space-y-2 text-gray-200">
             <input
-                className="w-full border rounded px-3 py-2"
+                className="w-full border rounded px-3 py-2 text-gray-200"
                 placeholder="제목"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
             />
             <textarea
-                className="w-full border rounded px-3 py-2 h-40 resize-none"
+                className="w-full border rounded px-3 py-2 h-40 resize-none text-gray-200"
                 placeholder="내용"
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
@@ -61,13 +61,16 @@ export default function WriteForm({
             />
             <div className="flex gap-2">
                 <button
-                    className="border rounded px-3 py-1 bg-emerald-600 text-white disabled:opacity-60"
+                    className="border rounded px-3 py-1 bg-emerald-600 text-white  text-xs disabled:opacity-60 cursor-pointer"
                     onClick={submit}
                     disabled={loading}
                 >
                     {loading ? "저장 중…" : "저장"}
                 </button>
-                <button className="border rounded px-3 py-1" onClick={onCancel}>
+                <button
+                    className="border rounded px-3 py-1 text-xs text-gray-200 cursor-pointer"
+                    onClick={onCancel}
+                >
                     취소
                 </button>
             </div>
