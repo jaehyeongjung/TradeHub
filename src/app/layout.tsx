@@ -8,7 +8,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="ko" className="bg-black">
-            <body className="">
+            <body>
                 <AuthGate>{children}</AuthGate>
             </body>
         </html>
