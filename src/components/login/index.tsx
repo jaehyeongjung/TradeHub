@@ -1,4 +1,3 @@
-// src/components/AuthBox.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -55,7 +54,7 @@ export default function AuthBox() {
         const p = pw.trim();
 
         if (!e || !p) {
-            setErr("회원가입하려면 이메일과 비밀번호를 기입해주세요.");
+            setErr("이메일과 비밀번호를 기입 후 메일확인 (스팸)");
             return;
         }
 
@@ -91,7 +90,7 @@ export default function AuthBox() {
         const e = email.trim();
         const p = pw.trim();
         if (!e || !p) {
-            setErr("로그인하려면 이메일과 비밀번호를 입력해주세요.");
+            setErr("이메일과 비밀번호를 입력해주세요.");
             return;
         }
 
@@ -117,9 +116,9 @@ export default function AuthBox() {
 
     if (user) {
         return (
-            <div className="space-y-2 border-2 p-3.5 h-34 rounded-xl flex flex-col justify-center bg-neutral-950">
-                <p className="text-gray-200">
-                    환영합니다 <b>{user.email}</b>
+            <div className="space-y-2 border-2 p-3.5 h-34 rounded-xl flex flex-col justify-center bg-neutral-950 gap-1">
+                <p className="text-gray-200 ml-2">
+                    환영합니다 <b className="text-sm">{user.email}</b>
                     <b> 님</b>
                 </p>
                 <button
@@ -134,7 +133,7 @@ export default function AuthBox() {
 
     return (
         <form
-            className="space-y-2 border-2 p-2 rounded-xl bg-neutral-950"
+            className="space-y-2 border-2 p-2 rounded-xl flex flex-col gap-0.5 bg-neutral-950"
             onSubmit={(e) => {
                 e.preventDefault();
                 void signIn();
@@ -146,13 +145,16 @@ export default function AuthBox() {
                 </div>
             )}
             {err && (
-                <div className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-red-400 text-xs">
+                <div
+                    className="rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-red-400"
+                    style={{ fontSize: "0.625rem" }}
+                >
                     {err}
                 </div>
             )}
 
             <input
-                className="border pl-4 py-2 w-full rounded-2xl text-gray-200 bg-neutral-900 outline-none focus:ring-2 focus:ring-emerald-600/40"
+                className="border pl-4 py-2 w-full h-8 text-xs rounded-2xl text-gray-200 bg-neutral-900 outline-none focus:ring-2 focus:ring-emerald-600/40"
                 placeholder="email"
                 value={email}
                 onChange={(e) => setE(e.target.value)}
@@ -160,7 +162,7 @@ export default function AuthBox() {
                 inputMode="email"
             />
             <input
-                className="border pl-4 py-2 w-full rounded-2xl text-gray-200 bg-neutral-900 outline-none focus:ring-2 focus:ring-emerald-600/40"
+                className="border pl-4 py-2 w-full h-8 text-xs rounded-2xl text-gray-200 bg-neutral-900 outline-none focus:ring-2 focus:ring-emerald-600/40"
                 placeholder="password"
                 type="password"
                 value={pw}
@@ -172,20 +174,20 @@ export default function AuthBox() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="border px-3 py-2 w-full rounded-2xl border-gray-200 disabled:opacity-60 hover:bg-emerald-700/70 transition"
+                    className="border px-3 py-2 w-full rounded-2xl h-8 flex items-center justify-center border-gray-200 disabled:opacity-60 hover:bg-emerald-700/70 transition"
                 >
                     <span className="text-xs xl:text-sm text-gray-200 cursor-pointer">
-                        {loading ? "로그인 중…" : "Sign in"}
+                        {"Sign in"}
                     </span>
                 </button>
                 <button
                     type="button"
                     disabled={loading}
-                    className="border px-3 py-2 w-full rounded-2xl border-gray-200 disabled:opacity-60 hover:bg-red-700/70 transition"
+                    className="border px-3 py-2 w-full h-8 flex items-center justify-center rounded-2xl border-gray-200 disabled:opacity-60 hover:bg-red-700/70 transition"
                     onClick={() => void signUp()}
                 >
                     <span className="text-xs xl:text-sm text-gray-200 cursor-pointer">
-                        {loading ? "가입 중…" : "Sign up"}
+                        {"Sign up"}
                     </span>
                 </button>
             </div>

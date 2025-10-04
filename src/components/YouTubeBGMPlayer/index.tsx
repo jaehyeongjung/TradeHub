@@ -116,7 +116,7 @@ export default function YouTubeBGMPlayer({
     }, [isMuted, isReady]);
 
     return (
-        <div className="flex justify-center p-3">
+        <div className="flex justify-center">
             {/*  플레이어 컨테이너 (화면 밖으로 완전히 숨김) */}
             <div
                 id="youtube-player-container"
