@@ -7,8 +7,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="ko">
-            <body>
+        <html lang="ko" className="bg-black">
+            <body className="">
                 <AuthGate>{children}</AuthGate>
             </body>
         </html>
