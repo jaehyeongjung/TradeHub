@@ -157,7 +157,7 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
                                             <button
                                                 disabled={!userId}
                                                 onClick={() => shareToChat(n)}
-                                                className={`rounded px-2 py-1 text-[11px] ${
+                                                className={`rounded px-2 py-1 cursor-pointer text-[11px] ${
                                                     userId
                                                         ? "bg-emerald-600 text-white hover:bg-emerald-500"
                                                         : "bg-neutral-700 text-neutral-400 cursor-not-allowed"
