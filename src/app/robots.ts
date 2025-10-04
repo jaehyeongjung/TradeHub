@@ -1,10 +1,9 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-    const base = "https://trade-hub-neon.vercel.app";
     return {
         rules: [{ userAgent: "*", allow: "/" }],
-        sitemap: `${base}/sitemap.xml`,
-        host: base,
+        sitemap: "https://www.tradehub.kr/sitemap.xml",
+        host: "https://www.tradehub.kr",
     };
 }

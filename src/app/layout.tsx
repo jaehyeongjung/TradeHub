@@ -1,18 +1,16 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import AuthGate from "@/components/AuthGate";
+import Script from "next/script";
 
-const SITE = "https://trade-hub-neon.vercel.app";
+const SITE = "https://www.tradehub.kr";
 
 export const metadata: Metadata = {
     metadataBase: new URL(SITE),
-    title: {
-        default: "TradeHub",
-        template: "%s | TradeHub",
-    },
+    title: { default: "TradeHub", template: "%s | TradeHub" },
     description: "트레이더를 위한 실시간 포지션/채팅/뉴스 허브",
     keywords: ["트레이딩", "비트코인", "코인", "뉴스", "포지션", "TradeHub"],
-    alternates: { canonical: SITE + "/" },
+    alternates: { canonical: "/" },
     openGraph: {
         type: "website",
         url: SITE,
@@ -28,9 +26,9 @@ export const metadata: Metadata = {
         images: ["/og.png"],
     },
     icons: { icon: "/favicon.ico" },
+
     verification: {
-        // 콘솔에서 받는 코드로 교체
-        google: "google-site-verification: googleee33be5b3c8d6d9c.html",
+        google: "GOOGLE_SITE_VERIFICATION_CODE",
         other: { "naver-site-verification": "NAVER_SITE_VERIFICATION_CODE" },
     },
 };
@@ -44,6 +42,19 @@ export default function RootLayout({
         <html lang="ko" className="bg-black">
             <body>
                 <AuthGate>{children}</AuthGate>
+                <Script
+                    async
+                    src="https://www.googletagmanager.com/gtag/js?id=G-PHXWQJSM4Z"
+                    strategy="afterInteractive"
+                />
+                <Script id="ga4-inline" strategy="afterInteractive">
+                    {`
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PHXWQJSM4Z', { send_page_view: true });
+    `}
+                </Script>
             </body>
         </html>
     );
