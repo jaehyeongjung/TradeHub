@@ -149,7 +149,7 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
 
                                         <div className="flex shrink-0 flex-col gap-1">
                                             <button
-                                                className="rounded bg-neutral-800 px-2 py-1 text-[11px] text-neutral-200 hover:bg-neutral-700"
+                                                className="rounded cursor-pointer bg-neutral-800 px-2 py-1 text-[11px] text-neutral-200 hover:bg-neutral-700"
                                                 onClick={() => openViewer(n)}
                                             >
                                                 열기
