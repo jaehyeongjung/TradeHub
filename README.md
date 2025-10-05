@@ -1,8 +1,7 @@
 # TradeHub  
 
-> **A 24/7 crypto traders’ hub with real-time chat, live prices, and a vibrant community.**  
-> 실시간 **채팅**, 실시간 **코인 시세**, **Top Trader의 선물 포지션 비율**,  
-> 그리고 **커뮤니티**가 함께하는 24시간 크립토 트레이더 허브.  
+> “투자는 외롭다.” 그래서 만든, 실시간 트레이더 허브  
+> 24시간 시세·채팅·뉴스·Top Trader 포지션을 한 화면에서 볼 수 있는 PC 기반 서비스
 >  
 > <sub>⚠️ **PC 버전만 지원** — 대부분의 트레이더는 PC 환경에서 시세를 확인하고 분석하기 때문에,  
 > 초기 MVP 단계에서는 **데스크톱 UX 최적화**에 집중했습니다.</sub>
