@@ -63,7 +63,7 @@ export default function LongShortRatioBox({
     const [shortPct, setShortPct] = useState<number | null>(null);
     const [ts, setTs] = useState<number | null>(null);
 
-    // ⭐️ 툴팁 상태 추가
+    //  툴팁 상태 추가
     const [isHovered, setIsHovered] = useState(false);
 
     const endpoint = useMemo<string>(() => {
@@ -137,7 +137,6 @@ export default function LongShortRatioBox({
     const description = DESCRIPTION_MAP[source];
 
     return (
-        // ⭐️ 컨테이너에 relative와 마우스 이벤트 핸들러 추가
         <div
             className="relative min-w-45 w-full min-h-30 border rounded-lg shadow-sm p-3 cursor-pointer bg-neutral-900"
             onMouseEnter={() => setIsHovered(true)}

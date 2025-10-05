@@ -4,7 +4,8 @@ import { DashBoard } from "@/components/DashBorad";
 const SITE = "https://www.tradehub.kr";
 
 export const Home = () => {
-    // Organization + WebSite 구조화 데이터
+    // 검색엔진(구글, 네이버)이 사이트 정보를 이해할 수 있게 하는 구조화 데이터(JSON-LD)
+    // Organization(운영 주체 정보) + WebSite(사이트 메타정보) 두 가지를 정의
     const jsonLd = [
         {
             "@context": "https://schema.org",
@@ -34,6 +35,7 @@ export const Home = () => {
         },
     ];
 
+    // scrpt: JSON-LD 데이터를 실제 HTML로 삽입해서 SEO에 효과를 주는 부분
     return (
         <>
             <script

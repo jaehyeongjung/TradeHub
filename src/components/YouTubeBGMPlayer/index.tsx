@@ -85,7 +85,7 @@ export default function YouTubeBGMPlayer({
                         playerRef.current.setVolume(initialVolume);
                         setIsReady(true);
                     },
-                    // ⭐️ YTErrorEvent 타입 적용
+                    //  YTErrorEvent 타입 적용
                     onError: (error: YTErrorEvent) => {
                         console.error("YouTube Player Error Code:", error.data);
                     },

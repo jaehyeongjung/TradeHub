@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { supabase } from "@/lib/supabase-browser";
 import { motion } from "framer-motion";
 
-// --- Types ---
 interface PostgrestError {
     message: string;
     details: string | null;

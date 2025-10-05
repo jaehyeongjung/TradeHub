@@ -15,7 +15,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
     const [pct, setPct] = useState<number | null>(null);
     const [open, setOpen] = useState(false);
 
-    // userId 상태는 로그인 여부와 현재 사용자 ID를 추적합니다.
+    // userId 상태는 로그인 여부와 현재 사용자 ID를 추적
     const [userId, setUserId] = useState<string | null>(null);
 
     // --- 레이스 방지용 ---
@@ -62,7 +62,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
                     if (loc) {
                         setSymbol(loc);
                     } else {
-                        // ⭐️ 로컬에도 값이 없으면 디폴트 심볼로 설정 (로그아웃 시 초기화)
+                        // 로컬에도 값이 없으면 디폴트 심볼로 설정 (로그아웃 시 초기화)
                         setSymbol(initialSymbol);
                     }
                 }
