@@ -1,7 +1,7 @@
 import { RealTimeSection } from "@/components/RealTimeSection";
 import { DashBoard } from "@/components/DashBorad";
 
-const SITE = "https://trade-hub-neon.vercel.app";
+const SITE = "https://www.tradehub.kr";
 
 export const Home = () => {
     // Organization + WebSite 구조화 데이터
@@ -11,7 +11,6 @@ export const Home = () => {
             "@type": "Organization",
             name: "TradeHub",
             url: SITE,
-            // 512x512 정도의 실제 파일이 /public 에 있어야 함 (없으면 있는 큰 아이콘/og로 바꿔줘)
             logo: `${SITE}/favicon-512.png`,
             sameAs: [],
             contactPoint: [
