@@ -4,22 +4,90 @@
 > 실시간 **채팅**, 실시간 **코인 시세**, **Top Trader의 선물 포지션 비율**,  
 > 그리고 **커뮤니티**가 함께하는 24시간 크립토 트레이더 허브.  
 >  
-> ⚠️ **PC 버전만 지원** — 대부분의 트레이더는 PC 환경에서 시세를 확인하고 분석하기 때문에,  
-> 초기 MVP 단계에서는 **데스크톱 UX 최적화**에 집중했습니다.
+> <sub>⚠️ **PC 버전만 지원** — 대부분의 트레이더는 PC 환경에서 시세를 확인하고 분석하기 때문에,  
+> 초기 MVP 단계에서는 **데스크톱 UX 최적화**에 집중했습니다.</sub>
+
+<p align="center">
+  <img width="90%" alt="TradeHub Main Screenshot" src="https://github.com/user-attachments/assets/3d456059-7b09-44f6-90c8-da2abe08bfdc" />
+</p>
+
 
 <p align="center">
   <a href="https://www.tradehub.kr/" target="_blank" rel="noopener noreferrer">
-    <img src="https://img.shields.io/badge/Visit%20TradeHub-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Visit TradeHub"/>
+    <img 
+      src="https://img.shields.io/badge/Visit%20TradeHub-10B981?style=for-the-badge&labelColor=000000&color=10B981"
+      alt="Visit TradeHub"
+    />
   </a>
 </p>
 
 ---
 
-## Main
 
-<p align="center">
-  <img width="90%" alt="TradeHub Main Screenshot" src="https://github.com/user-attachments/assets/3d456059-7b09-44f6-90c8-da2abe08bfdc" />
-</p>
+
+
+## Features  
+
+### 1. 코인 실시간 가격 
+#### 클릭 시 원하는 코인의 실시간 시세를 볼 수 있게 커스텀 기능
+
+<img width="555" height="200" alt="스크린샷 2025-10-05 오후 3 19 37" src="https://github.com/user-attachments/assets/a044e66c-6fe3-490c-948f-3e602abcf6ce" />
+
+#### 로그인 상태에서 설정 해둔 코인은 유지
+
+<img width="373" height="200" alt="스크린샷 2025-10-05 오후 3 20 06" src="https://github.com/user-attachments/assets/d9ec2ba2-0ed6-4c8c-b72a-eec64460e965" />
+
+
+---
+
+### 2. 실시간 차트 기능
+#### 실시간 BTC 차트 기능 (커스텀 기능 업데이트 예정)
+<img width="419" height="200" alt="스크린샷 2025-10-05 오후 3 20 25" src="https://github.com/user-attachments/assets/f7d1fc05-6937-4f83-a070-026834284c5b" />
+
+---
+
+### 3. 트레이딩 포지션 비율 
+#### 5분 단위 글로벌 트레이딩 포지션과 Top Trader의 포지션 비율 갱신 
+<img width="455" height="227" alt="스크린샷 2025-10-05 오후 3 20 48" src="https://github.com/user-attachments/assets/30c0c390-e8a1-4edc-b06e-f36a9c67d41a" />
+<img width="455" height="227" alt="스크린샷 2025-10-05 오후 3 20 41" src="https://github.com/user-attachments/assets/bb545af0-e2e0-4290-beb4-c3ba47f9f5ad" />
+
+
+---
+
+### 4.실시간 채팅 기능 
+#### Supabase **Realtime** 기반의 **실시간 채팅**  
+#### 본인 포지션을 공유하고 닉네임에 포지션이 표시, 커뮤니티 속 포지션 비율을 한 눈에 볼 수 있음 
+
+<img width="455" height="516" alt="스크린샷 2025-10-05 오후 3 53 16" src="https://github.com/user-attachments/assets/2d933921-b1ac-4c5d-9aa1-846e5ed43421" />
+
+---
+
+### 5. 코인 뉴스 대시보드
+#### 하루 단위로 최신 뉴스 자동 수집
+
+<img width="701" height="518" alt="스크린샷 2025-10-05 오후 4 00 14" src="https://github.com/user-attachments/assets/85771355-c40f-48a4-9c4d-91fce38c7649" />
+
+#### 뉴스는 페이지 이동이 아닌 iframe 형식으로 페이지 이탈을 줄임 
+<img width="1264" height="673" alt="스크린샷 2025-10-05 오후 4 00 25" src="https://github.com/user-attachments/assets/25bccf04-8705-4436-8159-463fb477d2f9" />
+
+
+#### 채팅에 공유 클릭 시 실시간으로 채팅방에 공유 기능
+<img width="437" height="146" alt="스크린샷 2025-10-05 오후 4 00 42" src="https://github.com/user-attachments/assets/bf33b498-ccdd-43dd-ab3d-4288b2bfc8c8" />
+
+---
+
+### 6. Crypto Fear & Greed 대시보드 
+#### 암호화폐 시장의 투자 심리를 0(극심한 공포)부터 100(극심한 탐욕)까지 나타내는 지수
+#### 공포는 가격 하락, 탐욕은 가격 상승과 연관되는 경향이 있고 포지션을 잡는 지표 중 하나 
+
+<img width="254" height="229" alt="스크린샷 2025-10-05 오후 4 03 59" src="https://github.com/user-attachments/assets/245d2fb5-a0b1-4da6-902a-ee0fc4d13c6d" />
+
+---
+### 7. 게시글 대시보드
+<img width="683" height="382" alt="스크린샷 2025-10-05 오후 4 04 12" src="https://github.com/user-attachments/assets/08c71721-893c-4c1e-9e1b-b134d15f2a2a" />
+
+
+
 
 ---
 
@@ -43,15 +111,7 @@
 
 ---
 
-## Features  
-
-- 실시간 **코인 시세** 및 **Top Trader 포지션 비율** 시각화  
-- Supabase **Realtime** 기반의 **실시간 채팅**  
-- 사용자 **게시글 작성 및 피드백 시스템**  
-- **코인 뉴스 대시보드** — 하루 단위로 최신 뉴스 자동 수집  
-
----
-
 <p align="center">
   <sub>Built by <strong>정재형</strong></sub>
+  <sub><strong>Contact: whird398@naver.com</strong></suv>
 </p>
