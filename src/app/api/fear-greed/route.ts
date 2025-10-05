@@ -4,7 +4,6 @@ export async function GET() {
     const r = await fetch(
         "https://api.alternative.me/fng/?limit=1&format=json",
         {
-            // (Vercel/Next 15) 기본 캐시 끄고 싶으면:
             cache: "no-store",
         }
     );
