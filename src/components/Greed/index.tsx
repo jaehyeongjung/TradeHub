@@ -53,7 +53,7 @@ export default function FearGreedCard() {
 
     return (
         <div
-            className="relative rounded-2xl border border-neutral-800 bg-neutral-900"
+            className="relative rounded-2xl border border-neutral-800 bg-neutral-900 cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >

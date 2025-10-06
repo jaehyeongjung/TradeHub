@@ -174,7 +174,7 @@ export default function AuthBox() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="border px-3 py-2 w-full rounded-2xl h-8 flex items-center justify-center border-gray-200 disabled:opacity-60 hover:bg-emerald-700/70 transition"
+                    className="border px-3 py-2 w-full rounded-2xl h-8 cursor-pointer flex items-center justify-center border-gray-200 disabled:opacity-60 hover:bg-emerald-700/70 transition"
                 >
                     <span className="text-xs xl:text-sm text-gray-200 cursor-pointer">
                         {"Sign in"}
@@ -183,7 +183,7 @@ export default function AuthBox() {
                 <button
                     type="button"
                     disabled={loading}
-                    className="border px-3 py-2 w-full h-8 flex items-center justify-center rounded-2xl border-gray-200 disabled:opacity-60 hover:bg-red-700/70 transition"
+                    className="border px-3 py-2 w-full h-8 flex cursor-pointer items-center justify-center rounded-2xl border-gray-200 disabled:opacity-60 hover:bg-red-700/70 transition"
                     onClick={() => void signUp()}
                 >
                     <span className="text-xs xl:text-sm text-gray-200 cursor-pointer">
