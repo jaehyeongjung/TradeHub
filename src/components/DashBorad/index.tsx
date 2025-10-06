@@ -10,6 +10,7 @@ import LiveStatsBox from "../LiveStatsBox";
 import FearGreedWidget from "../Greed";
 import YouTubeSeamlessPlayer from "@/components/YouTubeBGMPlayer";
 import NewsPanel from "../NewsPanel";
+import KimchiWidget from "@/components/KimchiWidget";
 
 type TabKey = "board" | "news";
 
@@ -88,7 +89,7 @@ export const DashBoard = () => {
       </div>
 
       <div className="flex flex-col gap-5 min-w-57">
-        <AuthBox />
+        <KimchiWidget/>
         <LiveStatsBox />
         <FearGreedWidget />
         <YouTubeSeamlessPlayer videoId="j23SO29LNWE" />

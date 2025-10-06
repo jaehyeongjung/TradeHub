@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import AuthGate from "@/components/AuthGate";
 import Script from "next/script";
+import FloatingLoginSidebar from "@/components/FloatingLoginDrawer";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -83,6 +84,7 @@ export default function RootLayout({
       gtag('config', 'G-PHXWQJSM4Z', { send_page_view: true });
     `}
                 </Script>
+                <FloatingLoginSidebar />
             </body>
         </html>
     );
