@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import Chat from "../Chat";
-import AuthBox from "../login";
 import PostBoard, { PostBoardHandle } from "../PostBoard";
 import LiveStatsBox from "../LiveStatsBox";
 import FearGreedWidget from "../Greed";

@@ -139,7 +139,7 @@ export default function YouTubeBGMPlayer({
                     ${
                         isMuted
                             ? "bg-neutral-600 hover:bg-neutral-700"
-                            : "bg-emerald-800 hover:bg-emerald-600"
+                            : "bg-emerald-600 hover:bg-emerald-600"
                     }
                     ${
                         !isReady
