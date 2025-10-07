@@ -1,4 +1,15 @@
-# TradeHub  
+<table>
+<tr>
+<td style="padding: 0; vertical-align: middle;">
+<img width="70" height="70" alt="favicon-512" src="https://github.com/user-attachments/assets/6557641a-0091-4d2a-a8ff-d1905a629115" />
+</td>
+<td style="padding: 0 0 0 10px; vertical-align: middle;">
+<h1 style="margin: 0; font-size: 2.5em;">TradeHub</h1>
+</td>
+</tr>
+</table>
+
+<br>
 
 > “투자는 생각보다 외로웠다.” 그래서 만든, 실시간 트레이더 허브  
 > 24시간 시세·채팅·뉴스·Top Trader 포지션을 한 화면에서 볼 수 있는 PC 기반 서비스
