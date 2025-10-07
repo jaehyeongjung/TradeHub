@@ -7,8 +7,9 @@
 > 초기 MVP 단계에서는 **데스크톱 UX 최적화**에 집중했습니다.</sub>
 
 <p align="center">
-  <img width="90%" alt="TradeHub Main Screenshot" src="https://github.com/user-attachments/assets/3d456059-7b09-44f6-90c8-da2abe08bfdc" />
+<img width="1440" height="706" alt="스크린샷 2025-10-07 오전 1 00 24" src="https://github.com/user-attachments/assets/eac77346-fc84-489c-b886-758f67a16ed3" />
 </p>
+
 
 
 <p align="center">
@@ -47,8 +48,8 @@
 
 ### 3. 트레이딩 포지션 비율 
 #### 5분 단위 글로벌 트레이딩 포지션과 Top Trader의 포지션 비율 갱신 
-<img width="455" height="227" alt="스크린샷 2025-10-05 오후 3 20 48" src="https://github.com/user-attachments/assets/30c0c390-e8a1-4edc-b06e-f36a9c67d41a" />
-<img width="455" height="227" alt="스크린샷 2025-10-05 오후 3 20 41" src="https://github.com/user-attachments/assets/bb545af0-e2e0-4290-beb4-c3ba47f9f5ad" />
+<img width="400" height="227" alt="스크린샷 2025-10-05 오후 3 20 48" src="https://github.com/user-attachments/assets/30c0c390-e8a1-4edc-b06e-f36a9c67d41a" />
+<img width="400" height="227" alt="스크린샷 2025-10-05 오후 3 20 41" src="https://github.com/user-attachments/assets/bb545af0-e2e0-4290-beb4-c3ba47f9f5ad" />
 
 
 ---
@@ -57,7 +58,7 @@
 #### Supabase **Realtime** 기반의 **실시간 채팅**  
 #### 본인 포지션을 공유하고 닉네임에 포지션이 표시, 커뮤니티 속 포지션 비율을 한 눈에 볼 수 있음 
 
-<img width="455" height="516" alt="스크린샷 2025-10-05 오후 3 53 16" src="https://github.com/user-attachments/assets/2d933921-b1ac-4c5d-9aa1-846e5ed43421" />
+<img width="400" height="500" alt="스크린샷 2025-10-05 오후 3 53 16" src="https://github.com/user-attachments/assets/2d933921-b1ac-4c5d-9aa1-846e5ed43421" />
 
 ---
 
@@ -67,7 +68,7 @@
 <img width="701" height="518" alt="스크린샷 2025-10-05 오후 4 00 14" src="https://github.com/user-attachments/assets/85771355-c40f-48a4-9c4d-91fce38c7649" />
 
 #### 뉴스는 페이지 이동이 아닌 iframe 형식으로 페이지 이탈을 줄임 
-<img width="1264" height="673" alt="스크린샷 2025-10-05 오후 4 00 25" src="https://github.com/user-attachments/assets/25bccf04-8705-4436-8159-463fb477d2f9" />
+<img width="700" height="500" alt="스크린샷 2025-10-05 오후 4 00 25" src="https://github.com/user-attachments/assets/25bccf04-8705-4436-8159-463fb477d2f9" />
 
 
 #### 채팅에 공유 클릭 시 실시간으로 채팅방에 공유 기능
@@ -82,7 +83,16 @@
 <img width="254" height="229" alt="스크린샷 2025-10-05 오후 4 03 59" src="https://github.com/user-attachments/assets/245d2fb5-a0b1-4da6-902a-ee0fc4d13c6d" />
 
 ---
-### 7. 게시글 대시보드
+
+### 7. 김치 프리미엄 실시간 제공 기능 
+#### “국내 암호화폐 시장의 가격이 해외 시장 대비 고평가 또는 저평가되었는지를 보여주며, 한국 투자자들의 심리 파악
+
+<img width="248" height="188" alt="스크린샷 2025-10-07 오전 12 18 51" src="https://github.com/user-attachments/assets/64e0b7bd-ecd7-4c94-9207-23a5a7304816" />
+
+
+---
+
+### 8. 게시글 대시보드
 <img width="683" height="382" alt="스크린샷 2025-10-05 오후 4 04 12" src="https://github.com/user-attachments/assets/08c71721-893c-4c1e-9e1b-b134d15f2a2a" />
 
 
@@ -94,9 +104,11 @@
 
 | 회차 | 제목 | 링크 |
 |------|------|------|
-| ① | **기획 — 코인 커뮤니티를 만들어보기** | [Velog 보기](https://velog.io/@whird625/%EA%B8%B0%ED%9A%8D-%EC%BD%94%EC%9D%B8-%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0%EB%A5%BC-%EB%A7%8C%EB%93%A4%EC%96%B4%EB%B3%B4%EA%B8%B0) |
-| ② | **코인 커뮤니티를 만들기로 마음먹었다 — 구조 & 과정** | [Velog 보기](https://velog.io/@whird625/%EC%BD%94%EC%9D%B8-%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0%EB%A5%BC-%EB%A7%8C%EB%93%A4%EA%B8%B0%EB%A1%9C-%EB%A7%88%EC%9D%8C-%EB%A8%B9%EC%97%88%EB%8B%A4-2%ED%8E%B8-%EA%B5%AC%EC%83%81-%EA%B3%BC%EC%A0%95) |
-| ③ | **코인 커뮤니티를 만들기로 마음먹었다 — 사용자 피드백 & 마케팅** | [Velog 보기](https://velog.io/@whird625/%EC%BD%94%EC%9D%B8-%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0%EB%A5%BC-%EB%A7%8C%EB%93%A4%EA%B8%B0%EB%A1%9C-%EB%A7%88%EC%9D%8C-%EB%A8%B9%EC%97%88%EB%8B%A4-3%ED%8E%B8-%EC%82%AC%EC%9A%A9%EC%9E%90-%ED%94%BC%EB%93%9C%EB%B0%B1-%EB%B0%9B%EA%B8%B0-%EB%A7%88%EC%BC%80%ED%8C%85) |
+| ① | **코인 커뮤니티를 만들기로 마음 먹었다 - [왜 coinpan은 대박났을까?]** | [Velog 보기](https://velog.io/@whird625/%EA%B8%B0%ED%9A%8D-%EC%BD%94%EC%9D%B8-%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0%EB%A5%BC-%EB%A7%8C%EB%93%A4%EC%96%B4%EB%B3%B4%EA%B8%B0) |
+| ② | **코인 커뮤니티를 만들기로 마음먹었다 — [구상 과정]** | [Velog 보기](https://velog.io/@whird625/%EC%BD%94%EC%9D%B8-%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0%EB%A5%BC-%EB%A7%8C%EB%93%A4%EA%B8%B0%EB%A1%9C-%EB%A7%88%EC%9D%8C-%EB%A8%B9%EC%97%88%EB%8B%A4-2%ED%8E%B8-%EA%B5%AC%EC%83%81-%EA%B3%BC%EC%A0%95) |
+| ③ | **코인 커뮤니티를 만들기로 마음먹었다 — [사용자 피드백을 받고 UI 고도화를 해 보자]** | [Velog 보기](https://velog.io/@whird625/%EC%BD%94%EC%9D%B8-%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0%EB%A5%BC-%EB%A7%8C%EB%93%A4%EA%B8%B0%EB%A1%9C-%EB%A7%88%EC%9D%8C-%EB%A8%B9%EC%97%88%EB%8B%A4-3%ED%8E%B8-%EC%82%AC%EC%9A%A9%EC%9E%90-%ED%94%BC%EB%93%9C%EB%B0%B1-%EB%B0%9B%EA%B8%B0-%EB%A7%88%EC%BC%80%ED%8C%85) |
+| ③ | **코인 커뮤니티를 만들기로 마음먹었다 — [바이낸스 api를 사용하던 중 451 error 발생 ]** | [Velog 보기](https://velog.io/@whird625/%EB%B0%94%EC%9D%B4%EB%82%B8%EC%8A%A4-%EC%97%90%EB%9F%AC-%ED%95%B4%EA%B2%B0) |
+
 
 ---
 
