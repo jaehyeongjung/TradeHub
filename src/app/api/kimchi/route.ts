@@ -3,41 +3,40 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const runtime = "nodejs";
-// Vercel 함수 선호 리전 (서울/도쿄/싱가폴)
 export const preferredRegion = ["icn1", "hnd1", "sin1"];
 
-// ===== Config: 현실 보정치 (환경변수로 미세 튜닝) =====
-const FX_SPREAD = Number(process.env.FX_SPREAD ?? "0.009"); // +0.9% TT Selling 근사
-const USDT_USD  = Number(process.env.USDT_USD  ?? "0.999"); // USDT≈USD 보정
+// ===== 설정 (현실 보정치) =====
+const FX_SPREAD = Number(process.env.FX_SPREAD ?? "0.009"); // +0.9%
+const USDT_USD  = Number(process.env.USDT_USD  ?? "0.999");
 
+// ===== 외부 응답 타입 =====
 type UpbitTicker = Array<{ trade_price: number; timestamp: number }>;
-type BinanceTicker = { symbol?: string; price?: string };
-type FxLatest = { rates?: { KRW?: number } };
-
 type UpbitOrderbook = Array<{
   orderbook_units: Array<{ ask_price: number; bid_price: number }>;
   timestamp: number;
 }>;
+type BinanceTicker = { symbol?: string; price?: string };
+type FxLatest = { rates?: { KRW?: number } };
 
-type KimchiPayload = {
+// ===== API 응답 타입(클라와 공유 가능) =====
+export type KimchiResponse = {
   symbol: string;
-  upbitKrw: number;
-  upbitPriceSource: "orderbook_mid" | "trade_price"; // 어떤 소스로 산출했는지 투명화
-  binanceUsdt: number;
-  usdkrw: number;
-  globalKrw: number;
-  premium: number; // 0.019 = 1.9%
+  upbitKrw: number | null;
+  upbitPriceSource?: "orderbook_mid" | "trade_price";
+  binanceUsdt: number | null;
+  usdkrw: number | null;
+  globalKrw: number | null;
+  premium: number | null;     // null이면 계산 불가
   updatedAt: string;
+  degraded: boolean;          // 부분성공/폴백 여부
+  cached?: boolean;           // 최근 스냅샷 사용 여부
   upstream?: {
-    upbit?: number;
-    binance?: number;
-    fx?: number;
-    fxHost?: string;
-    fxAdj?: number;   // 환율 보정 계수 (1 + FX_SPREAD)
-    usdtUsd?: number; // USDT/USD 보정 계수
+    fxAdj?: number;
+    usdtUsd?: number;
   };
 };
 
+// ===== 내부 유틸 =====
 function isNum(v: unknown): v is number {
   return typeof v === "number" && Number.isFinite(v);
 }
@@ -48,90 +47,90 @@ function withTimeout(url: string, ms = 3500, init?: RequestInit) {
   return fetch(url, { ...init, signal: ctrl.signal }).finally(() => clearTimeout(id));
 }
 
-// ----- 환율 (USD→KRW) -----
-async function fetchUsdKrw(): Promise<{ value: number; status: number }> {
-  // 1차
-  const r1 = await withTimeout(
+// ===== 외부 호출들 (실패 시 null 반환) =====
+async function fetchUsdKrw(): Promise<number | null> {
+  const urls = [
     "https://api.exchangerate.host/latest?base=USD&symbols=KRW",
-    3500,
-    {
-      headers: { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" },
-      cache: "no-store",
-    }
-  );
-  if (r1.ok) {
-    const j = (await r1.json()) as FxLatest;
-    if (isNum(j?.rates?.KRW)) return { value: j.rates!.KRW!, status: r1.status };
+    "https://open.er-api.com/v6/latest/USD",
+  ];
+  for (const url of urls) {
+    try {
+      const r = await withTimeout(url, 3500, {
+        headers: { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" },
+        cache: "no-store",
+      });
+      if (!r.ok) continue;
+      const j = (await r.json()) as FxLatest;
+      const v = j?.rates?.KRW;
+      if (isNum(v)) return v;
+    } catch { /* try next */ }
   }
-  // 2차
-  const r2 = await withTimeout("https://open.er-api.com/v6/latest/USD", 3500, {
-    headers: { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" },
-    cache: "no-store",
-  });
-  if (r2.ok) {
-    const j2 = (await r2.json()) as { rates?: { KRW?: number } };
-    if (isNum(j2?.rates?.KRW)) return { value: j2.rates!.KRW!, status: r2.status };
-  }
-  throw new Error("FX fetch failed");
+  return null;
 }
 
-// ----- 바이낸스 USDT 시세 (다중 호스트 폴백) -----
-async function fetchBinancePrice(
-  symbol: string
-): Promise<{ price: number; status: number; host: string }> {
+async function fetchBinancePrice(symbol: string): Promise<number | null> {
   const hosts = [
-    process.env.BINANCE_HOST?.trim(),
     "api.binance.com",
     "api1.binance.com",
     "api2.binance.com",
-    "api3.binance.com",
-    "data-api.binance.vision", // 마지막 백업
-  ].filter(Boolean) as string[];
-
-  const path = (host: string) =>
-    `https://${host}/api/v3/ticker/price?symbol=${encodeURIComponent(symbol)}`;
-
-  const headers = {
-    "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)",
-    Accept: "application/json" as const,
-  };
-
-  let lastStatus = 0;
-  for (const host of hosts) {
+    "data-api.binance.vision",
+  ];
+  for (const h of hosts) {
     try {
-      const r = await withTimeout(path(host), 3500, { headers, cache: "no-store" });
-      lastStatus = r.status;
+      const r = await withTimeout(`https://${h}/api/v3/ticker/price?symbol=${symbol}`, 3500, {
+        headers: { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" },
+        cache: "no-store",
+      });
       if (!r.ok) continue;
       const j = (await r.json()) as BinanceTicker;
       const p = Number(j?.price);
-      if (Number.isFinite(p)) return { price: p, status: r.status, host };
-    } catch {
-      // 다음 호스트로 폴백
-    }
+      if (isNum(p)) return p;
+    } catch { /* try next */ }
   }
-  throw new Error(`Binance fetch failed (lastStatus=${lastStatus})`);
+  return null;
 }
 
-// ----- 업비트 호가 중간값(mid) 시도 -----
-async function fetchUpbitMid(
-  market: string,
-  ua: Record<string, string>
-): Promise<{ mid: number; ts?: number }> {
-  const r = await withTimeout(
-    `https://api.upbit.com/v1/orderbook?markets=${encodeURIComponent(market)}`,
-    1500,
-    { headers: ua, cache: "no-store" }
-  );
-  if (!r.ok) throw new Error("Upbit orderbook failed");
-  const j = (await r.json()) as UpbitOrderbook;
-  const u0 = j?.[0]?.orderbook_units?.[0];
-  if (!u0) throw new Error("Upbit orderbook empty");
-  const mid = (u0.ask_price + u0.bid_price) / 2;
-  if (!Number.isFinite(mid)) throw new Error("Upbit mid invalid");
-  return { mid, ts: j?.[0]?.timestamp };
+type UpbitPriceResult = { price: number; source: "orderbook_mid" | "trade_price" } | null;
+
+async function fetchUpbitPrice(market: string): Promise<UpbitPriceResult> {
+  // 1) 오더북 MID 우선
+  try {
+    const r = await withTimeout(`https://api.upbit.com/v1/orderbook?markets=${market}`, 1500, {
+      headers: { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" },
+      cache: "no-store",
+    });
+    if (r.ok) {
+      const j = (await r.json()) as UpbitOrderbook;
+      const u0 = j?.[0]?.orderbook_units?.[0];
+      if (u0) {
+        const mid = (u0.ask_price + u0.bid_price) / 2;
+        if (isNum(mid)) return { price: mid, source: "orderbook_mid" };
+      }
+    }
+  } catch { /* fallback */ }
+
+  // 2) 체결가
+  try {
+    const r2 = await withTimeout(`https://api.upbit.com/v1/ticker?markets=${market}`, 1500, {
+      headers: { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" },
+      cache: "no-store",
+    });
+    if (r2.ok) {
+      const j2 = (await r2.json()) as UpbitTicker;
+      const p = j2?.[0]?.trade_price;
+      if (isNum(p)) return { price: p, source: "trade_price" };
+    }
+  } catch { /* give up */ }
+
+  return null;
 }
 
-// ====== Main Handler ======
+// ===== 최근 정상 스냅샷(메모리 캐시) =====
+let lastGood: KimchiResponse | null = null;
+let lastUpdated = 0; // ms
+const SNAPSHOT_TTL_MS = 60_000;
+
+// ===== 메인 핸들러 (항상 200) =====
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const sym = (url.searchParams.get("symbol") || "BTC").toUpperCase();
@@ -139,90 +138,80 @@ export async function GET(req: Request) {
   const binanceSymbol = `${sym}USDT`;
 
   try {
-    const ua = {
-      "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)",
-      Accept: "application/json",
-    };
-
-    // 업비트 체결가 + 환율을 우선 불러오고, 체결가 파싱 성공 후 orderbook mid를 시도
-    const [upbitRes, fx] = await Promise.all([
-      withTimeout(
-        `https://api.upbit.com/v1/ticker?markets=${encodeURIComponent(upbitMarket)}`,
-        3500,
-        { headers: ua, cache: "no-store" }
-      ),
+    const [usdkrw, binanceUsdt, upbit] = await Promise.all([
       fetchUsdKrw(),
+      fetchBinancePrice(binanceSymbol),
+      fetchUpbitPrice(upbitMarket),
     ]);
 
-    const upstream: KimchiPayload["upstream"] = {
-      upbit: upbitRes.status,
-      fx: fx.status,
-    };
-
-    if (!upbitRes.ok) {
-      const txt = await upbitRes.text().catch(() => "");
-      return NextResponse.json(
-        { error: true, source: "upbit", status: upbitRes.status, detail: txt, upstream },
-        { status: 502 }
-      );
-    }
-
-    const upbit = (await upbitRes.json()) as UpbitTicker;
-    const lastTrade = upbit?.[0]?.trade_price;
-
-    // 업비트 가격: orderbook mid 우선, 실패 시 trade_price 사용
-    let upbitKrw = lastTrade;
-    let upbitPriceSource: KimchiPayload["upbitPriceSource"] = "trade_price";
-    try {
-      const { mid } = await fetchUpbitMid(upbitMarket, ua);
-      if (isNum(mid)) {
-        upbitKrw = mid;
-        upbitPriceSource = "orderbook_mid";
+    // 일부라도 실패했을 때: 최근 스냅샷 있는지 확인
+    if (usdkrw === null || binanceUsdt === null || upbit === null) {
+      if (lastGood && Date.now() - lastUpdated < SNAPSHOT_TTL_MS) {
+        return NextResponse.json({ ...lastGood, degraded: true, cached: true }, {
+          headers: { "Cache-Control": "no-store, must-revalidate" },
+        });
       }
-    } catch {
-      // orderbook 실패 → trade_price 사용
+      // 최근 스냅샷이 없으면 가능한 값만 채워서 premium=null 로
+      const partial: KimchiResponse = {
+        symbol: sym,
+        upbitKrw: upbit?.price ?? null,
+        upbitPriceSource: upbit?.source ?? undefined,
+        binanceUsdt: binanceUsdt ?? null,
+        usdkrw: usdkrw ?? null,
+        globalKrw: null,
+        premium: null,
+        degraded: true,
+        updatedAt: new Date().toISOString(),
+      };
+      return NextResponse.json(partial, {
+        headers: { "Cache-Control": "no-store, must-revalidate" },
+      });
     }
 
-    if (!isNum(upbitKrw)) {
-      return NextResponse.json(
-        { error: true, source: "upbit", status: 500, detail: "Invalid Upbit payload", upstream },
-        { status: 500 }
-      );
-    }
-
-    // Binance 다중 호스트 폴백
-    const b = await fetchBinancePrice(binanceSymbol);
-    upstream.binance = b.status;
-    upstream.fxHost = "multi";
-
-    const binanceUsdt = b.price;
-    const usdkrw = fx.value;
-
-    // ===== 현실 보정 적용 =====
-    const usdkrwEffective = usdkrw * (1 + FX_SPREAD); // TT Selling 근사
+    // 정상 계산
+    const usdkrwEffective = usdkrw * (1 + FX_SPREAD);
     const globalKrw = binanceUsdt * USDT_USD * usdkrwEffective;
-    const premium = (upbitKrw - globalKrw) / globalKrw;
+    const premium = (upbit.price - globalKrw) / globalKrw;
 
-    upstream.fxAdj = 1 + FX_SPREAD;
-    upstream.usdtUsd = USDT_USD;
-
-    const body: KimchiPayload = {
+    const body: KimchiResponse = {
       symbol: sym,
-      upbitKrw,
-      upbitPriceSource,
+      upbitKrw: upbit.price,
+      upbitPriceSource: upbit.source,
       binanceUsdt,
       usdkrw,
       globalKrw,
       premium,
+      degraded: false,
       updatedAt: new Date().toISOString(),
-      upstream,
+      upstream: { fxAdj: 1 + FX_SPREAD, usdtUsd: USDT_USD },
     };
+
+    // 스냅샷 갱신
+    lastGood = body;
+    lastUpdated = Date.now();
 
     return NextResponse.json(body, {
       headers: { "Cache-Control": "no-store, must-revalidate" },
     });
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : "kimchi calc failed";
-    return NextResponse.json({ error: true, message: msg }, { status: 502 });
+  } catch (_e) {
+    // 예외여도 200 + 스냅샷/빈값
+    if (lastGood) {
+      return NextResponse.json({ ...lastGood, degraded: true, cached: true }, {
+        headers: { "Cache-Control": "no-store, must-revalidate" },
+      });
+    }
+    const empty: KimchiResponse = {
+      symbol: sym,
+      upbitKrw: null,
+      binanceUsdt: null,
+      usdkrw: null,
+      globalKrw: null,
+      premium: null,
+      degraded: true,
+      updatedAt: new Date().toISOString(),
+    };
+    return NextResponse.json(empty, {
+      headers: { "Cache-Control": "no-store, must-revalidate" },
+    });
   }
 }
