@@ -1,13 +1,6 @@
-<table>
-<tr>
-<td style="padding: 0; vertical-align: middle;">
-<img width="70" height="70" alt="favicon-512" src="https://github.com/user-attachments/assets/6557641a-0091-4d2a-a8ff-d1905a629115" />
-</td>
-<td style="padding: 0 0 0 10px; vertical-align: middle;">
-<h1 style="margin: 0; font-size: 2.5em;">TradeHub</h1>
-</td>
-</tr>
-</table>
+<img width="60" height="60" alt="favicon-512" src="https://github.com/user-attachments/assets/6557641a-0091-4d2a-a8ff-d1905a629115" />
+
+# TradeHub
 
 <br>
 
@@ -17,20 +10,25 @@
 > <sub>⚠️ **PC 버전만 지원** — 대부분의 트레이더는 PC 환경에서 시세를 확인하고 분석하기 때문에,  
 > 초기 MVP 단계에서는 **데스크톱 UX 최적화**에 집중했습니다.</sub>
 
+<br>
+
 <p align="center">
 <img width="1440" height="706" alt="스크린샷 2025-10-07 오전 1 00 24" src="https://github.com/user-attachments/assets/eac77346-fc84-489c-b886-758f67a16ed3" />
 </p>
 
-
+<br>
 
 <p align="center">
   <a href="https://www.tradehub.kr/" target="_blank" rel="noopener noreferrer">
     <img 
       src="https://img.shields.io/badge/Visit%20TradeHub-10B981?style=for-the-badge&labelColor=000000&color=10B981"
-      alt="Visit TradeHub"
+      alt="Visit TradeHub
+      "
     />
   </a>
 </p>
+
+
 
 ---
 
