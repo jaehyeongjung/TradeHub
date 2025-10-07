@@ -1,4 +1,3 @@
-// components/KimchiWidget.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -113,11 +112,11 @@ export default function KimchiWidget({
                 </dd>
             </dl>
 
-            {error && (
+            {/* {error && (
                 <p className="mt-2 text-xs text-rose-400">
                     업데이트 실패: {error}
                 </p>
-            )}
+            )} */}
         </div>
     );
 }
