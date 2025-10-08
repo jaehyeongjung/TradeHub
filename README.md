@@ -13,20 +13,25 @@
 <br>
 
 <p align="center">
-<img width="1440" height="706" alt="스크린샷 2025-10-07 오전 1 00 24" src="https://github.com/user-attachments/assets/eac77346-fc84-489c-b886-758f67a16ed3" />
+<img width="1432" height="706" alt="스크린샷 2025-10-08 오후 6 39 45" src="https://github.com/user-attachments/assets/47728970-ea82-4da5-badb-19f53b4bb7b6" />
 </p>
+
 
 <br>
 
 <p align="center">
   <a href="https://www.tradehub.kr/" target="_blank" rel="noopener noreferrer">
     <img 
-      src="https://img.shields.io/badge/Visit%20TradeHub-10B981?style=for-the-badge&labelColor=000000&color=10B981"
-      alt="Visit TradeHub
-      "
+      src="https://img.shields.io/badge/🚀 Visit_TradeHub-Click_Here-10B981?style=for-the-badge&logo=vercel&logoColor=white&labelColor=000000"
+      alt="Visit TradeHub"
     />
   </a>
 </p>
+
+<p align="center">
+  <b>TradeHub — 실시간 트레이딩 커뮤니티 바로가기</b>
+</p>
+
 
 
 
@@ -41,6 +46,8 @@
 #### 클릭 시 원하는 코인의 실시간 시세를 볼 수 있게 커스텀 기능
 
 <img width="555" height="200" alt="스크린샷 2025-10-05 오후 3 19 37" src="https://github.com/user-attachments/assets/a044e66c-6fe3-490c-948f-3e602abcf6ce" />
+<img width="555" height="200" alt="스크린샷 2025-10-08 오후 6 36 39" src="https://github.com/user-attachments/assets/217f5915-5200-4377-94c2-01bc6dc9772b" />
+
 
 #### 로그인 상태에서 설정 해둔 코인은 유지
 
@@ -57,8 +64,9 @@
 
 ### 3. 트레이딩 포지션 비율 
 #### 5분 단위 글로벌 트레이딩 포지션과 Top Trader의 포지션 비율 갱신 
-<img width="400" height="227" alt="스크린샷 2025-10-05 오후 3 20 48" src="https://github.com/user-attachments/assets/30c0c390-e8a1-4edc-b06e-f36a9c67d41a" />
-<img width="400" height="227" alt="스크린샷 2025-10-05 오후 3 20 41" src="https://github.com/user-attachments/assets/bb545af0-e2e0-4290-beb4-c3ba47f9f5ad" />
+
+<img width="275" height="241" alt="스크린샷 2025-10-08 오후 6 37 56" src="https://github.com/user-attachments/assets/cec2b9fa-a287-48d6-be14-d713b90c5807" />
+<img width="275" height="241" alt="스크린샷 2025-10-08 오후 6 38 01" src="https://github.com/user-attachments/assets/b49f6bb3-b3fc-4801-9a63-c90d817b5dca" />
 
 
 ---
@@ -89,19 +97,27 @@
 #### 암호화폐 시장의 투자 심리를 0(극심한 공포)부터 100(극심한 탐욕)까지 나타내는 지수
 #### 공포는 가격 하락, 탐욕은 가격 상승과 연관되는 경향이 있고 포지션을 잡는 지표 중 하나 
 
-<img width="254" height="229" alt="스크린샷 2025-10-05 오후 4 03 59" src="https://github.com/user-attachments/assets/245d2fb5-a0b1-4da6-902a-ee0fc4d13c6d" />
+<img width="281" height="454" alt="스크린샷 2025-10-08 오후 6 37 43" src="https://github.com/user-attachments/assets/198f833f-31fd-4c3c-9d47-6aae3d93acb9" />
 
 ---
 
 ### 7. 김치 프리미엄 실시간 제공 기능 
 #### “국내 암호화폐 시장의 가격이 해외 시장 대비 고평가 또는 저평가되었는지를 보여주며, 한국 투자자들의 심리 파악
 
-<img width="248" height="188" alt="스크린샷 2025-10-07 오전 12 18 51" src="https://github.com/user-attachments/assets/64e0b7bd-ecd7-4c94-9207-23a5a7304816" />
+
+<img width="261" height="381" alt="스크린샷 2025-10-08 오후 6 37 25" src="https://github.com/user-attachments/assets/b8cbd969-cc26-42cd-8233-45f75748b0a5" />
+
+---
+
+### 8. 실시간 Hot Coin
+#### "트레이더들은 돈이 몰리는 곳을 찾는다."
+#### 거래량과 등락률에 따른 실시간 돈이 몰리는 Coin List 
+<img width="457" height="115" alt="스크린샷 2025-10-08 오후 6 37 02" src="https://github.com/user-attachments/assets/cbcdbba7-1b2f-416a-b98d-a78df011c834" />
 
 
 ---
 
-### 8. 게시글 대시보드
+### 9. 게시글 대시보드
 <img width="683" height="382" alt="스크린샷 2025-10-05 오후 4 04 12" src="https://github.com/user-attachments/assets/08c71721-893c-4c1e-9e1b-b134d15f2a2a" />
 
 
