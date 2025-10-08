@@ -1,5 +1,7 @@
 "use client";
+
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 type Props = { value: number; title?: string; subLabel?: string };
 
@@ -26,75 +28,72 @@ function arcPath(
     return `M ${s.x} ${s.y} A ${r} ${r} 0 ${largeArc} ${sweep} ${e.x} ${e.y}`;
 }
 
-/** 스프링(언더댐핑) */
+/** 스프링(언더댐핑) 애니메이션 */
 function useSpring(
-  target: number,
-  {
-    stiffness = 90,
-    damping = 10,
-    kick = 1,
-    initFrom = -110, // 왼쪽 끝에서 출발
-  }: { stiffness?: number; damping?: number; kick?: number; initFrom?: number } = {}
+    target: number,
+    { stiffness = 90, damping = 10, kick = 1, initFrom = -110 } = {}
 ) {
-  const [val, setVal] = useState(initFrom);
-  const valRef = useRef(initFrom);   // ⭐ 최신 값을 ref로 보관
-  const velRef = useRef(0);
-  const raf = useRef<number | null>(null);
-  const didInit = useRef(false);
+    const [val, setVal] = useState(initFrom);
+    const valRef = useRef(initFrom);
+    const velRef = useRef(0);
+    const raf = useRef<number | null>(null);
+    const didInit = useRef(false);
 
-  useEffect(() => {
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    useEffect(() => {
+        const reduce =
+            typeof window !== "undefined" &&
+            window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-    if (!didInit.current) {
-      didInit.current = true;
-      valRef.current = initFrom;     // 초기값 세팅
-      setVal(initFrom);
-      velRef.current = kick;         // 살짝 튕겨 시작
-    }
+        if (!didInit.current) {
+            didInit.current = true;
+            valRef.current = initFrom;
+            setVal(initFrom);
+            velRef.current = kick;
+        }
 
-    if (reduce) {
-      valRef.current = target;
-      setVal(target);
-      velRef.current = 0;
-      return;
-    }
+        if (reduce) {
+            valRef.current = target;
+            setVal(target);
+            velRef.current = 0;
+            return;
+        }
 
-    let prev = performance.now();
+        let prev = performance.now();
 
-    const step = (now: number) => {
-      const dt = Math.min((now - prev) / 1000, 1 / 30);
-      prev = now;
+        const step = (now: number) => {
+            const dt = Math.min((now - prev) / 1000, 1 / 30);
+            prev = now;
 
-      const x = valRef.current - target;                  // ⭐ 항상 최신값 사용
-      const a = -stiffness * x - damping * velRef.current;
-      velRef.current += a * dt;
-      const next = valRef.current + velRef.current * dt;
+            const x = valRef.current - target;
+            const a = -stiffness * x - damping * velRef.current;
+            velRef.current += a * dt;
+            const next = valRef.current + velRef.current * dt;
 
-      valRef.current = next;                              // ⭐ ref 갱신
-      setVal(next);
+            valRef.current = next;
+            setVal(next);
 
-      if (Math.abs(next - target) < 0.01 && Math.abs(velRef.current) < 0.01) {
-        valRef.current = target;
-        setVal(target);
-        velRef.current = 0;
-        raf.current = null;
-        return;
-      }
-      raf.current = requestAnimationFrame(step);
-    };
+            if (
+                Math.abs(next - target) < 0.01 &&
+                Math.abs(velRef.current) < 0.01
+            ) {
+                valRef.current = target;
+                setVal(target);
+                velRef.current = 0;
+                raf.current = null;
+                return;
+            }
+            raf.current = requestAnimationFrame(step);
+        };
 
-    raf.current = requestAnimationFrame(step);
-    return () => {
-      if (raf.current) cancelAnimationFrame(raf.current!);
-      raf.current = null;
-    };
-  }, [target, stiffness, damping, kick, initFrom]);
+        raf.current = requestAnimationFrame(step);
+        return () => {
+            if (raf.current) cancelAnimationFrame(raf.current);
+            raf.current = null;
+        };
+    }, [target, stiffness, damping, kick, initFrom]);
 
-  return val;
+    return val;
 }
-
 
 export default function FearGreedGauge({
     value,
@@ -102,29 +101,23 @@ export default function FearGreedGauge({
     subLabel,
 }: Props) {
     const v = Math.max(0, Math.min(100, value));
+    const [isHovered, setIsHovered] = useState(false);
 
-    /** 각도 범위를 넓혀 체감 확대 (원하면 -100~+100, -90~+90로 조절) */
     const MIN = -110;
     const MAX = 110;
     const SPAN = MAX - MIN;
-
     const targetDeg = useMemo(() => MIN + (v / 100) * SPAN, [v]);
-
-    // 최초엔 왼쪽 끝에서 출발 → 스프링으로 목표 각도
     const animatedDeg = useSpring(targetDeg, {
         stiffness: 90,
         damping: 10,
         kick: 1,
         initFrom: MIN,
     });
-
-    // 진행도(채워지는 컬러 바)
     const progress = useMemo(
         () => clamp01((animatedDeg - MIN) / SPAN),
         [animatedDeg]
     );
 
-    // SVG 레이아웃
     const cx = 120,
         cy = 120,
         r = 95;
@@ -143,7 +136,12 @@ export default function FearGreedGauge({
             : "Extreme Greed");
 
     return (
-        <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4 text-white">
+        <div
+            className="relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4 text-white"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            {/* 헤더 */}
             <div className="mb-2 flex items-center justify-between">
                 <h3 className="text-sm font-semibold opacity-90">{title}</h3>
                 <div className="flex items-center gap-2">
@@ -156,6 +154,7 @@ export default function FearGreedGauge({
                 </div>
             </div>
 
+            {/* 게이지 */}
             <svg viewBox="0 0 240 150" className="w-full">
                 <defs>
                     <linearGradient
@@ -173,17 +172,16 @@ export default function FearGreedGauge({
                     </linearGradient>
                 </defs>
 
-                {/* 회색 트랙 */}
+                {/* 트랙 */}
                 <path
                     d={arcPath(cx, cy, r, 180, 0, 1)}
-                    stroke="#0f172a"
+                    stroke="#1f2937"
                     strokeOpacity="0.6"
                     strokeWidth="18"
                     fill="none"
                     strokeLinecap="round"
                 />
-
-                {/* 진행 채우기 */}
+                {/* 진행 바 */}
                 <path
                     d={arcPath(cx, cy, r, 180, 0, 1)}
                     stroke="url(#gaugeGradient)"
@@ -193,7 +191,6 @@ export default function FearGreedGauge({
                     strokeDasharray={trackLen}
                     strokeDashoffset={trackLen * (1 - progress)}
                 />
-
                 {/* 바늘 */}
                 <g transform={`rotate(${animatedDeg} ${cx} ${cy})`}>
                     <line
@@ -214,7 +211,6 @@ export default function FearGreedGauge({
                         strokeWidth="2"
                     />
                 </g>
-
                 <text
                     x="120"
                     y="145"
@@ -225,6 +221,39 @@ export default function FearGreedGauge({
                     0 (Fear) — 100 (Greed)
                 </text>
             </svg>
+
+            {/* 💬 커스텀 툴팁 */}
+            <AnimatePresence>
+                {isHovered && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 6 }}
+                        transition={{ duration: 0.18 }}
+                        className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+10px)] w-[255px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg z-50 pointer-events-none"
+                    >
+                        <div className="font-semibold text-amber-300 mb-1">
+                            지표 설명
+                        </div>
+                        <p className="leading-snug">
+                            암호화폐 시장의 <b>투자 심리</b>를 수치로
+                            표현합니다.
+                            <br />
+                            <br />• <b>가격 변동성</b> (Volatility)
+                            <br />• <b>거래량 및 모멘텀</b> (Volume & Momentum)
+                            <br />• <b>소셜 미디어 언급량</b> (Social Trends)
+                            <br />• <b>비트코인 도미넌스</b> 및 트렌드 등을
+                            <br />
+                            종합해 0~100 사이의 값으로 계산합니다.
+                            <br />
+                            <br />
+                            낮을수록 공포(Fear),<br></br> 높을수록 탐욕(Greed)을
+                            의미합니다.
+                        </p>
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-0 h-0 border-l-4 border-r-4 border-b-8 border-transparent border-b-neutral-900" />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

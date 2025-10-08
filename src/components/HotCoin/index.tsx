@@ -99,13 +99,13 @@ export default function HotSymbolsTicker() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[130%] w-[260px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg p-3 shadow-lg z-50"
+                            className="absolute left-1/2 -translate-x-1/2 top-[130%] w-[210px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg px-4 py-3 shadow-lg z-50"
                         >
                             <div className="font-semibold text-amber-300 mb-1">
                                 기준 설명
                             </div>
                             <ul className="space-y-[2px] leading-tight">
-                                <li>• 24h 거래대금(USDT) + 등락률 보너스</li>
+                                <li>24h 거래대금(USDT) + 등락률 보너스</li>
                             </ul>
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-0 h-0 border-l-4 border-r-4 border-b-8 border-transparent border-b-neutral-900"></div>
                         </motion.div>
