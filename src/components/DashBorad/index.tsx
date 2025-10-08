@@ -94,7 +94,7 @@ export const DashBoard = () => {
         <YouTubeSeamlessPlayer videoId="j23SO29LNWE" />
       </div>
 
-      <div className="min-w-75 border-2 rounded-2xl flex flex-col items-center gap-3 h-[calc(100vh-200px)] bg-neutral-950">
+      <div className="min-w-105 border-2 rounded-2xl flex flex-col items-center gap-3 h-[calc(100vh-200px)] bg-neutral-950">
         <Chat />
       </div>
     </div>

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const runtime = "nodejs";
-export const preferredRegion = ["icn1", "hnd1", "sin1"];
+export const preferredRegion = ["hnd1", "sin1"];
 
 // ===== 설정 (현실 보정치) =====
 const FX_SPREAD = Number(process.env.FX_SPREAD ?? "0.009"); // +0.9%

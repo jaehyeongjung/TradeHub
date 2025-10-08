@@ -383,7 +383,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
           `,
                 }}
             />
-            <div className="h-full flex flex-col p-3 text-white w/full">
+            <div className="h-full flex flex-col p-3 text-white w-full">
                 {/* 헤더 */}
                 <div className="mb-3 rounded-xl border border-neutral-700 bg-neutral-900/80 p-3 space-y-2 shadow-lg">
                     <div className="flex justify-between items-center text-[12px]">
