@@ -1,20 +1,31 @@
+// components/ForceTabReturnReload.tsx
 "use client";
 import { useEffect, useRef } from "react";
 
-// ✅ 타입가드: 이벤트에 persisted(boolean)가 있는지 안전 확인
-function hasPersisted(ev: unknown): ev is { persisted: boolean } {
-  return !!ev && typeof (ev as Record<string, unknown>).persisted === "boolean";
+// pageshow 이벤트 타입가드
+function hasPersisted(e: unknown): e is { persisted: boolean } {
+  return !!e && typeof (e as Record<string, unknown>).persisted === "boolean";
 }
 
 export default function ForceTabReturnReload() {
   const wasHiddenRef = useRef(false);
 
   useEffect(() => {
+    // ▶ 로드되자마자 __rv 있으면 깨끗이 치우기 (URL만 교체, 페이지는 안 바뀜)
+    const cleanOnce = () => {
+      const u = new URL(window.location.href);
+      if (u.searchParams.has("__rv")) {
+        u.searchParams.delete("__rv");
+        window.history.replaceState(null, "", u.toString());
+      }
+    };
+    cleanOnce();
+
     const hardReload = () => {
-      const { pathname, search, hash } = window.location;
-      const sep = search ? "&" : "?";
-      const url = `${pathname}${search}${sep}__rv=${Date.now()}${hash}`;
-      window.location.replace(url);
+      const u = new URL(window.location.href);
+      // ▶ 덧붙이지 않고 set으로 덮어쓰기 (중복 방지)
+      u.searchParams.set("__rv", String(Date.now()));
+      window.location.replace(u.toString());
     };
 
     const onVisibility = () => {
@@ -24,9 +35,8 @@ export default function ForceTabReturnReload() {
     };
 
     const onPageShow = (e: Event) => {
-      if (hasPersisted(e) && e.persisted) {
-        hardReload();
-      }
+      // bfcache에서 돌아오면 강제 새로고침
+      if (hasPersisted(e) && e.persisted) hardReload();
     };
 
     const onFocus = () => {
