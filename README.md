@@ -130,9 +130,8 @@
 ---
 
 ### 9. 게시글 대시보드
-<img width="683" height="382" alt="스크린샷 2025-10-05 오후 4 04 12" src="https://github.com/user-attachments/assets/08c71721-893c-4c1e-9e1b-b134d15f2a2a" />
 
-
+<img width="728" height="536" alt="스크린샷 2025-10-09 오후 11 06 48" src="https://github.com/user-attachments/assets/a23c3a35-b2c2-4936-a37b-3486a4571b2c" />
 
 
 ---
