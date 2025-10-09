@@ -4,11 +4,12 @@
 
 <br>
 
-> “투자는 생각보다 외로웠다.” 그래서 만든, 실시간 트레이더 허브  
-> 24시간 시세·채팅·뉴스·Top Trader 포지션을 한 화면에서 볼 수 있는 PC 기반 서비스
+“투자는 생각보다 외로웠다.” 
+
+> 그래서 만든, 실시간 트레이더 허브  
+> “실시간 Hot 코인·실시간 채팅·코인 뉴스·코인 시세/차트·Top Trader의 포지션을 한 화면에서 볼 수 있는 PC 기반 서비스”
 >  
-> <sub>⚠️ **PC 버전만 지원** — 대부분의 트레이더는 PC 환경에서 시세를 확인하고 분석하기 때문에,  
-> 초기 MVP 단계에서는 **데스크톱 UX 최적화**에 집중했습니다.</sub>
+> <sub>⚠️ **PC 버전만 지원** — 대부분의 트레이더는 PC 환경에서 시세를 확인하고 분석하기 때문에, 초기 MVP 단계에서는 **데스크톱 UX 최적화**에 집중했습니다.</sub>
 
 <br>
 
@@ -42,45 +43,60 @@
 
 ## Features  
 
-### 1. 코인 실시간 가격 
-#### 클릭 시 원하는 코인의 실시간 시세를 볼 수 있게 커스텀 기능
+### 1. 실시간 Hot Coin Top 15
+**"트레이더들은 돈이 몰리는 곳을 찾는다."**
 
-<img width="555" height="200" alt="스크린샷 2025-10-05 오후 3 19 37" src="https://github.com/user-attachments/assets/a044e66c-6fe3-490c-948f-3e602abcf6ce" />
-<img width="555" height="200" alt="스크린샷 2025-10-08 오후 6 36 39" src="https://github.com/user-attachments/assets/217f5915-5200-4377-94c2-01bc6dc9772b" />
+거래량과 등락률에 따른 실시간 돈이 몰리는 Coin List 
 
+<img width="369" height="60" alt="스크린샷 2025-10-08 오후 11 05 04" src="https://github.com/user-attachments/assets/0d9b92b3-bda0-4411-a0c8-14e36f3a263c" />
 
-#### 로그인 상태에서 설정 해둔 코인은 유지
-
-<img width="373" height="200" alt="스크린샷 2025-10-05 오후 3 20 06" src="https://github.com/user-attachments/assets/d9ec2ba2-0ed6-4c8c-b72a-eec64460e965" />
 
 
 ---
 
-### 2. 실시간 차트 기능
-#### 실시간 BTC 차트 기능 (커스텀 기능 업데이트 예정)
+### 2. 실시간 지정 코인 가격 갱신
+#### 원하는 코인 심볼의 실시간 가격과 24h 변동률(%)을 보여주는 작은 카드형 위젯
+ 클릭 한 번으로 심볼을 바꾸고, 로그인 상태면 내 선호 심볼을 서버에 저장해 다음 접속 때 그대로 복원
+
+
+
+<img width="555" height="200" alt="스크린샷 2025-10-05 오후 3 19 37" src="https://github.com/user-attachments/assets/a044e66c-6fe3-490c-948f-3e602abcf6ce" />
+
+<img width="555" height="200" alt="스크린샷 2025-10-08 오후 10 40 47" src="https://github.com/user-attachments/assets/8db7f903-4519-40fd-a1fb-fc2a46d2aafd" />
+
+
+<img width="300" height="140" alt="스크린샷 2025-10-05 오후 3 20 06" src="https://github.com/user-attachments/assets/d9ec2ba2-0ed6-4c8c-b72a-eec64460e965" />
+
+
+---
+
+### 3. 실시간 차트 기능
+#### Binance 실시간 캔들(kline) 스트림을 사용해 BTC/USDT 차트를 초단위로 갱신
+초기에는 REST로 최근 캔들(기본 200개)을 한 번에 로드하고, 이후에는 WebSocket으로 현재 진행 중인 봉의 OHLC를 실시간 업데이트
+
 <img width="419" height="200" alt="스크린샷 2025-10-05 오후 3 20 25" src="https://github.com/user-attachments/assets/f7d1fc05-6937-4f83-a070-026834284c5b" />
 
 ---
 
-### 3. 트레이딩 포지션 비율 
-#### 5분 단위 글로벌 트레이딩 포지션과 Top Trader의 포지션 비율 갱신 
+### 4. 트레이딩 포지션 비율 
+#### 5분 단위로 바이낸스 전체 계정 vs Top Traders 롱/숏 비율 갱신
 
-<img width="275" height="241" alt="스크린샷 2025-10-08 오후 6 37 56" src="https://github.com/user-attachments/assets/cec2b9fa-a287-48d6-be14-d713b90c5807" />
-<img width="275" height="241" alt="스크린샷 2025-10-08 오후 6 38 01" src="https://github.com/user-attachments/assets/b49f6bb3-b3fc-4801-9a63-c90d817b5dca" />
+<img width="428" height="141" alt="스크린샷 2025-10-08 오후 11 02 50" src="https://github.com/user-attachments/assets/2af81037-a955-4762-a495-6b37ab77ee11" />
 
 
 ---
 
-### 4.실시간 채팅 기능 
+### 5. 실시간 채팅 기능 
 #### Supabase **Realtime** 기반의 **실시간 채팅**  
-#### 본인 포지션을 공유하고 닉네임에 포지션이 표시, 커뮤니티 속 포지션 비율을 한 눈에 볼 수 있음 
+본인 포지션을 공유하고 닉네임에 포지션이 표시, 커뮤니티 속 포지션 비율을 한 눈에 확인
 
 <img width="400" height="500" alt="스크린샷 2025-10-05 오후 3 53 16" src="https://github.com/user-attachments/assets/2d933921-b1ac-4c5d-9aa1-846e5ed43421" />
 
 ---
 
-### 5. 코인 뉴스 대시보드
-#### 하루 단위로 최신 뉴스 자동 수집
+### 6. 코인 뉴스 대시보드
+#### 1일마다 서버 크론이 Node 런타임에서 rss-parser로 지정한 RSS 피드를 수집해 Supabase news_items 테이블에 url 기준 업서트로 저장
+클라이언트는 최신 30개만 쿼리해 카드 리스트로 표시
 
 <img width="701" height="518" alt="스크린샷 2025-10-05 오후 4 00 14" src="https://github.com/user-attachments/assets/85771355-c40f-48a4-9c4d-91fce38c7649" />
 
@@ -93,15 +109,15 @@
 
 ---
 
-### 6. Crypto Fear & Greed 대시보드 
+### 7. Crypto Fear & Greed 대시보드 
 #### 암호화폐 시장의 투자 심리를 0(극심한 공포)부터 100(극심한 탐욕)까지 나타내는 지수
-#### 공포는 가격 하락, 탐욕은 가격 상승과 연관되는 경향이 있고 포지션을 잡는 지표 중 하나 
+공포는 가격 하락, 탐욕은 가격 상승과 연관되는 경향이 있고 포지션을 잡는 지표 중 하나 
 
 <img width="281" height="454" alt="스크린샷 2025-10-08 오후 6 37 43" src="https://github.com/user-attachments/assets/198f833f-31fd-4c3c-9d47-6aae3d93acb9" />
 
 ---
 
-### 7. 김치 프리미엄 실시간 제공 기능 
+### 8. 김치 프리미엄 실시간 제공 기능 
 #### “국내 암호화폐 시장의 가격이 해외 시장 대비 고평가 또는 저평가되었는지를 보여주며, 한국 투자자들의 심리 파악
 
 
@@ -109,10 +125,6 @@
 
 ---
 
-### 8. 실시간 Hot Coin
-#### "트레이더들은 돈이 몰리는 곳을 찾는다."
-#### 거래량과 등락률에 따른 실시간 돈이 몰리는 Coin List 
-<img width="457" height="115" alt="스크린샷 2025-10-08 오후 6 37 02" src="https://github.com/user-attachments/assets/cbcdbba7-1b2f-416a-b98d-a78df011c834" />
 
 
 ---
