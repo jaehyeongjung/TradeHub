@@ -235,7 +235,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                                 onClick={() => setMode("write")}
                                 className="mb-3 border rounded px-3 py-1 bg-black text-gray-100 cursor-pointer"
                             >
-                                글쓰기
+                               <span className="whitespace-nowrap">글쓰기</span> 
                             </button>
                         )}
 

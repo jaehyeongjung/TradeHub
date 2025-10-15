@@ -82,15 +82,14 @@ export default function HotSymbolsTicker() {
 
     return (
         <div className="relative flex items-center gap-3 text-sm ml-10 text-neutral-200">
-            {/* 🔥 Hot Coin 라벨 + 툴팁 */}
             <div
                 className="relative"
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
             >
-                <span className="text-[12px] px-3 py-[3px] rounded-full bg-neutral-800 text-amber-300 select-none cursor-pointer shadow-sm">
-                    🔥 Hot Coin
-                </span>
+                <p className="text-[12px] px-3 py-[3px] rounded-full bg-neutral-800 text-amber-300 select-none cursor-pointer shadow-sm">
+                    <span className="whitespace-nowrap">🔥 Hot Coin</span>
+                </p>
 
                 <AnimatePresence>
                     {showTooltip && (

@@ -53,11 +53,11 @@ export const Home = () => {
                 {JSON.stringify(SITE_JSONLD)}
             </Script>
 
-            <div className="min-h-screen flex flex-col px-5 bg-black min-w-310">
+            <div className="flex flex-col px-5 bg-black min-w-310 ">
                 <RealTimeSection />
                 <DashBoard />
             </div>
-            <SeoFooter />
+
             <ForceTabReturnReload />
         </>
     );
