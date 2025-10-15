@@ -103,8 +103,8 @@ export default function FearGreedGauge({
     const v = Math.max(0, Math.min(100, value));
     const [isHovered, setIsHovered] = useState(false);
 
-    const MIN = -110;
-    const MAX = 110;
+    const MIN = -90;
+    const MAX = 95;
     const SPAN = MAX - MIN;
     const targetDeg = useMemo(() => MIN + (v / 100) * SPAN, [v]);
     const animatedDeg = useSpring(targetDeg, {
