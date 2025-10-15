@@ -69,7 +69,7 @@ export const DashBoard = () => {
                                 <span className="whitespace-nowrap">뉴스</span>
                             </button>
                         </div>
-                        <HotSymbolsTicker></HotSymbolsTicker>
+                        <HotSymbolsTicker />
                         <div className="ml-auto ">
                             {activeTab === "board" && (
                                 <button
