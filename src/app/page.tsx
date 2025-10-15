@@ -1,6 +1,6 @@
 import { RealTimeSection } from "@/components/RealTimeSection";
 import { DashBoard } from "@/components/DashBorad";
-import SeoFooter from "@/components/SeoFooter";
+import MobileSuggestModal from "@/components/MobileSuggestModa";
 import Script from "next/script";
 import ForceTabReturnReload from "@/components/ForceTabReturnReload";
 
@@ -57,7 +57,7 @@ export const Home = () => {
                 <RealTimeSection />
                 <DashBoard />
             </div>
-
+            <MobileSuggestModal coolDownDays={3} />
             <ForceTabReturnReload />
         </>
     );
