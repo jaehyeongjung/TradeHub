@@ -157,7 +157,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
     return (
         <>
             <div
-                className="relative"
+                className="relative w-full"
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
             >
