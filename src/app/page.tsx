@@ -57,7 +57,7 @@ export const Home = () => {
                 <RealTimeSection />
                 <DashBoard />
             </div>
-            <MobileSuggestModal coolDownDays={3} />
+            <MobileSuggestModal />
             <ForceTabReturnReload />
         </>
     );
