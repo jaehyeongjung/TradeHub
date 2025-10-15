@@ -149,8 +149,8 @@ export default function YouTubeBGMPlayer({
                 `}
                 disabled={!isReady}
             >
-                <span className="text-lg text-white">
-                    {isMuted ? "🔊 Bgm ON" : "🔇 BGM OFF"}
+                <span className="text-md text-white">
+                    {isMuted ? "🔊 " : "🔇 BGM OFF"}
                 </span>
             </button>
         </div>

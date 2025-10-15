@@ -36,7 +36,7 @@
                         수 있습니다.
                     </p>
 
-                    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div className="mt-6 grid grid-cols-3 gap-4 md:grid-cols-3">
                         <article className="rounded-xl bg-zinc-900/60 p-7 ring-1 ring-zinc-800">
                             <h3 className="text-sm font-semibold text-white">
                                 실시간 포지션 · 롱숏 비율
