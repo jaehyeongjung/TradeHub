@@ -242,7 +242,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                         {posts.map((p) => (
                             <div
                                 key={p.id}
-                                className="flex items-start border rounded p-3 mb-3 bg-neutral-900 hover:bg-neutral-950 cursor-pointer transition duration-200"
+                                className="flex items-start border rounded border-neutral-800 p-3 mb-3 bg-neutral-900 hover:bg-neutral-950 cursor-pointer transition duration-200"
                                 onClick={() => {
                                     setSelected(p);
                                     setMode("detail");
