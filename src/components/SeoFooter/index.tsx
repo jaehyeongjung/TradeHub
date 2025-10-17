@@ -6,7 +6,7 @@
         return (
             <section
                 aria-labelledby="seo-footer-heading"
-                className="border-t border-zinc-800"
+                className="border-t border-zinc-800 mt-5"
             >
                 <div className="mx-auto w-full max-w-screen-xl px-5 py-8 text-zinc-300 ">
                     <Image
