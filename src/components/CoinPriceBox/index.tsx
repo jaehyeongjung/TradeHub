@@ -6,237 +6,247 @@ import { supabase } from "@/lib/supabase-browser";
 
 type Props = { boxId: string; defaultSymbol?: string };
 
+// Binance ExchangeInfo 타입
+interface BinanceExchangeInfo {
+    symbols: {
+        symbol: string;
+        filters: {
+            filterType: string;
+            tickSize?: string;
+        }[];
+    }[];
+}
+
 export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
-  const initialSymbol = defaultSymbol.toLowerCase();
+    const initialSymbol = defaultSymbol.toLowerCase();
 
-  const [symbol, setSymbol] = useState(initialSymbol);
-  const [price, setPrice] = useState<number | null>(null);
-  const [pct, setPct] = useState<number | null>(null);
-  const [open, setOpen] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [hovered, setHovered] = useState(false);
+    const [symbol, setSymbol] = useState(initialSymbol);
+    const [price, setPrice] = useState<number | null>(null);
+    const [pct, setPct] = useState<number | null>(null);
+    const [open, setOpen] = useState(false);
+    const [userId, setUserId] = useState<string | null>(null);
+    const [hovered, setHovered] = useState(false);
 
-  const wsRef = useRef<WebSocket | null>(null);
-  const verRef = useRef(0);
-  const reconnectTimer = useRef<number | null>(null);
+    const wsRef = useRef<WebSocket | null>(null);
+    const verRef = useRef(0);
+    const reconnectTimer = useRef<number | null>(null);
 
-  // ------ precision (tickSize) 관리 -------
-  const precisionCache = useRef<Record<string, number>>({});
-  const [decimals, setDecimals] = useState<number>(2);
+    // precision 캐시
+    const precisionCache = useRef<Record<string, number>>({});
+    const [decimals, setDecimals] = useState<number>(2);
 
-  const decimalsFromTickSize = (tick: string) => {
-    // "0.00001" -> 5
-    const i = tick.indexOf(".");
-    if (i === -1) return 0;
-    const frac = tick.slice(i + 1);
-    // tickSize가 "0.10000000" 같은 케이스를 고려
-    const trimmed = frac.replace(/0+$/, "");
-    return (trimmed.length || frac.length);
-  };
+    const decimalsFromTickSize = (tick: string) => {
+        const i = tick.indexOf(".");
+        if (i === -1) return 0;
+        const frac = tick.slice(i + 1);
+        const trimmed = frac.replace(/0+$/, "");
+        return trimmed.length || frac.length;
+    };
 
-  const loadPrecision = async (sym: string) => {
-    const key = sym.toUpperCase();
-    if (precisionCache.current[key] != null) {
-      setDecimals(precisionCache.current[key]);
-      return;
-    }
-    try {
-      const res = await fetch(
-        `https://api.binance.com/api/v3/exchangeInfo?symbol=${key}`
-      );
-      const info = await res.json();
-      const filters = info?.symbols?.[0]?.filters ?? [];
-      const pf = filters.find((f: any) => f.filterType === "PRICE_FILTER");
-      const tick = pf?.tickSize ?? "0.01";
-      const d = decimalsFromTickSize(tick);
-      precisionCache.current[key] = d;
-      setDecimals(d);
-    } catch {
-      // 폴백: 1달러 미만 5자리, 이상 2자리
-      setDecimals(price != null && price < 1 ? 5 : 2);
-    }
-  };
-
-  // 숫자 포맷터 (통화 포맷은 기본 2자리라 직접 붙임)
-  const decimalFormatter = useMemo(
-    () =>
-      new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2, // 보기 좋게 최소 2자리
-        maximumFractionDigits: Math.max(2, decimals),
-      }),
-    [decimals]
-  );
-
-  const formatPrice = (v: number) => `$${decimalFormatter.format(v)}`;
-
-  // 로그인 세션 + 심볼 로드
-  useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      async (_e, session) => {
-        const uid = session?.user?.id ?? null;
-        setUserId(uid);
-
-        if (uid) {
-          const { data: row } = await supabase
-            .from("user_symbol_prefs")
-            .select("symbol")
-            .eq("user_id", uid)
-            .eq("box_id", boxId)
-            .maybeSingle();
-          if (row?.symbol) setSymbol(row.symbol.toLowerCase());
-          else setSymbol(initialSymbol);
-        } else {
-          const loc = localStorage.getItem(`coin_box:${boxId}`);
-          setSymbol(loc ?? initialSymbol);
+    const loadPrecision = async (sym: string) => {
+        const key = sym.toUpperCase();
+        if (precisionCache.current[key] != null) {
+            setDecimals(precisionCache.current[key]);
+            return;
         }
-      }
+        try {
+            const res = await fetch(
+                `https://api.binance.com/api/v3/exchangeInfo?symbol=${key}`
+            );
+            const info = (await res.json()) as BinanceExchangeInfo;
+            const filters = info.symbols?.[0]?.filters ?? [];
+            const pf = filters.find((f) => f.filterType === "PRICE_FILTER");
+            const tick = pf?.tickSize ?? "0.01";
+            const d = decimalsFromTickSize(tick);
+            precisionCache.current[key] = d;
+            setDecimals(d);
+        } catch {
+            setDecimals(price != null && price < 1 ? 5 : 2);
+        }
+    };
+
+    const decimalFormatter = useMemo(
+        () =>
+            new Intl.NumberFormat("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: Math.max(2, decimals),
+            }),
+        [decimals]
     );
 
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      const uid = data.session?.user?.id ?? null;
-      setUserId(uid);
+    const formatPrice = (v: number) => `$${decimalFormatter.format(v)}`;
 
-      if (uid) {
-        const { data: row } = await supabase
-          .from("user_symbol_prefs")
-          .select("symbol")
-          .eq("user_id", uid)
-          .eq("box_id", boxId)
-          .maybeSingle();
-        if (row?.symbol) setSymbol(row.symbol.toLowerCase());
-      } else {
-        const loc = localStorage.getItem(`coin_box:${boxId}`);
-        if (loc) setSymbol(loc);
-      }
-    })();
+    // 세션 + 심볼 불러오기
+    useEffect(() => {
+        const { data: sub } = supabase.auth.onAuthStateChange(
+            async (_e, session) => {
+                const uid = session?.user?.id ?? null;
+                setUserId(uid);
 
-    return () => sub.subscription.unsubscribe();
-  }, [boxId, initialSymbol]);
+                if (uid) {
+                    const { data: row } = await supabase
+                        .from("user_symbol_prefs")
+                        .select("symbol")
+                        .eq("user_id", uid)
+                        .eq("box_id", boxId)
+                        .maybeSingle();
+                    if (row?.symbol) setSymbol(row.symbol.toLowerCase());
+                    else setSymbol(initialSymbol);
+                } else {
+                    const loc = localStorage.getItem(`coin_box:${boxId}`);
+                    setSymbol(loc ?? initialSymbol);
+                }
+            }
+        );
 
-  // 심볼 변경 시 precision 로드
-  useEffect(() => {
-    loadPrecision(symbol);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [symbol]);
+        (async () => {
+            const { data } = await supabase.auth.getSession();
+            const uid = data.session?.user?.id ?? null;
+            setUserId(uid);
 
-  // Binance WebSocket
-  useEffect(() => {
-    const myVer = ++verRef.current;
-    setPrice(null);
-    setPct(null);
+            if (uid) {
+                const { data: row } = await supabase
+                    .from("user_symbol_prefs")
+                    .select("symbol")
+                    .eq("user_id", uid)
+                    .eq("box_id", boxId)
+                    .maybeSingle();
+                if (row?.symbol) setSymbol(row.symbol.toLowerCase());
+            } else {
+                const loc = localStorage.getItem(`coin_box:${boxId}`);
+                if (loc) setSymbol(loc);
+            }
+        })();
 
-    if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
-    if (wsRef.current) {
-      try {
-        wsRef.current.close(1000, "symbol change");
-      } catch {}
-      wsRef.current = null;
-    }
+        return () => sub.subscription.unsubscribe();
+    }, [boxId, initialSymbol]);
 
-    const stream = symbol.toLowerCase();
-    const url = `wss://stream.binance.com:9443/ws/${stream}@ticker`;
+    // precision 불러오기
+    useEffect(() => {
+        loadPrecision(symbol);
+    }, [symbol]);
 
-    const connect = () => {
-      const ws = new WebSocket(url);
-      wsRef.current = ws;
+    // Binance WebSocket
+    useEffect(() => {
+        const myVer = ++verRef.current;
+        setPrice(null);
+        setPct(null);
 
-      ws.onmessage = (ev) => {
-        if (verRef.current !== myVer) return;
-        const d = JSON.parse(ev.data);
-        const last = parseFloat(d?.c);
-        const changePct = parseFloat(d?.P);
-        if (!Number.isNaN(last)) setPrice(last);
-        if (!Number.isNaN(changePct)) setPct(changePct);
-      };
-
-      ws.onclose = () => {
-        if (verRef.current === myVer) {
-          reconnectTimer.current = window.setTimeout(connect, 1200);
+        if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
+        if (wsRef.current) {
+            try {
+                wsRef.current.close(1000, "symbol change");
+            } catch {}
+            wsRef.current = null;
         }
-      };
 
-      ws.onerror = () => {
-        try {
-          ws.close();
-        } catch {}
-      };
+        const stream = symbol.toLowerCase();
+        const url = `wss://stream.binance.com:9443/ws/${stream}@ticker`;
+
+        const connect = () => {
+            const ws = new WebSocket(url);
+            wsRef.current = ws;
+
+            ws.onmessage = (ev: MessageEvent<string>) => {
+                if (verRef.current !== myVer) return;
+                const d = JSON.parse(ev.data) as { c: string; P: string };
+                const last = parseFloat(d?.c);
+                const changePct = parseFloat(d?.P);
+                if (!Number.isNaN(last)) setPrice(last);
+                if (!Number.isNaN(changePct)) setPct(changePct);
+            };
+
+            ws.onclose = () => {
+                if (verRef.current === myVer) {
+                    reconnectTimer.current = window.setTimeout(connect, 1200);
+                }
+            };
+
+            ws.onerror = () => {
+                try {
+                    ws.close();
+                } catch {}
+            };
+        };
+
+        connect();
+
+        return () => {
+            if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
+            if (wsRef.current) {
+                try {
+                    wsRef.current.close(1000, "cleanup");
+                } catch {}
+            }
+        };
+    }, [symbol]);
+
+    const saveSymbol = async (next: string) => {
+        const s = next.toLowerCase();
+        setSymbol(s);
+        if (userId) {
+            await supabase
+                .from("user_symbol_prefs")
+                .upsert([{ user_id: userId, box_id: boxId, symbol: s }], {
+                    onConflict: "user_id,box_id",
+                });
+        } else {
+            localStorage.setItem(`coin_box:${boxId}`, s);
+        }
     };
 
-    connect();
+    const pctColor =
+        pct == null
+            ? "text-gray-300"
+            : pct > 0
+            ? "text-emerald-500"
+            : "text-red-500";
+    const arrow = pct == null ? "" : pct > 0 ? "▲" : pct < 0 ? "▼" : "•";
+    const pctText =
+        pct == null ? "" : `${pct > 0 ? "+" : ""}${pct.toFixed(2)}%`;
 
-    return () => {
-      if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
-      if (wsRef.current) {
-        try {
-          wsRef.current.close(1000, "cleanup");
-        } catch {}
-      }
-    };
-  }, [symbol]);
+    return (
+        <>
+            <div
+                className="relative w-full"
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+            >
+                <button
+                    onClick={() => setOpen(true)}
+                    className="min-w-30 w-full min-h-26 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-3 shadow-md transition hover:border-neutral-700"
+                >
+                    <h2 className="text-sm font-bold text-white">
+                        {symbol.toUpperCase()}
+                    </h2>
+                    <p className={`mt-1 text-lg font-mono ${pctColor}`}>
+                        {price != null ? formatPrice(price) : "—"}
+                    </p>
+                    <div className={`mt-0.5 text-xs font-semibold ${pctColor}`}>
+                        {pct != null ? (
+                            <>
+                                {arrow} {pctText}
+                            </>
+                        ) : (
+                            "—"
+                        )}
+                    </div>
+                </button>
 
-  const saveSymbol = async (next: string) => {
-    const s = next.toLowerCase();
-    setSymbol(s);
-    if (userId) {
-      await supabase
-        .from("user_symbol_prefs")
-        .upsert([{ user_id: userId, box_id: boxId, symbol: s }], {
-          onConflict: "user_id,box_id",
-        });
-    } else {
-      localStorage.setItem(`coin_box:${boxId}`, s);
-    }
-  };
+                {hovered && (
+                    <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+8px)] z-50 w-[200px] rounded-lg bg-neutral-900 border border-neutral-700 py-2 px-3 text-[11px] text-neutral-200 shadow-lg pointer-events-none">
+                        클릭 시 코인 심볼을 변경할 수 있습니다.
+                        <div className="absolute left-1/2 -translate-x-1/2 -top-2 w-0 h-0 border-l-4 border-r-4 border-b-8 border-transparent border-b-neutral-900" />
+                    </div>
+                )}
+            </div>
 
-  const pctColor =
-    pct == null ? "text-gray-300" : pct > 0 ? "text-emerald-500" : "text-red-500";
-  const arrow = pct == null ? "" : pct > 0 ? "▲" : pct < 0 ? "▼" : "•";
-  const pctText = pct == null ? "" : `${pct > 0 ? "+" : ""}${pct.toFixed(2)}%`;
-
-  return (
-    <>
-      <div
-        className="relative w-full"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        <button
-          onClick={() => setOpen(true)}
-          className="min-w-30 w-full min-h-26 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-3 shadow-md transition hover:border-neutral-700"
-        >
-          <h2 className="text-sm font-bold text-white">{symbol.toUpperCase()}</h2>
-
-          <p className={`mt-1 text-lg font-mono ${pctColor}`}>
-            {price != null ? formatPrice(price) : "—"}
-          </p>
-
-          <div className={`mt-0.5 text-xs font-semibold ${pctColor}`}>
-            {pct != null ? (
-              <>
-                {arrow} {pctText}
-              </>
-            ) : (
-              "—"
-            )}
-          </div>
-        </button>
-
-        {/* 간단한 툴팁 */}
-        {hovered && (
-          <div className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+8px)] z-50 w-[200px] rounded-lg bg-neutral-900 border border-neutral-700 py-2 px-3 text-[11px] text-neutral-200 shadow-lg pointer-events-none">
-            클릭 시 코인 심볼을 변경할 수 있습니다.
-            <div className="absolute left-1/2 -translate-x-1/2 -top-2 w-0 h-0 border-l-4 border-r-4 border-b-8 border-transparent border-b-neutral-900" />
-          </div>
-        )}
-      </div>
-
-      <SymbolPickerModal
-        open={open}
-        initialSymbol={symbol}
-        onClose={() => setOpen(false)}
-        onSelect={saveSymbol}
-      />
-    </>
-  );
+            <SymbolPickerModal
+                open={open}
+                initialSymbol={symbol}
+                onClose={() => setOpen(false)}
+                onSelect={saveSymbol}
+            />
+        </>
+    );
 };

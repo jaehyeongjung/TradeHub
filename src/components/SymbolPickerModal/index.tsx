@@ -16,12 +16,12 @@ const DEFAULT_SYMBOLS = [
     "dotusdt", // 폴카닷
     "ltcusdt", // 라이트코인
     "bchusdt", // 비트코인 캐시
-    //"shibusdt", // 시바이누 (주요 밈 코인)
+    "shibusdt", // 시바이누 (주요 밈 코인)
     "suiusdt", // Sui (신규 L1 고성능 코인)
     "aptusdt", // Aptos (신규 L1 고성능 코인)
     "seiusdt", // Sei (웹 3.0 인프라)
-   // "pepeusdt", // Pepe (밈 코인)
-    //"flokiusdt", // Floki (밈 코인)
+    "pepeusdt", // Pepe (밈 코인)
+    "flokiusdt", // Floki (밈 코인)
     "wldusdt", // Worldcoin (AI & Identity)
     "fetusdt", // Fetch.ai
 
