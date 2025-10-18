@@ -11,6 +11,7 @@ const DEFAULT_SYMBOLS = [
     "dogeusdt", // 도지코인 (밈 코인 대표)
     "adausdt", // 카르다노
     "avaxusdt", // 아발란체
+    "trxusdt",
     "linkusdt", // 체인링크
     "dotusdt", // 폴카닷
     "ltcusdt", // 라이트코인
@@ -19,22 +20,22 @@ const DEFAULT_SYMBOLS = [
     "suiusdt", // Sui (신규 L1 고성능 코인)
     "aptusdt", // Aptos (신규 L1 고성능 코인)
     "seiusdt", // Sei (웹 3.0 인프라)
-    "pepeusdt", // Pepe (밈 코인)
+   // "pepeusdt", // Pepe (밈 코인)
     //"flokiusdt", // Floki (밈 코인)
     "wldusdt", // Worldcoin (AI & Identity)
     "fetusdt", // Fetch.ai
 
-    // ⛓️ DeFi 및 주요 프로토콜
+    //  DeFi 및 주요 프로토콜
     "uniusdt", // 유니스왑
     "aaveusdt", // Aave
 
-    // 🌐 메타버스 및 게임 (Gaming/Metaverse)
+    //  메타버스 및 게임 (Gaming/Metaverse)
     "galausdt", // Gala
     "axsusdt", // Axie Infinity
     "manausdt", // Decentraland
     "sandusdt", // The Sandbox
 
-    // 💡 기타 고거래량 알트
+    //  기타 고거래량 알트
     "etcusdt", // 이더리움 클래식
     "nearusdt", // 니어 프로토콜
     "atomusdt", // 코스모스
