@@ -5,6 +5,7 @@ import AuthGate from "@/components/AuthGate";
 import Script from "next/script";
 import FloatingLoginSidebar from "@/components/FloatingLoginDrawer";
 
+
 const inter = Inter({
     subsets: ["latin"],
     display: "swap",
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
             "코인 선물 트레이더를 위한 실시간 포지션/선물 롱숏 비율/채팅/코인 뉴스 코인 커뮤니티",
         images: ["/og.png"],
     },
-    icons: { icon: "/favicon.ico" },
+    icons: { icon: "/favicon.png" },
     robots: {
         index: true,
         follow: true,
