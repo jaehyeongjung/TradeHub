@@ -40,9 +40,12 @@ export const DashBoard = () => {
 
     return (
         <>
-            <div className="flex gap-5 mt-5 min-h-130 h-[calc(100vh-400px)] lg:h-[calc(100vh-200px)] border-neutral-800">
+            <section
+                aria-label="커뮤니티 게시판 및 채팅"
+                className="flex gap-5 mt-5 min-h-130 h-[calc(100vh-400px)] lg:h-[calc(100vh-200px)] border-neutral-800"
+            >
                 {/* 왼쪽: 게시판/뉴스 카드 */}
-                <div className="min-w-113 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950 border border-zinc-800">
+                <article className="min-w-113 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950 border border-zinc-800">
                     {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
                     <div className="flex items-center gap-2">
                         <div className="inline-flex items-center rounded-lg bg-neutral-800 p-1 ml-3">
@@ -91,19 +94,27 @@ export const DashBoard = () => {
                             <NewsPanel roomId="lobby" />
                         )}
                     </div>
-                </div>
+                </article>
 
-                <div className="flex flex-col gap-5 min-w-57">
+                <aside
+                    aria-label="거래 정보 위젯"
+                    className="flex flex-col gap-5 min-w-57"
+                >
                     <KimchiWidget />
                     <LiveStatsBox />
                     <FearGreedWidget />
                     <YouTubeSeamlessPlayer videoId="j23SO29LNWE" />
-                </div>
+                </aside>
 
-                <div className="min-w-105  border border-zinc-800 rounded-2xl flex flex-col items-center gap-3 h-[calc(100vh-400px)]  lg:h-[calc(100vh-200px)] bg-neutral-950">
-                    <Chat />
-                </div>
-            </div>
+                <aside
+                    aria-label="실시간 채팅"
+                    className="min-w-105 border border-zinc-800 rounded-2xl h-full bg-neutral-950 overflow-hidden flex flex-col"
+                >
+                    <div className="flex-1 min-h-0">
+                        <Chat />
+                    </div>
+                </aside>
+            </section>
             <SeoFooter />
         </>
     );

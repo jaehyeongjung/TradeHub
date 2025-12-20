@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import Logo from "../../../public/favicon.png";
 
 export default function SeoFooter() {
     return (
@@ -10,8 +9,8 @@ export default function SeoFooter() {
         >
             <div className="mx-auto w-full max-w-screen-xl px-5 py-8 text-zinc-300 ">
                 <Image
-                    src={Logo}
-                    alt="Company Logo"
+                    src="/favicon.png"
+                    alt="TradeHub 로고"
                     width={80}
                     height={80}
                     className="ml-[-18px]"

@@ -11,7 +11,6 @@ export async function GET() {
         return NextResponse.json({ error: "upstream error" }, { status: 500 });
 
     const json = await r.json();
-    // 예: { data: [{ value: "63", value_classification: "Greed", ...}] }
     const item = json?.data?.[0];
     return NextResponse.json({
         value: Number(item?.value ?? 0),

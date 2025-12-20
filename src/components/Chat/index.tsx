@@ -465,49 +465,54 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                 {/* 메시지 리스트 */}
                 <div
                     ref={listRef}
-                    className="flex-1 min-h-0 overflow-y-auto space-y-2 pr-1 pb-2 scrollbar-hide"
+                    className="flex-1 min-h-0 overflow-y-auto space-y-2 pr-1 pb-2 scrollbar-hide relative"
                 >
-                    {msgs.map((m) => {
-                        const userChoice = positionsMap[m.user_id];
-                        const tag = userChoice
-                            ? `[${userChoice.toUpperCase()}] `
-                            : "";
-                        const nameColor =
-                            m.user_id === userId
-                                ? "text-yellow-300"
-                                : "text-blue-400";
-                        const tagColor =
-                            userChoice === "long"
-                                ? "text-green-400 font-semibold"
-                                : userChoice === "short"
-                                ? "text-red-400 font-semibold"
-                                : "text-neutral-500";
+                    {msgs.length > 0 ? (
+                        msgs.map((m) => {
+                            const userChoice = positionsMap[m.user_id];
+                            const tag = userChoice
+                                ? `[${userChoice.toUpperCase()}] `
+                                : "";
+                            const nameColor =
+                                m.user_id === userId
+                                    ? "text-yellow-300"
+                                    : "text-blue-400";
+                            const tagColor =
+                                userChoice === "long"
+                                    ? "text-green-400 font-semibold"
+                                    : userChoice === "short"
+                                    ? "text-red-400 font-semibold"
+                                    : "text-neutral-500";
 
-                        return (
-                            <motion.div
-                                key={m.id}
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.25 }}
-                                className="text-[13px] border border-neutral-800 rounded-lg px-3 py-2 bg-neutral-900 shadow-sm min-w-0 max-w-full"
-                            >
-                                <b className={`${nameColor} text-[13px]`}>
-                                    <span className={tagColor}>{tag}</span>
-                                    {m.user_id === userId
-                                        ? "나 (Me)"
-                                        : m.user_id.slice(0, 8)}
-                                </b>
-                                <span className="mx-2 text-neutral-600">·</span>
-                                <span className="text-neutral-300 text-[13px] whitespace-pre-wrap break-anywhere">
-                                    {linkify(m.content)}
-                                </span>
-                            </motion.div>
-                        );
-                    })}
-                    {!msgs.length && (
-                        <div className="text-[12px] text-neutral-500 text-center py-4">
-                            아직 메시지가 없습니다. 오늘의 첫 포지션을 잡고
-                            메시지를 남겨보세요!
+                            return (
+                                <motion.div
+                                    key={m.id}
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.25 }}
+                                    className="text-[13px] border border-neutral-800 rounded-lg px-3 py-2 bg-neutral-900 shadow-sm min-w-0 max-w-full"
+                                >
+                                    <b className={`${nameColor} text-[13px]`}>
+                                        <span className={tagColor}>{tag}</span>
+                                        {m.user_id === userId
+                                            ? "나 (Me)"
+                                            : m.user_id.slice(0, 8)}
+                                    </b>
+                                    <span className="mx-2 text-neutral-600">
+                                        ·
+                                    </span>
+                                    <span className="text-neutral-300 text-[13px] whitespace-pre-wrap break-anywhere">
+                                        {linkify(m.content)}
+                                    </span>
+                                </motion.div>
+                            );
+                        })
+                    ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-[12px] text-neutral-500 text-center px-4">
+                                아직 메시지가 없습니다. 오늘의 첫 포지션을 잡고
+                                메시지를 남겨보세요!
+                            </div>
                         </div>
                     )}
                 </div>

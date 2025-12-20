@@ -1,8 +1,15 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import AuthGate from "@/components/AuthGate";
 import Script from "next/script";
 import FloatingLoginSidebar from "@/components/FloatingLoginDrawer";
+
+const inter = Inter({
+    subsets: ["latin"],
+    display: "swap",
+    variable: "--font-inter",
+});
 
 const SITE = "https://www.tradehub.kr";
 
@@ -68,7 +75,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="ko" className="bg-black">
+        <html lang="ko" className={`bg-black ${inter.variable}`}>
             <body>
                 <AuthGate>{children}</AuthGate>
                 <Script

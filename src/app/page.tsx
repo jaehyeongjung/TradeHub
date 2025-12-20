@@ -37,7 +37,6 @@ const SITE_JSONLD = {
 export const Home = () => {
     return (
         <>
-            {/* JSON-LD는 스크립트 '각각' 객체로 주입 (배열 금지) */}
             <Script
                 id="ld-org"
                 type="application/ld+json"
@@ -53,10 +52,10 @@ export const Home = () => {
                 {JSON.stringify(SITE_JSONLD)}
             </Script>
 
-            <div className="flex flex-col px-5 bg-black min-w-310 ">
+            <main className="flex flex-col px-5 bg-black min-w-310 ">
                 <RealTimeSection />
                 <DashBoard />
-            </div>
+            </main>
             <MobileSuggestModal />
             <ForceTabReturnReload />
         </>
