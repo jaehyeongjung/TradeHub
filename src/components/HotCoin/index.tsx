@@ -24,8 +24,12 @@ function isHotCandidate(sym: string) {
 function scoreOf(t: Ticker24h) {
     const vol = Number(t.quoteVolume) || 0;
     const pct = Math.abs(Number(t.priceChangePercent) || 0) / 100;
-    const bonus = Math.min(pct, 0.5); // 최대 +50% 보너스
-    return vol * (1 + bonus);
+
+    // 거래량 최소 필터 (300만 달러 미만 제외)
+    if (vol < 3000000) return 0;
+
+    // √거래량 × 등락률² (거래량 있으면서 변동성 큰 코인 우선)
+    return Math.sqrt(vol) * Math.pow(pct, 2) * 1000000;
 }
 
 export default function HotSymbolsTicker() {
