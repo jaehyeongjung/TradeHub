@@ -112,6 +112,7 @@ function linkify(text: string): ReactNode[] {
 
 export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
     const [userId, setUserId] = useState<string | null>(null);
+    const [isAnonymous, setIsAnonymous] = useState(false);
     const [msgs, setMsgs] = useState<Msg[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
@@ -133,16 +134,48 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
         });
     };
 
-    // session
+    // session + auto anonymous login
     useEffect(() => {
         const {
             data: { subscription },
-        } = supabase.auth.onAuthStateChange((_e, s) => {
-            setUserId(s?.user?.id ?? null);
+        } = supabase.auth.onAuthStateChange(async (event, s) => {
+            console.log('[Chat] Auth event:', event, 'User:', s?.user?.id, 'IsAnon:', s?.user?.is_anonymous);
+            if (s?.user) {
+                // 로그인 상태 (실제 사용자 또는 익명)
+                console.log('[Chat] Setting userId to:', s.user.id);
+                setUserId(s.user.id);
+                setIsAnonymous(s.user.is_anonymous ?? false);
+            } else {
+                // 로그아웃 상태 → 자동 익명 로그인
+                console.log('[Chat] No user, attempting anonymous sign-in...');
+                const { data: anonData, error } = await supabase.auth.signInAnonymously();
+                if (error) {
+                    console.error('[Chat] Anonymous sign-in error:', error);
+                } else {
+                    console.log('[Chat] Anonymous sign-in success, userId:', anonData?.user?.id);
+                }
+                setUserId(anonData?.user?.id ?? null);
+                setIsAnonymous(true);
+            }
         });
         (async () => {
             const { data } = await supabase.auth.getSession();
-            setUserId(data.session?.user?.id ?? null);
+            console.log('[Chat] Initial session check:', data.session?.user?.id);
+            if (data.session) {
+                setUserId(data.session.user.id);
+                setIsAnonymous(data.session.user.is_anonymous ?? false);
+            } else {
+                // 비로그인이면 자동 익명 로그인
+                console.log('[Chat] No initial session, signing in anonymously...');
+                const { data: anonData, error } = await supabase.auth.signInAnonymously();
+                if (error) {
+                    console.error('[Chat] Initial anonymous sign-in error:', error);
+                } else {
+                    console.log('[Chat] Initial anonymous sign-in success:', anonData?.user?.id);
+                }
+                setUserId(anonData?.user?.id ?? null);
+                setIsAnonymous(true);
+            }
         })();
         return () => subscription.unsubscribe();
     }, []);
@@ -212,8 +245,26 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
 
         try {
             const text = inputRef.current?.value?.trim();
-            if (!text || !userIdRef.current) return;
+            if (!text) return;
 
+            console.log('[Chat] Sending message, current userId:', userIdRef.current);
+            // userId가 없으면 짧게 기다렸다가 재시도 (로그아웃 직후 익명 로그인 대기)
+            if (!userIdRef.current) {
+                console.log('[Chat] No userId, waiting 300ms...');
+                await new Promise(resolve => setTimeout(resolve, 300));
+                console.log('[Chat] After 300ms, userId:', userIdRef.current);
+                if (!userIdRef.current) {
+                    console.log('[Chat] Still no userId, waiting 500ms more...');
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    console.log('[Chat] After 800ms total, userId:', userIdRef.current);
+                }
+            }
+            if (!userIdRef.current) {
+                console.error('[Chat] Cannot send, no userId after waiting');
+                return;
+            }
+
+            console.log('[Chat] Attempting DB INSERT with userId:', userIdRef.current);
             const { data, error } = await supabase
                 .from("messages")
                 .insert([
@@ -226,17 +277,31 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                 .select()
                 .single();
 
+            if (error) {
+                console.error('[Chat] DB INSERT error:', error);
+            } else {
+                console.log('[Chat] DB INSERT success:', data);
+            }
+
             if (!error && data) {
                 const newMsg = data as Msg;
+                console.log('[Chat] Adding message to UI:', newMsg.id);
                 setMsgs((prev) => {
-                    if (prev.some((m) => m.id === newMsg.id)) return prev;
+                    if (prev.some((m) => m.id === newMsg.id)) {
+                        console.log('[Chat] Message already exists in UI');
+                        return prev;
+                    }
+                    console.log('[Chat] Adding new message to UI');
                     const next = [...prev, newMsg];
                     scrollToBottom();
                     return next;
                 });
             }
 
-            if (inputRef.current) inputRef.current.value = "";
+            if (inputRef.current) {
+                console.log('[Chat] Clearing input field');
+                inputRef.current.value = "";
+            }
         } finally {
             setTimeout(() => (sendingRef.current = false), 0);
         }
@@ -268,9 +333,9 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
             .catch(() => {});
     }, [roomId]);
 
-    // load my choice (only when logged in)
+    // load my choice (only when logged in, not anonymous)
     useEffect(() => {
-        if (!userId) {
+        if (!userId || isAnonymous) {
             setMyChoice(null);
             setLoadingChoice(false);
             return;
@@ -291,7 +356,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
             setLoadingChoice(false);
         };
         init();
-    }, [userId, roomId]);
+    }, [userId, roomId, isAnonymous]);
 
     // nickname tags map
     const [positionsMap, setPositionsMap] = useState<
@@ -353,7 +418,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
     }, [roomId]);
 
     const choose = async (choice: "long" | "short") => {
-        if (!userId) return;
+        if (!userId || isAnonymous) return;
         const day = todayKstDateStr();
         const { error } = await supabase
             .from("positions")
@@ -388,9 +453,13 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                 <div className="mb-3 rounded-xl border border-neutral-700 bg-neutral-900/80 p-3 space-y-2 shadow-lg">
                     <div className="flex justify-between items-center text-[12px]">
                         <div>
-                            {loadingChoice && userId ? (
+                            {loadingChoice && userId && !isAnonymous ? (
                                 <span className="text-neutral-400">
                                     포지션 로딩중...
+                                </span>
+                            ) : isAnonymous ? (
+                                <span className="text-neutral-400 text-[11px]">
+                                    💡 로그인하면 포지션을 선택할 수 있어요
                                 </span>
                             ) : (
                                 <span className="font-semibold">
@@ -433,28 +502,30 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                     {!myChoice && (
                         <div className="flex gap-2 pt-1">
                             <motion.button
-                                whileHover={{ scale: userId ? 1.02 : 1 }}
-                                whileTap={{ scale: userId ? 0.98 : 1 }}
-                                disabled={!userId}
+                                whileHover={{ scale: userId && !isAnonymous ? 1.02 : 1 }}
+                                whileTap={{ scale: userId && !isAnonymous ? 0.98 : 1 }}
+                                disabled={!userId || isAnonymous}
                                 className={`px-3 py-[6px] rounded-lg text-white text-[12px] font-semibold flex-1 shadow-md transition-colors ${
-                                    userId
+                                    userId && !isAnonymous
                                         ? "bg-green-700 hover:bg-green-600 active:bg-green-800"
                                         : "bg-neutral-700 cursor-not-allowed opacity-60"
                                 }`}
                                 onClick={() => choose("long")}
+                                title={isAnonymous ? "로그인하면 포지션을 선택할 수 있어요" : ""}
                             >
                                 Long
                             </motion.button>
                             <motion.button
-                                whileHover={{ scale: userId ? 1.02 : 1 }}
-                                whileTap={{ scale: userId ? 0.98 : 1 }}
-                                disabled={!userId}
+                                whileHover={{ scale: userId && !isAnonymous ? 1.02 : 1 }}
+                                whileTap={{ scale: userId && !isAnonymous ? 0.98 : 1 }}
+                                disabled={!userId || isAnonymous}
                                 className={`px-3 py-[6px] rounded-lg text-white text-[12px] font-semibold flex-1 shadow-md transition-colors ${
-                                    userId
+                                    userId && !isAnonymous
                                         ? "bg-red-700 hover:bg-red-600 active:bg-red-800"
                                         : "bg-neutral-700 cursor-not-allowed opacity-60"
                                 }`}
                                 onClick={() => choose("short")}
+                                title={isAnonymous ? "로그인하면 포지션을 선택할 수 있어요" : ""}
                             >
                                 Short
                             </motion.button>
@@ -530,11 +601,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                             }
                             onKeyDown={onKeyDown}
                             className="flex-1 border border-neutral-700 px-3 py-2 rounded-lg bg-neutral-900 text-gray-100 placeholder-neutral-500 focus:outline-none focus:border-emerald-400 text-[14px] shadow-inner"
-                            placeholder={
-                                userId
-                                    ? "채팅을 시작하세요."
-                                    : "로그인 후 메시지를 전송할 수 있어요."
-                            }
+                            placeholder="채팅을 시작하세요..."
                             maxLength={2000}
                             disabled={!userId}
                         />

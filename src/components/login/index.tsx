@@ -37,11 +37,15 @@ export default function AuthBox() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
 
-    // 세션 초기화 + 구독
+    // 세션 초기화 + 구독 (익명 사용자 제외)
     useEffect(() => {
-        supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
+        supabase.auth.getUser().then(({ data }) => {
+            const u = data.user;
+            setUser(u?.is_anonymous ? null : u ?? null);
+        });
         const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-            setUser(session?.user ?? null);
+            const u = session?.user;
+            setUser(u?.is_anonymous ? null : u ?? null);
         });
         return () => sub.subscription.unsubscribe();
     }, []);
@@ -112,6 +116,8 @@ export default function AuthBox() {
         setErr(null);
         setInfo(null);
         await supabase.auth.signOut();
+        // 익명 로그인이 완료될 때까지 기다리기
+        await new Promise(resolve => setTimeout(resolve, 500));
     };
 
     if (user) {

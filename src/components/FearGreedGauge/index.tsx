@@ -143,12 +143,14 @@ export default function FearGreedGauge({
         >
             {/* 헤더 */}
             <div className="mb-2 flex items-center justify-between">
-                <h3 className="text-sm font-semibold opacity-90">{title}</h3>
+                <h3 className="text-xs font-semibold opacity-90 ">
+                    {title}
+                </h3>
                 <div className="flex items-center gap-2">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-yellow-500/80 text-sm font-bold">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-yellow-500/80 text-xs font-bold ml-3">
                         {v}
                     </span>
-                    <span className="text-yellow-300 font-semibold">
+                    <span className="text-yellow-300 font-semibold text-xs ml-4">
                         {stateText}
                     </span>
                 </div>
