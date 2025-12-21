@@ -6,8 +6,8 @@ export const runtime = "nodejs";
 export const preferredRegion = ["hnd1", "sin1"];
 
 // ===== 설정 (현실 보정치) =====
-const FX_SPREAD = Number(process.env.FX_SPREAD ?? "0.009"); // +0.9%
-const USDT_USD  = Number(process.env.USDT_USD  ?? "0.999");
+const FX_SPREAD = Number(process.env.FX_SPREAD ?? "0"); // 보정 제거
+const USDT_USD  = Number(process.env.USDT_USD  ?? "1.0");
 
 // ===== 외부 응답 타입 =====
 type UpbitTicker = Array<{ trade_price: number; timestamp: number }>;
