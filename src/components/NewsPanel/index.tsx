@@ -204,13 +204,13 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
                                     href={viewer.url}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="px-2 py-1 text-xs rounded bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
+                                    className="px-2 py-1 text-xs rounded bg-neutral-800 text-neutral-200 hover:bg-neutral-700 whitespace-nowrap"
                                 >
                                     새 탭에서 열기
                                 </a>
                                 <button
                                     onClick={closeViewer}
-                                    className="px-2 py-1 text-xs rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
+                                    className="px-2 py-1 text-xs rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700 whitespace-nowrap"
                                 >
                                     닫기
                                 </button>
