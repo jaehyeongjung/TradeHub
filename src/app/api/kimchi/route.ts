@@ -16,7 +16,6 @@ type UpbitOrderbook = Array<{
   timestamp: number;
 }>;
 type BinanceTicker = { symbol?: string; price?: string };
-type FxLatest = { rates?: { KRW?: number } };
 
 // ===== API 응답 타입(클라와 공유 가능) =====
 export type KimchiResponse = {
@@ -49,11 +48,25 @@ function withTimeout(url: string, ms = 3500, init?: RequestInit) {
 
 // ===== 외부 호출들 (실패 시 null 반환) =====
 async function fetchUsdKrw(): Promise<number | null> {
+  // 1순위: frankfurter.app (ECB 기반 실시간 환율)
+  try {
+    const r = await withTimeout("https://api.frankfurter.app/latest?from=USD&to=KRW", 3000, {
+      headers: { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" },
+      cache: "no-store",
+    });
+    if (r.ok) {
+      const j = await r.json() as { rates?: { KRW?: number } };
+      const krw = j?.rates?.KRW;
+      if (isNum(krw)) return krw;
+    }
+  } catch { /* try fallback */ }
+
+  // 2순위: 폴백 API들
   const urls = [
-    "https://api.fxratesapi.com/latest?base=USD&currencies=KRW",
     "https://api.exchangerate-api.com/v4/latest/USD",
-    "https://open.er-api.com/v6/latest/USD",
+    "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json",
   ];
+
   for (const url of urls) {
     try {
       const r = await withTimeout(url, 3500, {
@@ -61,9 +74,17 @@ async function fetchUsdKrw(): Promise<number | null> {
         cache: "no-store",
       });
       if (!r.ok) continue;
-      const j = (await r.json()) as FxLatest;
-      const v = j?.rates?.KRW;
-      if (isNum(v)) return v;
+      const j = await r.json();
+
+      // exchangerate-api.com 형식
+      if (j?.rates?.KRW && isNum(j.rates.KRW)) {
+        return j.rates.KRW;
+      }
+
+      // fawazahmed0 형식
+      if (j?.usd?.krw && isNum(j.usd.krw)) {
+        return j.usd.krw;
+      }
     } catch { /* try next */ }
   }
   return null;

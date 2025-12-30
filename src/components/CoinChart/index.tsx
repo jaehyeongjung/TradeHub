@@ -336,7 +336,7 @@ export default function CoinChart({
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.18 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+10px)] z-50 w-[255px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg pointer-events-none"
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] z-50 w-[255px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg pointer-events-none"
                         >
                             <div className="font-semibold text-amber-300 mb-1">
                                 심볼 변경 안내
@@ -349,7 +349,9 @@ export default function CoinChart({
                                 <br />
                                 비로그인 시에는 <b>브라우저에 저장</b>됩니다.
                             </p>
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-0 h-0 border-l-4 border-r-4 border-b-8 border-transparent border-b-neutral-900" />
+                            {/* 테두리가 있는 삼각형 화살표 */}
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
                         </motion.div>
                     )}
                 </AnimatePresence>

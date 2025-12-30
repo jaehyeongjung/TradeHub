@@ -103,7 +103,7 @@ export default function HotSymbolsTicker() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[130%] w-[210px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg px-4 py-3 shadow-lg z-50"
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[210px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg px-4 py-3 shadow-lg z-50"
                         >
                             <div className="font-semibold text-amber-300 mb-1">
                                 기준 설명
@@ -111,7 +111,9 @@ export default function HotSymbolsTicker() {
                             <ul className="space-y-[2px] leading-tight">
                                 <li>24h 거래대금(USDT) + 등락률 보너스</li>
                             </ul>
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-0 h-0 border-l-4 border-r-4 border-b-8 border-transparent border-b-neutral-900"></div>
+                            {/* 테두리가 있는 삼각형 화살표 */}
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -120,8 +122,7 @@ export default function HotSymbolsTicker() {
             {/* 실시간 회전 코인 */}
             <div
                 className="relative w-[300px] cursor-pointer"
-                onMouseEnter={() => setShowListTooltip(true)}
-                onMouseLeave={() => setShowListTooltip(false)}
+                onClick={() => setShowListTooltip(!showListTooltip)}
             >
                 <div className="overflow-hidden">
                 <AnimatePresence mode="popLayout">
@@ -179,12 +180,12 @@ export default function HotSymbolsTicker() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.18 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+10px)] w-[280px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg z-50 pointer-events-none"
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[280px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg z-50 pointer-events-none"
                         >
                             <div className="font-semibold text-amber-300 mb-2">
                                 🔥 Hot Coin Top 15
                             </div>
-                            <div className="space-y-1 max-h-[300px] overflow-y-auto">
+                            <div className="space-y-0.5 max-h-[380px] overflow-y-auto pb-1">
                                 {list.slice(0, 15).map((item, i) => (
                                     <div
                                         key={item.symbol}
@@ -192,7 +193,7 @@ export default function HotSymbolsTicker() {
                                             i === idx ? 'text-amber-300 font-semibold' : ''
                                         }`}
                                     >
-                                        <span className="text-[10px] text-neutral-500 mr-2">
+                                        <span className="text-[10px] text-neutral-500 mr-2 w-[14px] text-right">
                                             {i + 1}
                                         </span>
                                         <span className="flex-1 font-mono">
@@ -211,7 +212,9 @@ export default function HotSymbolsTicker() {
                                     </div>
                                 ))}
                             </div>
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-0 h-0 border-l-4 border-r-4 border-b-8 border-transparent border-b-neutral-900" />
+                            {/* 테두리가 있는 삼각형 화살표 */}
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
                         </motion.div>
                     )}
                 </AnimatePresence>
