@@ -36,6 +36,7 @@ export default function HotSymbolsTicker() {
     const [list, setList] = useState<Ticker24h[]>([]);
     const [idx, setIdx] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
+    const [showListTooltip, setShowListTooltip] = useState(false);
     const timerRef = useRef<number | null>(null);
 
     // 30초마다 전체 리스트 갱신
@@ -117,7 +118,12 @@ export default function HotSymbolsTicker() {
             </div>
 
             {/* 실시간 회전 코인 */}
-            <div className="w-[300px] overflow-hidden">
+            <div
+                className="relative w-[300px] cursor-pointer"
+                onMouseEnter={() => setShowListTooltip(true)}
+                onMouseLeave={() => setShowListTooltip(false)}
+            >
+                <div className="overflow-hidden">
                 <AnimatePresence mode="popLayout">
                     {current ? (
                         <motion.div
@@ -160,6 +166,52 @@ export default function HotSymbolsTicker() {
                             className="text-neutral-400"
                         >
                             인기 코인 로딩중…
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                </div>
+
+                {/* Top 15 전체 리스트 툴팁 */}
+                <AnimatePresence>
+                    {showListTooltip && list.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 6 }}
+                            transition={{ duration: 0.18 }}
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+10px)] w-[280px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg z-50 pointer-events-none"
+                        >
+                            <div className="font-semibold text-amber-300 mb-2">
+                                🔥 Hot Coin Top 15
+                            </div>
+                            <div className="space-y-1 max-h-[300px] overflow-y-auto">
+                                {list.slice(0, 15).map((item, i) => (
+                                    <div
+                                        key={item.symbol}
+                                        className={`flex items-center justify-between py-1 ${
+                                            i === idx ? 'text-amber-300 font-semibold' : ''
+                                        }`}
+                                    >
+                                        <span className="text-[10px] text-neutral-500 mr-2">
+                                            {i + 1}
+                                        </span>
+                                        <span className="flex-1 font-mono">
+                                            {prettySym(item.symbol)}
+                                        </span>
+                                        <span
+                                            className={
+                                                Number(item.priceChangePercent) >= 0
+                                                    ? "text-emerald-400"
+                                                    : "text-red-400"
+                                            }
+                                        >
+                                            {Number(item.priceChangePercent) >= 0 ? "▲" : "▼"}{" "}
+                                            {Number(item.priceChangePercent).toFixed(2)}%
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-0 h-0 border-l-4 border-r-4 border-b-8 border-transparent border-b-neutral-900" />
                         </motion.div>
                     )}
                 </AnimatePresence>
