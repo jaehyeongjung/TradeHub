@@ -50,7 +50,8 @@ function withTimeout(url: string, ms = 3500, init?: RequestInit) {
 // ===== 외부 호출들 (실패 시 null 반환) =====
 async function fetchUsdKrw(): Promise<number | null> {
   const urls = [
-    "https://api.exchangerate.host/latest?base=USD&symbols=KRW",
+    "https://api.fxratesapi.com/latest?base=USD&currencies=KRW",
+    "https://api.exchangerate-api.com/v4/latest/USD",
     "https://open.er-api.com/v6/latest/USD",
   ];
   for (const url of urls) {
