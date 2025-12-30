@@ -3,46 +3,115 @@
 import { useEffect, useState } from "react";
 
 const DEFAULT_SYMBOLS = [
-    "btcusdt", // 비트코인
-    "ethusdt", // 이더리움
-    "bnbusdt", // 바이낸스 코인
-    "solusdt", // 솔라나 (최신 레이어 1 강자)
-    "xrpusdt", // 리플
-    "dogeusdt", // 도지코인 (밈 코인 대표)
-    "adausdt", // 카르다노
-    "avaxusdt", // 아발란체
-    "trxusdt",
-    "linkusdt", // 체인링크
-    "dotusdt", // 폴카닷
-    "ltcusdt", // 라이트코인
-    "bchusdt", // 비트코인 캐시
-    "shibusdt", // 시바이누 (주요 밈 코인)
-    "suiusdt", // Sui (신규 L1 고성능 코인)
-    "aptusdt", // Aptos (신규 L1 고성능 코인)
-    "seiusdt", // Sei (웹 3.0 인프라)
-    "pepeusdt", // Pepe (밈 코인)
-    "flokiusdt", // Floki (밈 코인)
-    "wldusdt", // Worldcoin (AI & Identity)
-    "fetusdt", // Fetch.ai
-
-    //  DeFi 및 주요 프로토콜
-    "uniusdt", // 유니스왑
+    "1inchusdt", // 1inch
     "aaveusdt", // Aave
-
-    //  메타버스 및 게임 (Gaming/Metaverse)
-    "galausdt", // Gala
+    "adausdt", // Cardano
+    "agixusdt", // SingularityNET
+    "algousdt", // Algorand
+    "ankrusdt", // Ankr
+    "apeusdt", // ApeCoin
+    "aptusdt", // Aptos
+    "arbusdt", // Arbitrum
+    "arkmusdt", // Arkham
+    "arumbusdt", // Arweave
+    "atomusdt", // Cosmos
+    "avaxusdt", // Avalanche
     "axsusdt", // Axie Infinity
+    "bchusdt", // Bitcoin Cash
+    "beamxusdt", // BeamX
+    "blurusdt", // Blur
+    "bnbusdt", // Binance Coin
+    "bonkusdt", // Bonk (밈)
+    "btcusdt", // Bitcoin
+    "celousdt", // Celo
+    "chzusdt", // Chiliz
+    "ckbusdt", // Nervos Network
+    "crvusdt", // Curve
+    "dogeusdt", // Dogecoin
+    "dotusdt", // Polkadot
+    "dydusdt", // dYdX
+    "egldusdt", // MultiversX
+    "enjusdt", // Enjin
+    "ensusdt", // ENS
+    "eosusdt", // EOS
+    "etcusdt", // Ethereum Classic
+    "ethusdt", // Ethereum
+    "fetusdt", // Fetch.ai
+    "filusdt", // Filecoin
+    "flokiusdt", // Floki
+    "flowusdt", // Flow
+    "ftmusdt", // Fantom
+    "galausdt", // Gala
+    "grtusdt", // The Graph
+    "hbarusdt", // Hedera
+    "idexusdt", // IDEX
+    "imxusdt", // Immutable X
+    "injusdt", // Injective
+    "iostusdt", // IOST
+    "iotausdt", // IOTA
+    "iotxusdt", // IoTeX
+    "jasmyusdt", // Jasmy
+    "jupusdt", // Jupiter
+    "kasusdt", // Kaspa
+    "kavausdt", // Kava
+    "kncusdt", // Kyber Network
+    "ksmusdt", // Kusama
+    "ldousdt", // Lido DAO
+    "linkusdt", // Chainlink
+    "lrcusdt", // Loopring
+    "ltcusdt", // Litecoin
+    "lunausdt", // Terra
     "manausdt", // Decentraland
+    "maskusdt", // Mask Network
+    "maticusdt", // Polygon
+    "maviausdt", // Mavia
+    "metisusdt", // Metis
+    "minausdt", // Mina
+    "mkrusdt", // Maker
+    "nearusdt", // Near Protocol
+    "neousdt", // NEO
+    "notusdt", // Notcoin
+    "oceanusdt", // Ocean Protocol
+    "omgusdt", // OMG Network
+    "ondousdt", // Ondo (RWA)
+    "opusdt", // Optimism
+    "ordiusdt", // ORDI
+    "paxgusdt", // PAX Gold
+    "pendleusdt", // Pendle
+    "pepeusdt", // Pepe
+    "pythusdt", // Pyth Network
+    "qtumusdt", // QTUM
+    "rdntusdt", // Radiant Capital
+    "renderusdt", // Render
+    "rswfusdt", // Raydium
+    "runeusdt", // THORChain
+    "rvnusdt", // Ravencoin
     "sandusdt", // The Sandbox
-
-    //  기타 고거래량 알트
-    "etcusdt", // 이더리움 클래식
-    "nearusdt", // 니어 프로토콜
-    "atomusdt", // 코스모스
-    "imxusdt", // Immutable X (NFT/Gaming L2)
-    "beamxusdt", // BeamX (Gaming/DeFi)
+    "seiusdt", // Sei
+    "shibusdt", // Shiba Inu
+    "snxusdt", // Synthetix
+    "solusdt", // Solana
+    "stiusdt", // SingularityDAO
+    "stjusdt", // Stratis
+    "stxusdt", // Stacks
+    "suiusdt", // Sui
+    "thetausdt", // Theta
+    "tiausdt", // Celestia
+    "tonusdt", // Toncoin
+    "trxusdt", // TRON
+    "uniusdt", // Uniswap
+    "vetusdt", // VeChain
+    "wavesusdt", // Waves
+    "wicpusdt", // Internet Computer (ICP)
+    "wldusdt", // Worldcoin
+    "woousdt", // WOO Network
+    "xrpusdt", // Ripple
+    "xtzusdt", // Tezos
+    "zecusdt", // Zcash
+    "zenusdt", // Horizen
+    "zilusdt", // Zilliqa
+    "zrxusdt", // Ox
 ];
-
 type Props = {
     open: boolean;
     initialSymbol: string;
