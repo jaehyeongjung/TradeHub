@@ -112,7 +112,8 @@ function linkify(text: string): ReactNode[] {
 
 export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
     const [userId, setUserId] = useState<string | null>(null);
-    const [isAnonymous, setIsAnonymous] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_isAnonymous, setIsAnonymous] = useState(false);
     const [msgs, setMsgs] = useState<Msg[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLDivElement>(null);

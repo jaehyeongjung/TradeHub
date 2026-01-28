@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase-browser";
+import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
 
 /** 브라우저 당 고정되는 익명 디바이스 ID */
 function getDeviceId() {
@@ -17,79 +18,58 @@ function getDeviceId() {
 
 export default function LiveStatsBox() {
     const deviceIdRef = useRef<string>(getDeviceId());
-    const [todayVisitors, setTodayVisitors] = useState<number>(0);
     const [onlineNow, setOnlineNow] = useState<number>(0);
     const [connected, setConnected] = useState<boolean>(false);
 
     const today = new Date().toISOString().slice(0, 10);
 
-    // 오늘 방문(유니크) 기록: 하루에 1번만 upsert
+    // 오늘 방문(유니크) 기록: 마운트 시 1번만 upsert
     useEffect(() => {
         const upsertVisit = async () => {
-            const { error } = await supabase
+            await supabase
                 .from("visits")
                 .upsert([{ day: today, device_id: deviceIdRef.current }], {
                     onConflict: "day,device_id",
                 });
-
-            if (error) console.warn("visit upsert error", error);
         };
         void upsertVisit();
     }, [today]);
 
-    // presence heartbeat (현재 접속자 추정)
-    useEffect(() => {
-        const beat = async () => {
-            await supabase.from("presence").upsert(
-                [
-                    {
-                        device_id: deviceIdRef.current,
-                        last_seen: new Date().toISOString(),
-                    },
-                ],
-                { onConflict: "device_id" },
-            );
-        };
-
-        // 즉시 1회 + 15초마다
-        void beat();
-        const t = setInterval(() => void beat(), 15_000);
-        return () => clearInterval(t);
-    }, []);
-
-    // 오늘 방문자 수 조회
-    const fetchVisitors = async () => {
-        const { count, error } = await supabase
-            .from("visits")
-            .select("device_id", { count: "exact", head: true })
-            .eq("day", today);
-
-        if (!error) setTodayVisitors(count ?? 0);
-    };
-
-    // 현재 접속자 수(최근 60초 내 활동)
-    const fetchOnline = async () => {
+    // 현재 접속자 수 조회 (최근 60초 내 활동)
+    const fetchOnline = useCallback(async () => {
         const { count, error } = await supabase
             .from("presence")
             .select("device_id", { count: "exact", head: true })
             .gt("last_seen", new Date(Date.now() - 60_000).toISOString());
 
         if (!error) setOnlineNow(count ?? 0);
-    };
+    }, []);
 
-    // 폴링 + realtime 변화 감지
+    // presence heartbeat + 접속자 조회 (탭 활성화 시에만)
+    const heartbeatAndFetch = useCallback(async () => {
+        // heartbeat 전송
+        await supabase.from("presence").upsert(
+            [
+                {
+                    device_id: deviceIdRef.current,
+                    last_seen: new Date().toISOString(),
+                },
+            ],
+            { onConflict: "device_id" },
+        );
+        // 접속자 수 조회
+        await fetchOnline();
+    }, [fetchOnline]);
+
+    // 탭 비활성화 시 폴링 중단
+    useVisibilityPolling({
+        interval: 15_000,
+        onPoll: heartbeatAndFetch,
+        immediate: true,
+    });
+
+    // Realtime 구독 (presence 변경 시 즉시 반영)
     useEffect(() => {
-        // 처음 로드 시 한번
-        void fetchVisitors();
-        void fetchOnline();
-
-        // 10초마다 새로고침(백업)
-        const poll = setInterval(() => {
-            void fetchVisitors();
-            void fetchOnline();
-        }, 10_000);
-
-        // Realtime 구독 (presence 변경 시 즉시 반영)
         const channel = supabase
             .channel("presence-watch")
             .on(
@@ -102,10 +82,9 @@ export default function LiveStatsBox() {
             });
 
         return () => {
-            clearInterval(poll);
-            supabase.removeChannel(channel);
+            void supabase.removeChannel(channel);
         };
-    }, []); // 의존성 없음: 내부에서 자체적으로 최신값을 다시 조회
+    }, [fetchOnline]);
 
     return (
         <div className="flex items-center gap-3 2xl:gap-4 rounded-xl border p-3 2xl:p-4 shadow-sm justify-center bg-neutral-900">

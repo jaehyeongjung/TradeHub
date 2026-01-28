@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
 import type { KimchiResponse } from "@/app/api/kimchi/route";
 
 type Data = KimchiResponse;
@@ -48,41 +49,28 @@ export default function KimchiWidget({
     pollMs?: number;
 }) {
     const [data, setData] = useState<Data | null>(null);
-    const [error, setError] = useState<string | null>(null);
     const [isHovered, setIsHovered] = useState(false);
-
-    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const abortRef = useRef<AbortController | null>(null);
 
-    useEffect(() => {
-        let mounted = true;
-
-        const load = async () => {
-            try {
-                abortRef.current?.abort();
-                const ctrl = new AbortController();
-                abortRef.current = ctrl;
-                const d = await fetchKimchiWithRetry(symbol, ctrl.signal);
-                if (!mounted || ctrl.signal.aborted) return;
-                setData(d);
-                setError(null);
-            } catch (e) {
-                if (!mounted || (abortRef.current?.signal?.aborted ?? false))
-                    return;
-                const msg = e instanceof Error ? e.message : "fetch error";
-                setError(msg);
-            }
-        };
-
-        load();
-        timerRef.current = setInterval(load, pollMs);
-
-        return () => {
-            mounted = false;
+    const load = useCallback(async () => {
+        try {
             abortRef.current?.abort();
-            if (timerRef.current) clearInterval(timerRef.current);
-        };
-    }, [symbol, pollMs]);
+            const ctrl = new AbortController();
+            abortRef.current = ctrl;
+            const d = await fetchKimchiWithRetry(symbol, ctrl.signal);
+            if (ctrl.signal.aborted) return;
+            setData(d);
+        } catch {
+            // 에러 시 기존 데이터 유지
+        }
+    }, [symbol]);
+
+    // 탭 비활성화 시 폴링 중단
+    useVisibilityPolling({
+        interval: pollMs,
+        onPoll: load,
+        immediate: true,
+    });
 
     const pct = data?.premium != null ? data.premium * 100 : null;
     const color =
@@ -142,11 +130,8 @@ export default function KimchiWidget({
                     최근 스냅샷 표시 중
                 </p>
             )}
-            {/* {error && (
-        <p className="mt-2 text-[11px] text-rose-400">업데이트 실패: {error}</p>
-      )} */}
 
-            {/*  동일 스타일 툴팁 */}
+            {/* 툴팁 */}
             <AnimatePresence>
                 {isHovered && (
                     <motion.div
@@ -173,7 +158,7 @@ export default function KimchiWidget({
                             <br />
                             거래소 가격 차이를 함께 반영합니다.
                         </p>
-                        {/* 테두리가 있는 삼각형 화살표 */}
+                        {/* 삼각형 화살표 */}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
                     </motion.div>

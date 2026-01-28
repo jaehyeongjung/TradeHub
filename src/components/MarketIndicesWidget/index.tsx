@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
 import type { MarketIndicesResponse, MarketIndex } from "@/app/api/market-indices/route";
 
 async function fetchIndices(signal?: AbortSignal): Promise<MarketIndicesResponse> {
@@ -45,45 +46,33 @@ function IndexItem({ index }: { index: MarketIndex }) {
 
 export default function MarketIndicesWidget({ pollMs = 30000 }: { pollMs?: number }) {
     const [data, setData] = useState<MarketIndicesResponse | null>(null);
-    const [error, setError] = useState<string | null>(null);
     const abortRef = useRef<AbortController | null>(null);
-    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    useEffect(() => {
-        let mounted = true;
-
-        const load = async () => {
-            try {
-                abortRef.current?.abort();
-                const ctrl = new AbortController();
-                abortRef.current = ctrl;
-
-                const result = await fetchIndices(ctrl.signal);
-                if (!mounted || ctrl.signal.aborted) return;
-
-                setData(result);
-                setError(null);
-            } catch (e) {
-                if (!mounted || abortRef.current?.signal.aborted) return;
-                setError(e instanceof Error ? e.message : "fetch error");
-            }
-        };
-
-        load();
-        timerRef.current = setInterval(load, pollMs);
-
-        return () => {
-            mounted = false;
+    const load = useCallback(async () => {
+        try {
             abortRef.current?.abort();
-            if (timerRef.current) clearInterval(timerRef.current);
-        };
-    }, [pollMs]);
+            const ctrl = new AbortController();
+            abortRef.current = ctrl;
+
+            const result = await fetchIndices(ctrl.signal);
+            if (ctrl.signal.aborted) return;
+
+            setData(result);
+        } catch {
+            // 에러 시 기존 데이터 유지
+        }
+    }, []);
+
+    // 탭 비활성화 시 폴링 중단
+    useVisibilityPolling({
+        interval: pollMs,
+        onPoll: load,
+        immediate: true,
+    });
 
     return (
         <div className="rounded-2xl border border-zinc-800 bg-neutral-950 p-3 2xl:p-4">
-            {error && !data ? (
-                <div className="text-[10px] text-amber-500">⚠</div>
-            ) : !data ? (
+            {!data ? (
                 <div className="flex gap-3">
                     {[1, 2, 3].map((i) => (
                         <div key={i} className="h-12 2xl:h-14 flex-1 bg-neutral-900 border border-zinc-800 rounded-xl animate-pulse" />
