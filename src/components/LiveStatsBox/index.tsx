@@ -47,7 +47,7 @@ export default function LiveStatsBox() {
                         last_seen: new Date().toISOString(),
                     },
                 ],
-                { onConflict: "device_id" }
+                { onConflict: "device_id" },
             );
         };
 
@@ -95,7 +95,7 @@ export default function LiveStatsBox() {
             .on(
                 "postgres_changes",
                 { schema: "public", table: "presence", event: "*" },
-                () => void fetchOnline()
+                () => void fetchOnline(),
             )
             .subscribe((status) => {
                 setConnected(status === "SUBSCRIBED");

@@ -137,20 +137,20 @@ export default function FearGreedGauge({
 
     return (
         <div
-            className="relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4 2xl:p-5 text-white"
+            className="relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4 2xl:p-8 text-white"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
             {/* 헤더 */}
-            <div className="mb-2 2xl:mb-3 flex items-center justify-between">
-                <h3 className="text-xs 2xl:text-sm font-semibold opacity-90">
+            <div className="mb-2 2xl:mb-4 flex items-center justify-between">
+                <h3 className="text-xs 2xl:text-base font-semibold opacity-90">
                     {title}
                 </h3>
-                <div className="flex items-center gap-2 2xl:gap-3">
-                    <span className="inline-flex h-8 w-8 2xl:h-10 2xl:w-10 items-center justify-center rounded-full bg-yellow-500/80 text-xs 2xl:text-sm font-bold ml-3">
+                <div className="flex items-center gap-2 2xl:gap-4">
+                    <span className="inline-flex h-8 w-8 2xl:h-12 2xl:w-12 items-center justify-center rounded-full bg-yellow-500/80 text-xs 2xl:text-base font-bold ml-3">
                         {v}
                     </span>
-                    <span className="text-yellow-300 font-semibold text-xs 2xl:text-sm ml-4">
+                    <span className="text-yellow-300 font-semibold text-xs 2xl:text-base ml-4">
                         {stateText}
                     </span>
                 </div>

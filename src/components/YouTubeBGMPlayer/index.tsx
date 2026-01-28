@@ -24,7 +24,7 @@ declare global {
         YT: {
             Player: new (
                 elementId: string | HTMLElement,
-                options: object
+                options: object,
             ) => YTPlayer;
             PlayerState: {
                 UNSTARTED: number;
@@ -116,7 +116,7 @@ export default function YouTubeBGMPlayer({
     }, [isMuted, isReady]);
 
     return (
-        <div className="flex justify-center h-7 items-center 2xl:mt-5">
+        <div className="flex justify-center items-center">
             {/*  플레이어 컨테이너 (화면 밖으로 완전히 숨김) */}
             <div
                 id="youtube-player-container"
@@ -149,8 +149,15 @@ export default function YouTubeBGMPlayer({
                 `}
                 disabled={!isReady}
             >
-                <span className="text-md 2xl:text-lg text-white">
-                    {isMuted ? "🔊 " : "🔇 BGM OFF"}
+                <span className="text-md 2xl:text-lg text-white flex items-center justify-center gap-2 2xl:gap-4">
+                    {isMuted ? (
+                        "🔊"
+                    ) : (
+                        <>
+                            <span>🔇</span>
+                            <span>BGM OFF</span>
+                        </>
+                    )}
                 </span>
             </button>
         </div>

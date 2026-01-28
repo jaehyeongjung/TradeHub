@@ -94,7 +94,7 @@ export default function KimchiWidget({
 
     return (
         <div
-            className="relative rounded-2xl border border-zinc-800 bg-neutral-950 p-4 2xl:p-5 text-white"
+            className="relative rounded-2xl border border-zinc-800 bg-neutral-950 p-4 2xl:p-8 text-white"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
