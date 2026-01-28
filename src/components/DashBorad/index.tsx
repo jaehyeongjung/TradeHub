@@ -73,7 +73,7 @@ export const DashBoard = () => {
                                 <span className="whitespace-nowrap">뉴스</span>
                             </button>
                         </div>
-                        <div className="flex-1 min-w-0 overflow-hidden">
+                        <div className="flex-1 min-w-0">
                             <HotSymbolsTicker />
                         </div>
                         <div className="ml-auto shrink-0">
