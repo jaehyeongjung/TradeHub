@@ -94,22 +94,22 @@ export default function KimchiWidget({
 
     return (
         <div
-            className="relative rounded-2xl border border-zinc-800 bg-neutral-950 p-4 text-white"
+            className="relative rounded-2xl border border-zinc-800 bg-neutral-950 p-4 2xl:p-5 text-white"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">김치 프리미엄</h3>
-                <span className="text-xs text-zinc-400">
+                <h3 className="text-sm 2xl:text-base font-semibold">김치 프리미엄</h3>
+                <span className="text-xs 2xl:text-sm text-zinc-400">
                     {data?.symbol ?? symbol}
                 </span>
             </div>
 
-            <div className={`mt-2 text-2xl font-bold ${color}`}>
+            <div className={`mt-2 2xl:mt-3 text-2xl 2xl:text-3xl font-bold ${color}`}>
                 {pct == null ? "—" : `${pct.toFixed(2)}%`}
             </div>
 
-            <dl className="mt-2 grid grid-cols-2 gap-2 text-xs text-zinc-400">
+            <dl className="mt-2 2xl:mt-3 grid grid-cols-2 gap-2 2xl:gap-3 text-xs 2xl:text-sm text-zinc-400">
                 <dt>업비트(KRW)</dt>
                 <dd className="text-right text-emerald-300 whitespace-nowrap">
                     {data?.upbitKrw != null

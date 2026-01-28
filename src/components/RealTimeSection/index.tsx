@@ -6,7 +6,7 @@ export const RealTimeSection = () => {
     return (
         <section
             aria-label="실시간 코인 가격 및 차트"
-            className="font-sans flex gap-5 min-h-35 mt-4 mx-auto bg-neutral-950  items-center w-full  border border-zinc-800 rounded-2xl "
+            className="font-sans flex gap-5 min-h-35 2xl:min-h-50 mt-4 mx-auto bg-neutral-950  items-center w-full  border border-zinc-800 rounded-2xl "
         >
             <div className="flex gap-3 ml-6 w-full border-neutral-800">
                 <CoinPriceBox boxId="tile-1" defaultSymbol="btcusdt" />

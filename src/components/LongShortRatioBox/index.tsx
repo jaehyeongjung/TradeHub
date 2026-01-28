@@ -118,14 +118,14 @@ export default function LongShortRatioBox({
 
   return (
     <div
-      className="relative min-w-45 w-full min-h-30 border border-neutral-800 rounded-lg shadow-sm p-3 cursor-default bg-neutral-900"
+      className="relative min-w-45 w-full min-h-30 2xl:min-h-45 border border-neutral-800 rounded-lg shadow-sm p-3 2xl:p-4 cursor-default bg-neutral-900 flex flex-col justify-center"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-1">
-        <div className="font-semibold text-sm text-neutral-100">{symbol}</div>
-        <div className="text-[11px] text-neutral-300">
+      <div className="flex items-center justify-between mb-1 2xl:mb-2">
+        <div className="font-semibold text-sm 2xl:text-base text-neutral-100">{symbol}</div>
+        <div className="text-[11px] 2xl:text-xs text-neutral-300">
           {source === "global" && "Global"}
           {source === "top-trader" && "Top Trader"}
           {source === "taker" && "Taker"}
@@ -136,20 +136,20 @@ export default function LongShortRatioBox({
 
       {/* 바디 */}
       {loading ? (
-        <div className="h-[72px] rounded-md bg-neutral-800 animate-pulse" />
+        <div className="h-[72px] 2xl:h-[90px] rounded-md bg-neutral-800 animate-pulse" />
       ) : err ? (
         <div className="text-sm text-amber-500">⚠ {err}</div>
       ) : (
         <>
-          <div className="mt-1">
-            <div className="h-6 w-full bg-neutral-800 rounded-full overflow-hidden">
+          <div className="mt-1 2xl:mt-2">
+            <div className="h-6 2xl:h-8 w-full bg-neutral-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-emerald-500"
                 style={{ width: `${Math.max(0, Math.min(100, longPct ?? 0))}%` }}
                 title={`Long ${longPct?.toFixed(2)}%`}
               />
             </div>
-            <div className="flex justify-between text-[12px] mt-1">
+            <div className="flex justify-between text-[12px] 2xl:text-sm mt-1 2xl:mt-2">
               <span className="text-emerald-400 font-medium">
                 Long {longPct?.toFixed(2)}%
               </span>
@@ -159,7 +159,7 @@ export default function LongShortRatioBox({
             </div>
           </div>
 
-          <div className="mt-1 text-[11px] text-neutral-400">
+          <div className="mt-1 2xl:mt-2 text-[11px] 2xl:text-xs text-neutral-400">
             {ts ? new Date(ts).toLocaleString() : ""}
           </div>
         </>

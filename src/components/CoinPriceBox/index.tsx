@@ -52,7 +52,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
         }
         try {
             const res = await fetch(
-                `https://api.binance.com/api/v3/exchangeInfo?symbol=${key}`
+                `https://api.binance.com/api/v3/exchangeInfo?symbol=${key}`,
             );
             const info = (await res.json()) as BinanceExchangeInfo;
             const filters = info.symbols?.[0]?.filters ?? [];
@@ -72,7 +72,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: Math.max(2, decimals),
             }),
-        [decimals]
+        [decimals],
     );
 
     const formatPrice = (v: number) => `$${decimalFormatter.format(v)}`;
@@ -97,7 +97,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
                     const loc = localStorage.getItem(`coin_box:${boxId}`);
                     setSymbol(loc ?? initialSymbol);
                 }
-            }
+            },
         );
 
         (async () => {
@@ -200,8 +200,8 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
         pct == null
             ? "text-gray-300"
             : pct > 0
-            ? "text-emerald-500"
-            : "text-red-500";
+              ? "text-emerald-500"
+              : "text-red-500";
     const arrow = pct == null ? "" : pct > 0 ? "▲" : pct < 0 ? "▼" : "•";
     const pctText =
         pct == null ? "" : `${pct > 0 ? "+" : ""}${pct.toFixed(2)}%`;
@@ -215,15 +215,19 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
             >
                 <button
                     onClick={() => setOpen(true)}
-                    className="min-w-30 w-full min-h-26 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-3 shadow-md transition hover:border-neutral-700"
+                    className="min-w-30 w-full min-h-26 2xl:min-h-40 2xl:min-w-40 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-3 2xl:p-4 shadow-md transition hover:border-neutral-700 flex flex-col justify-center"
                 >
-                    <h2 className="text-sm font-bold text-white">
+                    <h2 className="text-sm 2xl:text-base font-bold text-white">
                         {symbol.toUpperCase()}
                     </h2>
-                    <p className={`mt-1 text-lg font-mono ${pctColor}`}>
+                    <p
+                        className={`mt-1 2xl:mt-2 text-lg 2xl:text-2xl font-mono ${pctColor}`}
+                    >
                         {price != null ? formatPrice(price) : "—"}
                     </p>
-                    <div className={`mt-0.5 text-xs font-semibold ${pctColor}`}>
+                    <div
+                        className={`mt-0.5 2xl:mt-1 text-xs 2xl:text-sm font-semibold ${pctColor}`}
+                    >
                         {pct != null ? (
                             <>
                                 {arrow} {pctText}

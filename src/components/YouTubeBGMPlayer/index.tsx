@@ -116,7 +116,7 @@ export default function YouTubeBGMPlayer({
     }, [isMuted, isReady]);
 
     return (
-        <div className="flex justify-center h-7 items-center">
+        <div className="flex justify-center h-7 items-center 2xl:mt-5">
             {/*  플레이어 컨테이너 (화면 밖으로 완전히 숨김) */}
             <div
                 id="youtube-player-container"
@@ -135,7 +135,7 @@ export default function YouTubeBGMPlayer({
                 onClick={toggleMute}
                 title={isMuted ? "배경 음악 재생" : "배경 음악 음소거"}
                 className={`
-                    p-3 rounded-full shadow-lg transition-colors duration-300 w-full
+                    p-3 2xl:p-4 rounded-full shadow-lg transition-colors duration-300 w-full
                     ${
                         isMuted
                             ? "bg-neutral-600 hover:bg-neutral-700"
@@ -149,7 +149,7 @@ export default function YouTubeBGMPlayer({
                 `}
                 disabled={!isReady}
             >
-                <span className="text-md text-white">
+                <span className="text-md 2xl:text-lg text-white">
                     {isMuted ? "🔊 " : "🔇 BGM OFF"}
                 </span>
             </button>

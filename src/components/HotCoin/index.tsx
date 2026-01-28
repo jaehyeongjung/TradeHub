@@ -86,13 +86,13 @@ export default function HotSymbolsTicker() {
     const current = list.length ? list[idx] : null;
 
     return (
-        <div className="relative flex items-center gap-3 text-sm ml-10 text-neutral-200">
+        <div className="relative flex items-center gap-3 2xl:gap-4 text-sm 2xl:text-base ml-10 text-neutral-200">
             <div
                 className="relative"
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
             >
-                <p className="text-[12px] px-3 py-[3px] rounded-full bg-neutral-800 text-amber-300 select-none cursor-pointer shadow-sm">
+                <p className="text-[12px] 2xl:text-sm px-3 2xl:px-4 py-[3px] 2xl:py-1 rounded-full bg-neutral-800 text-amber-300 select-none cursor-pointer shadow-sm">
                     <span className="whitespace-nowrap">🔥 Hot Coin</span>
                 </p>
 
@@ -103,9 +103,9 @@ export default function HotSymbolsTicker() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[210px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg px-4 py-3 shadow-lg z-50"
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[210px] 2xl:w-[260px] text-[11px] 2xl:text-xs bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg px-4 2xl:px-5 py-3 2xl:py-4 shadow-lg z-50"
                         >
-                            <div className="font-semibold text-amber-300 mb-1">
+                            <div className="font-semibold text-amber-300 mb-1 2xl:mb-2">
                                 기준 설명
                             </div>
                             <ul className="space-y-[2px] leading-tight">
@@ -121,7 +121,7 @@ export default function HotSymbolsTicker() {
 
             {/* 실시간 회전 코인 */}
             <div
-                className="relative w-[300px] cursor-pointer"
+                className="relative w-[300px] 2xl:w-[380px] cursor-pointer"
                 onClick={() => setShowListTooltip(!showListTooltip)}
             >
                 <div className="overflow-hidden">
@@ -180,20 +180,20 @@ export default function HotSymbolsTicker() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.18 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[280px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg z-50 pointer-events-none"
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[280px] 2xl:w-[340px] text-[11px] 2xl:text-xs bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 2xl:py-5 px-5 2xl:px-6 shadow-lg z-50 pointer-events-none"
                         >
-                            <div className="font-semibold text-amber-300 mb-2">
+                            <div className="font-semibold text-amber-300 mb-2 2xl:mb-3 2xl:text-sm">
                                 🔥 Hot Coin Top 15
                             </div>
-                            <div className="space-y-0.5 max-h-[380px] overflow-y-auto pb-1">
+                            <div className="space-y-0.5 2xl:space-y-1 pb-1">
                                 {list.slice(0, 15).map((item, i) => (
                                     <div
                                         key={item.symbol}
-                                        className={`flex items-center justify-between py-1 ${
+                                        className={`flex items-center justify-between py-1 2xl:py-1.5 ${
                                             i === idx ? 'text-amber-300 font-semibold' : ''
                                         }`}
                                     >
-                                        <span className="text-[10px] text-neutral-500 mr-2 w-[14px] text-right">
+                                        <span className="text-[10px] 2xl:text-[11px] text-neutral-500 mr-2 w-[14px] text-right">
                                             {i + 1}
                                         </span>
                                         <span className="flex-1 font-mono">

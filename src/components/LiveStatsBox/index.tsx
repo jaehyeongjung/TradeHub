@@ -108,13 +108,13 @@ export default function LiveStatsBox() {
     }, []); // 의존성 없음: 내부에서 자체적으로 최신값을 다시 조회
 
     return (
-        <div className="flex items-center gap-3 rounded-xl border p-3 shadow-sm justify-center bg-neutral-900">
-            <span className="text-xs flex gap-2 whitespace-nowrap text-gray-300">
+        <div className="flex items-center gap-3 2xl:gap-4 rounded-xl border p-3 2xl:p-4 shadow-sm justify-center bg-neutral-900">
+            <span className="text-xs 2xl:text-sm flex gap-2 whitespace-nowrap text-gray-300">
                 <b>현재 접속 </b>
                 <b>{onlineNow.toLocaleString()}명</b>
             </span>
             <span
-                className={`inline-block h-2 w-2 rounded-full   ${
+                className={`inline-block h-2 w-2 2xl:h-3 2xl:w-3 rounded-full ${
                     connected ? "bg-emerald-500" : "bg-gray-300"
                 }`}
                 title={connected ? "Realtime connected" : "Disconnected"}
