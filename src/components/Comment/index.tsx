@@ -42,14 +42,14 @@ const CustomModal: React.FC<{
                 {isConfirm && (
                     <button
                         onClick={onCancel}
-                        className="flex-1 px-4 py-2 rounded-lg text-sm bg-neutral-700 text-white hover:bg-neutral-600 transition"
+                        className="flex-1 px-4 py-2 rounded-lg text-sm bg-neutral-700 text-white hover:bg-neutral-600 transition cursor-pointer"
                     >
                         취소
                     </button>
                 )}
                 <button
                     onClick={onConfirm}
-                    className="flex-1 px-4 py-2 rounded-lg text-sm bg-emerald-600 text-white hover:bg-emerald-500 transition"
+                    className="flex-1 px-4 py-2 rounded-lg text-sm bg-emerald-600 text-white hover:bg-emerald-500 transition cursor-pointer"
                 >
                     {isConfirm ? "확인" : "닫기"}
                 </button>
@@ -214,7 +214,7 @@ export default function Comments({
                     disabled={loading || !userId || !text.trim()}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="rounded-lg px-4 py-2 text-base font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="rounded-lg px-4 py-2 text-base font-semibold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                         backgroundColor:
                             loading || !userId || !text.trim()

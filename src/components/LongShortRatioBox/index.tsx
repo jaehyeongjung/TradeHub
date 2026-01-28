@@ -118,7 +118,7 @@ export default function LongShortRatioBox({
 
   return (
     <div
-      className="relative min-w-45 w-full min-h-30 2xl:min-h-45 border border-neutral-800 rounded-lg shadow-sm p-3 2xl:p-4 cursor-default bg-neutral-900 flex flex-col justify-center"
+      className="relative flex-1 min-w-0 min-h-30 2xl:min-h-45 border border-neutral-800 rounded-lg shadow-sm p-2 2xl:p-4 cursor-default bg-neutral-900 flex flex-col justify-center overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

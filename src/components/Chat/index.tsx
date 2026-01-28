@@ -333,9 +333,9 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
             .catch(() => {});
     }, [roomId]);
 
-    // load my choice (only when logged in, not anonymous)
+    // load my choice
     useEffect(() => {
-        if (!userId || isAnonymous) {
+        if (!userId) {
             setMyChoice(null);
             setLoadingChoice(false);
             return;
@@ -356,7 +356,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
             setLoadingChoice(false);
         };
         init();
-    }, [userId, roomId, isAnonymous]);
+    }, [userId, roomId]);
 
     // nickname tags map
     const [positionsMap, setPositionsMap] = useState<
@@ -418,7 +418,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
     }, [roomId]);
 
     const choose = async (choice: "long" | "short") => {
-        if (!userId || isAnonymous) return;
+        if (!userId) return;
         const day = todayKstDateStr();
         const { error } = await supabase
             .from("positions")
@@ -431,6 +431,8 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
         }
         setMyChoice(choice);
         setPositionsMap((prev) => ({ ...prev, [userId]: choice }));
+        // 비율 즉시 업데이트
+        fetchRatio(roomId).then(setRatio).catch(() => {});
     };
 
     const longPct = Math.round(ratio.long_ratio * 100);
@@ -453,16 +455,12 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                 <div className="mb-3 rounded-xl border border-neutral-700 bg-neutral-900/80 p-3 space-y-2 shadow-lg">
                     <div className="flex justify-between items-center text-[12px]">
                         <div>
-                            {loadingChoice && userId && !isAnonymous ? (
+                            {loadingChoice && userId ? (
                                 <span className="text-neutral-400">
                                     포지션 로딩중...
                                 </span>
-                            ) : isAnonymous ? (
-                                <span className="text-neutral-400 text-[11px]">
-                                    💡 로그인하면 포지션을 선택할 수 있어요
-                                </span>
                             ) : (
-                                <span className="font-semibold">
+                                <span className="font-semibold flex items-center gap-2">
                                     My Position:{" "}
                                     <b
                                         className={
@@ -477,6 +475,14 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                                             ? myChoice.toUpperCase()
                                             : "—"}
                                     </b>
+                                    {myChoice && (
+                                        <button
+                                            onClick={() => setMyChoice(null)}
+                                            className="text-[10px] text-neutral-400 hover:text-neutral-200 bg-neutral-800 hover:bg-neutral-700 px-1.5 py-0.5 rounded transition-colors cursor-pointer"
+                                        >
+                                            수정
+                                        </button>
+                                    )}
                                 </span>
                             )}
                         </div>
@@ -502,30 +508,28 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                     {!myChoice && (
                         <div className="flex gap-2 pt-1">
                             <motion.button
-                                whileHover={{ scale: userId && !isAnonymous ? 1.02 : 1 }}
-                                whileTap={{ scale: userId && !isAnonymous ? 0.98 : 1 }}
-                                disabled={!userId || isAnonymous}
+                                whileHover={{ scale: userId ? 1.02 : 1 }}
+                                whileTap={{ scale: userId ? 0.98 : 1 }}
+                                disabled={!userId}
                                 className={`px-3 py-[6px] rounded-lg text-white text-[12px] font-semibold flex-1 shadow-md transition-colors ${
-                                    userId && !isAnonymous
+                                    userId
                                         ? "bg-green-700 hover:bg-green-600 active:bg-green-800"
                                         : "bg-neutral-700 cursor-not-allowed opacity-60"
                                 }`}
                                 onClick={() => choose("long")}
-                                title={isAnonymous ? "로그인하면 포지션을 선택할 수 있어요" : ""}
                             >
                                 Long
                             </motion.button>
                             <motion.button
-                                whileHover={{ scale: userId && !isAnonymous ? 1.02 : 1 }}
-                                whileTap={{ scale: userId && !isAnonymous ? 0.98 : 1 }}
-                                disabled={!userId || isAnonymous}
+                                whileHover={{ scale: userId ? 1.02 : 1 }}
+                                whileTap={{ scale: userId ? 0.98 : 1 }}
+                                disabled={!userId}
                                 className={`px-3 py-[6px] rounded-lg text-white text-[12px] font-semibold flex-1 shadow-md transition-colors ${
-                                    userId && !isAnonymous
+                                    userId
                                         ? "bg-red-700 hover:bg-red-600 active:bg-red-800"
                                         : "bg-neutral-700 cursor-not-allowed opacity-60"
                                 }`}
                                 onClick={() => choose("short")}
-                                title={isAnonymous ? "로그인하면 포지션을 선택할 수 있어요" : ""}
                             >
                                 Short
                             </motion.button>
@@ -600,8 +604,8 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                                 (composingRef.current = false)
                             }
                             onKeyDown={onKeyDown}
-                            className="flex-1 border border-neutral-700 px-3 py-2 rounded-lg bg-neutral-900 text-gray-100 placeholder-neutral-500 focus:outline-none focus:border-emerald-400 text-[14px] shadow-inner"
-                            placeholder="채팅을 시작하세요..."
+                            className="flex-1 border border-neutral-700 px-3 py-2 rounded-lg bg-neutral-900 text-gray-100 placeholder-neutral-500 focus:outline-none focus:border-emerald-400 text-[12px] shadow-inner"
+                            placeholder="익명으로도 채팅이 가능합니다"
                             maxLength={2000}
                             disabled={!userId}
                         />

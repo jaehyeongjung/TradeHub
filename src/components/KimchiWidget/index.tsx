@@ -94,7 +94,7 @@ export default function KimchiWidget({
 
     return (
         <div
-            className="relative rounded-2xl border border-zinc-800 bg-neutral-950 p-4 2xl:p-8 text-white"
+            className="relative rounded-2xl border border-zinc-800 bg-neutral-950 p-5 2xl:p-8 text-white"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -109,23 +109,23 @@ export default function KimchiWidget({
                 {pct == null ? "—" : `${pct.toFixed(2)}%`}
             </div>
 
-            <dl className="mt-2 2xl:mt-3 grid grid-cols-2 gap-2 2xl:gap-3 text-xs 2xl:text-sm text-zinc-400">
-                <dt>업비트(KRW)</dt>
-                <dd className="text-right text-emerald-300 whitespace-nowrap">
+            <dl className="mt-2 2xl:mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 2xl:gap-x-4 2xl:gap-y-2 text-xs 2xl:text-sm text-zinc-400">
+                <dt className="whitespace-nowrap">업비트(KRW)</dt>
+                <dd className="text-right text-emerald-300 font-mono tabular-nums whitespace-nowrap">
                     {data?.upbitKrw != null
                         ? `${data.upbitKrw.toLocaleString()} KRW`
                         : "—"}
                 </dd>
 
-                <dt>바이낸스(USDT)</dt>
-                <dd className="text-right text-amber-300 whitespace-nowrap">
+                <dt className="whitespace-nowrap">바이낸스(USDT)</dt>
+                <dd className="text-right text-amber-300 font-mono tabular-nums whitespace-nowrap">
                     {data?.binanceUsdt != null
                         ? `${data.binanceUsdt.toLocaleString()} USDT`
                         : "—"}
                 </dd>
 
-                <dt>USD/KRW</dt>
-                <dd className="text-right text-zinc-200">
+                <dt className="whitespace-nowrap">USD/KRW</dt>
+                <dd className="text-right text-zinc-200 font-mono tabular-nums whitespace-nowrap">
                     {data?.usdkrw != null
                         ? `${Math.round(data.usdkrw).toLocaleString()}원`
                         : "—"}

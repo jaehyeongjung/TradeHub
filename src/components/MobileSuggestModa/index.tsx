@@ -53,7 +53,7 @@ export default function MobileSuggestModal() {
                 <div className="mt-4 flex justify-end">
                   <button
                     onClick={close}
-                    className="px-4 py-2 rounded-lg border border-neutral-700 hover:border-neutral-600 text-neutral-200"
+                    className="px-4 py-2 rounded-lg border border-neutral-700 hover:border-neutral-600 text-neutral-200 cursor-pointer"
                   >
                     닫기
                   </button>

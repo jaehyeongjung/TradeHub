@@ -11,6 +11,7 @@ import YouTubeSeamlessPlayer from "@/components/YouTubeBGMPlayer";
 import NewsPanel from "../NewsPanel";
 import KimchiWidget from "@/components/KimchiWidget";
 import HotSymbolsTicker from "../HotCoin";
+import MarketIndicesWidget from "@/components/MarketIndicesWidget";
 
 type TabKey = "board" | "news";
 
@@ -45,10 +46,10 @@ export const DashBoard = () => {
                 className="flex gap-5 mt-5 min-h-120 h-[calc(100vh-400px)] lg:h-[calc(100vh-200px)] 2xl:h-[calc(100vh-300px)] border-neutral-800"
             >
                 {/* 왼쪽: 게시판/뉴스 카드 */}
-                <article className="min-w-113 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950 border border-zinc-800">
+                <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950 border border-zinc-800">
                     {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
                     <div className="flex items-center gap-2 2xl:py-2 2xl:min-h-14">
-                        <div className="inline-flex items-center rounded-lg bg-neutral-800 p-1 ml-3">
+                        <div className="inline-flex items-center rounded-lg bg-neutral-800 p-1 ml-3 shrink-0">
                             <button
                                 onClick={() => switchTab("board")}
                                 className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition ${
@@ -72,8 +73,10 @@ export const DashBoard = () => {
                                 <span className="whitespace-nowrap">뉴스</span>
                             </button>
                         </div>
-                        <HotSymbolsTicker />
-                        <div className="ml-auto ">
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                            <HotSymbolsTicker />
+                        </div>
+                        <div className="ml-auto shrink-0">
                             {activeTab === "board" && (
                                 <button
                                     onClick={() => postRef.current?.openWrite()}
@@ -106,14 +109,17 @@ export const DashBoard = () => {
                     <YouTubeSeamlessPlayer videoId="j23SO29LNWE" />
                 </aside>
 
-                <aside
-                    aria-label="실시간 채팅"
-                    className="min-w-105 2xl:min-w-120 border border-zinc-800 rounded-2xl h-[calc(100%-60px)] 2xl:h-full bg-neutral-950 overflow-hidden flex flex-col"
-                >
-                    <div className="flex-1 min-h-0">
-                        <Chat />
-                    </div>
-                </aside>
+                <div className="flex flex-col gap-3 2xl:gap-5 min-w-115 2xl:min-w-140">
+                    <MarketIndicesWidget />
+                    <aside
+                        aria-label="실시간 채팅"
+                        className="border border-zinc-800 rounded-2xl flex-1 mb-14 bg-neutral-950 overflow-hidden flex flex-col"
+                    >
+                        <div className="flex-1 min-h-0">
+                            <Chat />
+                        </div>
+                    </aside>
+                </div>
             </section>
             <SeoFooter />
         </>

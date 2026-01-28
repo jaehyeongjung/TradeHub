@@ -215,7 +215,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
             >
                 <button
                     onClick={() => setOpen(true)}
-                    className="min-w-30 w-full min-h-26 2xl:min-h-40 2xl:min-w-40 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-3 2xl:p-4 shadow-md transition hover:border-neutral-700 flex flex-col justify-center"
+                    className="flex-1 min-w-0 w-full min-h-26 2xl:min-h-40 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-2 2xl:p-4 shadow-md transition hover:border-neutral-700 flex flex-col justify-center overflow-hidden"
                 >
                     <h2 className="text-sm 2xl:text-base font-bold text-white">
                         {symbol.toUpperCase()}

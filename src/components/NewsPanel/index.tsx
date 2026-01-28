@@ -125,7 +125,7 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
 
                                             {/* 제목은 모바일에서 2줄까지, md 이상은 한 줄 말줄임 */}
                                             <button
-                                                className="block w-full text-left text-sm text-neutral-100 hover:underline line-clamp-2 md:line-clamp-1"
+                                                className="block w-full text-left text-sm text-neutral-100 hover:underline line-clamp-2 md:line-clamp-1 cursor-pointer"
                                                 title={n.title}
                                                 onClick={() => openViewer(n)}
                                             >
@@ -166,7 +166,7 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
                                                 onClick={() => shareToChat(n)}
                                                 className={`flex-1 md:flex-none rounded px-2 py-1 text-[11px] ${
                                                     userId
-                                                        ? "bg-emerald-600 text-white hover:bg-emerald-500"
+                                                        ? "bg-emerald-600 text-white hover:bg-emerald-500 cursor-pointer"
                                                         : "bg-neutral-700 text-neutral-400 cursor-not-allowed"
                                                 }`}
                                             >
@@ -210,7 +210,7 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
                                 </a>
                                 <button
                                     onClick={closeViewer}
-                                    className="px-2 py-1 text-xs rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700 whitespace-nowrap"
+                                    className="px-2 py-1 text-xs rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700 whitespace-nowrap cursor-pointer"
                                 >
                                     닫기
                                 </button>

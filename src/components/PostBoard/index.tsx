@@ -40,14 +40,14 @@ const CustomModal: React.FC<{
                 {isConfirm && (
                     <button
                         onClick={onCancel}
-                        className="flex-1 px-4 py-2 rounded-lg text-sm bg-neutral-700 text-white hover:bg-neutral-600 transition"
+                        className="flex-1 px-4 py-2 rounded-lg text-sm bg-neutral-700 text-white hover:bg-neutral-600 transition cursor-pointer"
                     >
                         취소
                     </button>
                 )}
                 <button
                     onClick={onConfirm}
-                    className="flex-1 px-4 py-2 rounded-lg text-sm bg-emerald-600 text-white hover:bg-emerald-500 transition"
+                    className="flex-1 px-4 py-2 rounded-lg text-sm bg-emerald-600 text-white hover:bg-emerald-500 transition cursor-pointer"
                 >
                     {isConfirm ? "확인" : "닫기"}
                 </button>

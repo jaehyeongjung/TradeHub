@@ -324,7 +324,7 @@ export default function CoinChart({
                 <div
                     ref={chartRef}
                     onClick={() => setOpen(true)}
-                    className="cursor-pointer w-full min-w-55 min-h-30 2xl:min-h-45 rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900"
+                    className="cursor-pointer w-full h-30 2xl:h-45 rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900"
                     title="클릭해서 코인 심볼 변경"
                 />
 
