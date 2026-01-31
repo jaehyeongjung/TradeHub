@@ -39,17 +39,15 @@ export const metadata: Metadata = {
         url: SITE,
         title: "TradeHub",
         siteName: "TradeHub",
-        description:
-            "코인 선물 트레이더를 위한 실시간 포지션/선물 롱숏 비율/채팅/코인 뉴스 코인 커뮤니티",
-        images: [{ url: "/og.png", width: 1200, height: 630 }],
+        description: "코인 선물 트레이더를 위한 커뮤니티",
+        images: [{ url: "/main-Image.png", width: 1200, height: 630 }],
         locale: "ko_KR",
     },
     twitter: {
         card: "summary_large_image",
         title: "TradeHub",
-        description:
-            "코인 선물 트레이더를 위한 실시간 포지션/선물 롱숏 비율/채팅/코인 뉴스 코인 커뮤니티",
-        images: ["/og.png"],
+        description: "코인 선물 트레이더를 위한 커뮤니티",
+        images: ["/main-Image.png"],
     },
     icons: { icon: "/favicon.png" },
     robots: {
