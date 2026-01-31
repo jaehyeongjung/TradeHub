@@ -80,6 +80,8 @@ export default function KimchiWidget({
             ? "text-emerald-500"
             : "text-rose-500";
 
+    const isLoading = data == null;
+
     return (
         <div
             className="relative rounded-2xl border border-zinc-800 bg-neutral-950 p-5 2xl:p-8 text-white"
@@ -88,48 +90,51 @@ export default function KimchiWidget({
         >
             <div className="flex items-center justify-between">
                 <h3 className="text-sm 2xl:text-base font-semibold">김치 프리미엄</h3>
-                <span className="text-xs 2xl:text-sm text-zinc-400">
-                    {data?.symbol ?? symbol}
-                </span>
+                {isLoading ? (
+                    <div className="h-4 w-10 bg-neutral-800 rounded animate-pulse" />
+                ) : (
+                    <span className="text-xs 2xl:text-sm text-zinc-400">
+                        {data?.symbol ?? symbol}
+                    </span>
+                )}
             </div>
 
             <div className={`mt-2 2xl:mt-3 text-2xl 2xl:text-3xl font-bold ${color}`}>
-                {pct == null ? "—" : `${pct.toFixed(2)}%`}
+                {isLoading ? (
+                    <div className="h-8 w-24 bg-neutral-800 rounded animate-pulse" />
+                ) : (
+                    `${pct!.toFixed(2)}%`
+                )}
             </div>
 
             <dl className="mt-2 2xl:mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 2xl:gap-x-4 2xl:gap-y-2 text-xs 2xl:text-sm text-zinc-400">
                 <dt className="whitespace-nowrap">업비트(KRW)</dt>
                 <dd className="text-right text-emerald-300 font-mono tabular-nums whitespace-nowrap">
-                    {data?.upbitKrw != null
-                        ? `${data.upbitKrw.toLocaleString()} KRW`
-                        : "—"}
+                    {isLoading ? (
+                        <div className="h-4 w-16 bg-neutral-800 rounded animate-pulse ml-auto" />
+                    ) : (
+                        `${(data.upbitKrw ?? 0).toLocaleString()} KRW`
+                    )}
                 </dd>
 
                 <dt className="whitespace-nowrap">바이낸스(USDT)</dt>
                 <dd className="text-right text-amber-300 font-mono tabular-nums whitespace-nowrap">
-                    {data?.binanceUsdt != null
-                        ? `${data.binanceUsdt.toLocaleString()} USDT`
-                        : "—"}
+                    {isLoading ? (
+                        <div className="h-4 w-14 bg-neutral-800 rounded animate-pulse ml-auto" />
+                    ) : (
+                        `${(data.binanceUsdt ?? 0).toLocaleString()} USDT`
+                    )}
                 </dd>
 
                 <dt className="whitespace-nowrap">USD/KRW</dt>
                 <dd className="text-right text-zinc-200 font-mono tabular-nums whitespace-nowrap">
-                    {data?.usdkrw != null
-                        ? `${Math.round(data.usdkrw).toLocaleString()}원`
-                        : "—"}
+                    {isLoading ? (
+                        <div className="h-4 w-12 bg-neutral-800 rounded animate-pulse ml-auto" />
+                    ) : (
+                        `${Math.round(data.usdkrw ?? 0).toLocaleString()}원`
+                    )}
                 </dd>
             </dl>
-
-            {data?.degraded && (
-                <p className="mt-1 text-[11px] text-zinc-500">
-                    일부 데이터 폴백 적용
-                </p>
-            )}
-            {data?.cached && (
-                <p className="mt-1 text-[11px] text-amber-400">
-                    최근 스냅샷 표시 중
-                </p>
-            )}
 
             {/* 툴팁 */}
             <AnimatePresence>

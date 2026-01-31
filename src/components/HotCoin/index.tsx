@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Ticker24h = {
@@ -38,6 +38,19 @@ export default function HotSymbolsTicker() {
     const [showTooltip, setShowTooltip] = useState(false);
     const [showListTooltip, setShowListTooltip] = useState(false);
     const timerRef = useRef<number | null>(null);
+    const listTooltipRef = useRef<HTMLDivElement>(null);
+
+    // 바깥 클릭 시 툴팁 닫기
+    useEffect(() => {
+        if (!showListTooltip) return;
+        const handleClick = (e: MouseEvent) => {
+            if (listTooltipRef.current && !listTooltipRef.current.contains(e.target as Node)) {
+                setShowListTooltip(false);
+            }
+        };
+        document.addEventListener("click", handleClick);
+        return () => document.removeEventListener("click", handleClick);
+    }, [showListTooltip]);
 
     // 30초마다 전체 리스트 갱신
     useEffect(() => {
@@ -121,6 +134,7 @@ export default function HotSymbolsTicker() {
 
             {/* 실시간 회전 코인 */}
             <div
+                ref={listTooltipRef}
                 className="relative w-[300px] 2xl:w-[380px] cursor-pointer"
                 onClick={() => setShowListTooltip(!showListTooltip)}
             >
