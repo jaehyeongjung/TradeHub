@@ -54,14 +54,13 @@ function squarify(
         const isHorizontal = currentWidth >= currentHeight;
         const side = isHorizontal ? currentHeight : currentWidth;
 
-        let row: TreemapItem[] = [];
+        const row: TreemapItem[] = [];
         let rowVolume = 0;
         const remainingVolume = remaining.reduce((sum, item) => sum + item.volume, 0);
 
         for (const item of remaining) {
             const testRow = [...row, item];
             const testVolume = rowVolume + item.volume;
-            const testRatio = (testVolume / remainingVolume) * (isHorizontal ? currentWidth : currentHeight);
 
             if (row.length === 0) {
                 row.push(item);

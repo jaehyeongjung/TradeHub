@@ -1,7 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase-browser";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Comment = {

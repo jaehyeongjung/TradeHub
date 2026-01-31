@@ -80,7 +80,7 @@ export default function YouTubeBGMPlayer({
 
         // 플레이어 생성 함수 정의 (전역 함수로 등록)
         window.onYouTubeIframeAPIReady = () => {
-            const player = new window.YT.Player("youtube-player-container", {
+            new window.YT.Player("youtube-player-container", {
                 videoId: videoId,
                 playerVars: {
                     autoplay: 1,
