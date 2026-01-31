@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAtomValue } from "jotai";
 import { supabase } from "@/lib/supabase-browser";
 import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
+import { treemapOpenAtom } from "@/store/atoms";
 
 /** 브라우저 당 고정되는 익명 디바이스 ID */
 function getDeviceId() {
@@ -20,6 +22,7 @@ export default function LiveStatsBox() {
     const deviceIdRef = useRef<string>(getDeviceId());
     const [onlineNow, setOnlineNow] = useState<number>(0);
     const [connected, setConnected] = useState<boolean>(false);
+    const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
     const today = new Date().toISOString().slice(0, 10);
 
@@ -61,11 +64,12 @@ export default function LiveStatsBox() {
         await fetchOnline();
     }, [fetchOnline]);
 
-    // 탭 비활성화 시 폴링 중단
+    // 탭 비활성화 또는 트리맵 열림 시 폴링 중단
     useVisibilityPolling({
         interval: 15_000,
         onPoll: heartbeatAndFetch,
         immediate: true,
+        enabled: !isTreemapOpen,
     });
 
     // Realtime 구독 (presence 변경 시 즉시 반영)

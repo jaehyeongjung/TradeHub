@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAtomValue } from "jotai";
+import { treemapOpenAtom } from "@/store/atoms";
 
 type Ticker24h = {
     symbol: string;
@@ -39,6 +41,7 @@ export default function HotSymbolsTicker() {
     const [showListTooltip, setShowListTooltip] = useState(false);
     const timerRef = useRef<number | null>(null);
     const listTooltipRef = useRef<HTMLDivElement>(null);
+    const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
     // 바깥 클릭 시 툴팁 닫기
     useEffect(() => {
@@ -52,8 +55,10 @@ export default function HotSymbolsTicker() {
         return () => document.removeEventListener("click", handleClick);
     }, [showListTooltip]);
 
-    // 30초마다 전체 리스트 갱신
+    // 30초마다 전체 리스트 갱신 (트리맵 열려있으면 중단)
     useEffect(() => {
+        if (isTreemapOpen) return;
+
         let aborted = false;
         const load = async () => {
             try {
@@ -81,10 +86,16 @@ export default function HotSymbolsTicker() {
             aborted = true;
             clearInterval(intv);
         };
-    }, []);
+    }, [isTreemapOpen]);
 
-    // 2초마다 다음 항목으로 (Top 15만 회전)
+    // 2초마다 다음 항목으로 (Top 15만 회전, 트리맵 열려있으면 중단)
     useEffect(() => {
+        if (isTreemapOpen) {
+            if (timerRef.current) window.clearInterval(timerRef.current);
+            timerRef.current = null;
+            return;
+        }
+
         if (timerRef.current) window.clearInterval(timerRef.current);
         timerRef.current = window.setInterval(() => {
             setIdx((i) =>
@@ -94,7 +105,7 @@ export default function HotSymbolsTicker() {
         return () => {
             if (timerRef.current) window.clearInterval(timerRef.current);
         };
-    }, [list]);
+    }, [list, isTreemapOpen]);
 
     const current = list.length ? list[idx] : null;
 

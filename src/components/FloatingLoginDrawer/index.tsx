@@ -3,13 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
+import { useAtom } from "jotai";
 import AuthBox from "@/components/login";
 import CryptoTreemap from "@/components/CryptoTreemap";
+import { treemapOpenAtom } from "@/store/atoms";
 
 export default function FloatingLoginSidebar() {
     const [open, setOpen] = useState(false);
     const [isDark, setIsDark] = useState(false);
-    const [showTreemap, setShowTreemap] = useState(false);
+    const [showTreemap, setShowTreemap] = useAtom(treemapOpenAtom);
     const pathname = usePathname();
     const closeBtnRef = useRef<HTMLButtonElement | null>(null);
     const lastFocusRef = useRef<HTMLElement | null>(null);

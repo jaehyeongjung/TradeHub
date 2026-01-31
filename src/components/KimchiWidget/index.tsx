@@ -2,7 +2,9 @@
 
 import { useCallback, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAtomValue } from "jotai";
 import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
+import { treemapOpenAtom } from "@/store/atoms";
 import type { KimchiResponse } from "@/app/api/kimchi/route";
 
 type Data = KimchiResponse;
@@ -51,6 +53,7 @@ export default function KimchiWidget({
     const [data, setData] = useState<Data | null>(null);
     const [isHovered, setIsHovered] = useState(false);
     const abortRef = useRef<AbortController | null>(null);
+    const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
     const load = useCallback(async () => {
         try {
@@ -65,11 +68,12 @@ export default function KimchiWidget({
         }
     }, [symbol]);
 
-    // 탭 비활성화 시 폴링 중단
+    // 탭 비활성화 또는 트리맵 열림 시 폴링 중단
     useVisibilityPolling({
         interval: pollMs,
         onPoll: load,
         immediate: true,
+        enabled: !isTreemapOpen,
     });
 
     const pct = data?.premium != null ? data.premium * 100 : null;

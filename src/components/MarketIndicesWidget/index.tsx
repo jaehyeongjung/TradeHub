@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { useAtomValue } from "jotai";
 import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
+import { treemapOpenAtom } from "@/store/atoms";
 import type { MarketIndicesResponse, MarketIndex } from "@/app/api/market-indices/route";
 
 async function fetchIndices(signal?: AbortSignal): Promise<MarketIndicesResponse> {
@@ -47,6 +49,7 @@ function IndexItem({ index }: { index: MarketIndex }) {
 export default function MarketIndicesWidget({ pollMs = 30000 }: { pollMs?: number }) {
     const [data, setData] = useState<MarketIndicesResponse | null>(null);
     const abortRef = useRef<AbortController | null>(null);
+    const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
     const load = useCallback(async () => {
         try {
@@ -63,11 +66,12 @@ export default function MarketIndicesWidget({ pollMs = 30000 }: { pollMs?: numbe
         }
     }, []);
 
-    // 탭 비활성화 시 폴링 중단
+    // 탭 비활성화 또는 트리맵 열림 시 폴링 중단
     useVisibilityPolling({
         interval: pollMs,
         onPoll: load,
         immediate: true,
+        enabled: !isTreemapOpen,
     });
 
     return (

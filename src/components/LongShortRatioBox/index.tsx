@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAtomValue } from "jotai";
+import { treemapOpenAtom } from "@/store/atoms";
 
 type Period = "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "6h" | "12h" | "1d";
 type Source = "global" | "top-trader" | "taker";
@@ -55,6 +57,7 @@ export default function LongShortRatioBox({
   const [shortPct, setShortPct] = useState<number | null>(null);
   const [ts, setTs] = useState<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
   const endpoint = useMemo(() => {
     switch (source) {
@@ -105,6 +108,9 @@ export default function LongShortRatioBox({
   }
 
   useEffect(() => {
+    // 트리맵 열려있으면 폴링 중단
+    if (isTreemapOpen) return;
+
     setLoading(true);
     void fetchRatio();
     if (pollMs > 0) {
@@ -112,7 +118,7 @@ export default function LongShortRatioBox({
       return () => clearInterval(t);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [symbol, period, source, pollMs]);
+  }, [symbol, period, source, pollMs, isTreemapOpen]);
 
   const description = DESCRIPTION_MAP[source];
 
