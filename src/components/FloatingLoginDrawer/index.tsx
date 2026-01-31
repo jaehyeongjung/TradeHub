@@ -64,6 +64,9 @@ export default function FloatingLoginSidebar() {
         close();
     }, [pathname]);
 
+    // 모바일 페이지에서는 플로팅 버튼 숨김
+    if (pathname === "/mobile") return null;
+
     return (
         <>
             {/* FAB: 우하단 떠있는 버튼들 */}
