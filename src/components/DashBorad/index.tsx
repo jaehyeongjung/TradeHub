@@ -113,7 +113,7 @@ export const DashBoard = () => {
                     <MarketIndicesWidget />
                     <aside
                         aria-label="실시간 채팅"
-                        className="border border-zinc-800 rounded-2xl flex-1 mb-14 bg-neutral-950 overflow-hidden flex flex-col"
+                        className="border border-zinc-800 rounded-2xl flex-1 mb-14 2xl:mb-0 bg-neutral-950 overflow-hidden flex flex-col"
                     >
                         <div className="flex-1 min-h-0">
                             <Chat />
