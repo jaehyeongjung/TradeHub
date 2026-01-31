@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function MobilePage() {
     const [isLight, setIsLight] = useState(false);
@@ -14,45 +15,6 @@ export default function MobilePage() {
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
         return () => observer.disconnect();
     }, []);
-
-    const features = [
-        {
-            icon: (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-            ),
-            title: "실시간 차트",
-            desc: "비트코인 실시간 가격과 차트를 한눈에",
-        },
-        {
-            icon: (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            ),
-            title: "실시간 포지션",
-            desc: "트레이더들의 롱/숏 비율 실시간 확인",
-        },
-        {
-            icon: (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-            ),
-            title: "실시간 채팅",
-            desc: "다른 트레이더들과 실시간 소통",
-        },
-        {
-            icon: (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                </svg>
-            ),
-            title: "코인 뉴스",
-            desc: "최신 암호화폐 뉴스를 빠르게",
-        },
-    ];
 
     return (
         <div className={`min-h-screen flex flex-col ${isLight ? "bg-neutral-50" : "bg-neutral-950"}`}>
@@ -106,39 +68,49 @@ export default function MobilePage() {
                     </div>
                 </div>
 
-                {/* Features */}
+                {/* Preview Images */}
                 <div className="w-full max-w-sm">
                     <h2 className={`text-sm font-semibold mb-4 ${isLight ? "text-neutral-500" : "text-neutral-500"}`}>
-                        주요 기능
+                        미리보기
                     </h2>
-                    <div className="space-y-3">
-                        {features.map((feature, idx) => (
-                            <div
-                                key={idx}
-                                className={`flex items-center gap-4 p-4 rounded-xl ${isLight ? "bg-neutral-100" : "bg-neutral-900"}`}
-                            >
-                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                    isLight ? "bg-emerald-100 text-emerald-600" : "bg-emerald-900/30 text-emerald-400"
-                                }`}>
-                                    {feature.icon}
-                                </div>
-                                <div>
-                                    <h3 className={`font-medium ${isLight ? "text-neutral-900" : "text-white"}`}>
-                                        {feature.title}
-                                    </h3>
-                                    <p className={`text-sm ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>
-                                        {feature.desc}
-                                    </p>
-                                </div>
+                    <div className="space-y-4">
+                        {/* Image 1 - 메인페이지 */}
+                        <div className={`rounded-xl overflow-hidden border ${isLight ? "border-neutral-200" : "border-neutral-800"}`}>
+                            <Image
+                                src="/main-Image.png"
+                                alt="TradeHub 메인페이지"
+                                width={400}
+                                height={225}
+                                className="w-full h-auto"
+                            />
+                            <div className={`px-3 py-2 ${isLight ? "bg-neutral-100" : "bg-neutral-900"}`}>
+                                <p className={`text-xs ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
+                                    구독 코인 가격 · 실시간 포지션 · 뉴스 · 실시간 채팅
+                                </p>
                             </div>
-                        ))}
+                        </div>
+                        {/* Image 2 - 트리맵 */}
+                        <div className={`rounded-xl overflow-hidden border ${isLight ? "border-neutral-200" : "border-neutral-800"}`}>
+                            <Image
+                                src="/mobile-Image.png"
+                                alt="TradeHub 트리맵"
+                                width={400}
+                                height={225}
+                                className="w-full h-auto"
+                            />
+                            <div className={`px-3 py-2 ${isLight ? "bg-neutral-100" : "bg-neutral-900"}`}>
+                                <p className={`text-xs ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
+                                    트리맵 · 거래량 기반 코인 시각화
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
 
             {/* Footer */}
             <footer className={`px-6 py-6 text-center ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>
-                <p className="text-xs">© 2025 TradeHub. All rights reserved.</p>
+                <p className="text-xs">© 2026 TradeHub. All rights reserved.</p>
             </footer>
         </div>
     );
