@@ -13,7 +13,8 @@
 <br>
 
 
-<img width="1437" height="684" alt="스크린샷 2026-01-31 오후 2 42 13" src="https://github.com/user-attachments/assets/7bd0af6b-7c36-4cad-b6ed-4e4de4a2dbd6" />
+<img width="1437" height="684" alt="스크린샷 2026-01-31 오후 5 25 14" src="https://github.com/user-attachments/assets/b4f98f36-0743-4bd8-99a8-dffa247f142c" />
+
 
 <img width="1437" height="684" alt="스크린샷 2026-01-31 오후 5 25 20" src="https://github.com/user-attachments/assets/4b82ac3b-05d2-4c58-84ec-1edbccef0a6b" />
 
