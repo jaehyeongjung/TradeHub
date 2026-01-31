@@ -100,8 +100,17 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
                 {/* 본문 */}
                 <div className="flex-1 min-h-0 overflow-y-auto p-3 pr-2 scrollbar-hide">
                     {loading ? (
-                        <div className="rounded-xl border border-neutral-700 bg-neutral-900/70 p-3 text-sm text-neutral-400">
-                            뉴스 로딩중...
+                        <div className="space-y-2">
+                            {[...Array(5)].map((_, i) => (
+                                <div key={i} className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2">
+                                    <div className="h-3 w-16 bg-neutral-800 rounded animate-pulse mb-2" />
+                                    <div className="h-4 w-full bg-neutral-800 rounded animate-pulse mb-2" />
+                                    <div className="flex gap-2">
+                                        <div className="h-3 w-12 bg-neutral-800 rounded animate-pulse" />
+                                        <div className="h-3 w-20 bg-neutral-800 rounded animate-pulse" />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ) : !news.length ? (
                         <div className="text-xs text-neutral-500">
@@ -237,7 +246,7 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
                                             </a>
                                         </div>
                                     ) : (
-                                        <div>불러오는 중…</div>
+                                        <div className="w-full h-full bg-neutral-800 animate-pulse" />
                                     )}
                                 </div>
                             )}

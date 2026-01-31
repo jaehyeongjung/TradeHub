@@ -161,13 +161,11 @@ export default function HotSymbolsTicker() {
                             </span>
                         </motion.div>
                     ) : (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="text-neutral-400"
-                        >
-                            인기 코인 로딩중…
-                        </motion.div>
+                        <div className="flex items-center gap-2">
+                            <div className="h-4 w-12 bg-neutral-800 rounded animate-pulse" />
+                            <div className="h-4 w-20 bg-neutral-800 rounded animate-pulse" />
+                            <div className="h-4 w-14 bg-neutral-800 rounded animate-pulse" />
+                        </div>
                     )}
                 </AnimatePresence>
                 </div>

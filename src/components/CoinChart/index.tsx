@@ -44,6 +44,7 @@ export default function CoinChart({
     const [hovered, setHovered] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
     const [theme, setTheme] = useState<"dark" | "light">("light");
+    const [chartLoading, setChartLoading] = useState(true);
 
     // 심볼별 precision 캐시
     const precisionCache = useRef<
@@ -135,6 +136,7 @@ export default function CoinChart({
         let reconnectTimer: number | null = null;
         let ro: ResizeObserver | null = null;
 
+        setChartLoading(true);
         const isLight = theme === "light";
 
         const chart: IChartApi = createChart(el, {
@@ -231,8 +233,10 @@ export default function CoinChart({
                         close: parseFloat(d[4]),
                     }))
                 );
+                setChartLoading(false);
             } catch (e) {
                 console.error(e);
+                setChartLoading(false);
             }
         }
 
@@ -337,12 +341,19 @@ export default function CoinChart({
                 className={`relative w-full ${className ?? ""}`}
             >
                 {/* 실제 차트 박스 */}
-                <div
-                    ref={chartRef}
-                    onClick={() => setOpen(true)}
-                    className="cursor-pointer w-full h-30 2xl:h-45 rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900"
-                    title="클릭해서 코인 심볼 변경"
-                />
+                <div className="relative w-full h-30 2xl:h-45">
+                    {chartLoading && (
+                        <div className="absolute inset-0 rounded-2xl border border-neutral-800 bg-neutral-900 flex items-center justify-center z-10">
+                            <div className="w-[90%] h-[70%] bg-neutral-800 rounded animate-pulse" />
+                        </div>
+                    )}
+                    <div
+                        ref={chartRef}
+                        onClick={() => setOpen(true)}
+                        className={`cursor-pointer w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 ${chartLoading ? 'opacity-0' : 'opacity-100'} transition-opacity`}
+                        title="클릭해서 코인 심볼 변경"
+                    />
+                </div>
 
                 {/* 툴팁 */}
                 <AnimatePresence>

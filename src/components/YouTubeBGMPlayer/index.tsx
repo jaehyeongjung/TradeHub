@@ -51,7 +51,21 @@ export default function YouTubeBGMPlayer({
 }: Props) {
     const [isMuted, setIsMuted] = useState(true);
     const [isReady, setIsReady] = useState(false);
+    const [isLight, setIsLight] = useState(true);
     const playerRef = useRef<YTPlayer | null>(null);
+
+    // 테마 감지
+    useEffect(() => {
+        const html = document.documentElement;
+        setIsLight(html.classList.contains("light"));
+
+        const observer = new MutationObserver(() => {
+            setIsLight(html.classList.contains("light"));
+        });
+        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+
+        return () => observer.disconnect();
+    }, []);
 
     // 1. YouTube API 로드 및 플레이어 준비
     useEffect(() => {
@@ -138,8 +152,10 @@ export default function YouTubeBGMPlayer({
                     p-3 2xl:p-4 rounded-full shadow-lg transition-colors duration-300 w-full
                     ${
                         isMuted
-                            ? "bg-neutral-600 hover:bg-neutral-700"
-                            : "bg-emerald-600 hover:bg-emerald-600"
+                            ? isLight
+                                ? "bg-white ring-1 ring-neutral-200 shadow-md hover:brightness-95"
+                                : "bg-neutral-600 hover:bg-neutral-700"
+                            : "bg-emerald-600 hover:bg-emerald-500"
                     }
                     ${
                         !isReady
@@ -149,15 +165,10 @@ export default function YouTubeBGMPlayer({
                 `}
                 disabled={!isReady}
             >
-                <span className="text-md 2xl:text-lg text-white flex items-center justify-center gap-2 2xl:gap-4">
-                    {isMuted ? (
-                        "🔊"
-                    ) : (
-                        <>
-                            <span>🔇</span>
-                            <span>BGM OFF</span>
-                        </>
-                    )}
+                <span className={`text-md 2xl:text-lg flex items-center justify-center ${
+                    isMuted && isLight ? "text-neutral-700" : "text-white"
+                }`}>
+                    {isMuted ? "🔊" : "🔇"}
                 </span>
             </button>
         </div>

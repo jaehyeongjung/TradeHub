@@ -87,7 +87,7 @@ export default function LiveStatsBox() {
     }, [fetchOnline]);
 
     return (
-        <div className="flex items-center gap-3 2xl:gap-4 rounded-xl border p-3 2xl:p-4 shadow-sm justify-center bg-neutral-900">
+        <div className="flex items-center gap-3 2xl:gap-4 rounded-xl border border-neutral-700/50 p-3 2xl:p-4 shadow-sm justify-center bg-neutral-900">
             <span className="text-xs 2xl:text-sm flex gap-2 whitespace-nowrap text-gray-300">
                 <b>현재 접속 </b>
                 <b>{onlineNow.toLocaleString()}명</b>

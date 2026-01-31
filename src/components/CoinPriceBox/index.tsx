@@ -217,25 +217,36 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
                     onClick={() => setOpen(true)}
                     className="flex-1 min-w-0 w-full min-h-26 2xl:min-h-40 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-2 2xl:p-4 shadow-md transition hover:border-neutral-700 flex flex-col justify-center overflow-hidden"
                 >
-                    <h2 className="text-sm 2xl:text-base font-bold text-white">
-                        {symbol.toUpperCase()}
-                    </h2>
-                    <p
-                        className={`mt-1 2xl:mt-2 text-lg 2xl:text-2xl font-mono ${pctColor}`}
-                    >
-                        {price != null ? formatPrice(price) : "—"}
-                    </p>
-                    <div
-                        className={`mt-0.5 2xl:mt-1 text-xs 2xl:text-sm font-semibold ${pctColor}`}
-                    >
-                        {pct != null ? (
-                            <>
-                                {arrow} {pctText}
-                            </>
-                        ) : (
-                            "—"
-                        )}
-                    </div>
+                    {price == null ? (
+                        /* 스켈레톤 */
+                        <>
+                            <div className="h-4 2xl:h-5 w-20 bg-neutral-800 rounded animate-pulse" />
+                            <div className="mt-1 2xl:mt-2 h-6 2xl:h-8 w-28 bg-neutral-800 rounded animate-pulse" />
+                            <div className="mt-0.5 2xl:mt-1 h-4 w-16 bg-neutral-800 rounded animate-pulse" />
+                        </>
+                    ) : (
+                        <>
+                            <h2 className="text-sm 2xl:text-base font-bold text-white">
+                                {symbol.toUpperCase()}
+                            </h2>
+                            <p
+                                className={`mt-1 2xl:mt-2 text-lg 2xl:text-2xl font-mono ${pctColor}`}
+                            >
+                                {formatPrice(price)}
+                            </p>
+                            <div
+                                className={`mt-0.5 2xl:mt-1 text-xs 2xl:text-sm font-semibold ${pctColor}`}
+                            >
+                                {pct != null ? (
+                                    <>
+                                        {arrow} {pctText}
+                                    </>
+                                ) : (
+                                    <div className="h-4 w-12 bg-neutral-800 rounded animate-pulse" />
+                                )}
+                            </div>
+                        </>
+                    )}
                 </button>
 
                 <AnimatePresence>

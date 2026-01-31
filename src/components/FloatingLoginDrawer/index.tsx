@@ -70,10 +70,10 @@ export default function FloatingLoginSidebar() {
                     type="button"
                     onClick={toggleTheme}
                     aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
-                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-105 focus:outline-none transition-colors ${
                         isDark
-                            ? "bg-zinc-700 text-yellow-300 ring-1 ring-zinc-600/50 focus:ring-zinc-500 focus:ring-offset-black"
-                            : "bg-amber-100 text-orange-500 ring-1 ring-amber-300/50 focus:ring-amber-400 focus:ring-offset-white"
+                            ? "bg-zinc-700 text-yellow-300 ring-1 ring-zinc-600/50"
+                            : "bg-white text-amber-500 ring-1 ring-neutral-200 shadow-md"
                     }`}
                 >
                     {isDark ? (
@@ -112,7 +112,11 @@ export default function FloatingLoginSidebar() {
                     aria-haspopup="dialog"
                     aria-expanded={open}
                     aria-controls="login-drawer"
-                    className="flex h-12 w-12 items-center cursor-pointer justify-center rounded-full bg-amber-400 text-black shadow-lg ring-1 ring-amber-300/50 hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 focus:ring-offset-black"
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-105 focus:outline-none transition-colors ${
+                        isDark
+                            ? "bg-amber-400 text-black ring-1 ring-amber-300/50"
+                            : "bg-white text-neutral-700 ring-1 ring-neutral-200 shadow-md"
+                    }`}
                 >
                     <span className="sr-only">로그인 사이드바 열기</span>
                     {/* user 아이콘 (inlined) */}
@@ -151,15 +155,21 @@ export default function FloatingLoginSidebar() {
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="login-drawer-title"
-                    className={`absolute right-0 top-0 h-full w-[360px] max-w-[92vw] border-l border-zinc-800 bg-neutral-950 shadow-2xl transition-transform duration-300 ${
+                    className={`absolute right-0 top-0 h-full w-[360px] max-w-[92vw] border-l shadow-2xl transition-transform duration-300 ${
                         open ? "translate-x-0" : "translate-x-full"
+                    } ${
+                        isDark
+                            ? "border-neutral-700/50 bg-neutral-950"
+                            : "border-neutral-200 bg-white"
                     }`}
                 >
                     {/* 헤더 */}
-                    <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
+                    <div className={`flex items-center justify-between border-b px-4 py-3 ${
+                        isDark ? "border-neutral-700/50" : "border-neutral-200"
+                    }`}>
                         <h2
                             id="login-drawer-title"
-                            className="text-sm font-semibold text-white"
+                            className={`text-sm font-semibold ${isDark ? "text-white" : "text-neutral-800"}`}
                         >
                             로그인
                         </h2>
@@ -167,7 +177,11 @@ export default function FloatingLoginSidebar() {
                             ref={closeBtnRef}
                             type="button"
                             onClick={close}
-                            className="rounded-md p-2 text-zinc-300 cursor-pointer hover:bg-zinc-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-zinc-500"
+                            className={`rounded-md p-2 cursor-pointer focus:outline-none focus:ring-2 ${
+                                isDark
+                                    ? "text-zinc-300 hover:bg-zinc-800 hover:text-white focus:ring-zinc-500"
+                                    : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 focus:ring-neutral-300"
+                            }`}
                         >
                             <span className="sr-only">닫기</span>
                             {/* close 아이콘 */}
@@ -185,22 +199,9 @@ export default function FloatingLoginSidebar() {
                         </button>
                     </div>
 
-                    {/* 본문: 로그인 박스 이동 */}
+                    {/* 본문 */}
                     <div className="h-[calc(100%-49px)] overflow-y-auto p-4">
-                        {/* 여기에 기존 AuthBox를 그대로 렌더 */}
-                        <AuthBox />
-
-                        {/* 필요시 안내/링크들 */}
-                        <div className="mt-6 space-y-2 text-xs text-zinc-400">
-                            <p>
-                                계정이 없으신가요? 가입은 로그인 화면에서 진행할
-                                수 있어요.
-                            </p>
-                            <p>
-                                문제가 있으면 우측 하단 버튼으로 언제든 열고
-                                닫을 수 있습니다.
-                            </p>
-                        </div>
+                        <AuthBox isDark={isDark} />
                     </div>
                 </aside>
             </div>
