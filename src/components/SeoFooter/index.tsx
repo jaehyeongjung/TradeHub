@@ -1,6 +1,23 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function SeoFooter() {
+    const [isLight, setIsLight] = useState(true);
+
+    useEffect(() => {
+        const html = document.documentElement;
+        setIsLight(html.classList.contains("light"));
+
+        const observer = new MutationObserver(() => {
+            setIsLight(html.classList.contains("light"));
+        });
+        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+
+        return () => observer.disconnect();
+    }, []);
+
     return (
         <section
             aria-labelledby="seo-footer-heading"
@@ -8,7 +25,7 @@ export default function SeoFooter() {
         >
             <div className="mx-auto w-full max-w-screen-xl px-5 py-8 text-zinc-300 ">
                 <Image
-                    src="/favicon.png"
+                    src={isLight ? "/favicon-light.png" : "/favicon.png"}
                     alt="TradeHub 로고"
                     width={80}
                     height={80}

@@ -12,6 +12,7 @@ const DEFAULT_SYMBOLS = [
     "apeusdt", // ApeCoin
     "aptusdt", // Aptos
     "arbusdt", // Arbitrum
+    "arkusdt", // ARK
     "arkmusdt", // Arkham
     "arumbusdt", // Arweave
     "atomusdt", // Cosmos

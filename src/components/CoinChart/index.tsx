@@ -43,6 +43,7 @@ export default function CoinChart({
     const [open, setOpen] = useState(false);
     const [hovered, setHovered] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
+    const [theme, setTheme] = useState<"dark" | "light">("light");
 
     // 심볼별 precision 캐시
     const precisionCache = useRef<
@@ -61,6 +62,19 @@ export default function CoinChart({
         const n = Number(tick);
         return Number.isFinite(n) ? n : 0.01;
     };
+
+    // 테마 변경 감지
+    useEffect(() => {
+        const html = document.documentElement;
+        setTheme(html.classList.contains("light") ? "light" : "dark");
+
+        const observer = new MutationObserver(() => {
+            setTheme(html.classList.contains("light") ? "light" : "dark");
+        });
+        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+
+        return () => observer.disconnect();
+    }, []);
 
     // 유저 세션 + 저장된 심볼 불러오기
     useEffect(() => {
@@ -121,19 +135,21 @@ export default function CoinChart({
         let reconnectTimer: number | null = null;
         let ro: ResizeObserver | null = null;
 
+        const isLight = theme === "light";
+
         const chart: IChartApi = createChart(el, {
             width: el.clientWidth,
             height: el.clientHeight,
             layout: {
-                background: { color: "#171717" },
-                textColor: "#E5E5E5",
+                background: { color: isLight ? "#ffffff" : "#171717" },
+                textColor: isLight ? "#333333" : "#E5E5E5",
             },
             grid: {
-                vertLines: { color: "#1F1F1F" },
-                horzLines: { color: "#1F1F1F" },
+                vertLines: { color: isLight ? "#e0e0e0" : "#1F1F1F" },
+                horzLines: { color: isLight ? "#e0e0e0" : "#1F1F1F" },
             },
-            rightPriceScale: { borderColor: "#2A2A2A" },
-            timeScale: { borderColor: "#2A2A2A" },
+            rightPriceScale: { borderColor: isLight ? "#d0d0d0" : "#2A2A2A" },
+            timeScale: { borderColor: isLight ? "#d0d0d0" : "#2A2A2A" },
         });
 
         chart.timeScale().applyOptions({
@@ -295,7 +311,7 @@ export default function CoinChart({
                 chart.remove();
             } catch {}
         };
-    }, [sym, interval, historyLimit]);
+    }, [sym, interval, historyLimit, theme]);
 
     const saveSymbol = async (next: string) => {
         const s = next.toUpperCase();

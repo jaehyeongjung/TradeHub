@@ -76,7 +76,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="ko" className={`bg-black ${inter.variable}`}>
+        <html lang="ko" className={`bg-black light ${inter.variable}`} suppressHydrationWarning>
             <body>
                 <AuthGate>{children}</AuthGate>
                 <Script
