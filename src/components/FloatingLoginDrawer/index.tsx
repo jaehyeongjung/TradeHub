@@ -2,11 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
 import AuthBox from "@/components/login";
+import CryptoTreemap from "@/components/CryptoTreemap";
 
 export default function FloatingLoginSidebar() {
     const [open, setOpen] = useState(false);
     const [isDark, setIsDark] = useState(false);
+    const [showTreemap, setShowTreemap] = useState(false);
     const pathname = usePathname();
     const closeBtnRef = useRef<HTMLButtonElement | null>(null);
     const lastFocusRef = useRef<HTMLElement | null>(null);
@@ -65,6 +68,31 @@ export default function FloatingLoginSidebar() {
         <>
             {/* FAB: 우하단 떠있는 버튼들 */}
             <div className="fixed bottom-5 right-5 z-[60] flex items-center gap-3">
+                {/* 트리맵 버튼 */}
+                <button
+                    type="button"
+                    onClick={() => setShowTreemap(true)}
+                    aria-label="트리맵 보기"
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-105 focus:outline-none transition-colors ${
+                        isDark
+                            ? "bg-zinc-700 text-emerald-400 ring-1 ring-zinc-600/50"
+                            : "bg-white text-emerald-600 ring-1 ring-neutral-200 shadow-md"
+                    }`}
+                >
+                    {/* Grid 아이콘 */}
+                    <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            fill="currentColor"
+                            d="M3 3h8v8H3V3zm0 10h8v8H3v-8zm10-10h8v8h-8V3zm0 10h8v8h-8v-8z"
+                        />
+                    </svg>
+                </button>
+
                 {/* 다크모드 토글 */}
                 <button
                     type="button"
@@ -205,6 +233,13 @@ export default function FloatingLoginSidebar() {
                     </div>
                 </aside>
             </div>
+
+            {/* 트리맵 */}
+            <AnimatePresence>
+                {showTreemap && (
+                    <CryptoTreemap onClose={() => setShowTreemap(false)} />
+                )}
+            </AnimatePresence>
         </>
     );
 }
