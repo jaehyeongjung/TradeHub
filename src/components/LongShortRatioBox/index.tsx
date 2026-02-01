@@ -124,7 +124,7 @@ export default function LongShortRatioBox({
 
   return (
     <div
-      className="relative flex-1 min-w-0 min-h-30 2xl:min-h-45 border border-neutral-800 rounded-lg shadow-sm p-2 2xl:p-4 cursor-default bg-neutral-900 flex flex-col justify-center overflow-hidden"
+      className="relative flex-1 min-w-0 min-h-30 2xl:min-h-45 border border-neutral-800 rounded-lg shadow-sm p-2 2xl:p-4 cursor-default bg-neutral-900 flex flex-col justify-center"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -148,11 +148,13 @@ export default function LongShortRatioBox({
       ) : (
         <>
           <div className="mt-1 2xl:mt-2">
-            <div className="h-6 2xl:h-8 w-full bg-neutral-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-emerald-500"
-                style={{ width: `${Math.max(0, Math.min(100, longPct ?? 0))}%` }}
-                title={`Long ${longPct?.toFixed(2)}%`}
+            <div className="h-6 2xl:h-8 w-full bg-neutral-800 rounded-full overflow-hidden relative">
+              <div className="absolute inset-0 bg-red-500/80" />
+              <motion.div
+                className="absolute left-0 top-0 bottom-0 bg-emerald-500"
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.max(0, Math.min(100, longPct ?? 0))}%` }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
               />
             </div>
             <div className="flex justify-between text-[12px] 2xl:text-sm mt-1 2xl:mt-2">
@@ -171,24 +173,24 @@ export default function LongShortRatioBox({
         </>
       )}
 
-      {/* 💬 커스텀 툴팁 (Hot Coin과 동일 스타일) */}
+      {/* 💬 커스텀 툴팁 (HotCoin과 동일 스타일) */}
       <AnimatePresence>
         {isHovered && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.18 }}
-            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[248px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-3 px-4 shadow-lg z-50 pointer-events-none"
+            transition={{ duration: 0.2 }}
+            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[220px] 2xl:w-[260px] text-[11px] 2xl:text-xs bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-3 px-4 2xl:py-4 2xl:px-5 shadow-lg z-50 pointer-events-none"
           >
-            <div className="font-semibold text-amber-300 mb-1">
-              지표 설명 ({source})
+            <div className="font-semibold text-amber-300 mb-1 2xl:mb-2">
+              지표 설명 ({source === "top-trader" ? "Top Trader" : source === "global" ? "Global" : "Taker"})
             </div>
             <p
               className="leading-snug"
               dangerouslySetInnerHTML={{ __html: description }}
             />
-            {/* 테두리가 있는 삼각형 화살표 */}
+            {/* 위쪽 화살표 */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
           </motion.div>
