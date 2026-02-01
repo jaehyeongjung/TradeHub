@@ -35,30 +35,28 @@ export default function SeoFooter() {
                     id="seo-footer-heading"
                     className="text-base md:text-xl font-semibold text-white"
                 >
-                    TradeHub, 코인 선물 커뮤니티
-                    <br></br>실시간 포지션과 롱/숏 비율을 한 화면에서
+                    TradeHub, 코인 트레이더를 위한 올인원 대시보드
+                    <br></br>거래량 트리맵과 김치프리미엄을 한 화면에서
                 </h2>
                 <p className="mt-5  text-sm md:text-base">
-                    TradeHub는 코인 커뮤니티와 코인선물 커뮤니티 기능을 결합해
+                    TradeHub는 코인 트레이더를 위한 통합 대시보드입니다.
                     <strong className="font-medium">
                         {" "}
-                        실시간 포지션(롱/숏 비율)
+                        150개 코인 거래량 트리맵
                     </strong>
-                    ,<strong className="font-medium"> 김치 프리미엄</strong>,
-                    코인 뉴스, 실시간 채팅을 제공합니다. <br />
-                    <span className="text-amber-400">바이낸스</span> 글로벌·Top
-                    트레이더 포지션 비율을 비교하고, 시장 흐름을 한눈에 파악할
-                    수 있습니다.
+                    으로 시장을 한눈에 파악하고,
+                    <strong className="font-medium"> 김치프리미엄</strong>,
+                    급등코인, 뉴스, 실시간 채팅까지 제공합니다.
                 </p>
 
                 <div className="mt-6 grid grid-cols-3 gap-4 md:grid-cols-3">
                     <article className="rounded-xl bg-zinc-900/60 p-7 ring-1 ring-zinc-800">
                         <h3 className="text-sm font-semibold text-white">
-                            실시간 포지션 · 롱숏 비율
+                            거래량 트리맵 · 시장 시각화
                         </h3>
                         <p className="mt-2 text-sm">
-                            글로벌/Top 트레이더 포지션 비율을 실시간으로
-                            확인하고 변동 구간을 빠르게 파악하세요.
+                            150개 코인의 거래량과 변동률을 트리맵으로 한눈에
+                            파악하고 급등코인을 빠르게 찾으세요.
                         </p>
                         <div className="mt-3"></div>
                     </article>
@@ -104,9 +102,8 @@ export default function SeoFooter() {
 
                 {/* 작은 각주/브랜딩 */}
                 <p className="mt-8 text-xs text-zinc-500">
-                    TradeHub는 트레이더를 위한 실시간 포지션·롱숏 비율·김치
-                    프리미엄·뉴스·채팅을 한 화면에서 제공하는 코인 선물
-                    커뮤니티입니다.
+                    TradeHub는 거래량 트리맵·김치프리미엄·급등코인·뉴스·채팅을
+                    한 화면에서 제공하는 코인 트레이더 대시보드입니다.
                 </p>
             </div>
         </section>
