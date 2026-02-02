@@ -101,7 +101,7 @@ export const DashBoard = () => {
 
                 <aside
                     aria-label="거래 정보 위젯"
-                    className="flex flex-col gap-3 min-w-57 2xl:min-w-80 2xl:gap-7"
+                    className="flex flex-col gap-2.5 min-w-57 2xl:min-w-80 2xl:gap-3"
                 >
                     <KimchiWidget />
                     <LiveStatsBox />
@@ -113,7 +113,7 @@ export const DashBoard = () => {
                     <MarketIndicesWidget />
                     <aside
                         aria-label="실시간 채팅"
-                        className="border border-zinc-800 rounded-2xl flex-1 mb-14 2xl:mb-0 bg-neutral-950 overflow-hidden flex flex-col"
+                        className="border border-zinc-800 rounded-2xl flex-1 bg-neutral-950 overflow-hidden flex flex-col"
                     >
                         <div className="flex-1 min-h-0">
                             <Chat />

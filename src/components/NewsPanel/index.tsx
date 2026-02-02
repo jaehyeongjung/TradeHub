@@ -91,12 +91,6 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
 
             {/* 카드 */}
             <div className="h-full min-h-0 flex flex-col rounded-xl border border-neutral-700 bg-neutral-900/70 overflow-hidden">
-                {/* 헤더 */}
-                <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-800 bg-neutral-900/70 sticky top-0 z-10">
-                    <h3 className="text-sm font-semibold">최신 뉴스</h3>
-                    <span className="text-xs text-neutral-500">최근 30개</span>
-                </div>
-
                 {/* 본문 */}
                 <div className="flex-1 min-h-0 overflow-y-auto p-3 pr-2 scrollbar-hide">
                     {loading ? (
