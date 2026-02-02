@@ -217,3 +217,233 @@ body {
     color: var(--foreground);
     font-family: Arial, Helvetica, sans-serif;
 }
+
+/* widget-column 내부 요소들 비율 조정 */
+.widget-column > * {
+    flex-shrink: 1;
+    min-height: 0;
+}
+
+/* 높이 1500px 이상에서 SEO 영역 보이도록 높이 제한 */
+@media (min-height: 1500px) {
+    section[aria-label="커뮤니티 게시판 및 채팅"] {
+        max-height: 900px !important;
+        height: 900px !important;
+    }
+    .chat-column {
+        max-width: 480px !important;
+    }
+    .board-news-column {
+        flex: 1 1 auto !important;
+        max-width: none !important;
+    }
+    .widget-column {
+        flex: 0 0 auto !important;
+    }
+}
+
+/* 높이 1800px 이상에서 조금 더 여유 */
+@media (min-height: 1800px) {
+    section[aria-label="커뮤니티 게시판 및 채팅"] {
+        max-height: 1000px !important;
+        height: 1000px !important;
+    }
+}
+
+
+/* 중간 구간 (1700px ~ 2000px) - 뉴스 우선 */
+@media (min-width: 1700px) and (max-width: 1999px) {
+    .board-news-column {
+        max-width: none !important;
+        flex: 0.5 1 auto !important;
+    }
+    .chat-column {
+        max-width: none !important;
+        min-width: 500px !important;
+        flex: 1.5 1 auto !important;
+    }
+    .widget-column {
+        min-width: 280px !important;
+        max-width: 320px !important;
+        flex: 0 0 auto !important;
+    }
+}
+
+/* 중간 구간 (2000px ~ 2560px) */
+@media (min-width: 2000px) and (max-width: 2559px) {
+    .board-news-column {
+        max-width: none !important;
+        flex: 1 1 auto !important;
+    }
+    .chat-column {
+        max-width: 550px !important;
+        flex: 0 0 auto !important;
+    }
+    .widget-column {
+        flex: 0 0 auto !important;
+    }
+}
+
+/* QHD (2560px) 이상에서 영역 확대 */
+@media (min-width: 2560px) {
+    .chat-column {
+        min-width: 480px !important;
+        max-width: none !important;
+        flex: 1 1 auto !important;
+    }
+    .widget-column {
+        min-width: 380px !important;
+        max-width: 500px !important;
+        gap: 16px !important;
+        flex: 0 0 420px !important;
+    }
+    .board-news-column {
+        max-width: 1800px !important;
+        flex: 2 1 auto !important;
+    }
+    /* QHD 갭 증가 */
+    section[aria-label="커뮤니티 게시판 및 채팅"] {
+        gap: 32px !important;
+    }
+    /* QHD 메인 영역 패딩 */
+    main.flex.flex-col {
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+    }
+}
+
+/* 3000px 이상에서 균형 조정 */
+@media (min-width: 3000px) {
+    .chat-column {
+        min-width: 550px !important;
+        flex: 1 1 auto !important;
+    }
+    .widget-column {
+        min-width: 420px !important;
+        flex: 0 0 480px !important;
+    }
+    .board-news-column {
+        max-width: 2000px !important;
+        flex: 2 1 auto !important;
+    }
+}
+
+/* 4K (3840px) 이상에서 최적화 */
+@media (min-width: 3840px) {
+    .chat-column {
+        min-width: 560px !important;
+        flex: 1 1 auto !important;
+    }
+    .widget-column {
+        min-width: 450px !important;
+        gap: 28px !important;
+        flex: 0 0 auto !important;
+    }
+    .board-news-column {
+        max-width: 2200px !important;
+        flex: 2 1 auto !important;
+    }
+    /* 4K 대시보드 높이 제한 - SEO 푸터 보이도록 */
+    section[aria-label="커뮤니티 게시판 및 채팅"] {
+        gap: 48px !important;
+        height: calc(100vh - 900px) !important;
+        min-height: 350px !important;
+    }
+    /* 4K 헤더 영역 2배 확대 */
+    .realtime-section {
+        min-height: 480px !important;
+        padding: 40px 48px !important;
+        gap: 40px !important;
+    }
+    /* 4K 헤더 내부 코인 가격 박스 확대 */
+    .realtime-section button {
+        min-height: 380px !important;
+        padding: 36px !important;
+        border-radius: 16px !important;
+    }
+    .realtime-section h2 {
+        font-size: 1.75rem !important;
+    }
+    .realtime-section p {
+        font-size: 3rem !important;
+        margin-top: 24px !important;
+    }
+    .realtime-section .text-xs,
+    .realtime-section .text-sm {
+        font-size: 1.5rem !important;
+        margin-top: 16px !important;
+    }
+    /* 4K 차트 높이 확대 */
+    .realtime-section .h-30,
+    .realtime-section .h-45 {
+        height: 380px !important;
+    }
+    /* 4K 롱숏 박스 높이 확대 */
+    .realtime-section .min-h-30,
+    .realtime-section .min-h-45 {
+        min-height: 380px !important;
+        padding: 28px !important;
+    }
+    /* 4K 롱숏 박스 내부 요소 확대 */
+    .realtime-section .min-h-30 .font-semibold,
+    .realtime-section .min-h-45 .font-semibold {
+        font-size: 1.5rem !important;
+    }
+    .realtime-section .min-h-30 .h-6,
+    .realtime-section .min-h-30 .h-8,
+    .realtime-section .min-h-45 .h-6,
+    .realtime-section .min-h-45 .h-8 {
+        height: 48px !important;
+    }
+    .realtime-section .min-h-30 .text-emerald-400,
+    .realtime-section .min-h-30 .text-red-400,
+    .realtime-section .min-h-45 .text-emerald-400,
+    .realtime-section .min-h-45 .text-red-400 {
+        font-size: 1.25rem !important;
+    }
+    /* 4K 헤더 내부 갭 확대 */
+    .realtime-section > div {
+        gap: 24px !important;
+    }
+    /* 4K 메인 영역 패딩 증가 */
+    main.flex.flex-col {
+        padding-left: 48px !important;
+        padding-right: 48px !important;
+    }
+    /* 4K SEO 푸터 확대 */
+    section[aria-labelledby="seo-footer-heading"] {
+        margin-top: 40px !important;
+        border-top-width: 2px !important;
+    }
+    section[aria-labelledby="seo-footer-heading"] > div {
+        max-width: 100% !important;
+        padding: 48px 60px !important;
+    }
+    section[aria-labelledby="seo-footer-heading"] img {
+        width: 120px !important;
+        height: 120px !important;
+    }
+    section[aria-labelledby="seo-footer-heading"] h2 {
+        font-size: 2rem !important;
+        line-height: 1.4 !important;
+    }
+    section[aria-labelledby="seo-footer-heading"] p {
+        font-size: 1.25rem !important;
+        line-height: 1.8 !important;
+    }
+    section[aria-labelledby="seo-footer-heading"] .grid {
+        gap: 32px !important;
+        margin-top: 48px !important;
+    }
+    section[aria-labelledby="seo-footer-heading"] article {
+        padding: 40px !important;
+        border-radius: 20px !important;
+    }
+    section[aria-labelledby="seo-footer-heading"] article h3 {
+        font-size: 1.25rem !important;
+    }
+    section[aria-labelledby="seo-footer-heading"] article p,
+    section[aria-labelledby="seo-footer-heading"] article li {
+        font-size: 1.1rem !important;
+    }
+}

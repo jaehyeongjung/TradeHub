@@ -52,7 +52,7 @@ export const Home = () => {
                 {JSON.stringify(SITE_JSONLD)}
             </Script>
 
-            <main className="flex flex-col px-5 bg-black min-w-310 ">
+            <main className="flex flex-col px-5 bg-black min-w-310">
                 <RealTimeSection />
                 <DashBoard />
             </main>
