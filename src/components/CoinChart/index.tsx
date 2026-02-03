@@ -30,16 +30,26 @@ type Props = {
     className?: string;
 };
 
+const INTERVAL_OPTIONS: { value: Interval; label: string }[] = [
+    { value: "1m", label: "1분" },
+    { value: "5m", label: "5분" },
+    { value: "15m", label: "15분" },
+    { value: "1h", label: "1시간" },
+    { value: "4h", label: "4시간" },
+    { value: "1d", label: "1일" },
+];
+
 export default function CoinChart({
     boxId = "chart-1",
     symbol = "BTCUSDT",
-    interval = "1m",
+    interval: defaultInterval = "1m",
     historyLimit = 200,
     className,
 }: Props) {
     const outerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<HTMLDivElement>(null);
     const [sym, setSym] = useState(symbol.toUpperCase());
+    const [interval, setInterval] = useState<Interval>(defaultInterval);
     const [open, setOpen] = useState(false);
     const [hovered, setHovered] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
@@ -85,6 +95,12 @@ export default function CoinChart({
             const { data } = await supabase.auth.getSession();
             const uid = data.session?.user?.id ?? null;
             setUserId(uid);
+
+            // 인터벌 불러오기 (로컬스토리지)
+            const savedInterval = localStorage.getItem(`chart:${boxId}:interval`);
+            if (savedInterval && INTERVAL_OPTIONS.some(o => o.value === savedInterval)) {
+                setInterval(savedInterval as Interval);
+            }
 
             if (uid) {
                 const { data: row } = await supabase
@@ -353,6 +369,32 @@ export default function CoinChart({
                         className={`cursor-pointer w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 ${chartLoading ? 'opacity-0' : 'opacity-100'} transition-opacity`}
                         title="클릭해서 코인 심볼 변경"
                     />
+                    {/* 인터벌 선택 버튼 */}
+                    <div
+                        className="absolute top-2 left-2 flex gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50 z-20"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {INTERVAL_OPTIONS.map((opt) => (
+                            <button
+                                key={opt.value}
+                                onClick={() => {
+                                    setInterval(opt.value);
+                                    localStorage.setItem(`chart:${boxId}:interval`, opt.value);
+                                }}
+                                className={`px-1.5 py-0.5 text-[10px] 2xl:text-xs rounded-md transition-all ${
+                                    interval === opt.value
+                                        ? "bg-amber-500/20 text-amber-300 font-medium"
+                                        : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/50"
+                                }`}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
+                    {/* 심볼 표시 */}
+                    <div className="absolute top-2 right-2 px-2 py-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50 z-20">
+                        <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">{sym}</span>
+                    </div>
                 </div>
 
                 {/* 툴팁 */}
