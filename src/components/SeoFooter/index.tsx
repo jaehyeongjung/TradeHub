@@ -36,38 +36,39 @@ export default function SeoFooter() {
                     className="text-base md:text-xl font-semibold text-white"
                 >
                     TradeHub, 코인 트레이더를 위한 올인원 대시보드
-                    <br></br>거래량 트리맵과 김치프리미엄을 한 화면에서
+                    <br></br>트리맵 · 실시간 청산 · 고래 거래를 한 화면에서
                 </h2>
                 <p className="mt-5  text-sm md:text-base">
                     TradeHub는 코인 트레이더를 위한 통합 대시보드입니다.
+                    <br />
                     <strong className="font-medium">
-                        {" "}
                         150개 코인 거래량 트리맵
                     </strong>
                     으로 시장을 한눈에 파악하고,
-                    <strong className="font-medium"> 김치프리미엄</strong>,
-                    급등코인, 뉴스, 실시간 채팅까지 제공합니다.
+                    <strong className="font-medium"> 실시간 청산</strong>,
+                    <strong className="font-medium"> 고래 거래</strong>,
+                    김치프리미엄, 공포탐욕지수, 뉴스, 실시간 채팅까지 제공합니다.
                 </p>
 
                 <div className="mt-6 grid grid-cols-3 gap-4 md:grid-cols-3">
                     <article className="rounded-xl bg-zinc-900/60 p-7 ring-1 ring-zinc-800">
                         <h3 className="text-sm font-semibold text-white">
-                            거래량 트리맵 · 시장 시각화
+                            실시간 청산 · 고래 거래
                         </h3>
                         <p className="mt-2 text-sm">
-                            150개 코인의 거래량과 변동률을 트리맵으로 한눈에
-                            파악하고 급등코인을 빠르게 찾으세요.
+                            바이낸스 선물 실시간 청산과 $50K 이상 고래 거래를
+                            실시간으로 추적하여 시장 흐름을 파악하세요.
                         </p>
                         <div className="mt-3"></div>
                     </article>
 
                     <article className="rounded-xl bg-zinc-900/60 p-7 ring-1 ring-zinc-800">
                         <h3 className="text-sm font-semibold text-white">
-                            커뮤니티 · 실시간 채팅
+                            트리맵 · 김프 · 공포탐욕
                         </h3>
                         <p className="mt-2 text-sm">
-                            실시간 채팅으로 트레이더들과 의견을 나누고, 게시글로
-                            수익/손실 후기를 공유하세요.
+                            150개 코인 거래량 트리맵, 김치프리미엄,
+                            공포탐욕지수로 시장 심리를 한눈에 확인하세요.
                         </p>
                         <div className="mt-3 space-x-3"></div>
                     </article>
@@ -102,7 +103,7 @@ export default function SeoFooter() {
 
                 {/* 작은 각주/브랜딩 */}
                 <p className="mt-8 text-xs text-zinc-500">
-                    TradeHub는 거래량 트리맵·김치프리미엄·급등코인·뉴스·채팅을
+                    TradeHub는 실시간 청산·고래 거래·트리맵·김프·공포탐욕지수·뉴스·채팅을
                     한 화면에서 제공하는 코인 트레이더 대시보드입니다.
                 </p>
             </div>
