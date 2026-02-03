@@ -185,9 +185,14 @@ html.light .text-zinc-500 {
     color: #737373 !important;
 }
 
-/* HotCoin 노란색 글씨 - 라이트모드에서 더 진하게 */
+/* HotCoin/USDT 노란색 글씨 - 라이트모드에서 세련된 골드 톤 */
 html.light .text-amber-300 {
-    color: #b45309 !important;
+    color: #ca8a04 !important;
+}
+
+/* 김치 프리미엄 - KRW 색상 (라이트모드에서 차분한 초록) */
+html.light .text-emerald-300 {
+    color: #059669 !important;
 }
 
 /* BGM 버튼 비활성화 - 라이트모드에서 밝은 회색 */
