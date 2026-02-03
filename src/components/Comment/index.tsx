@@ -169,104 +169,124 @@ export default function Comments({
         });
     };
 
-    return (
-        // 전체 스크롤바를 숨기기 위해 scrollbar-hide 클래스를 루트 컨테이너에 추가합니다.
-        // 이는 컨테이너가 Canvas보다 커질 때 생기는 스크롤바를 대상으로 합니다.
-        <div className="mt-10 flex flex-col gap-4 bg-neutral-950 p-4 rounded-xl shadow-inner border border-neutral-800 scrollbar-hide">
-            <h4 className="font-bold text-xl mb-2 text-white">
-                댓글 ({list.length})
-            </h4>
+    // 상대 시간 포맷
+    const formatRelativeTime = (dateStr: string): string => {
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const seconds = Math.floor(diff / 1000);
+        if (seconds < 60) return "방금";
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}분 전`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}시간 전`;
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days}일 전`;
+        return new Date(dateStr).toLocaleDateString();
+    };
 
-            {/* 에러 메시지 표시 */}
+    return (
+        <div className="flex flex-col gap-3 scrollbar-hide">
+            {/* 헤더 */}
+            <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <h4 className="font-semibold text-sm text-neutral-200">
+                    댓글 <span className="text-neutral-500 font-normal">{list.length}</span>
+                </h4>
+            </div>
+
+            {/* 에러 메시지 */}
             <AnimatePresence>
                 {error && (
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-red-400"
-                        style={{ fontSize: "0.75rem" }}
+                        className="rounded-lg bg-red-500/10 border border-red-500/20 px-3 py-2 text-xs text-red-400"
                     >
-                        ⚠️ 오류: {error}
+                        {error}
                     </motion.div>
                 )}
             </AnimatePresence>
 
             {/* 입력 */}
-            <div className="flex gap-3 mb-3">
-                {/* 스크롤바 숨기기 (focus:ring-0 추가, scrollbar-hide 추가) */}
+            <div className="flex gap-2">
                 <input
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    placeholder={
-                        userId
-                            ? "댓글을 입력하세요..."
-                            : "로그인 후 댓글을 남길 수 있습니다."
-                    }
-                    className="flex-1 rounded-lg px-3 py-2 text-base border border-neutral-700 bg-neutral-900 text-white shadow-inner 
-                                focus:outline-none focus:ring-0 focus:border-emerald-400 transition 
-                                scrollbar-hide"
+                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && add()}
+                    placeholder={userId ? "댓글을 입력하세요" : "로그인 후 댓글 작성 가능"}
+                    className="flex-1 rounded-lg px-3 py-2 text-sm bg-neutral-800/50 border border-neutral-700/50 text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-600 transition"
                     maxLength={1000}
                     disabled={!userId}
                 />
-                <motion.button
+                <button
                     onClick={add}
                     disabled={loading || !userId || !text.trim()}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="rounded-lg px-4 py-2 text-base font-semibold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                        backgroundColor:
-                            loading || !userId || !text.trim()
-                                ? "#4b5563"
-                                : "#10b981",
-                        color: "white",
-                    }}
+                    className="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed transition cursor-pointer"
                 >
-                    {loading ? "등록중…" : "등록"}
-                </motion.button>
+                    {loading ? (
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                    ) : "등록"}
+                </button>
             </div>
 
             {/* 목록 */}
-            <div className="space-y-3">
-                {list.map((c) => (
-                    <motion.div
-                        key={c.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="rounded-lg p-3 text-sm bg-neutral-900 border border-neutral-800 shadow-sm"
-                    >
-                        <p className="whitespace-pre-wrap text-neutral-200 text-base">
-                            {c.body}
-                        </p>
-                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-neutral-800 text-xs text-gray-500">
-                            <span className="text-neutral-400">
-                                <b className="text-neutral-300 font-semibold">
-                                    {c.user_id.slice(0, 8)}
-                                </b>{" "}
-                                · {new Date(c.created_at).toLocaleString()}
-                            </span>
-                            {userId === c.user_id && (
-                                <motion.button
-                                    onClick={() => remove(c.id)}
-                                    whileHover={{ color: "#ef4444" }}
-                                    className="text-red-500/80 cursor-pointer font-medium hover:text-red-400 transition"
-                                >
-                                    삭제
-                                </motion.button>
-                            )}
-                        </div>
-                    </motion.div>
-                ))}
+            <div className="space-y-2">
+                <AnimatePresence>
+                    {list.map((c) => (
+                        <motion.div
+                            key={c.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.2 }}
+                            className="group rounded-lg p-3 bg-neutral-800/30 hover:bg-neutral-800/50 transition-colors"
+                        >
+                            <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <span className="text-xs font-medium text-neutral-300">
+                                            {c.user_id.slice(0, 6)}
+                                        </span>
+                                        <span className="text-[10px] text-neutral-600">·</span>
+                                        <span className="text-[10px] text-neutral-500">
+                                            {formatRelativeTime(c.created_at)}
+                                        </span>
+                                    </div>
+                                    <p className="whitespace-pre-wrap text-sm text-neutral-300 leading-relaxed">
+                                        {c.body}
+                                    </p>
+                                </div>
+                                {userId === c.user_id && (
+                                    <button
+                                        onClick={() => remove(c.id)}
+                                        className="opacity-0 group-hover:opacity-100 p-1 rounded text-neutral-500 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer"
+                                    >
+                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+
                 {list.length === 0 && (
-                    <p className="text-sm text-neutral-500 text-center py-4 border border-dashed border-neutral-800 rounded-lg">
-                        첫 댓글을 남겨보세요!
-                    </p>
+                    <div className="flex flex-col items-center justify-center py-6 text-neutral-500">
+                        <svg className="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        <p className="text-xs">첫 댓글을 남겨보세요</p>
+                    </div>
                 )}
             </div>
 
-            {/* Custom Modal 렌더링 */}
+            {/* Modal */}
             <AnimatePresence>
                 {modal && (
                     <CustomModal

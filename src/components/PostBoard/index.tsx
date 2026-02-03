@@ -188,30 +188,48 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
         });
     };
 
+    // 상대 시간 포맷
+    const formatRelativeTime = (dateStr: string): string => {
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const seconds = Math.floor(diff / 1000);
+        if (seconds < 60) return "방금";
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}분 전`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}시간 전`;
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days}일 전`;
+        return new Date(dateStr).toLocaleDateString();
+    };
+
     // 썸네일 (목록)
     const Thumb = ({ url }: { url?: string | null }) =>
         url ? (
-            <Image
-                src={url}
-                alt="thumb"
-                width={96}
-                height={96}
-                className="object-cover rounded mr-3 flex-shrink-0"
-                unoptimized
-            />
+            <div className="w-16 h-16 2xl:w-20 2xl:h-20 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-800">
+                <Image
+                    src={url}
+                    alt="thumb"
+                    width={80}
+                    height={80}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                />
+            </div>
         ) : null;
 
     // 본문 이미지 (상세)
     const DetailImage = ({ url }: { url?: string | null }) =>
         url ? (
-            <Image
-                src={url}
-                alt="이미지"
-                width={600}
-                height={400}
-                className="mt-3 rounded max-h-96 w-full object-contain bg-neutral-950"
-                unoptimized
-            />
+            <div className="mt-4 rounded-lg overflow-hidden bg-neutral-900/50">
+                <Image
+                    src={url}
+                    alt="이미지"
+                    width={600}
+                    height={400}
+                    className="max-h-96 w-full object-contain"
+                    unoptimized
+                />
+            </div>
         ) : null;
 
     return (
@@ -239,84 +257,117 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                             </button>
                         )}
 
-                        {posts.map((p) => (
-                            <div
-                                key={p.id}
-                                className="flex items-start border rounded border-neutral-800 p-3 mb-3 bg-neutral-900 hover:bg-neutral-950 cursor-pointer transition duration-200"
-                                onClick={() => {
-                                    setSelected(p);
-                                    setMode("detail");
-                                }}
-                            >
-                                <Thumb url={p.image_url} />
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-bold text-sm truncate text-gray-100">
-                                        {p.title}
-                                    </h3>
-                                    <p className="text-xs text-gray-100 line-clamp-2">
-                                        {p.body}
-                                    </p>
-                                    <p className="text-[10px] text-gray-500 mt-1">
-                                        작성자 {p.user_id.slice(0, 8)} ·{" "}
-                                        {new Date(
-                                            p.created_at
-                                        ).toLocaleString()}
-                                    </p>
-                                </div>
+                        {posts.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-12 text-neutral-500">
+                                <svg className="w-12 h-12 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                                </svg>
+                                <p className="text-sm">아직 게시물이 없습니다</p>
                             </div>
-                        ))}
+                        ) : (
+                            posts.map((p) => (
+                                <div
+                                    key={p.id}
+                                    className="group flex items-start gap-3 p-3 mb-2 rounded-xl bg-neutral-800/30 hover:bg-neutral-800/60 border border-transparent hover:border-neutral-700/50 cursor-pointer transition-all duration-200"
+                                    onClick={() => {
+                                        setSelected(p);
+                                        setMode("detail");
+                                    }}
+                                >
+                                    <Thumb url={p.image_url} />
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-semibold text-sm text-neutral-100 truncate group-hover:text-white transition-colors">
+                                            {p.title}
+                                        </h3>
+                                        <p className="text-xs text-neutral-400 line-clamp-2 mt-1 leading-relaxed">
+                                            {p.body}
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-2 text-[10px] text-neutral-500">
+                                            <span className="flex items-center gap-1">
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                                {p.user_id.slice(0, 6)}
+                                            </span>
+                                            <span>·</span>
+                                            <span>{formatRelativeTime(p.created_at)}</span>
+                                        </div>
+                                    </div>
+                                    <svg className="w-4 h-4 text-neutral-600 group-hover:text-neutral-400 transition-colors flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </div>
+                            ))
+                        )}
                     </div>
                 )}
 
                 {/* 상세 */}
                 {mode === "detail" && selected && (
                     <div className="flex-1 overflow-auto scrollbar-hide">
-                        <div className="flex items-center justify-between mb-4 pb-2 border-b border-neutral-800">
+                        {/* 헤더 */}
+                        <div className="flex items-center justify-between mb-4">
                             <button
-                                className="text-sm text-gray-400 p-2 rounded-xl cursor-pointer hover:bg-neutral-900 transition"
+                                className="flex items-center gap-1 text-sm text-neutral-400 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-neutral-800 hover:text-neutral-200 transition-all"
                                 onClick={() => setMode("list")}
                             >
-                                ← 목록으로
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                                목록
                             </button>
 
-                            {/* 로그인 상태 && 내 글일 때만 표시 */}
                             {userId && userId === selected.user_id && (
                                 <div className="flex gap-2">
                                     <button
-                                        className="text-sm px-3 py-1 border border-gray-600 rounded-lg text-gray-200 cursor-pointer hover:bg-neutral-800 transition"
+                                        className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg text-neutral-300 bg-neutral-800 cursor-pointer hover:bg-neutral-700 transition-all"
                                         onClick={() => setMode("edit")}
                                     >
+                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
                                         수정
                                     </button>
                                     <button
-                                        className="text-sm px-3 py-1 border border-red-700 rounded-lg text-red-500 cursor-pointer hover:bg-red-900/20 transition"
-                                        onClick={() =>
-                                            handleDelete(selected.id)
-                                        }
+                                        className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg text-red-400 bg-red-500/10 cursor-pointer hover:bg-red-500/20 transition-all"
+                                        onClick={() => handleDelete(selected.id)}
                                     >
+                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
                                         삭제
                                     </button>
                                 </div>
                             )}
                         </div>
 
-                        <div className="text-xs text-gray-500 mb-2 flex justify-between">
-                            <span>작성자: {selected.user_id.slice(0, 8)}</span>
-                            <span>
-                                {new Date(selected.created_at).toLocaleString()}
-                            </span>
-                        </div>
+                        {/* 본문 */}
+                        <article className="bg-neutral-800/30 rounded-xl p-4 2xl:p-5">
+                            <h2 className="text-xl 2xl:text-2xl font-bold text-white mb-3">
+                                {selected.title}
+                            </h2>
 
-                        <h2 className="text-2xl font-bold text-white mb-3">
-                            {selected.title}
-                        </h2>
-                        <p className="mt-2 whitespace-pre-wrap text-neutral-300">
-                            {selected.body}
-                        </p>
-                        <DetailImage url={selected.image_url} />
+                            <div className="flex items-center gap-3 pb-3 mb-4 border-b border-neutral-700/50 text-xs text-neutral-500">
+                                <span className="flex items-center gap-1">
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    {selected.user_id.slice(0, 8)}
+                                </span>
+                                <span>·</span>
+                                <span>{formatRelativeTime(selected.created_at)}</span>
+                            </div>
+
+                            <p className="whitespace-pre-wrap text-neutral-300 leading-relaxed">
+                                {selected.body}
+                            </p>
+                            <DetailImage url={selected.image_url} />
+                        </article>
 
                         {/* 댓글 */}
-                        <Comments postId={selected.id} userId={userId} />
+                        <div className="mt-4">
+                            <Comments postId={selected.id} userId={userId} />
+                        </div>
                     </div>
                 )}
 

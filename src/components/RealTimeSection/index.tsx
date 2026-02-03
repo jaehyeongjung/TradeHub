@@ -1,6 +1,7 @@
 import { CoinPriceBox } from "@/components/CoinPriceBox";
 import CoinChart from "@/components/CoinChart";
-import LongShortRatioBox from "@/components/LongShortRatioBox";
+import LiquidationFeed from "@/components/LiquidationFeed";
+import WhaleTrades from "@/components/WhaleTrades";
 
 export const RealTimeSection = () => {
     return (
@@ -21,18 +22,10 @@ export const RealTimeSection = () => {
                 <CoinChart />
             </div>
 
-            {/* 롱숏 비율 박스들 - 비율 2 */}
+            {/* 고래 거래 + 청산 피드 - 비율 2 */}
             <div className="flex gap-2 2xl:gap-4 flex-[2] min-w-0">
-                <LongShortRatioBox
-                    symbol="BTCUSDT"
-                    source="global"
-                    period="5m"
-                />
-                <LongShortRatioBox
-                    symbol="BTCUSDT"
-                    source="top-trader"
-                    period="5m"
-                />
+                <WhaleTrades />
+                <LiquidationFeed />
             </div>
         </section>
     );

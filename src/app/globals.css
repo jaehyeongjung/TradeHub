@@ -240,6 +240,67 @@ html.light .bg-black\/70 {
     background-color: rgba(0, 0, 0, 0.5) !important;
 }
 
+/* 게시판 - 라이트모드 */
+html.light .bg-neutral-800\/30 {
+    background-color: rgba(245, 245, 245, 0.8) !important;
+}
+
+html.light .bg-neutral-800\/60 {
+    background-color: rgba(229, 229, 229, 0.9) !important;
+}
+
+html.light .hover\:bg-neutral-800\/60:hover {
+    background-color: rgba(229, 229, 229, 0.9) !important;
+}
+
+html.light .hover\:bg-neutral-800\/50:hover {
+    background-color: rgba(229, 229, 229, 0.8) !important;
+}
+
+html.light .hover\:border-neutral-700\/50:hover {
+    border-color: rgba(163, 163, 163, 0.5) !important;
+}
+
+html.light .bg-emerald-600 {
+    background-color: #059669 !important;
+}
+
+html.light .hover\:bg-emerald-500:hover {
+    background-color: #10b981 !important;
+}
+
+html.light .bg-red-500\/10 {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+html.light .hover\:bg-red-500\/20:hover {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+html.light .text-red-400 {
+    color: #dc2626 !important;
+}
+
+html.light .hover\:text-red-400:hover {
+    color: #dc2626 !important;
+}
+
+html.light .border-neutral-700\/50 {
+    border-color: rgba(212, 212, 212, 0.7) !important;
+}
+
+html.light .focus\:border-neutral-600:focus {
+    border-color: #a3a3a3 !important;
+}
+
+html.light .hover\:bg-neutral-700:hover {
+    background-color: #e5e5e5 !important;
+}
+
+html.light .bg-neutral-800\/50 {
+    background-color: rgba(245, 245, 245, 0.9) !important;
+}
+
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);

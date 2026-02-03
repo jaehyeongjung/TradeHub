@@ -48,43 +48,48 @@ export const DashBoard = () => {
                 {/* 왼쪽: 게시판/뉴스 카드 */}
                 <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950 border border-zinc-800">
                     {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
-                    <div className="flex items-center gap-2 2xl:py-2 2xl:min-h-14">
-                        <div className="inline-flex items-center rounded-lg bg-neutral-800 p-1 ml-3 shrink-0">
+                    <div className="flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14">
+                        <div className="inline-flex items-center rounded-xl bg-neutral-800/50 p-1 shrink-0">
                             <button
                                 onClick={() => switchTab("board")}
-                                className={`px-3 py-1.5 text-sm rounded-md cursor-pointer transition ${
+                                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg cursor-pointer transition-all ${
                                     activeTab === "board"
-                                        ? "bg-neutral-700 text-white"
-                                        : "text-neutral-300 hover:text-white"
+                                        ? "bg-neutral-700 text-white shadow-sm"
+                                        : "text-neutral-400 hover:text-neutral-200"
                                 }`}
                             >
-                                <span className="whitespace-nowrap">
-                                    게시판
-                                </span>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                                </svg>
+                                <span className="whitespace-nowrap">게시판</span>
                             </button>
                             <button
                                 onClick={() => switchTab("news")}
-                                className={`px-3 py-1.5 text-sm rounded-md transition cursor-pointer ${
+                                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-all cursor-pointer ${
                                     activeTab === "news"
-                                        ? "bg-neutral-700 text-white"
-                                        : "text-neutral-300 hover:text-white"
+                                        ? "bg-neutral-700 text-white shadow-sm"
+                                        : "text-neutral-400 hover:text-neutral-200"
                                 }`}
                             >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
+                                </svg>
                                 <span className="whitespace-nowrap">뉴스</span>
                             </button>
                         </div>
                         <div className="flex-1 min-w-0">
                             <HotSymbolsTicker />
                         </div>
-                        <div className="ml-auto shrink-0">
+                        <div className="ml-auto shrink-0 mr-1">
                             {activeTab === "board" && (
                                 <button
                                     onClick={() => postRef.current?.openWrite()}
-                                    className="border rounded px-3 py-1 bg-black text-xs mr-3 text-gray-100 hover:bg-neutral-800 cursor-pointer"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 hover:text-white border border-neutral-700 hover:border-neutral-600 transition-all cursor-pointer"
                                 >
-                                    <span className="whitespace-nowrap">
-                                        글쓰기
-                                    </span>
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    <span className="whitespace-nowrap">글쓰기</span>
                                 </button>
                             )}
                         </div>
