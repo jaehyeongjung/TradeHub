@@ -226,7 +226,7 @@ export default function SymbolPickerModal({
             <button
                 onClick={() => handleSelect(symbol)}
                 className={`
-                    flex flex-col items-center justify-center p-2 rounded-xl border transition-all
+                    flex flex-col items-center justify-center p-2 rounded-xl border transition-all cursor-pointer
                     ${isSelected
                         ? "bg-amber-500/20 border-amber-500/50 text-amber-300"
                         : "bg-neutral-800/50 border-neutral-700/50 text-neutral-300 hover:bg-neutral-700/50 hover:border-neutral-600"
@@ -275,7 +275,7 @@ export default function SymbolPickerModal({
                                 </h3>
                                 <button
                                     onClick={onClose}
-                                    className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+                                    className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors cursor-pointer"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -309,7 +309,7 @@ export default function SymbolPickerModal({
                                 {search && (
                                     <button
                                         onClick={() => setSearch("")}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded text-neutral-500 hover:text-white transition-colors"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded text-neutral-500 hover:text-white transition-colors cursor-pointer"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

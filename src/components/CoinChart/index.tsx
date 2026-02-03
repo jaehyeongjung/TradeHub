@@ -173,6 +173,9 @@ export default function CoinChart({
         chart.timeScale().applyOptions({
             timeVisible: true,
             secondsVisible: false,
+            rightOffset: 0,
+            lockVisibleTimeRangeOnResize: true,
+            shiftVisibleRangeOnNewBar: true,
         });
 
         const candleSeries = chart.addSeries(CandlestickSeries, {
@@ -232,6 +235,22 @@ export default function CoinChart({
             }
         })();
 
+        // 데이터 개수 추적
+        let dataLength = 0;
+
+        // 미래 영역 스크롤 방지
+        chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
+            if (!range || destroyed) return;
+            const maxRight = dataLength - 1;
+            if (range.to > maxRight) {
+                const visibleBars = range.to - range.from;
+                chart.timeScale().setVisibleLogicalRange({
+                    from: maxRight - visibleBars,
+                    to: maxRight,
+                });
+            }
+        });
+
         // 과거 데이터
         async function loadHistory() {
             try {
@@ -240,6 +259,7 @@ export default function CoinChart({
                 const rows = (await res.json()) as KlineRow[];
                 if (destroyed) return;
 
+                dataLength = rows.length;
                 candleSeries.setData(
                     rows.map((d) => ({
                         time: toKstUtcTimestamp(d[0]),
@@ -273,6 +293,8 @@ export default function CoinChart({
                         low: parseFloat(k.l),
                         close: parseFloat(k.c),
                     });
+                    // 새 캔들이 확정되면 dataLength 증가
+                    if (k.x) dataLength++;
                 } catch {}
             };
 
@@ -365,15 +387,10 @@ export default function CoinChart({
                     )}
                     <div
                         ref={chartRef}
-                        onClick={() => setOpen(true)}
-                        className={`cursor-pointer w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 ${chartLoading ? 'opacity-0' : 'opacity-100'} transition-opacity`}
-                        title="클릭해서 코인 심볼 변경"
+                        className={`w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 cursor-grab active:cursor-grabbing ${chartLoading ? 'opacity-0' : 'opacity-100'} transition-opacity`}
                     />
                     {/* 인터벌 선택 버튼 */}
-                    <div
-                        className="absolute top-2 left-2 flex gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50 z-20"
-                        onClick={(e) => e.stopPropagation()}
-                    >
+                    <div className="absolute top-2 left-2 flex gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50 z-20">
                         {INTERVAL_OPTIONS.map((opt) => (
                             <button
                                 key={opt.value}
@@ -381,7 +398,7 @@ export default function CoinChart({
                                     setInterval(opt.value);
                                     localStorage.setItem(`chart:${boxId}:interval`, opt.value);
                                 }}
-                                className={`px-1.5 py-0.5 text-[10px] 2xl:text-xs rounded-md transition-all ${
+                                className={`px-1.5 py-0.5 text-[10px] 2xl:text-xs rounded-md transition-all cursor-pointer ${
                                     interval === opt.value
                                         ? "bg-amber-500/20 text-amber-300 font-medium"
                                         : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/50"
@@ -395,6 +412,16 @@ export default function CoinChart({
                     <div className="absolute top-2 right-2 px-2 py-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50 z-20">
                         <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">{sym}</span>
                     </div>
+                    {/* 코인 변경 버튼 */}
+                    <button
+                        onClick={() => setOpen(true)}
+                        className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-neutral-900/80 backdrop-blur-sm rounded-lg border border-neutral-700/50 z-20 text-[10px] 2xl:text-xs text-neutral-400 hover:text-amber-300 hover:border-amber-500/50 transition-all cursor-pointer"
+                    >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        변경
+                    </button>
                 </div>
 
                 {/* 툴팁 */}
@@ -405,18 +432,17 @@ export default function CoinChart({
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.18 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] z-50 w-[255px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg pointer-events-none"
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] z-50 w-[295px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg pointer-events-none"
                         >
                             <div className="font-semibold text-amber-300 mb-1">
-                                심볼 변경 안내
+                                차트 사용 안내
                             </div>
-                            <p className="leading-snug">
-                                차트를 <b>클릭</b>하면 코인 심볼을 변경할 수
-                                있습니다.
+                            <p className="leading-snug whitespace-nowrap">
+                                • 좌측 상단에서 <b>인터벌</b>을 선택하세요.
                                 <br />
-                                로그인 시 선택은 <b>계정에 저장</b>되며,
+                                • 우측 하단 <b>변경</b> 버튼으로 코인을 바꿀 수 있습니다.
                                 <br />
-                                비로그인 시에는 <b>브라우저에 저장</b>됩니다.
+                                • 차트를 <b>드래그</b>해서 과거 데이터를 확인하세요.
                             </p>
                             {/* 테두리가 있는 삼각형 화살표 */}
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
