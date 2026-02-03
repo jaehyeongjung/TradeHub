@@ -12,7 +12,7 @@
 
 <br>
 
-**Dark&Lite Mode**
+**Dark&Light Mode**
 
 <img width="1440" height="687" alt="스크린샷 2026-02-03 오후 11 42 25" src="https://github.com/user-attachments/assets/5d8d0935-0f11-4ac5-955e-f2a9cc906bbc" />
 
