@@ -11,6 +11,7 @@ import { sanitizeText } from "@/lib/sanitize";
 import WriteForm from "@/components/WriteForm";
 import Comments from "@/components/Comment";
 import Image from "next/image";
+import { useToast } from "@/components/Toast";
 
 type Post = {
     id: string;
@@ -27,35 +28,54 @@ const CustomModal: React.FC<{
     onConfirm: () => void;
     onCancel: () => void;
     isConfirm: boolean;
-}> = ({ message, onConfirm, onCancel, isConfirm }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-        <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-6 shadow-2xl max-w-sm w-full">
-            <p className="text-white mb-6 text-base whitespace-pre-wrap">
-                {message}
-            </p>
-            <div
-                className={`flex ${
-                    isConfirm ? "justify-between" : "justify-center"
-                } gap-3`}
-            >
-                {isConfirm && (
-                    <button
-                        onClick={onCancel}
-                        className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-neutral-700 text-white hover:bg-neutral-600 active:bg-neutral-800 active:scale-[0.98] transition-all cursor-pointer"
-                    >
-                        취소
-                    </button>
-                )}
-                <button
-                    onClick={onConfirm}
-                    className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] transition-all cursor-pointer"
+}> = ({ message, onConfirm, onCancel, isConfirm }) => {
+    // 키보드 이벤트 처리
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            onConfirm();
+        } else if (e.key === "Escape") {
+            e.preventDefault();
+            onCancel();
+        }
+    };
+
+    return (
+        <div
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            onKeyDown={handleKeyDown}
+            tabIndex={-1}
+            ref={(el) => el?.focus()}
+        >
+            <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-6 shadow-2xl max-w-sm w-full outline-none">
+                <p className="text-white mb-6 text-base whitespace-pre-wrap">
+                    {message}
+                </p>
+                <div
+                    className={`flex ${
+                        isConfirm ? "justify-between" : "justify-center"
+                    } gap-3`}
                 >
-                    {isConfirm ? "확인" : "닫기"}
-                </button>
+                    {isConfirm && (
+                        <button
+                            onClick={onCancel}
+                            className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-neutral-700 text-white hover:bg-neutral-600 active:bg-neutral-800 active:scale-[0.98] transition-all cursor-pointer"
+                        >
+                            취소
+                        </button>
+                    )}
+                    <button
+                        onClick={onConfirm}
+                        autoFocus
+                        className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] transition-all cursor-pointer"
+                    >
+                        {isConfirm ? "확인" : "닫기"}
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 // 부모가 호출할 수 있는 메서드 타입
 export type PostBoardHandle = {
@@ -73,6 +93,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
     { showInternalWriteButton = false, fadeDelay = 0 },
     ref
 ) {
+    const { showToast } = useToast();
     const [posts, setPosts] = useState<Post[]>([]);
     const [postsLoaded, setPostsLoaded] = useState(false);
     const [mode, setMode] = useState<"list" | "write" | "detail" | "edit">(
@@ -151,6 +172,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
         }
         await loadPosts();
         setMode("list");
+        showToast("게시물이 작성되었습니다");
     };
 
     // 업데이트
@@ -179,6 +201,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
         const fresh = posts.find((p) => p.id === selected.id);
         setSelected(fresh ?? null);
         setMode("detail");
+        showToast("게시물이 수정되었습니다");
     };
 
     // 삭제
@@ -200,6 +223,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                 await loadPosts();
                 setMode("list");
                 setSelected(null);
+                showToast("게시물이 삭제되었습니다");
             },
         });
     };

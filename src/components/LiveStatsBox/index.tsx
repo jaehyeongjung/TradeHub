@@ -5,6 +5,7 @@ import { useAtomValue } from "jotai";
 import { supabase } from "@/lib/supabase-browser";
 import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
 import { treemapOpenAtom } from "@/store/atoms";
+import AnimatedNumber from "@/components/AnimatedNumber";
 
 /** 브라우저 당 고정되는 익명 디바이스 ID */
 function getDeviceId() {
@@ -98,7 +99,7 @@ export default function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } =
         <div className={`flex items-center gap-3 2xl:gap-4 rounded-xl border border-neutral-700/50 p-3 2xl:p-4 shadow-sm justify-center bg-neutral-900 transition-[opacity,transform] duration-700 ${ready ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
             <span className="text-xs 2xl:text-sm flex gap-2 whitespace-nowrap text-gray-300">
                 <b>현재 접속 </b>
-                <b>{onlineNow.toLocaleString()}명</b>
+                <b><AnimatedNumber value={onlineNow} suffix="명" /></b>
             </span>
             <span
                 className={`inline-block h-2 w-2 2xl:h-3 2xl:w-3 rounded-full ${

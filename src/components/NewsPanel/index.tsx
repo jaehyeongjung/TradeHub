@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase-browser";
+import { useToast } from "@/components/Toast";
 
 type NewsItem = {
     id: string;
@@ -12,6 +13,7 @@ type NewsItem = {
 };
 
 export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; fadeDelay?: number }) {
+    const { showToast } = useToast();
     const [news, setNews] = useState<NewsItem[]>([]);
     const [userId, setUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -42,9 +44,12 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
     const shareToChat = async (n: NewsItem) => {
         if (!userId) return;
         const text = `[NEWS] ${n.title}  ${n.url}`;
-        await supabase
+        const { error } = await supabase
             .from("messages")
             .insert([{ room_id: roomId, user_id: userId, content: text }]);
+        if (!error) {
+            showToast("뉴스가 채팅방에 공유되었습니다");
+        }
     };
 
     // open/close modal

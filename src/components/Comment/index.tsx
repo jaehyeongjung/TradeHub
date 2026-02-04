@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase-browser";
 import { sanitizeText } from "@/lib/sanitize";
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/components/Toast";
 
 type Comment = {
     id: string;
@@ -19,45 +20,62 @@ const CustomModal: React.FC<{
     onConfirm: () => void;
     onCancel: () => void;
     isConfirm: boolean;
-}> = ({ message, onConfirm, onCancel, isConfirm }) => (
-    <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
-    >
+}> = ({ message, onConfirm, onCancel, isConfirm }) => {
+    // 키보드 이벤트 처리
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            onConfirm();
+        } else if (e.key === "Escape") {
+            e.preventDefault();
+            onCancel();
+        }
+    };
+
+    return (
         <motion.div
-            initial={{ scale: 0.9, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.9, y: 20 }}
-            className="bg-neutral-900 border border-neutral-700 rounded-xl p-6 shadow-2xl max-w-sm w-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            onKeyDown={handleKeyDown}
+            tabIndex={-1}
+            ref={(el) => el?.focus()}
         >
-            <p className="text-white mb-6 text-base whitespace-pre-wrap">
-                {message}
-            </p>
-            <div
-                className={`flex ${
-                    isConfirm ? "justify-between" : "justify-center"
-                } gap-3`}
+            <motion.div
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+                className="bg-neutral-900 border border-neutral-700 rounded-xl p-6 shadow-2xl max-w-sm w-full outline-none"
             >
-                {isConfirm && (
-                    <button
-                        onClick={onCancel}
-                        className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-neutral-700 text-white hover:bg-neutral-600 active:bg-neutral-800 active:scale-[0.98] transition-all cursor-pointer"
-                    >
-                        취소
-                    </button>
-                )}
-                <button
-                    onClick={onConfirm}
-                    className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] transition-all cursor-pointer"
+                <p className="text-white mb-6 text-base whitespace-pre-wrap">
+                    {message}
+                </p>
+                <div
+                    className={`flex ${
+                        isConfirm ? "justify-between" : "justify-center"
+                    } gap-3`}
                 >
-                    {isConfirm ? "확인" : "닫기"}
-                </button>
-            </div>
+                    {isConfirm && (
+                        <button
+                            onClick={onCancel}
+                            className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-neutral-700 text-white hover:bg-neutral-600 active:bg-neutral-800 active:scale-[0.98] transition-all cursor-pointer"
+                        >
+                            취소
+                        </button>
+                    )}
+                    <button
+                        onClick={onConfirm}
+                        autoFocus
+                        className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] transition-all cursor-pointer"
+                    >
+                        {isConfirm ? "확인" : "닫기"}
+                    </button>
+                </div>
+            </motion.div>
         </motion.div>
-    </motion.div>
-);
+    );
+};
 
 export default function Comments({
     postId,
@@ -66,6 +84,7 @@ export default function Comments({
     postId: string;
     userId: string | null;
 }) {
+    const { showToast } = useToast();
     const [list, setList] = useState<Comment[]>([]);
     const [text, setText] = useState("");
     const [loading, setLoading] = useState(false);
@@ -102,7 +121,10 @@ export default function Comments({
                     filter: `post_id=eq.${postId}`,
                 },
                 (payload) => {
-                    setList((prev) => [...prev, payload.new as Comment]);
+                    const newComment = payload.new as Comment;
+                    setList((prev) =>
+                        prev.some((c) => c.id === newComment.id) ? prev : [...prev, newComment]
+                    );
                 }
             )
             .subscribe();
@@ -146,6 +168,7 @@ export default function Comments({
             setList((prev) =>
                 prev.some((c) => c.id === inserted.id) ? prev : [...prev, inserted as Comment]
             );
+            showToast("댓글이 등록되었습니다");
         }
         setText("");
     };
@@ -172,6 +195,7 @@ export default function Comments({
                 }
 
                 setList((prev) => prev.filter((c) => c.id !== id));
+                showToast("댓글이 삭제되었습니다");
             },
         });
     };
@@ -217,28 +241,35 @@ export default function Comments({
             </AnimatePresence>
 
             {/* 입력 */}
-            <div className="flex gap-2">
-                <input
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && add()}
-                    placeholder={userId ? "댓글을 입력하세요" : "로그인 후 댓글 작성 가능"}
-                    className="flex-1 rounded-lg px-3 py-2.5 text-sm bg-neutral-800/50 border border-neutral-700/50 text-white placeholder-neutral-500 focus:outline-none focus:border-emerald-500 transition"
-                    maxLength={1000}
-                    disabled={!userId}
-                />
-                <button
-                    onClick={add}
-                    disabled={loading || !userId || !text.trim()}
-                    className="px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed disabled:active:scale-100 transition-all cursor-pointer"
-                >
-                    {loading ? (
-                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                    ) : "등록"}
-                </button>
+            <div className="space-y-1">
+                <div className="flex gap-2">
+                    <input
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && !loading && text.trim() && add()}
+                        placeholder={userId ? "댓글을 입력하세요" : "로그인 후 댓글 작성 가능"}
+                        className="flex-1 rounded-lg px-3 py-2.5 text-sm bg-neutral-800/50 border border-neutral-700/50 text-white placeholder-neutral-500 focus:outline-none focus:border-emerald-500 transition"
+                        maxLength={1000}
+                        disabled={!userId}
+                    />
+                    <button
+                        onClick={add}
+                        disabled={loading || !userId || !text.trim()}
+                        className="px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed disabled:active:scale-100 transition-all cursor-pointer"
+                    >
+                        {loading ? (
+                            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                        ) : "등록"}
+                    </button>
+                </div>
+                {text.length > 0 && (
+                    <div className={`text-[10px] text-right ${text.length > 900 ? "text-amber-400" : "text-neutral-500"}`}>
+                        {text.length}/1000
+                    </div>
+                )}
             </div>
 
             {/* 목록 */}

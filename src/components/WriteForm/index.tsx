@@ -60,22 +60,34 @@ export default function WriteForm({
             {/* 폼 */}
             <div className="flex-1 flex flex-col gap-4 min-h-0">
                 <div>
-                    <label className="block text-xs text-neutral-400 mb-1.5">제목</label>
+                    <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs text-neutral-400">제목</label>
+                        <span className={`text-[10px] ${title.length > 180 ? "text-amber-400" : "text-neutral-500"}`}>
+                            {title.length}/200
+                        </span>
+                    </div>
                     <input
                         className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2.5 text-white placeholder-neutral-500 focus:outline-none focus:border-emerald-500 transition"
                         placeholder="제목을 입력하세요"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
+                        maxLength={200}
                     />
                 </div>
 
                 <div className="flex-1 flex flex-col min-h-0">
-                    <label className="block text-xs text-neutral-400 mb-1.5">내용</label>
+                    <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs text-neutral-400">내용</label>
+                        <span className={`text-[10px] ${body.length > 4500 ? "text-amber-400" : "text-neutral-500"}`}>
+                            {body.length}/5000
+                        </span>
+                    </div>
                     <textarea
                         className="flex-1 w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-white placeholder-neutral-500 resize-none focus:outline-none focus:border-emerald-500 transition min-h-32"
                         placeholder="내용을 입력하세요"
                         value={body}
                         onChange={(e) => setBody(e.target.value)}
+                        maxLength={5000}
                     />
                 </div>
 

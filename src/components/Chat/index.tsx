@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { supabase } from "@/lib/supabase-browser";
 import { sanitizeText } from "@/lib/sanitize";
 import { AnimatePresence, motion } from "framer-motion";
+import { useToast } from "@/components/Toast";
 
 interface PostgrestError {
     message: string;
@@ -112,6 +113,7 @@ function linkify(text: string): ReactNode[] {
 }
 
 export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fadeDelay?: number }) {
+    const { showToast } = useToast();
     const [userId, setUserId] = useState<string | null>(null);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_isAnonymous, setIsAnonymous] = useState(false);
@@ -417,9 +419,13 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
             .upsert([{ user_id: userId, room_id: roomId, day, choice }], {
                 onConflict: "user_id,room_id,day",
             });
-        if (error) return;
+        if (error) {
+            showToast("포지션 선택에 실패했습니다", "error");
+            return;
+        }
         setMyChoice(choice);
         setPositionsMap((prev) => ({ ...prev, [userId]: choice }));
+        showToast(`${choice === "long" ? "📈 Long" : "📉 Short"} 포지션을 선택했습니다`);
         // 비율 즉시 업데이트
         fetchRatio(roomId).then(setRatio).catch(() => {});
     };

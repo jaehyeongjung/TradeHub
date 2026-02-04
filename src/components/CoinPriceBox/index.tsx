@@ -100,10 +100,12 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
     const [open, setOpen] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
     const [hovered, setHovered] = useState(false);
+    const [priceFlash, setPriceFlash] = useState<"up" | "down" | null>(null);
 
     const wsRef = useRef<WebSocket | null>(null);
     const verRef = useRef(0);
     const reconnectTimer = useRef<number | null>(null);
+    const prevPriceRef = useRef<number | null>(null);
 
     const [decimals, setDecimals] = useState<number>(2);
 
@@ -208,7 +210,16 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                 const d = JSON.parse(ev.data) as { c: string; P: string };
                 const last = parseFloat(d?.c);
                 const changePct = parseFloat(d?.P);
-                if (!Number.isNaN(last)) setPrice(last);
+
+                if (!Number.isNaN(last)) {
+                    // 가격 변동 플래시 효과
+                    if (prevPriceRef.current !== null && last !== prevPriceRef.current) {
+                        setPriceFlash(last > prevPriceRef.current ? "up" : "down");
+                        setTimeout(() => setPriceFlash(null), 300);
+                    }
+                    prevPriceRef.current = last;
+                    setPrice(last);
+                }
                 if (!Number.isNaN(changePct)) setPct(changePct);
             };
 
@@ -276,7 +287,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                         <h2 className="text-sm 2xl:text-base font-bold text-white">
                             {symbol.toUpperCase()}
                         </h2>
-                        <p className={`mt-1 2xl:mt-2 text-lg 2xl:text-2xl font-mono ${pctColor}`}>
+                        <p className={`mt-1 2xl:mt-2 text-lg 2xl:text-2xl font-mono tabular-nums transition-colors duration-150 rounded px-1 -mx-1 ${pctColor} ${priceFlash === "up" ? "bg-emerald-500/20" : priceFlash === "down" ? "bg-red-500/20" : ""}`}>
                             {price != null ? formatPrice(price) : "$—"}
                         </p>
                         <div className={`mt-0.5 2xl:mt-1 text-xs 2xl:text-sm font-semibold ${pctColor}`}>

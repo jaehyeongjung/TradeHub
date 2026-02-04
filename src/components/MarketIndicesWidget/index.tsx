@@ -24,20 +24,20 @@ function formatCompact(price: number, symbol: string): string {
 function IndexItem({ index }: { index: MarketIndex }) {
     const isPositive = (index.changePercent ?? 0) >= 0;
     const color = index.changePercent === null
-        ? "text-zinc-400"
+        ? "text-neutral-400"
         : isPositive
         ? "text-emerald-400"
-        : "text-rose-400";
+        : "text-red-400";
 
     return (
-        <div className="flex-1 min-w-0 flex flex-col items-center justify-center py-2 2xl:py-3 px-3 2xl:px-4 bg-neutral-900 border border-zinc-800 rounded-xl">
-            <span className="text-[10px] 2xl:text-xs text-zinc-500 font-medium mb-1">
+        <div className="flex-1 min-w-0 flex flex-col items-center justify-center py-2 2xl:py-3 px-3 2xl:px-4 bg-neutral-800/50 border border-neutral-700/50 rounded-xl hover:bg-neutral-800/70 transition-colors">
+            <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium mb-1">
                 {index.name}
             </span>
-            <span className="text-xs 2xl:text-sm text-zinc-100 font-mono font-semibold">
+            <span className="text-sm 2xl:text-base text-white font-mono font-semibold">
                 {index.price !== null ? formatCompact(index.price, index.symbol) : "—"}
             </span>
-            <span className={`text-[10px] 2xl:text-xs font-mono mt-0.5 ${color}`}>
+            <span className={`text-[11px] 2xl:text-xs font-mono font-medium mt-0.5 ${color}`}>
                 {index.changePercent !== null ? (
                     `${isPositive ? "+" : ""}${index.changePercent.toFixed(2)}%`
                 ) : "—"}
@@ -75,7 +75,7 @@ export default function MarketIndicesWidget({ pollMs = 30000, fadeDelay = 0 }: {
     });
 
     return (
-        <div className="rounded-2xl border border-zinc-800 bg-neutral-950 p-3 2xl:p-4">
+        <div className="rounded-2xl border border-neutral-700/50 bg-neutral-900 p-3 2xl:p-4">
             <div className={`flex gap-3 transition-[opacity,transform] duration-700 ${data ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                 {data ? (
                     data.indices.map((idx) => (
@@ -83,7 +83,7 @@ export default function MarketIndicesWidget({ pollMs = 30000, fadeDelay = 0 }: {
                     ))
                 ) : (
                     [1, 2, 3].map((i) => (
-                        <div key={i} className="h-12 2xl:h-14 flex-1 bg-neutral-900 border border-zinc-800 rounded-xl" />
+                        <div key={i} className="h-14 2xl:h-16 flex-1 bg-neutral-800/50 border border-neutral-700/50 rounded-xl animate-pulse" />
                     ))
                 )}
             </div>

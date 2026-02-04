@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase-browser";
+import { ToastProvider } from "@/components/Toast";
 
 function isMobileDevice(): boolean {
     if (typeof window === "undefined") return false;
@@ -39,5 +40,5 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     }, []);
 
     if (!ready) return null;
-    return <>{children}</>;
+    return <ToastProvider>{children}</ToastProvider>;
 }
