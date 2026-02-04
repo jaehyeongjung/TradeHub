@@ -41,14 +41,14 @@ const CustomModal: React.FC<{
                 {isConfirm && (
                     <button
                         onClick={onCancel}
-                        className="flex-1 px-4 py-2 rounded-lg text-sm bg-neutral-700 text-white hover:bg-neutral-600 transition cursor-pointer"
+                        className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-neutral-700 text-white hover:bg-neutral-600 active:bg-neutral-800 active:scale-[0.98] transition-all cursor-pointer"
                     >
                         취소
                     </button>
                 )}
                 <button
                     onClick={onConfirm}
-                    className="flex-1 px-4 py-2 rounded-lg text-sm bg-emerald-600 text-white hover:bg-emerald-500 transition cursor-pointer"
+                    className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] transition-all cursor-pointer"
                 >
                     {isConfirm ? "확인" : "닫기"}
                 </button>
@@ -273,14 +273,40 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                             </button>
                         )}
 
-                        {posts.length === 0 ? (
+                        {/* 스켈레톤 로딩 */}
+                        {!postsLoaded && (
+                            <div className="space-y-2">
+                                {[...Array(4)].map((_, i) => (
+                                    <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-neutral-800/30 animate-pulse">
+                                        <div className="w-16 h-16 rounded-lg bg-neutral-700" />
+                                        <div className="flex-1">
+                                            <div className="h-4 w-3/4 bg-neutral-700 rounded mb-2" />
+                                            <div className="h-3 w-full bg-neutral-700 rounded mb-1" />
+                                            <div className="h-3 w-2/3 bg-neutral-700 rounded mb-3" />
+                                            <div className="flex gap-2">
+                                                <div className="h-3 w-16 bg-neutral-700 rounded" />
+                                                <div className="h-3 w-12 bg-neutral-700 rounded" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {postsLoaded && posts.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-12 text-neutral-500">
                                 <svg className="w-12 h-12 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                                 </svg>
                                 <p className="text-sm">아직 게시물이 없습니다</p>
+                                <button
+                                    onClick={() => setMode("write")}
+                                    className="mt-3 text-sm text-emerald-500 hover:text-emerald-400 transition-colors cursor-pointer"
+                                >
+                                    첫 글 작성하기
+                                </button>
                             </div>
-                        ) : (
+                        ) : postsLoaded && (
                             posts.map((p) => (
                                 <div
                                     key={p.id}

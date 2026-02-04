@@ -43,14 +43,14 @@ const CustomModal: React.FC<{
                 {isConfirm && (
                     <button
                         onClick={onCancel}
-                        className="flex-1 px-4 py-2 rounded-lg text-sm bg-neutral-700 text-white hover:bg-neutral-600 transition cursor-pointer"
+                        className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-neutral-700 text-white hover:bg-neutral-600 active:bg-neutral-800 active:scale-[0.98] transition-all cursor-pointer"
                     >
                         취소
                     </button>
                 )}
                 <button
                     onClick={onConfirm}
-                    className="flex-1 px-4 py-2 rounded-lg text-sm bg-emerald-600 text-white hover:bg-emerald-500 transition cursor-pointer"
+                    className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] transition-all cursor-pointer"
                 >
                     {isConfirm ? "확인" : "닫기"}
                 </button>
@@ -223,14 +223,14 @@ export default function Comments({
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && add()}
                     placeholder={userId ? "댓글을 입력하세요" : "로그인 후 댓글 작성 가능"}
-                    className="flex-1 rounded-lg px-3 py-2 text-sm bg-neutral-800/50 border border-neutral-700/50 text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-600 transition"
+                    className="flex-1 rounded-lg px-3 py-2.5 text-sm bg-neutral-800/50 border border-neutral-700/50 text-white placeholder-neutral-500 focus:outline-none focus:border-emerald-500 transition"
                     maxLength={1000}
                     disabled={!userId}
                 />
                 <button
                     onClick={add}
                     disabled={loading || !userId || !text.trim()}
-                    className="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed transition cursor-pointer"
+                    className="px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] disabled:bg-neutral-700 disabled:text-neutral-500 disabled:cursor-not-allowed disabled:active:scale-100 transition-all cursor-pointer"
                 >
                     {loading ? (
                         <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">

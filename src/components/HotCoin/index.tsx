@@ -116,7 +116,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
             >
-                <p className="text-[12px] 2xl:text-sm px-3 2xl:px-4 py-[3px] 2xl:py-1 rounded-full bg-neutral-800 text-amber-300 select-none cursor-pointer shadow-sm">
+                <p className="hotcoin-badge text-[12px] 2xl:text-sm px-3 2xl:px-4 py-2 2xl:py-2.5 min-h-[36px] 2xl:min-h-[44px] flex items-center rounded-full select-none cursor-pointer shadow-sm transition-colors">
                     <span className="whitespace-nowrap">🔥 Hot Coin</span>
                 </p>
 
@@ -127,7 +127,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[210px] 2xl:w-[260px] text-[11px] 2xl:text-xs bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg px-4 2xl:px-5 py-3 2xl:py-4 shadow-lg z-50"
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[210px] 2xl:w-[260px] text-[11px] 2xl:text-xs bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg px-4 2xl:px-5 py-3 2xl:py-4 shadow-xl z-[100]"
                         >
                             <div className="font-semibold text-amber-300 mb-1 2xl:mb-2">
                                 기준 설명
@@ -199,7 +199,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.18 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[280px] 2xl:w-[340px] text-[11px] 2xl:text-xs bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 2xl:py-5 px-5 2xl:px-6 shadow-lg z-50 pointer-events-none"
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[280px] 2xl:w-[340px] text-[11px] 2xl:text-xs bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 2xl:py-5 px-5 2xl:px-6 shadow-xl z-[100] pointer-events-none"
                         >
                             <div className="font-semibold text-amber-300 mb-2 2xl:mb-3 2xl:text-sm">
                                 🔥 Hot Coin Top 15

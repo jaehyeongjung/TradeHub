@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { supabase } from "@/lib/supabase-browser";
 import { sanitizeText } from "@/lib/sanitize";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface PostgrestError {
     message: string;
@@ -213,7 +213,20 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                     setMsgs((prev) => {
                         if (prev.some((m) => m.id === newMsg.id)) return prev;
                         const next = [...prev, newMsg];
-                        scrollToBottom();
+
+                        // 스크롤이 아래에 있으면 자동 스크롤, 아니면 unread 카운트 증가
+                        if (listRef.current) {
+                            const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+                            const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+                            if (isAtBottom) {
+                                scrollToBottom();
+                            } else if (newMsg.user_id !== userIdRef.current) {
+                                setUnreadCount((c) => c + 1);
+                            }
+                        } else {
+                            scrollToBottom();
+                        }
+
                         return next;
                     });
                 }
@@ -288,6 +301,22 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
         long_ratio: 0,
     });
     const [loadingChoice, setLoadingChoice] = useState(true);
+    const [showScrollBtn, setShowScrollBtn] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    // 스크롤 위치 감지
+    const handleScroll = () => {
+        if (!listRef.current) return;
+        const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+        const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+        setShowScrollBtn(distanceFromBottom > 100);
+    };
+
+    // 스크롤 버튼 클릭 시 읽음 처리
+    const handleScrollBtnClick = () => {
+        scrollToBottom();
+        setUnreadCount(0);
+    };
 
     // always load ratio (even when logged out)
     useEffect(() => {
@@ -469,11 +498,11 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                         <div className="flex gap-2 pt-1">
                             <motion.button
                                 whileHover={{ scale: userId ? 1.02 : 1 }}
-                                whileTap={{ scale: userId ? 0.98 : 1 }}
+                                whileTap={{ scale: userId ? 0.97 : 1 }}
                                 disabled={!userId}
-                                className={`px-3 py-[6px] rounded-lg text-white text-[12px] font-semibold flex-1 shadow-md transition-colors ${
+                                className={`px-3 py-2 rounded-lg text-white text-[13px] font-semibold flex-1 shadow-md transition-all ${
                                     userId
-                                        ? "bg-green-700 hover:bg-green-600 active:bg-green-800"
+                                        ? "bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 cursor-pointer"
                                         : "bg-neutral-700 cursor-not-allowed opacity-60"
                                 }`}
                                 onClick={() => choose("long")}
@@ -482,11 +511,11 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                             </motion.button>
                             <motion.button
                                 whileHover={{ scale: userId ? 1.02 : 1 }}
-                                whileTap={{ scale: userId ? 0.98 : 1 }}
+                                whileTap={{ scale: userId ? 0.97 : 1 }}
                                 disabled={!userId}
-                                className={`px-3 py-[6px] rounded-lg text-white text-[12px] font-semibold flex-1 shadow-md transition-colors ${
+                                className={`px-3 py-2 rounded-lg text-white text-[13px] font-semibold flex-1 shadow-md transition-all ${
                                     userId
-                                        ? "bg-red-700 hover:bg-red-600 active:bg-red-800"
+                                        ? "bg-red-600 hover:bg-red-500 active:bg-red-700 cursor-pointer"
                                         : "bg-neutral-700 cursor-not-allowed opacity-60"
                                 }`}
                                 onClick={() => choose("short")}
@@ -497,59 +526,81 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                     )}
                 </div>
 
-                {/* 메시지 리스트 */}
-                <div
-                    ref={listRef}
-                    className="flex-1 min-h-0 overflow-y-auto space-y-2 pr-1 pb-2 scrollbar-hide relative"
-                >
-                    {msgs.length > 0 ? (
-                        msgs.map((m) => {
-                            const userChoice = positionsMap[m.user_id];
-                            const tag = userChoice
-                                ? `[${userChoice.toUpperCase()}] `
-                                : "";
-                            const nameColor =
-                                m.user_id === userId
-                                    ? "text-yellow-300"
-                                    : "text-blue-400";
-                            const tagColor =
-                                userChoice === "long"
-                                    ? "text-green-400 font-semibold"
-                                    : userChoice === "short"
-                                    ? "text-red-400 font-semibold"
-                                    : "text-neutral-500";
+                {/* 메시지 리스트 래퍼 */}
+                <div className="relative flex-1 min-h-0">
+                    <div
+                        ref={listRef}
+                        onScroll={handleScroll}
+                        className="absolute inset-0 overflow-y-auto space-y-2 pr-1 pb-8 scrollbar-hide"
+                    >
+                        {msgs.length > 0 ? (
+                            msgs.map((m) => {
+                                const userChoice = positionsMap[m.user_id];
+                                const tag = userChoice
+                                    ? `[${userChoice.toUpperCase()}] `
+                                    : "";
+                                const nameColor =
+                                    m.user_id === userId
+                                        ? "text-yellow-300"
+                                        : "text-blue-400";
+                                const tagColor =
+                                    userChoice === "long"
+                                        ? "text-green-400 font-semibold"
+                                        : userChoice === "short"
+                                        ? "text-red-400 font-semibold"
+                                        : "text-neutral-500";
 
-                            return (
-                                <motion.div
-                                    key={m.id}
-                                    initial={{ opacity: 0, y: 8 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.25 }}
-                                    className="text-[13px] border border-neutral-800 rounded-lg px-3 py-2 bg-neutral-900 shadow-sm min-w-0 max-w-full"
-                                >
-                                    <b className={`${nameColor} text-[13px]`}>
-                                        <span className={tagColor}>{tag}</span>
-                                        {m.user_id === userId
-                                            ? "나 (Me)"
-                                            : m.user_id.slice(0, 8)}
-                                    </b>
-                                    <span className="mx-2 text-neutral-600">
-                                        ·
-                                    </span>
-                                    <span className="text-neutral-300 text-[13px] whitespace-pre-wrap break-anywhere">
-                                        {linkify(m.content)}
-                                    </span>
-                                </motion.div>
-                            );
-                        })
-                    ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-[12px] text-neutral-500 text-center px-4">
-                                아직 메시지가 없습니다. 오늘의 첫 포지션을 잡고
-                                메시지를 남겨보세요!
+                                return (
+                                    <motion.div
+                                        key={m.id}
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.25 }}
+                                        className="text-[13px] border border-neutral-800 rounded-lg px-3 py-2 bg-neutral-900 shadow-sm min-w-0 max-w-full"
+                                    >
+                                        <b className={`${nameColor} text-[13px]`}>
+                                            <span className={tagColor}>{tag}</span>
+                                            {m.user_id === userId
+                                                ? "나 (Me)"
+                                                : m.user_id.slice(0, 8)}
+                                        </b>
+                                        <span className="mx-2 text-neutral-600">
+                                            ·
+                                        </span>
+                                        <span className="text-neutral-300 text-[13px] whitespace-pre-wrap break-anywhere">
+                                            {linkify(m.content)}
+                                        </span>
+                                    </motion.div>
+                                );
+                            })
+                        ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="text-[12px] text-neutral-500 text-center px-4">
+                                    아직 메시지가 없습니다. 오늘의 첫 포지션을 잡고
+                                    메시지를 남겨보세요!
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
+
+                    {/* 스크롤 투 바텀 버튼 (스크롤 영역 바깥에 고정) */}
+                    <AnimatePresence>
+                        {showScrollBtn && (
+                            <motion.button
+                                initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                                transition={{ duration: 0.2 }}
+                                onClick={handleScrollBtnClick}
+                                className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-800/95 border border-neutral-700 text-neutral-200 text-xs font-medium shadow-lg backdrop-blur-sm hover:bg-neutral-700 transition-colors cursor-pointer z-20"
+                            >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                                </svg>
+                                {unreadCount > 0 ? `새 메시지 ${unreadCount}개` : "최신 메시지"}
+                            </motion.button>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* 입력바 */}
@@ -564,20 +615,20 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                 (composingRef.current = false)
                             }
                             onKeyDown={onKeyDown}
-                            className="flex-1 border border-neutral-700 px-3 py-2 rounded-lg bg-neutral-900 text-gray-100 placeholder-neutral-500 focus:outline-none focus:border-emerald-400 text-[12px] shadow-inner"
+                            className="flex-1 border border-neutral-700 px-3 py-2.5 rounded-lg bg-neutral-900 text-gray-100 placeholder-neutral-500 focus:outline-none focus:border-emerald-500 text-[13px] shadow-inner"
                             placeholder="익명으로도 채팅이 가능합니다"
                             maxLength={2000}
                             disabled={!userId}
                         />
                         <motion.button
-                            whileHover={{ scale: userId ? 1.04 : 1 }}
-                            whileTap={{ scale: userId ? 0.96 : 1 }}
+                            whileHover={{ scale: userId ? 1.02 : 1 }}
+                            whileTap={{ scale: userId ? 0.97 : 1 }}
                             type="button"
                             onClick={send}
-                            className={`px-3 py-2 rounded-lg transition duration-150 text-[12px] font-bold shadow ${
+                            className={`px-4 py-2.5 rounded-lg transition-all duration-150 text-[13px] font-semibold shadow ${
                                 userId
-                                    ? "bg-emerald-500 text-white hover:bg-emerald-500 active:bg-blue-700 cursor-pointer"
-                                    : "bg-neutral-700 text-gray-400 cursor-not-allowed"
+                                    ? "bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 cursor-pointer"
+                                    : "bg-neutral-700 text-neutral-500 cursor-not-allowed"
                             }`}
                             disabled={!userId}
                         >

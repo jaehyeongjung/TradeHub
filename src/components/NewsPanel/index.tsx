@@ -93,12 +93,34 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
             <div className="h-full min-h-0 flex flex-col rounded-xl border border-neutral-700 bg-neutral-900/70 overflow-hidden">
                 {/* 본문 */}
                 <div className="flex-1 min-h-0 overflow-y-auto p-3 pr-2 scrollbar-hide">
-                    <div className={`transition-[opacity,transform] duration-700 ${loading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-                    {!news.length && !loading ? (
-                        <div className="text-xs text-neutral-500">
-                            표시할 뉴스가 없습니다.
+                    {/* 스켈레톤 로딩 */}
+                    {loading && (
+                        <div className="space-y-2">
+                            {[...Array(5)].map((_, i) => (
+                                <div key={i} className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-3 animate-pulse">
+                                    <div className="h-3 w-16 bg-neutral-700 rounded mb-2" />
+                                    <div className="h-4 w-full bg-neutral-700 rounded mb-2" />
+                                    <div className="h-4 w-3/4 bg-neutral-700 rounded mb-3" />
+                                    <div className="flex gap-2">
+                                        <div className="h-5 w-12 bg-neutral-700 rounded" />
+                                        <div className="h-5 w-12 bg-neutral-700 rounded" />
+                                        <div className="h-5 w-24 bg-neutral-700 rounded" />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ) : (
+                    )}
+
+                    {/* 실제 콘텐츠 */}
+                    <div className={`transition-[opacity,transform] duration-700 ${loading ? "opacity-0 translate-y-4 hidden" : "opacity-100 translate-y-0"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
+                    {!news.length && !loading ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-neutral-500">
+                            <svg className="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
+                            </svg>
+                            <p className="text-xs">표시할 뉴스가 없습니다</p>
+                        </div>
+                    ) : !loading && (
                         <ul className="space-y-2">
                             {news.map((n) => (
                                 <li
@@ -144,9 +166,9 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                                         </div>
 
                                         {/* 오른쪽(버튼영역) – 모바일에서는 아래로 내려오며 가로 100% */}
-                                        <div className="mt-2 md:mt-0 md:ml-3 w-full md:w-auto flex gap-1 md:shrink-0">
+                                        <div className="mt-2 md:mt-0 md:ml-3 w-full md:w-auto flex gap-1.5 md:shrink-0">
                                             <button
-                                                className="flex-1 md:flex-none rounded cursor-pointer bg-neutral-800 px-2 py-1 text-[11px] text-neutral-200 hover:bg-neutral-700"
+                                                className="flex-1 md:flex-none rounded-lg cursor-pointer bg-neutral-800 px-3 py-1.5 text-xs font-medium text-neutral-200 hover:bg-neutral-700 active:bg-neutral-900 active:scale-[0.98] transition-all"
                                                 onClick={() => openViewer(n)}
                                             >
                                                 열기
@@ -154,13 +176,13 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                                             <button
                                                 disabled={!userId}
                                                 onClick={() => shareToChat(n)}
-                                                className={`flex-1 md:flex-none rounded px-2 py-1 text-[11px] ${
+                                                className={`flex-1 md:flex-none rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
                                                     userId
-                                                        ? "bg-emerald-600 text-white hover:bg-emerald-500 cursor-pointer"
+                                                        ? "bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] cursor-pointer"
                                                         : "bg-neutral-700 text-neutral-400 cursor-not-allowed"
                                                 }`}
                                             >
-                                                채팅에 공유
+                                                공유
                                             </button>
                                         </div>
                                     </div>

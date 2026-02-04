@@ -5,7 +5,6 @@ import AuthGate from "@/components/AuthGate";
 import Script from "next/script";
 import FloatingLoginSidebar from "@/components/FloatingLoginDrawer";
 
-
 const inter = Inter({
     subsets: ["latin"],
     display: "swap",
@@ -76,7 +75,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="ko" className={`bg-black light ${inter.variable}`} suppressHydrationWarning>
+        <html lang="ko" className={`bg-black ${inter.variable}`} suppressHydrationWarning>
             <body>
                 <AuthGate>{children}</AuthGate>
                 <Script

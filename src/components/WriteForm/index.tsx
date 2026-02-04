@@ -104,14 +104,14 @@ export default function WriteForm({
             <div className="flex gap-3 pt-4 mt-4 border-t border-neutral-800">
                 <button
                     onClick={onCancel}
-                    className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-neutral-800 text-neutral-300 hover:bg-neutral-700 transition cursor-pointer"
+                    className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-neutral-800 text-neutral-300 hover:bg-neutral-700 active:bg-neutral-900 active:scale-[0.98] transition-all cursor-pointer"
                 >
                     취소
                 </button>
                 <button
                     onClick={submit}
                     disabled={loading || !title.trim() || !body.trim()}
-                    className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+                    className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 transition-all cursor-pointer"
                 >
                     {loading ? "저장 중..." : "등록"}
                 </button>

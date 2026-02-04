@@ -50,7 +50,7 @@ export const DashBoard = () => {
                 {/* 왼쪽: 게시판/뉴스 카드 */}
                 <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950 border border-zinc-800">
                     {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
-                    <div className={`flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14 transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: "50ms", transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
+                    <div className={`relative z-20 flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14 transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: "50ms", transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                         <div className="inline-flex items-center rounded-xl bg-neutral-800/50 p-1 shrink-0">
                             <button
                                 onClick={() => switchTab("board")}
@@ -86,10 +86,10 @@ export const DashBoard = () => {
                             {activeTab === "board" && (
                                 <button
                                     onClick={() => postRef.current?.openWrite()}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-300 bg-neutral-800 hover:bg-neutral-700 hover:text-white border border-neutral-700 hover:border-neutral-600 transition-all cursor-pointer"
+                                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] shadow-sm transition-all cursor-pointer"
                                 >
                                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                     </svg>
                                     <span className="whitespace-nowrap">글쓰기</span>
                                 </button>
@@ -97,7 +97,7 @@ export const DashBoard = () => {
                         </div>
                     </div>
 
-                    <div className="flex-1 min-h-0">
+                    <div className="relative z-10 flex-1 min-h-0">
                         {activeTab === "board" ? (
                             <PostBoard ref={postRef} fadeDelay={100} />
                         ) : (

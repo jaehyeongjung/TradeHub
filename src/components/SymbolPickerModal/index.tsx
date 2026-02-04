@@ -304,7 +304,7 @@ export default function SymbolPickerModal({
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     placeholder="BTC, Ethereum"
-                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-700 bg-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/25 transition-all"
+                                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-neutral-700 bg-neutral-800 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/25 transition-all"
                                 />
                                 {search && (
                                     <button
