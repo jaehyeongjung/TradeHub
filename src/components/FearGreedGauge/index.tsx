@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-type Props = { value: number; title?: string; subLabel?: string; isLoading?: boolean };
+type Props = { value: number; title?: string; subLabel?: string; isLoading?: boolean; fadeDelay?: number };
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
@@ -95,38 +95,12 @@ function useSpring(
     return val;
 }
 
-// 스켈레톤 컴포넌트
-function FearGreedSkeleton() {
-    return (
-        <div className="relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4 2xl:p-8">
-            {/* 헤더 스켈레톤 */}
-            <div className="mb-2 2xl:mb-4 flex items-center justify-between">
-                <div className="h-4 2xl:h-5 w-32 bg-neutral-800 rounded animate-pulse" />
-                <div className="flex items-center gap-2 2xl:gap-4">
-                    <div className="h-8 w-8 2xl:h-12 2xl:w-12 rounded-full bg-neutral-800 animate-pulse" />
-                    <div className="h-4 w-20 bg-neutral-800 rounded animate-pulse ml-4" />
-                </div>
-            </div>
-            {/* 게이지 스켈레톤 */}
-            <svg viewBox="0 0 240 150" className="w-full">
-                <path
-                    d="M 25 120 A 95 95 0 0 1 215 120"
-                    stroke="#262626"
-                    strokeWidth="18"
-                    fill="none"
-                    strokeLinecap="round"
-                    className="animate-pulse"
-                />
-            </svg>
-        </div>
-    );
-}
-
 export default function FearGreedGauge({
     value,
     title = "Crypto Fear & Greed",
     subLabel,
     isLoading = false,
+    fadeDelay = 0,
 }: Props) {
     const v = Math.max(0, Math.min(100, value));
     const [isHovered, setIsHovered] = useState(false);
@@ -145,11 +119,6 @@ export default function FearGreedGauge({
         () => clamp01((animatedDeg - MIN) / SPAN),
         [animatedDeg, MIN, SPAN]
     );
-
-    // 로딩 중이면 스켈레톤 표시 (hooks 이후에 체크)
-    if (isLoading) {
-        return <FearGreedSkeleton />;
-    }
 
     const cx = 120,
         cy = 120,
@@ -174,6 +143,7 @@ export default function FearGreedGauge({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
+            <div className={`transition-opacity duration-700 ease-in-out ${isLoading ? "opacity-0" : "opacity-100"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
             {/* 헤더 */}
             <div className="mb-2 2xl:mb-4 flex items-center justify-between">
                 <h3 className="text-xs 2xl:text-base font-semibold opacity-90">
@@ -256,6 +226,7 @@ export default function FearGreedGauge({
                     0 (Fear) — 100 (Greed)
                 </text>
             </svg>
+            </div>
 
             {/* 💬 커스텀 툴팁 */}
             <AnimatePresence>

@@ -46,7 +46,7 @@ function IndexItem({ index }: { index: MarketIndex }) {
     );
 }
 
-export default function MarketIndicesWidget({ pollMs = 30000 }: { pollMs?: number }) {
+export default function MarketIndicesWidget({ pollMs = 30000, fadeDelay = 0 }: { pollMs?: number; fadeDelay?: number }) {
     const [data, setData] = useState<MarketIndicesResponse | null>(null);
     const abortRef = useRef<AbortController | null>(null);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
@@ -76,19 +76,17 @@ export default function MarketIndicesWidget({ pollMs = 30000 }: { pollMs?: numbe
 
     return (
         <div className="rounded-2xl border border-zinc-800 bg-neutral-950 p-3 2xl:p-4">
-            {!data ? (
-                <div className="flex gap-3">
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-12 2xl:h-14 flex-1 bg-neutral-900 border border-zinc-800 rounded-xl animate-pulse" />
-                    ))}
-                </div>
-            ) : (
-                <div className="flex gap-3">
-                    {data.indices.map((idx) => (
+            <div className={`flex gap-3 transition-opacity duration-700 ease-in-out ${data ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+                {data ? (
+                    data.indices.map((idx) => (
                         <IndexItem key={idx.symbol} index={idx} />
-                    ))}
-                </div>
-            )}
+                    ))
+                ) : (
+                    [1, 2, 3].map((i) => (
+                        <div key={i} className="h-12 2xl:h-14 flex-1 bg-neutral-900 border border-zinc-800 rounded-xl" />
+                    ))
+                )}
+            </div>
         </div>
     );
 }

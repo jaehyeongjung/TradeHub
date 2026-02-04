@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import SymbolPickerModal from "@/components/SymbolPickerModal";
 import { supabase } from "@/lib/supabase-browser";
 
-type Props = { boxId: string; defaultSymbol?: string };
+type Props = { boxId: string; defaultSymbol?: string; fadeDelay?: number };
 
 // Binance ExchangeInfo 타입
 interface BinanceExchangeInfo {
@@ -22,6 +22,38 @@ interface BinanceExchangeInfo {
 const globalPrecisionCache: Record<string, number> = {};
 const pendingRequests: Record<string, Promise<number>> = {};
 
+// 배치 ticker fetch (50ms 내 요청을 모아 한번에 호출 → 동시에 표시)
+type TickerData = { lastPrice: string; priceChangePercent: string; symbol: string };
+type TickerCallback = (d: TickerData | null) => void;
+let tickerQueue: { symbol: string; resolve: TickerCallback }[] = [];
+let tickerTimer: ReturnType<typeof setTimeout> | null = null;
+
+function fetchTickerBatched(sym: string): Promise<TickerData | null> {
+    return new Promise((resolve) => {
+        tickerQueue.push({ symbol: sym.toUpperCase(), resolve });
+        if (!tickerTimer) {
+            tickerTimer = setTimeout(async () => {
+                const batch = tickerQueue;
+                tickerQueue = [];
+                tickerTimer = null;
+
+                const symbols = [...new Set(batch.map((b) => b.symbol))];
+                try {
+                    const param = JSON.stringify(symbols);
+                    const res = await fetch(
+                        `https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(param)}`,
+                    );
+                    const list = (await res.json()) as TickerData[];
+                    const map = new Map(list.map((t) => [t.symbol, t]));
+                    batch.forEach((b) => b.resolve(map.get(b.symbol) ?? null));
+                } catch {
+                    batch.forEach((b) => b.resolve(null));
+                }
+            }, 50);
+        }
+    });
+}
+
 function decimalsFromTickSize(tick: string) {
     const i = tick.indexOf(".");
     if (i === -1) return 0;
@@ -35,7 +67,7 @@ async function fetchPrecision(sym: string): Promise<number> {
     if (globalPrecisionCache[key] != null) return globalPrecisionCache[key];
 
     // 동일 심볼 동시 요청 중복 방지
-    if (pendingRequests[key]) return pendingRequests[key];
+    if (key in pendingRequests) return pendingRequests[key];
 
     pendingRequests[key] = (async () => {
         try {
@@ -59,7 +91,7 @@ async function fetchPrecision(sym: string): Promise<number> {
     return pendingRequests[key];
 }
 
-export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
+export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }: Props) => {
     const initialSymbol = defaultSymbol.toLowerCase();
 
     const [symbol, setSymbol] = useState(initialSymbol);
@@ -155,18 +187,14 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
             wsRef.current = null;
         }
 
-        // REST로 현재가 즉시 fetch (WebSocket 첫 메시지 대기 없이 바로 표시)
-        const upper = symbol.toUpperCase();
-        fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${upper}`)
-            .then((r) => r.json())
-            .then((d: { lastPrice?: string; priceChangePercent?: string }) => {
-                if (verRef.current !== myVer) return;
-                const p = parseFloat(d?.lastPrice ?? "");
-                const c = parseFloat(d?.priceChangePercent ?? "");
-                if (!Number.isNaN(p)) setPrice(p);
-                if (!Number.isNaN(c)) setPct(c);
-            })
-            .catch(() => {});
+        // 배치 REST로 현재가 즉시 fetch (50ms 내 요청 모아서 1회 호출 → 4개 동시 표시)
+        fetchTickerBatched(symbol).then((d) => {
+            if (!d || verRef.current !== myVer) return;
+            const p = parseFloat(d.lastPrice);
+            const c = parseFloat(d.priceChangePercent);
+            if (!Number.isNaN(p)) setPrice(p);
+            if (!Number.isNaN(c)) setPct(c);
+        });
 
         const stream = symbol.toLowerCase();
         const url = `wss://stream.binance.com:9443/ws/${stream}@ticker`;
@@ -244,36 +272,17 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
                     onClick={() => setOpen(true)}
                     className="flex-1 min-w-0 w-full min-h-26 2xl:min-h-40 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-2 2xl:p-4 shadow-md transition hover:border-neutral-700 flex flex-col justify-center overflow-hidden"
                 >
-                    {price == null ? (
-                        /* 스켈레톤 */
-                        <>
-                            <div className="h-4 2xl:h-5 w-20 bg-neutral-800 rounded animate-pulse" />
-                            <div className="mt-1 2xl:mt-2 h-6 2xl:h-8 w-28 bg-neutral-800 rounded animate-pulse" />
-                            <div className="mt-0.5 2xl:mt-1 h-4 w-16 bg-neutral-800 rounded animate-pulse" />
-                        </>
-                    ) : (
-                        <>
-                            <h2 className="text-sm 2xl:text-base font-bold text-white">
-                                {symbol.toUpperCase()}
-                            </h2>
-                            <p
-                                className={`mt-1 2xl:mt-2 text-lg 2xl:text-2xl font-mono ${pctColor}`}
-                            >
-                                {formatPrice(price)}
-                            </p>
-                            <div
-                                className={`mt-0.5 2xl:mt-1 text-xs 2xl:text-sm font-semibold ${pctColor}`}
-                            >
-                                {pct != null ? (
-                                    <>
-                                        {arrow} {pctText}
-                                    </>
-                                ) : (
-                                    <div className="h-4 w-12 bg-neutral-800 rounded animate-pulse" />
-                                )}
-                            </div>
-                        </>
-                    )}
+                    <div className={`transition-opacity duration-700 ease-in-out ${price != null ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+                        <h2 className="text-sm 2xl:text-base font-bold text-white">
+                            {symbol.toUpperCase()}
+                        </h2>
+                        <p className={`mt-1 2xl:mt-2 text-lg 2xl:text-2xl font-mono ${pctColor}`}>
+                            {price != null ? formatPrice(price) : "$—"}
+                        </p>
+                        <div className={`mt-0.5 2xl:mt-1 text-xs 2xl:text-sm font-semibold ${pctColor}`}>
+                            {pct != null ? `${arrow} ${pctText}` : "—"}
+                        </div>
+                    </div>
                 </button>
 
                 <AnimatePresence>

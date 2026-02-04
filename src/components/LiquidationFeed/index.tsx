@@ -33,13 +33,16 @@ type BinanceForceOrder = {
 const MIN_USD_VALUE = 10000; // $10,000 이상만 표시
 const MAX_ITEMS = 15;
 
-export default function LiquidationFeed() {
+export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number }) {
     const [liquidations, setLiquidations] = useState<Liquidation[]>([]);
     const [isConnected, setIsConnected] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const wsRef = useRef<WebSocket | null>(null);
     const reconnectTimerRef = useRef<number | null>(null);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
+
+    useEffect(() => { setMounted(true); }, []);
 
     useEffect(() => {
         if (isTreemapOpen) return;
@@ -142,7 +145,7 @@ export default function LiquidationFeed() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className="absolute inset-0 border border-neutral-800 rounded-lg shadow-sm p-2 2xl:p-4 bg-neutral-900 flex flex-col overflow-hidden">
+            <div className={`absolute inset-0 border border-neutral-800 rounded-lg shadow-sm p-2 2xl:p-4 bg-neutral-900 flex flex-col overflow-hidden transition-opacity duration-700 ease-in-out ${mounted ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
             {/* 헤더 */}
             <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -164,14 +167,14 @@ export default function LiquidationFeed() {
             {/* 청산 리스트 */}
             <div className="flex-1 overflow-hidden">
                 {liquidations.length === 0 ? (
-                    <div className="space-y-1.5">
-                        {[...Array(5)].map((_, i) => (
-                            <div
-                                key={i}
-                                className="h-5 2xl:h-6 rounded bg-neutral-800 animate-pulse"
-                                style={{ opacity: 1 - i * 0.15 }}
-                            />
-                        ))}
+                    <div className="flex flex-col items-center justify-center h-full gap-2">
+                        <div className="flex items-center gap-1.5">
+                            <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? "bg-emerald-500 animate-pulse" : "bg-neutral-600 animate-pulse"}`} />
+                            <span className="text-[10px] 2xl:text-xs text-neutral-500">
+                                {isConnected ? "수신 대기 중" : "연결 중"}
+                            </span>
+                            <span className="text-[10px] text-neutral-600 animate-pulse">···</span>
+                        </div>
                     </div>
                 ) : (
                     <div className="space-y-1 overflow-y-auto max-h-full scrollbar-thin">

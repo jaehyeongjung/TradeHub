@@ -66,13 +66,15 @@ export type PostBoardHandle = {
 type Props = {
     /** 내부에 예전처럼 '글쓰기' 버튼을 보여주고 싶을 때만 true */
     showInternalWriteButton?: boolean;
+    fadeDelay?: number;
 };
 
 const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
-    { showInternalWriteButton = false },
+    { showInternalWriteButton = false, fadeDelay = 0 },
     ref
 ) {
     const [posts, setPosts] = useState<Post[]>([]);
+    const [postsLoaded, setPostsLoaded] = useState(false);
     const [mode, setMode] = useState<"list" | "write" | "detail" | "edit">(
         "list"
     );
@@ -115,6 +117,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
             .select("id,title,body,image_url,created_at,user_id")
             .order("created_at", { ascending: false });
         if (!error && data) setPosts(data as Post[]);
+        setPostsLoaded(true);
     };
 
     useEffect(() => {
@@ -256,7 +259,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                 }}
             />
 
-            <div className="p-3 h-full flex flex-col min-h-0">
+            <div className={`p-3 h-full flex flex-col min-h-0 transition-opacity duration-700 ease-in-out ${postsLoaded ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
                 {/* 목록 */}
                 {mode === "list" && (
                     <div className="flex-1 overflow-auto scrollbar-hide">

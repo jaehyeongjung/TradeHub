@@ -20,21 +20,21 @@ export const RealTimeSection = () => {
         >
             {/* 코인 가격 박스들 - 비율 3 */}
             <div className="flex gap-2 2xl:gap-3 flex-[3] min-w-0">
-                <CoinPriceBox boxId="tile-1" defaultSymbol="btcusdt" />
-                <CoinPriceBox boxId="tile-2" defaultSymbol="ethusdt" />
-                <CoinPriceBox boxId="tile-3" defaultSymbol="xrpusdt" />
-                <CoinPriceBox boxId="tile-4" defaultSymbol="solusdt" />
+                <CoinPriceBox boxId="tile-1" defaultSymbol="btcusdt" fadeDelay={0} />
+                <CoinPriceBox boxId="tile-2" defaultSymbol="ethusdt" fadeDelay={80} />
+                <CoinPriceBox boxId="tile-3" defaultSymbol="xrpusdt" fadeDelay={160} />
+                <CoinPriceBox boxId="tile-4" defaultSymbol="solusdt" fadeDelay={240} />
             </div>
 
             {/* 차트 - 비율 2 */}
             <div className="flex-[2] min-w-0">
-                <CoinChart />
+                <CoinChart fadeDelay={300} />
             </div>
 
             {/* 고래 거래 + 청산 피드 - 비율 2 */}
             <div className="flex gap-2 2xl:gap-4 flex-[2] min-w-0">
-                <WhaleTrades />
-                <LiquidationFeed />
+                <WhaleTrades fadeDelay={380} />
+                <LiquidationFeed fadeDelay={460} />
             </div>
         </section>
     );

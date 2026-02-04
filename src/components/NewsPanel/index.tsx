@@ -11,7 +11,7 @@ type NewsItem = {
     published_at: string;
 };
 
-export default function NewsPanel({ roomId }: { roomId: string }) {
+export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; fadeDelay?: number }) {
     const [news, setNews] = useState<NewsItem[]>([]);
     const [userId, setUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -93,25 +93,12 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
             <div className="h-full min-h-0 flex flex-col rounded-xl border border-neutral-700 bg-neutral-900/70 overflow-hidden">
                 {/* 본문 */}
                 <div className="flex-1 min-h-0 overflow-y-auto p-3 pr-2 scrollbar-hide">
-                    {loading ? (
-                        <div className="space-y-2">
-                            {[...Array(5)].map((_, i) => (
-                                <div key={i} className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2">
-                                    <div className="h-3 w-16 bg-neutral-800 rounded animate-pulse mb-2" />
-                                    <div className="h-4 w-full bg-neutral-800 rounded animate-pulse mb-2" />
-                                    <div className="flex gap-2">
-                                        <div className="h-3 w-12 bg-neutral-800 rounded animate-pulse" />
-                                        <div className="h-3 w-20 bg-neutral-800 rounded animate-pulse" />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : !news.length ? (
+                    <div className={`transition-opacity duration-700 ease-in-out ${loading ? "opacity-0" : "opacity-100"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+                    {!news.length && !loading ? (
                         <div className="text-xs text-neutral-500">
                             표시할 뉴스가 없습니다.
                         </div>
                     ) : (
-                        // src/components/NewsPanel/index.tsx (렌더 부분만 교체)
                         <ul className="space-y-2">
                             {news.map((n) => (
                                 <li
@@ -181,6 +168,7 @@ export default function NewsPanel({ roomId }: { roomId: string }) {
                             ))}
                         </ul>
                     )}
+                    </div>
                 </div>
             </div>
 

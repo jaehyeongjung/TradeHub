@@ -18,9 +18,10 @@ function getDeviceId() {
     return id;
 }
 
-export default function LiveStatsBox() {
+export default function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } = {}) {
     const deviceIdRef = useRef<string>(getDeviceId());
     const [onlineNow, setOnlineNow] = useState<number>(0);
+    const [ready, setReady] = useState(false);
     const [connected, setConnected] = useState<boolean>(false);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
@@ -45,7 +46,10 @@ export default function LiveStatsBox() {
             .select("device_id", { count: "exact", head: true })
             .gt("last_seen", new Date(Date.now() - 60_000).toISOString());
 
-        if (!error) setOnlineNow(count ?? 0);
+        if (!error) {
+            setOnlineNow(count ?? 0);
+            setReady(true);
+        }
     }, []);
 
     // presence heartbeat + 접속자 조회 (탭 활성화 시에만)
@@ -91,7 +95,7 @@ export default function LiveStatsBox() {
     }, [fetchOnline]);
 
     return (
-        <div className="flex items-center gap-3 2xl:gap-4 rounded-xl border border-neutral-700/50 p-3 2xl:p-4 shadow-sm justify-center bg-neutral-900">
+        <div className={`flex items-center gap-3 2xl:gap-4 rounded-xl border border-neutral-700/50 p-3 2xl:p-4 shadow-sm justify-center bg-neutral-900 transition-opacity duration-700 ease-in-out ${ready ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
             <span className="text-xs 2xl:text-sm flex gap-2 whitespace-nowrap text-gray-300">
                 <b>현재 접속 </b>
                 <b>{onlineNow.toLocaleString()}명</b>

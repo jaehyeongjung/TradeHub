@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SeoFooter from "../SeoFooter";
 import Chat from "../Chat";
@@ -17,6 +17,8 @@ type TabKey = "board" | "news";
 
 export const DashBoard = () => {
     const postRef = useRef<PostBoardHandle>(null);
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
 
     const router = useRouter();
 
@@ -48,7 +50,7 @@ export const DashBoard = () => {
                 {/* 왼쪽: 게시판/뉴스 카드 */}
                 <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950 border border-zinc-800">
                     {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
-                    <div className="flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14">
+                    <div className={`flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14 transition-opacity duration-700 ease-in-out ${mounted ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: "50ms" }}>
                         <div className="inline-flex items-center rounded-xl bg-neutral-800/50 p-1 shrink-0">
                             <button
                                 onClick={() => switchTab("board")}
@@ -78,7 +80,7 @@ export const DashBoard = () => {
                             </button>
                         </div>
                         <div className="flex-1 min-w-0">
-                            <HotSymbolsTicker />
+                            <HotSymbolsTicker fadeDelay={150} />
                         </div>
                         <div className="ml-auto shrink-0 mr-1">
                             {activeTab === "board" && (
@@ -97,9 +99,9 @@ export const DashBoard = () => {
 
                     <div className="flex-1 min-h-0">
                         {activeTab === "board" ? (
-                            <PostBoard ref={postRef} />
+                            <PostBoard ref={postRef} fadeDelay={100} />
                         ) : (
-                            <NewsPanel roomId="lobby" />
+                            <NewsPanel roomId="lobby" fadeDelay={100} />
                         )}
                     </div>
                 </article>
@@ -108,20 +110,20 @@ export const DashBoard = () => {
                     aria-label="거래 정보 위젯"
                     className="flex flex-col gap-2.5 min-w-57 2xl:min-w-80 2xl:gap-3"
                 >
-                    <KimchiWidget />
-                    <LiveStatsBox />
-                    <FearGreedWidget />
+                    <KimchiWidget fadeDelay={200} />
+                    <LiveStatsBox fadeDelay={280} />
+                    <FearGreedWidget fadeDelay={350} />
                     <YouTubeSeamlessPlayer videoId="j23SO29LNWE" />
                 </aside>
 
                 <div className="flex flex-col gap-3 2xl:gap-5 min-w-115 2xl:min-w-140">
-                    <MarketIndicesWidget />
+                    <MarketIndicesWidget fadeDelay={280} />
                     <aside
                         aria-label="실시간 채팅"
                         className="border border-zinc-800 rounded-2xl flex-1 bg-neutral-950 overflow-hidden flex flex-col"
                     >
                         <div className="flex-1 min-h-0">
-                            <Chat />
+                            <Chat fadeDelay={350} />
                         </div>
                     </aside>
                 </div>

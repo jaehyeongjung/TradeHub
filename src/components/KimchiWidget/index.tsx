@@ -46,9 +46,11 @@ async function fetchKimchiWithRetry(
 export default function KimchiWidget({
     symbol = "BTC",
     pollMs = 5000,
+    fadeDelay = 0,
 }: {
     symbol?: string;
     pollMs?: number;
+    fadeDelay?: number;
 }) {
     const [data, setData] = useState<Data | null>(null);
     const [isHovered, setIsHovered] = useState(false);
@@ -92,53 +94,35 @@ export default function KimchiWidget({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className="flex items-center justify-between">
-                <h3 className="text-sm 2xl:text-base font-semibold">김치 프리미엄</h3>
-                {isLoading ? (
-                    <div className="h-4 w-10 bg-neutral-800 rounded animate-pulse" />
-                ) : (
+            <div className={`transition-opacity duration-700 ease-in-out ${isLoading ? "opacity-0" : "opacity-100"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+                <div className="flex items-center justify-between">
+                    <h3 className="text-sm 2xl:text-base font-semibold">김치 프리미엄</h3>
                     <span className="text-xs 2xl:text-sm text-zinc-400">
                         {data?.symbol ?? symbol}
                     </span>
-                )}
+                </div>
+
+                <div className={`mt-2 2xl:mt-3 text-2xl 2xl:text-3xl font-bold ${color}`}>
+                    {pct != null ? `${pct.toFixed(2)}%` : "—"}
+                </div>
+
+                <dl className="mt-2 2xl:mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 2xl:gap-x-4 2xl:gap-y-2 text-xs 2xl:text-sm text-zinc-400">
+                    <dt className="whitespace-nowrap">업비트(KRW)</dt>
+                    <dd className="text-right text-emerald-300 font-mono tabular-nums whitespace-nowrap">
+                        {data ? `${(data.upbitKrw ?? 0).toLocaleString()} KRW` : "—"}
+                    </dd>
+
+                    <dt className="whitespace-nowrap">바이낸스(USDT)</dt>
+                    <dd className="text-right text-amber-300 font-mono tabular-nums whitespace-nowrap">
+                        {data ? `${(data.binanceUsdt ?? 0).toLocaleString()} USDT` : "—"}
+                    </dd>
+
+                    <dt className="whitespace-nowrap">USD/KRW</dt>
+                    <dd className="text-right text-zinc-200 font-mono tabular-nums whitespace-nowrap">
+                        {data ? `${Math.round(data.usdkrw ?? 0).toLocaleString()}원` : "—"}
+                    </dd>
+                </dl>
             </div>
-
-            <div className={`mt-2 2xl:mt-3 text-2xl 2xl:text-3xl font-bold ${color}`}>
-                {isLoading ? (
-                    <div className="h-8 w-24 bg-neutral-800 rounded animate-pulse" />
-                ) : (
-                    `${pct!.toFixed(2)}%`
-                )}
-            </div>
-
-            <dl className="mt-2 2xl:mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 2xl:gap-x-4 2xl:gap-y-2 text-xs 2xl:text-sm text-zinc-400">
-                <dt className="whitespace-nowrap">업비트(KRW)</dt>
-                <dd className="text-right text-emerald-300 font-mono tabular-nums whitespace-nowrap">
-                    {isLoading ? (
-                        <div className="h-4 w-16 bg-neutral-800 rounded animate-pulse ml-auto" />
-                    ) : (
-                        `${(data.upbitKrw ?? 0).toLocaleString()} KRW`
-                    )}
-                </dd>
-
-                <dt className="whitespace-nowrap">바이낸스(USDT)</dt>
-                <dd className="text-right text-amber-300 font-mono tabular-nums whitespace-nowrap">
-                    {isLoading ? (
-                        <div className="h-4 w-14 bg-neutral-800 rounded animate-pulse ml-auto" />
-                    ) : (
-                        `${(data.binanceUsdt ?? 0).toLocaleString()} USDT`
-                    )}
-                </dd>
-
-                <dt className="whitespace-nowrap">USD/KRW</dt>
-                <dd className="text-right text-zinc-200 font-mono tabular-nums whitespace-nowrap">
-                    {isLoading ? (
-                        <div className="h-4 w-12 bg-neutral-800 rounded animate-pulse ml-auto" />
-                    ) : (
-                        `${Math.round(data.usdkrw ?? 0).toLocaleString()}원`
-                    )}
-                </dd>
-            </dl>
 
             {/* 툴팁 */}
             <AnimatePresence>

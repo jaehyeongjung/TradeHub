@@ -34,7 +34,7 @@ function scoreOf(t: Ticker24h) {
     return Math.sqrt(vol) * Math.pow(pct, 2) * 1000000;
 }
 
-export default function HotSymbolsTicker() {
+export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {}) {
     const [list, setList] = useState<Ticker24h[]>([]);
     const [idx, setIdx] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
@@ -110,7 +110,7 @@ export default function HotSymbolsTicker() {
     const current = list.length ? list[idx] : null;
 
     return (
-        <div className="relative flex items-center gap-3 2xl:gap-4 text-sm 2xl:text-base ml-10 text-neutral-200">
+        <div className={`relative flex items-center gap-3 2xl:gap-4 text-sm 2xl:text-base ml-10 text-neutral-200 transition-opacity duration-700 ease-in-out ${current ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
             <div
                 className="relative"
                 onMouseEnter={() => setShowTooltip(true)}
@@ -150,8 +150,9 @@ export default function HotSymbolsTicker() {
                 onClick={() => setShowListTooltip(!showListTooltip)}
             >
                 <div className="overflow-hidden">
+                <div>
                 <AnimatePresence mode="popLayout">
-                    {current ? (
+                    {current && (
                         <motion.div
                             key={current.symbol + idx}
                             initial={{ y: 16, opacity: 0 }}
@@ -185,14 +186,9 @@ export default function HotSymbolsTicker() {
                                 {Number(current.priceChangePercent).toFixed(2)}%
                             </span>
                         </motion.div>
-                    ) : (
-                        <div className="flex items-center gap-2">
-                            <div className="h-4 w-12 bg-neutral-800 rounded animate-pulse" />
-                            <div className="h-4 w-20 bg-neutral-800 rounded animate-pulse" />
-                            <div className="h-4 w-14 bg-neutral-800 rounded animate-pulse" />
-                        </div>
                     )}
                 </AnimatePresence>
+                </div>
                 </div>
 
                 {/* Top 15 전체 리스트 툴팁 */}

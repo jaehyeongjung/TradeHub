@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import FearGreedGauge from "@/components/FearGreedGauge";
 
-export default function FearGreedCard() {
+export default function FearGreedCard({ fadeDelay = 0 }: { fadeDelay?: number }) {
     const [val, setVal] = useState<number | null>(null);
     const [label, setLabel] = useState<string | undefined>(undefined);
 
@@ -25,6 +25,7 @@ export default function FearGreedCard() {
             subLabel={label}
             title="Crypto Fear & Greed"
             isLoading={val == null}
+            fadeDelay={fadeDelay}
         />
     );
 }

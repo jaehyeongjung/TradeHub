@@ -5,45 +5,6 @@ import { supabase } from "@/lib/supabase-browser";
 import { sanitizeText } from "@/lib/sanitize";
 import { motion } from "framer-motion";
 
-// 스켈레톤 컴포넌트
-function ChatSkeleton() {
-    return (
-        <div className="h-full flex flex-col p-3 w-full">
-            {/* 헤더 스켈레톤 */}
-            <div className="mb-3 rounded-xl border border-neutral-700 bg-neutral-900/80 p-3 space-y-2">
-                <div className="flex justify-between items-center">
-                    <div className="h-4 w-24 bg-neutral-800 rounded animate-pulse" />
-                    <div className="h-5 w-16 bg-neutral-800 rounded-full animate-pulse" />
-                </div>
-                <div className="h-[10px] w-full bg-neutral-800 rounded-full animate-pulse" />
-                <div className="flex gap-2 pt-1">
-                    <div className="h-8 flex-1 bg-neutral-800 rounded-lg animate-pulse" />
-                    <div className="h-8 flex-1 bg-neutral-800 rounded-lg animate-pulse" />
-                </div>
-            </div>
-            {/* 메시지 리스트 스켈레톤 */}
-            <div className="flex-1 min-h-0 space-y-2 pr-1 pb-2">
-                {[...Array(4)].map((_, i) => (
-                    <div key={i} className="border border-neutral-800 rounded-lg px-3 py-2 bg-neutral-900">
-                        <div className="flex items-center gap-2 mb-1">
-                            <div className="h-3 w-16 bg-neutral-800 rounded animate-pulse" />
-                            <div className="h-3 w-3 bg-neutral-800 rounded animate-pulse" />
-                        </div>
-                        <div className="h-4 w-3/4 bg-neutral-800 rounded animate-pulse" />
-                    </div>
-                ))}
-            </div>
-            {/* 입력바 스켈레톤 */}
-            <div className="border-t border-neutral-800 pt-1">
-                <div className="flex gap-2">
-                    <div className="flex-1 h-9 bg-neutral-800 rounded-lg animate-pulse" />
-                    <div className="h-9 w-12 bg-neutral-800 rounded-lg animate-pulse" />
-                </div>
-            </div>
-        </div>
-    );
-}
-
 interface PostgrestError {
     message: string;
     details: string | null;
@@ -150,7 +111,7 @@ function linkify(text: string): ReactNode[] {
     return parts;
 }
 
-export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
+export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fadeDelay?: number }) {
     const [userId, setUserId] = useState<string | null>(null);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_isAnonymous, setIsAnonymous] = useState(false);
@@ -436,11 +397,6 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
 
     const longPct = Math.round(ratio.long_ratio * 100);
 
-    // 초기 로딩 중이면 스켈레톤 표시
-    if (initialLoading) {
-        return <ChatSkeleton />;
-    }
-
     return (
         <>
             {/* Scrollbar Hide + long-word wrap utility */}
@@ -454,7 +410,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
           `,
                 }}
             />
-            <div className="h-full flex flex-col p-3 text-white w-full">
+            <div className={`h-full flex flex-col p-3 text-white w-full transition-opacity duration-700 ease-in-out ${initialLoading ? "opacity-0" : "opacity-100"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
                 {/* 헤더 */}
                 <div className="mb-3 rounded-xl border border-neutral-700 bg-neutral-900/80 p-3 space-y-2 shadow-lg">
                     <div className="flex justify-between items-center text-[12px]">

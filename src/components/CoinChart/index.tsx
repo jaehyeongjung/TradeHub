@@ -28,6 +28,7 @@ type Props = {
     interval?: Interval;
     historyLimit?: number;
     className?: string;
+    fadeDelay?: number;
 };
 
 const INTERVAL_OPTIONS: { value: Interval; label: string }[] = [
@@ -45,6 +46,7 @@ export default function CoinChart({
     interval: defaultInterval = "1m",
     historyLimit = 200,
     className,
+    fadeDelay = 0,
 }: Props) {
     const outerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<HTMLDivElement>(null);
@@ -380,14 +382,10 @@ export default function CoinChart({
             >
                 {/* 실제 차트 박스 */}
                 <div className="relative w-full h-30 2xl:h-45">
-                    {chartLoading && (
-                        <div className="absolute inset-0 rounded-2xl border border-neutral-800 bg-neutral-900 flex items-center justify-center z-10">
-                            <div className="w-[90%] h-[70%] bg-neutral-800 rounded animate-pulse" />
-                        </div>
-                    )}
                     <div
                         ref={chartRef}
-                        className={`w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 cursor-grab active:cursor-grabbing ${chartLoading ? 'opacity-0' : 'opacity-100'} transition-opacity`}
+                        className={`w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 cursor-grab active:cursor-grabbing transition-opacity duration-700 ease-in-out ${chartLoading ? 'opacity-0' : 'opacity-100'}`}
+                        style={{ transitionDelay: `${fadeDelay}ms` }}
                     />
                     {/* 인터벌 선택 버튼 */}
                     <div className="absolute top-2 left-2 flex gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50 z-20">
