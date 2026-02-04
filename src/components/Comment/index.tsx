@@ -126,9 +126,11 @@ export default function Comments({
         setLoading(true);
         setError(null);
 
-        const { error: insertError } = await supabase
+        const { data: inserted, error: insertError } = await supabase
             .from("comments")
-            .insert([{ post_id: postId, user_id: userId, body: sanitized }]);
+            .insert([{ post_id: postId, user_id: userId, body: sanitized }])
+            .select()
+            .single();
 
         setLoading(false);
         if (insertError) {
@@ -139,11 +141,13 @@ export default function Comments({
             return;
         }
 
+        // 즉시 UI 반영 (실시간 구독 중복 방지 포함)
+        if (inserted) {
+            setList((prev) =>
+                prev.some((c) => c.id === inserted.id) ? prev : [...prev, inserted as Comment]
+            );
+        }
         setText("");
-        // 실시간 구독이 없는 경우 대비해서 다시 로드 (혹은 로컬에서 추가)
-        // setList((prev) => [...prev, { id: Date.now().toString(), post_id: postId, user_id: userId, body: text.trim(), created_at: new Date().toISOString() }]);
-        // 실시간 구독이 확실하므로 load()는 불필요하지만, 보험으로 남겨둠
-        // await load();
     };
 
     // 댓글 삭제

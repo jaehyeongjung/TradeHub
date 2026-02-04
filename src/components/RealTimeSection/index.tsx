@@ -1,7 +1,16 @@
+"use client";
+
+import dynamic from "next/dynamic";
 import { CoinPriceBox } from "@/components/CoinPriceBox";
-import CoinChart from "@/components/CoinChart";
 import LiquidationFeed from "@/components/LiquidationFeed";
 import WhaleTrades from "@/components/WhaleTrades";
+
+const CoinChart = dynamic(() => import("@/components/CoinChart"), {
+    ssr: false,
+    loading: () => (
+        <div className="w-full h-full min-h-35 2xl:min-h-50 bg-neutral-900 rounded-xl animate-pulse" />
+    ),
+});
 
 export const RealTimeSection = () => {
     return (
