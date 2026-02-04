@@ -18,6 +18,47 @@ interface BinanceExchangeInfo {
     }[];
 }
 
+// 모듈 레벨 precision 캐시 (모든 인스턴스가 공유)
+const globalPrecisionCache: Record<string, number> = {};
+const pendingRequests: Record<string, Promise<number>> = {};
+
+function decimalsFromTickSize(tick: string) {
+    const i = tick.indexOf(".");
+    if (i === -1) return 0;
+    const frac = tick.slice(i + 1);
+    const trimmed = frac.replace(/0+$/, "");
+    return trimmed.length || frac.length;
+}
+
+async function fetchPrecision(sym: string): Promise<number> {
+    const key = sym.toUpperCase();
+    if (globalPrecisionCache[key] != null) return globalPrecisionCache[key];
+
+    // 동일 심볼 동시 요청 중복 방지
+    if (pendingRequests[key]) return pendingRequests[key];
+
+    pendingRequests[key] = (async () => {
+        try {
+            const res = await fetch(
+                `https://api.binance.com/api/v3/exchangeInfo?symbol=${key}`,
+            );
+            const info = (await res.json()) as BinanceExchangeInfo;
+            const filters = info.symbols?.[0]?.filters ?? [];
+            const pf = filters.find((f) => f.filterType === "PRICE_FILTER");
+            const tick = pf?.tickSize ?? "0.01";
+            const d = decimalsFromTickSize(tick);
+            globalPrecisionCache[key] = d;
+            return d;
+        } catch {
+            return 2;
+        } finally {
+            delete pendingRequests[key];
+        }
+    })();
+
+    return pendingRequests[key];
+}
+
 export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
     const initialSymbol = defaultSymbol.toLowerCase();
 
@@ -32,38 +73,11 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
     const verRef = useRef(0);
     const reconnectTimer = useRef<number | null>(null);
 
-    // precision 캐시
-    const precisionCache = useRef<Record<string, number>>({});
     const [decimals, setDecimals] = useState<number>(2);
 
-    const decimalsFromTickSize = (tick: string) => {
-        const i = tick.indexOf(".");
-        if (i === -1) return 0;
-        const frac = tick.slice(i + 1);
-        const trimmed = frac.replace(/0+$/, "");
-        return trimmed.length || frac.length;
-    };
-
     const loadPrecision = async (sym: string) => {
-        const key = sym.toUpperCase();
-        if (precisionCache.current[key] != null) {
-            setDecimals(precisionCache.current[key]);
-            return;
-        }
-        try {
-            const res = await fetch(
-                `https://api.binance.com/api/v3/exchangeInfo?symbol=${key}`,
-            );
-            const info = (await res.json()) as BinanceExchangeInfo;
-            const filters = info.symbols?.[0]?.filters ?? [];
-            const pf = filters.find((f) => f.filterType === "PRICE_FILTER");
-            const tick = pf?.tickSize ?? "0.01";
-            const d = decimalsFromTickSize(tick);
-            precisionCache.current[key] = d;
-            setDecimals(d);
-        } catch {
-            setDecimals(price != null && price < 1 ? 5 : 2);
-        }
+        const d = await fetchPrecision(sym);
+        setDecimals(d);
     };
 
     const decimalFormatter = useMemo(
@@ -140,6 +154,19 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt" }: Props) => {
             } catch {}
             wsRef.current = null;
         }
+
+        // REST로 현재가 즉시 fetch (WebSocket 첫 메시지 대기 없이 바로 표시)
+        const upper = symbol.toUpperCase();
+        fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${upper}`)
+            .then((r) => r.json())
+            .then((d: { lastPrice?: string; priceChangePercent?: string }) => {
+                if (verRef.current !== myVer) return;
+                const p = parseFloat(d?.lastPrice ?? "");
+                const c = parseFloat(d?.priceChangePercent ?? "");
+                if (!Number.isNaN(p)) setPrice(p);
+                if (!Number.isNaN(c)) setPct(c);
+            })
+            .catch(() => {});
 
         const stream = symbol.toLowerCase();
         const url = `wss://stream.binance.com:9443/ws/${stream}@ticker`;
