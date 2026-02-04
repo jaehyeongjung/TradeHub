@@ -143,7 +143,7 @@ export default function FearGreedGauge({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className={`transition-opacity duration-700 ease-in-out ${isLoading ? "opacity-0" : "opacity-100"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+            <div className={`transition-[opacity,transform] duration-700 ${isLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
             {/* 헤더 */}
             <div className="mb-2 2xl:mb-4 flex items-center justify-between">
                 <h3 className="text-xs 2xl:text-base font-semibold opacity-90">

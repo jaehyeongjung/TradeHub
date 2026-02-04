@@ -189,7 +189,7 @@ export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className={`absolute inset-0 border border-neutral-800 rounded-lg shadow-sm p-2 2xl:p-4 bg-neutral-900 flex flex-col overflow-hidden transition-opacity duration-700 ease-in-out ${mounted ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+            <div className={`absolute inset-0 border border-neutral-800 rounded-lg shadow-sm p-2 2xl:p-4 bg-neutral-900 flex flex-col overflow-hidden transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
             {/* 헤더 */}
             <div className="flex items-center justify-between mb-2 flex-shrink-0">
                 <div className="flex items-center gap-2">

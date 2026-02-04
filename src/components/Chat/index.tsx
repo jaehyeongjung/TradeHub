@@ -410,7 +410,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
           `,
                 }}
             />
-            <div className={`h-full flex flex-col p-3 text-white w-full transition-opacity duration-700 ease-in-out ${initialLoading ? "opacity-0" : "opacity-100"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+            <div className={`h-full flex flex-col p-3 text-white w-full transition-[opacity,transform] duration-700 ${initialLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                 {/* 헤더 */}
                 <div className="mb-3 rounded-xl border border-neutral-700 bg-neutral-900/80 p-3 space-y-2 shadow-lg">
                     <div className="flex justify-between items-center text-[12px]">

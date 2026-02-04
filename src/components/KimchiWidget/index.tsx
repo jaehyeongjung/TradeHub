@@ -94,7 +94,7 @@ export default function KimchiWidget({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className={`transition-opacity duration-700 ease-in-out ${isLoading ? "opacity-0" : "opacity-100"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+            <div className={`transition-[opacity,transform] duration-700 ${isLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                 <div className="flex items-center justify-between">
                     <h3 className="text-sm 2xl:text-base font-semibold">김치 프리미엄</h3>
                     <span className="text-xs 2xl:text-sm text-zinc-400">

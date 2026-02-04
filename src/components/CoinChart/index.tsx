@@ -384,8 +384,8 @@ export default function CoinChart({
                 <div className="relative w-full h-30 2xl:h-45">
                     <div
                         ref={chartRef}
-                        className={`w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 cursor-grab active:cursor-grabbing transition-opacity duration-700 ease-in-out ${chartLoading ? 'opacity-0' : 'opacity-100'}`}
-                        style={{ transitionDelay: `${fadeDelay}ms` }}
+                        className={`w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 cursor-grab active:cursor-grabbing transition-[opacity,transform] duration-700 ${chartLoading ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
+                        style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
                     />
                     {/* 인터벌 선택 버튼 */}
                     <div className="absolute top-2 left-2 flex gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50 z-20">

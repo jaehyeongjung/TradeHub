@@ -76,7 +76,7 @@ export default function MarketIndicesWidget({ pollMs = 30000, fadeDelay = 0 }: {
 
     return (
         <div className="rounded-2xl border border-zinc-800 bg-neutral-950 p-3 2xl:p-4">
-            <div className={`flex gap-3 transition-opacity duration-700 ease-in-out ${data ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+            <div className={`flex gap-3 transition-[opacity,transform] duration-700 ${data ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                 {data ? (
                     data.indices.map((idx) => (
                         <IndexItem key={idx.symbol} index={idx} />

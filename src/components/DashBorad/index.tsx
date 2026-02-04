@@ -50,7 +50,7 @@ export const DashBoard = () => {
                 {/* 왼쪽: 게시판/뉴스 카드 */}
                 <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950 border border-zinc-800">
                     {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
-                    <div className={`flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14 transition-opacity duration-700 ease-in-out ${mounted ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: "50ms" }}>
+                    <div className={`flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14 transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: "50ms", transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                         <div className="inline-flex items-center rounded-xl bg-neutral-800/50 p-1 shrink-0">
                             <button
                                 onClick={() => switchTab("board")}

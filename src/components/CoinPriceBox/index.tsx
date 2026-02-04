@@ -272,7 +272,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                     onClick={() => setOpen(true)}
                     className="flex-1 min-w-0 w-full min-h-26 2xl:min-h-40 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-2 2xl:p-4 shadow-md transition hover:border-neutral-700 flex flex-col justify-center overflow-hidden"
                 >
-                    <div className={`transition-opacity duration-700 ease-in-out ${price != null ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+                    <div className={`transition-[opacity,transform] duration-700 ${price != null ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                         <h2 className="text-sm 2xl:text-base font-bold text-white">
                             {symbol.toUpperCase()}
                         </h2>

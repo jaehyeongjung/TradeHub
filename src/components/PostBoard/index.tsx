@@ -259,7 +259,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                 }}
             />
 
-            <div className={`p-3 h-full flex flex-col min-h-0 transition-opacity duration-700 ease-in-out ${postsLoaded ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+            <div className={`p-3 h-full flex flex-col min-h-0 transition-[opacity,transform] duration-700 ${postsLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                 {/* 목록 */}
                 {mode === "list" && (
                     <div className="flex-1 overflow-auto scrollbar-hide">

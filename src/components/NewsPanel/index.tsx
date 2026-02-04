@@ -93,7 +93,7 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
             <div className="h-full min-h-0 flex flex-col rounded-xl border border-neutral-700 bg-neutral-900/70 overflow-hidden">
                 {/* 본문 */}
                 <div className="flex-1 min-h-0 overflow-y-auto p-3 pr-2 scrollbar-hide">
-                    <div className={`transition-opacity duration-700 ease-in-out ${loading ? "opacity-0" : "opacity-100"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+                    <div className={`transition-[opacity,transform] duration-700 ${loading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                     {!news.length && !loading ? (
                         <div className="text-xs text-neutral-500">
                             표시할 뉴스가 없습니다.

@@ -110,7 +110,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
     const current = list.length ? list[idx] : null;
 
     return (
-        <div className={`relative flex items-center gap-3 2xl:gap-4 text-sm 2xl:text-base ml-10 text-neutral-200 transition-opacity duration-700 ease-in-out ${current ? "opacity-100" : "opacity-0"}`} style={{ transitionDelay: `${fadeDelay}ms` }}>
+        <div className={`relative flex items-center gap-3 2xl:gap-4 text-sm 2xl:text-base ml-10 text-neutral-200 transition-[opacity,transform] duration-700 ${current ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
             <div
                 className="relative"
                 onMouseEnter={() => setShowTooltip(true)}
