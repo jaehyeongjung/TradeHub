@@ -180,40 +180,22 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange(async (event, s) => {
-            console.log('[Chat] Auth event:', event, 'User:', s?.user?.id, 'IsAnon:', s?.user?.is_anonymous);
             if (s?.user) {
-                // 로그인 상태 (실제 사용자 또는 익명)
-                console.log('[Chat] Setting userId to:', s.user.id);
                 setUserId(s.user.id);
                 setIsAnonymous(s.user.is_anonymous ?? false);
             } else {
-                // 로그아웃 상태 → 자동 익명 로그인
-                console.log('[Chat] No user, attempting anonymous sign-in...');
-                const { data: anonData, error } = await supabase.auth.signInAnonymously();
-                if (error) {
-                    console.error('[Chat] Anonymous sign-in error:', error);
-                } else {
-                    console.log('[Chat] Anonymous sign-in success, userId:', anonData?.user?.id);
-                }
+                const { data: anonData } = await supabase.auth.signInAnonymously();
                 setUserId(anonData?.user?.id ?? null);
                 setIsAnonymous(true);
             }
         });
         (async () => {
             const { data } = await supabase.auth.getSession();
-            console.log('[Chat] Initial session check:', data.session?.user?.id);
             if (data.session) {
                 setUserId(data.session.user.id);
                 setIsAnonymous(data.session.user.is_anonymous ?? false);
             } else {
-                // 비로그인이면 자동 익명 로그인
-                console.log('[Chat] No initial session, signing in anonymously...');
-                const { data: anonData, error } = await supabase.auth.signInAnonymously();
-                if (error) {
-                    console.error('[Chat] Initial anonymous sign-in error:', error);
-                } else {
-                    console.log('[Chat] Initial anonymous sign-in success:', anonData?.user?.id);
-                }
+                const { data: anonData } = await supabase.auth.signInAnonymously();
                 setUserId(anonData?.user?.id ?? null);
                 setIsAnonymous(true);
             }
@@ -289,24 +271,15 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
             const text = inputRef.current?.value?.trim();
             if (!text) return;
 
-            console.log('[Chat] Sending message, current userId:', userIdRef.current);
             // userId가 없으면 짧게 기다렸다가 재시도 (로그아웃 직후 익명 로그인 대기)
             if (!userIdRef.current) {
-                console.log('[Chat] No userId, waiting 300ms...');
                 await new Promise(resolve => setTimeout(resolve, 300));
-                console.log('[Chat] After 300ms, userId:', userIdRef.current);
                 if (!userIdRef.current) {
-                    console.log('[Chat] Still no userId, waiting 500ms more...');
                     await new Promise(resolve => setTimeout(resolve, 500));
-                    console.log('[Chat] After 800ms total, userId:', userIdRef.current);
                 }
             }
-            if (!userIdRef.current) {
-                console.error('[Chat] Cannot send, no userId after waiting');
-                return;
-            }
+            if (!userIdRef.current) return;
 
-            console.log('[Chat] Attempting DB INSERT with userId:', userIdRef.current);
             const { data, error } = await supabase
                 .from("messages")
                 .insert([
@@ -319,31 +292,17 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
                 .select()
                 .single();
 
-            if (error) {
-                console.error('[Chat] DB INSERT error:', error);
-            } else {
-                console.log('[Chat] DB INSERT success:', data);
-            }
-
             if (!error && data) {
                 const newMsg = data as Msg;
-                console.log('[Chat] Adding message to UI:', newMsg.id);
                 setMsgs((prev) => {
-                    if (prev.some((m) => m.id === newMsg.id)) {
-                        console.log('[Chat] Message already exists in UI');
-                        return prev;
-                    }
-                    console.log('[Chat] Adding new message to UI');
+                    if (prev.some((m) => m.id === newMsg.id)) return prev;
                     const next = [...prev, newMsg];
                     scrollToBottom();
                     return next;
                 });
             }
 
-            if (inputRef.current) {
-                console.log('[Chat] Clearing input field');
-                inputRef.current.value = "";
-            }
+            if (inputRef.current) inputRef.current.value = "";
         } finally {
             setTimeout(() => (sendingRef.current = false), 0);
         }
@@ -467,10 +426,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
             .upsert([{ user_id: userId, room_id: roomId, day, choice }], {
                 onConflict: "user_id,room_id,day",
             });
-        if (error) {
-            console.error("vote error", error);
-            return;
-        }
+        if (error) return;
         setMyChoice(choice);
         setPositionsMap((prev) => ({ ...prev, [userId]: choice }));
         // 비율 즉시 업데이트
