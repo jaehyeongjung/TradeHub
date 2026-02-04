@@ -1,6 +1,7 @@
 "use client";
 
 import { supabase } from "@/lib/supabase-browser";
+import { sanitizeText } from "@/lib/sanitize";
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -120,13 +121,14 @@ export default function Comments({
             });
             return;
         }
-        if (!text.trim()) return;
+        const sanitized = sanitizeText(text, 1000);
+        if (!sanitized) return;
         setLoading(true);
         setError(null);
 
         const { error: insertError } = await supabase
             .from("comments")
-            .insert([{ post_id: postId, user_id: userId, body: text.trim() }]);
+            .insert([{ post_id: postId, user_id: userId, body: sanitized }]);
 
         setLoading(false);
         if (insertError) {
@@ -154,7 +156,8 @@ export default function Comments({
                 const { error: deleteError } = await supabase
                     .from("comments")
                     .delete()
-                    .eq("id", id);
+                    .eq("id", id)
+                    .eq("user_id", userId);
 
                 if (deleteError) {
                     setModal({

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { supabase } from "@/lib/supabase-browser";
+import { sanitizeText } from "@/lib/sanitize";
 import { motion } from "framer-motion";
 
 // 스켈레톤 컴포넌트
@@ -268,7 +269,7 @@ export default function Chat({ roomId = "lobby" }: { roomId?: string }) {
         sendingRef.current = true;
 
         try {
-            const text = inputRef.current?.value?.trim();
+            const text = sanitizeText(inputRef.current?.value ?? "", 2000);
             if (!text) return;
 
             // userId가 없으면 짧게 기다렸다가 재시도 (로그아웃 직후 익명 로그인 대기)

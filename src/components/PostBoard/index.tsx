@@ -7,6 +7,7 @@ import React, {
     useImperativeHandle,
 } from "react";
 import { supabase } from "@/lib/supabase-browser";
+import { sanitizeText } from "@/lib/sanitize";
 import WriteForm from "@/components/WriteForm";
 import Comments from "@/components/Comment";
 import Image from "next/image";
@@ -130,10 +131,16 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
             setModal({ message: "로그인이 필요합니다.", isConfirm: false });
             return;
         }
+        const safeTitle = sanitizeText(title, 200);
+        const safeBody = sanitizeText(body, 5000);
+        if (!safeTitle || !safeBody) {
+            setModal({ message: "제목과 내용을 입력해주세요.", isConfirm: false });
+            return;
+        }
         const { error } = await supabase
             .from("posts")
             .insert([
-                { title, body, image_url: imageUrl ?? null, user_id: userId },
+                { title: safeTitle, body: safeBody, image_url: imageUrl ?? null, user_id: userId },
             ]);
         if (error) {
             setModal({ message: error.message, isConfirm: false });
@@ -150,11 +157,17 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
         imageUrl?: string
     ) => {
         if (!selected) return;
+        const safeTitle = sanitizeText(title, 200);
+        const safeBody = sanitizeText(body, 5000);
+        if (!safeTitle || !safeBody) {
+            setModal({ message: "제목과 내용을 입력해주세요.", isConfirm: false });
+            return;
+        }
         const { error } = await supabase
             .from("posts")
-            .update({ title, body, image_url: imageUrl ?? null })
+            .update({ title: safeTitle, body: safeBody, image_url: imageUrl ?? null })
             .eq("id", selected.id)
-            .eq("user_id", userId); // 내 글만 수정
+            .eq("user_id", userId);
         if (error) {
             setModal({ message: error.message, isConfirm: false });
             return;
