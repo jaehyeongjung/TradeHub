@@ -108,9 +108,9 @@ export const DashBoard = () => {
 
                 <aside
                     aria-label="거래 정보 위젯"
-                    className="flex flex-col gap-5 min-w-57 2xl:min-w-80 h-full min-h-0"
+                    className="flex flex-col justify-between 2xl:justify-start 2xl:gap-5 min-w-57 2xl:min-w-80"
                 >
-                    <KimchiWidget fadeDelay={200} className="flex-1 min-h-0 overflow-hidden" />
+                    <KimchiWidget fadeDelay={200} />
                     <LiveStatsBox fadeDelay={280} />
                     <FearGreedWidget fadeDelay={350} />
                     <YouTubeSeamlessPlayer videoId="j23SO29LNWE" />

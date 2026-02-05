@@ -1,103 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-type Props = { value: number; title?: string; subLabel?: string; isLoading?: boolean; fadeDelay?: number };
-
-const toRad = (deg: number) => (deg * Math.PI) / 180;
-const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
-
-function arcPath(
-    cx: number,
-    cy: number,
-    r: number,
-    startDeg: number,
-    endDeg: number,
-    sweep = 1
-) {
-    const s = {
-        x: cx + r * Math.cos(toRad(startDeg)),
-        y: cy + r * Math.sin(toRad(startDeg)),
-    };
-    const e = {
-        x: cx + r * Math.cos(toRad(endDeg)),
-        y: cy + r * Math.sin(toRad(endDeg)),
-    };
-    const largeArc = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
-    return `M ${s.x} ${s.y} A ${r} ${r} 0 ${largeArc} ${sweep} ${e.x} ${e.y}`;
-}
-
-/** 스프링(언더댐핑) 애니메이션 */
-function useSpring(
-    target: number,
-    { stiffness = 90, damping = 10, kick = 1, initFrom = -110 } = {}
-) {
-    const [val, setVal] = useState(initFrom);
-    const valRef = useRef(initFrom);
-    const velRef = useRef(0);
-    const raf = useRef<number | null>(null);
-    const didInit = useRef(false);
-
-    useEffect(() => {
-        const reduce =
-            typeof window !== "undefined" &&
-            window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-
-        if (!didInit.current) {
-            didInit.current = true;
-            valRef.current = initFrom;
-            setVal(initFrom);
-            velRef.current = kick;
-        }
-
-        if (reduce) {
-            valRef.current = target;
-            setVal(target);
-            velRef.current = 0;
-            return;
-        }
-
-        let prev = performance.now();
-
-        const step = (now: number) => {
-            const dt = Math.min((now - prev) / 1000, 1 / 30);
-            prev = now;
-
-            const x = valRef.current - target;
-            const a = -stiffness * x - damping * velRef.current;
-            velRef.current += a * dt;
-            const next = valRef.current + velRef.current * dt;
-
-            valRef.current = next;
-            setVal(next);
-
-            if (
-                Math.abs(next - target) < 0.01 &&
-                Math.abs(velRef.current) < 0.01
-            ) {
-                valRef.current = target;
-                setVal(target);
-                velRef.current = 0;
-                raf.current = null;
-                return;
-            }
-            raf.current = requestAnimationFrame(step);
-        };
-
-        raf.current = requestAnimationFrame(step);
-        return () => {
-            if (raf.current) cancelAnimationFrame(raf.current);
-            raf.current = null;
-        };
-    }, [target, stiffness, damping, kick, initFrom]);
-
-    return val;
-}
+type Props = {
+    value: number;
+    title?: string;
+    subLabel?: string;
+    isLoading?: boolean;
+    fadeDelay?: number;
+};
 
 export default function FearGreedGauge({
     value,
-    title = "Crypto Fear & Greed",
+    title = "공포 & 탐욕 지수",
     subLabel,
     isLoading = false,
     fadeDelay = 0,
@@ -105,130 +21,84 @@ export default function FearGreedGauge({
     const v = Math.max(0, Math.min(100, value));
     const [isHovered, setIsHovered] = useState(false);
 
-    const MIN = -90;
-    const MAX = 95;
-    const SPAN = MAX - MIN;
-    const targetDeg = useMemo(() => MIN + (v / 100) * SPAN, [v, MIN, SPAN]);
-    const animatedDeg = useSpring(targetDeg, {
-        stiffness: 90,
-        damping: 10,
-        kick: 1,
-        initFrom: MIN,
-    });
-    const progress = useMemo(
-        () => clamp01((animatedDeg - MIN) / SPAN),
-        [animatedDeg, MIN, SPAN]
-    );
+    // 상태 텍스트 및 색상
+    const getStateInfo = (val: number) => {
+        if (val < 25) return { text: "극도의 공포", color: "text-red-400", bg: "bg-red-500", bgLight: "bg-red-500/10" };
+        if (val < 45) return { text: "공포", color: "text-orange-400", bg: "bg-orange-500", bgLight: "bg-orange-500/10" };
+        if (val < 55) return { text: "중립", color: "text-yellow-400", bg: "bg-yellow-500", bgLight: "bg-yellow-500/10" };
+        if (val < 75) return { text: "탐욕", color: "text-lime-400", bg: "bg-lime-500", bgLight: "bg-lime-500/10" };
+        return { text: "극도의 탐욕", color: "text-emerald-400", bg: "bg-emerald-500", bgLight: "bg-emerald-500/10" };
+    };
 
-    const cx = 120,
-        cy = 120,
-        r = 95;
-    const trackLen = Math.PI * r;
-
-    const stateText =
-        subLabel ??
-        (v < 25
-            ? "Extreme Fear"
-            : v < 45
-            ? "Fear"
-            : v < 55
-            ? "Neutral"
-            : v < 75
-            ? "Greed"
-            : "Extreme Greed");
+    const state = getStateInfo(v);
+    const displayLabel = subLabel ?? state.text;
 
     return (
         <div
-            className="relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4 2xl:p-8 text-white"
+            className="relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4 2xl:p-5 text-white"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className={`transition-[opacity,transform] duration-700 ${isLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-            {/* 헤더 */}
-            <div className="mb-2 2xl:mb-4 flex items-center justify-between">
-                <h3 className="text-xs 2xl:text-base font-semibold opacity-90">
-                    {title}
-                </h3>
-                <div className="flex items-center gap-2 2xl:gap-4">
-                    <span className="inline-flex h-8 w-8 2xl:h-12 2xl:w-12 items-center justify-center rounded-full bg-yellow-500/80 text-xs 2xl:text-base font-bold ml-3">
+            <div
+                className={`transition-[opacity,transform] duration-700 ${isLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
+                style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
+            >
+                {/* 헤더 */}
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xs 2xl:text-sm text-neutral-400 font-medium">
+                        {title}
+                    </h3>
+                    <div className={`px-2 py-0.5 rounded-full text-[10px] 2xl:text-xs font-medium ${state.bgLight} ${state.color}`}>
+                        {displayLabel}
+                    </div>
+                </div>
+
+                {/* 메인 숫자 */}
+                <div className="flex items-baseline gap-2 mb-4">
+                    <span className={`text-4xl 2xl:text-5xl font-bold tabular-nums ${state.color}`}>
                         {v}
                     </span>
-                    <span className="text-yellow-300 font-semibold text-xs 2xl:text-base ml-4">
-                        {stateText}
-                    </span>
+                    <span className="text-neutral-500 text-sm">/100</span>
+                </div>
+
+                {/* 프로그레스 바 */}
+                <div className="space-y-2">
+                    <div className="relative h-2 rounded-full bg-neutral-800 overflow-hidden">
+                        {/* 그라데이션 배경 (전체) */}
+                        <div
+                            className="absolute inset-0 opacity-30"
+                            style={{
+                                background: "linear-gradient(to right, #ef4444, #f97316, #eab308, #84cc16, #22c55e)"
+                            }}
+                        />
+                        {/* 진행 바 */}
+                        <motion.div
+                            className="absolute left-0 top-0 bottom-0 rounded-full"
+                            style={{
+                                background: "linear-gradient(to right, #ef4444, #f97316, #eab308, #84cc16, #22c55e)"
+                            }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${v}%` }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                        />
+                        {/* 인디케이터 */}
+                        <motion.div
+                            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow-lg border-2 border-neutral-900"
+                            initial={{ left: 0 }}
+                            animate={{ left: `calc(${v}% - 6px)` }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                        />
+                    </div>
+
+                    {/* 레이블 */}
+                    <div className="flex justify-between text-[10px] 2xl:text-xs text-neutral-500">
+                        <span>공포</span>
+                        <span>탐욕</span>
+                    </div>
                 </div>
             </div>
 
-            {/* 게이지 */}
-            <svg viewBox="0 0 240 150" className="w-full">
-                <defs>
-                    <linearGradient
-                        id="gaugeGradient"
-                        x1="0"
-                        y1="0"
-                        x2="240"
-                        y2="0"
-                        gradientUnits="userSpaceOnUse"
-                    >
-                        <stop offset="0%" stopColor="#ef4444" />
-                        <stop offset="35%" stopColor="#f59e0b" />
-                        <stop offset="65%" stopColor="#84cc16" />
-                        <stop offset="100%" stopColor="#16a34a" />
-                    </linearGradient>
-                </defs>
-
-                {/* 트랙 */}
-                <path
-                    d={arcPath(cx, cy, r, 180, 0, 1)}
-                    stroke="#1f2937"
-                    strokeOpacity="0.6"
-                    strokeWidth="18"
-                    fill="none"
-                    strokeLinecap="round"
-                />
-                {/* 진행 바 */}
-                <path
-                    d={arcPath(cx, cy, r, 180, 0, 1)}
-                    stroke="url(#gaugeGradient)"
-                    strokeWidth="18"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeDasharray={trackLen}
-                    strokeDashoffset={trackLen * (1 - progress)}
-                />
-                {/* 바늘 */}
-                <g transform={`rotate(${animatedDeg} ${cx} ${cy})`}>
-                    <line
-                        x1={cx}
-                        y1={cy}
-                        x2={cx}
-                        y2={cy - 85}
-                        stroke="#e5e7eb"
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                    />
-                    <circle
-                        cx={cx}
-                        cy={cy}
-                        r="10"
-                        fill="#e5e7eb"
-                        stroke="#111827"
-                        strokeWidth="2"
-                    />
-                </g>
-                <text
-                    x="120"
-                    y="145"
-                    textAnchor="middle"
-                    fill="#9CA3AF"
-                    fontSize="10"
-                >
-                    0 (Fear) — 100 (Greed)
-                </text>
-            </svg>
-            </div>
-
-            {/* 💬 커스텀 툴팁 */}
+            {/* 툴팁 */}
             <AnimatePresence>
                 {isHovered && (
                     <motion.div
@@ -236,29 +106,14 @@ export default function FearGreedGauge({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 6 }}
                         transition={{ duration: 0.18 }}
-                        className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[255px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg z-50 pointer-events-none"
+                        className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-[240px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-xl py-3 px-4 shadow-xl z-50 pointer-events-none"
                     >
-                        <div className="font-semibold text-amber-300 mb-1">
-                            지표 설명
-                        </div>
-                        <p className="leading-snug">
-                            암호화폐 시장의 <b>투자 심리</b>를 수치로
-                            표현합니다.
-                            <br />
-                            <br />• <b>가격 변동성</b> (Volatility)
-                            <br />• <b>거래량 및 모멘텀</b> (Volume & Momentum)
-                            <br />• <b>소셜 미디어 언급량</b> (Social Trends)
-                            <br />• <b>비트코인 도미넌스</b> 및 트렌드 등을
-                            <br />
-                            종합해 0~100 사이의 값으로 계산합니다.
-                            <br />
-                            <br />
-                            낮을수록 공포(Fear),<br></br> 높을수록 탐욕(Greed)을
-                            의미합니다.
+                        <p className="text-neutral-400 leading-relaxed">
+                            가격 변동성, 거래량, 소셜 트렌드 등을 종합해 시장 심리를 0~100으로 표현합니다.
                         </p>
-                        {/* 테두리가 있는 삼각형 화살표 */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
+                        {/* 화살표 */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[6px] w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-neutral-700" />
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[4px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-neutral-900" />
                     </motion.div>
                 )}
             </AnimatePresence>

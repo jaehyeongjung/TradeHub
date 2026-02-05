@@ -23,7 +23,6 @@ export default function FearGreedCard({ fadeDelay = 0 }: { fadeDelay?: number })
         <FearGreedGauge
             value={val ?? 0}
             subLabel={label}
-            title="Crypto Fear & Greed"
             isLoading={val == null}
             fadeDelay={fadeDelay}
         />

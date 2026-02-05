@@ -6,12 +6,25 @@ export default function robots(): MetadataRoute.Robots {
             {
                 userAgent: "*",
                 allow: "/",
-                disallow: ["/api/"],
+                disallow: ["/api/", "/mobile"],
             },
             {
                 userAgent: "Googlebot",
                 allow: "/",
+                disallow: ["/api/", "/mobile"],
                 crawlDelay: 0,
+            },
+            {
+                userAgent: "Bingbot",
+                allow: "/",
+                disallow: ["/api/", "/mobile"],
+                crawlDelay: 1,
+            },
+            {
+                userAgent: "Yeti",
+                allow: "/",
+                disallow: ["/api/", "/mobile"],
+                crawlDelay: 1,
             },
         ],
         sitemap: "https://www.tradehub.kr/sitemap.xml",

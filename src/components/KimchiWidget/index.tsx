@@ -92,7 +92,7 @@ export default function KimchiWidget({
 
     return (
         <div
-            className={`relative rounded-2xl border border-zinc-800 bg-neutral-950 p-5 2xl:p-8 text-white ${className}`}
+            className={`relative rounded-2xl border border-neutral-800 bg-neutral-900 p-5 2xl:p-6 text-white ${className}`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -104,11 +104,11 @@ export default function KimchiWidget({
                     </span>
                 </div>
 
-                <div className={`mt-2 2xl:mt-3 text-2xl 2xl:text-3xl font-bold ${color}`}>
+                <div className={`mt-3 text-2xl 2xl:text-3xl font-bold ${color}`}>
                     {pct != null ? `${pct.toFixed(2)}%` : "—"}
                 </div>
 
-                <dl className="mt-2 2xl:mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 2xl:gap-x-4 2xl:gap-y-2 text-xs 2xl:text-sm text-zinc-400">
+                <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 2xl:gap-x-4 2xl:gap-y-2 text-xs 2xl:text-sm text-zinc-400">
                     <dt className="whitespace-nowrap">업비트(KRW)</dt>
                     <dd className="text-right text-emerald-300 font-mono tabular-nums whitespace-nowrap">
                         {data ? `${(data.upbitKrw ?? 0).toLocaleString()} KRW` : "—"}

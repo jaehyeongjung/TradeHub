@@ -130,8 +130,8 @@ export default function YouTubeBGMPlayer({
     }, [isMuted, isReady]);
 
     return (
-        <div className="flex justify-center items-center">
-            {/*  플레이어 컨테이너 (화면 밖으로 완전히 숨김) */}
+        <div className="w-full">
+            {/* 플레이어 컨테이너 (화면 밖으로 완전히 숨김) */}
             <div
                 id="youtube-player-container"
                 style={{
@@ -144,33 +144,80 @@ export default function YouTubeBGMPlayer({
                 }}
             />
 
-            {/*  사용자 컨트롤 버튼 (UI 플로우 내에 배치) */}
+            {/* 미니멀 BGM 컨트롤 */}
             <button
                 onClick={toggleMute}
-                title={isMuted ? "배경 음악 재생" : "배경 음악 음소거"}
+                disabled={!isReady}
                 className={`
-                    p-3 2xl:p-4 rounded-full shadow-lg transition-colors duration-300 w-full
-                    ${
-                        isMuted
-                            ? isLight
-                                ? "bg-white ring-1 ring-neutral-200 shadow-md hover:brightness-95"
-                                : "bg-neutral-600 hover:bg-neutral-700"
-                            : "bg-emerald-600 hover:bg-emerald-500"
-                    }
-                    ${
-                        !isReady
-                            ? "opacity-50 cursor-not-allowed"
-                            : "cursor-pointer"
+                    group w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all duration-200
+                    ${isReady ? "cursor-pointer" : "opacity-50 cursor-not-allowed"}
+                    ${isMuted
+                        ? isLight
+                            ? "bg-white border-neutral-200 hover:border-neutral-300"
+                            : "bg-neutral-900 border-neutral-800 hover:border-neutral-700"
+                        : "bg-emerald-500/10 border-emerald-500/30 hover:border-emerald-500/50"
                     }
                 `}
-                disabled={!isReady}
             >
-                <span className={`text-md 2xl:text-lg flex items-center justify-center ${
-                    isMuted && isLight ? "text-neutral-700" : "text-white"
+                {/* 아이콘 + 사운드웨이브 */}
+                <div className={`relative flex items-center justify-center w-8 h-8 rounded-xl transition-colors ${
+                    isMuted
+                        ? isLight ? "bg-neutral-100" : "bg-neutral-800"
+                        : "bg-emerald-500/20"
                 }`}>
-                    {isMuted ? "🔊" : "🔇"}
-                </span>
+                    {isMuted ? (
+                        <svg className={`w-4 h-4 ${isLight ? "text-neutral-500" : "text-neutral-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                        </svg>
+                    ) : (
+                        <>
+                            <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            </svg>
+                            {/* 사운드웨이브 애니메이션 */}
+                            <div className="absolute -right-1 flex items-center gap-[2px]">
+                                <span className="w-[2px] h-2 bg-emerald-500 rounded-full animate-[soundwave_0.5s_ease-in-out_infinite]" style={{ animationDelay: "0ms" }} />
+                                <span className="w-[2px] h-3 bg-emerald-500 rounded-full animate-[soundwave_0.5s_ease-in-out_infinite]" style={{ animationDelay: "150ms" }} />
+                                <span className="w-[2px] h-2 bg-emerald-500 rounded-full animate-[soundwave_0.5s_ease-in-out_infinite]" style={{ animationDelay: "300ms" }} />
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                {/* 텍스트 */}
+                <div className="flex-1 text-left">
+                    <p className={`text-xs font-medium ${
+                        isMuted
+                            ? isLight ? "text-neutral-700" : "text-neutral-200"
+                            : "text-emerald-500"
+                    }`}>
+                        {isMuted ? "BGM 꺼짐" : "재생 중"}
+                    </p>
+                    <p className={`text-[10px] ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>
+                        클릭하여 {isMuted ? "켜기" : "끄기"}
+                    </p>
+                </div>
+
+                {/* 토글 인디케이터 */}
+                <div className={`w-8 h-5 rounded-full p-0.5 transition-colors ${
+                    isMuted
+                        ? isLight ? "bg-neutral-200" : "bg-neutral-700"
+                        : "bg-emerald-500"
+                }`}>
+                    <div className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${
+                        isMuted ? "translate-x-0" : "translate-x-3"
+                    }`} />
+                </div>
             </button>
+
+            {/* 사운드웨이브 키프레임 */}
+            <style jsx>{`
+                @keyframes soundwave {
+                    0%, 100% { transform: scaleY(0.5); }
+                    50% { transform: scaleY(1); }
+                }
+            `}</style>
         </div>
     );
 }
