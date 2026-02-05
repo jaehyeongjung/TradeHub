@@ -47,10 +47,12 @@ export default function KimchiWidget({
     symbol = "BTC",
     pollMs = 5000,
     fadeDelay = 0,
+    className = "",
 }: {
     symbol?: string;
     pollMs?: number;
     fadeDelay?: number;
+    className?: string;
 }) {
     const [data, setData] = useState<Data | null>(null);
     const [isHovered, setIsHovered] = useState(false);
@@ -90,7 +92,7 @@ export default function KimchiWidget({
 
     return (
         <div
-            className="relative rounded-2xl border border-zinc-800 bg-neutral-950 p-5 2xl:p-8 text-white"
+            className={`relative rounded-2xl border border-zinc-800 bg-neutral-950 p-5 2xl:p-8 text-white ${className}`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
