@@ -2,8 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import SymbolPickerModal from "@/components/SymbolPickerModal";
 import { supabase } from "@/lib/supabase-browser";
+
+// 코인 로고 URL 생성 (USDT 제거한 base symbol 사용)
+function getCoinLogoUrl(symbol: string): string {
+    const base = symbol.toUpperCase().replace(/USDT$/, "").toLowerCase();
+    return `https://assets.coincap.io/assets/icons/${base}@2x.png`;
+}
 
 type Props = { boxId: string; defaultSymbol?: string; fadeDelay?: number };
 
@@ -281,16 +288,28 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
             >
                 <button
                     onClick={() => setOpen(true)}
-                    className="flex-1 min-w-0 w-full min-h-26 2xl:min-h-40 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-2 2xl:p-4 shadow-md transition hover:border-neutral-700 flex flex-col justify-center overflow-hidden"
+                    className="flex-1 min-w-0 w-full min-h-26 2xl:min-h-40 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-2 2xl:p-4 shadow-md transition hover:border-neutral-700 flex flex-col items-center justify-center overflow-hidden"
                 >
-                    <div className={`transition-[opacity,transform] duration-700 ${price != null ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
+                    <div className={`flex flex-col items-center gap-1 2xl:gap-2 transition-[opacity,transform] duration-700 ${price != null ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
+                        <div className="relative w-8 h-8 2xl:w-10 2xl:h-10 flex-shrink-0">
+                            <Image
+                                src={getCoinLogoUrl(symbol)}
+                                alt={symbol}
+                                fill
+                                className="object-contain rounded-full"
+                                unoptimized
+                                onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                }}
+                            />
+                        </div>
                         <h2 className="text-sm 2xl:text-base font-bold text-white">
                             {symbol.toUpperCase()}
                         </h2>
-                        <p className={`mt-1 2xl:mt-2 text-lg 2xl:text-2xl font-mono tabular-nums transition-colors duration-150 rounded px-1 -mx-1 ${pctColor} ${priceFlash === "up" ? "bg-emerald-500/20" : priceFlash === "down" ? "bg-red-500/20" : ""}`}>
+                        <p className={`text-lg 2xl:text-2xl font-mono tabular-nums transition-colors duration-150 rounded px-1 ${pctColor} ${priceFlash === "up" ? "bg-emerald-500/20" : priceFlash === "down" ? "bg-red-500/20" : ""}`}>
                             {price != null ? formatPrice(price) : "$—"}
                         </p>
-                        <div className={`mt-0.5 2xl:mt-1 text-xs 2xl:text-sm font-semibold ${pctColor}`}>
+                        <div className={`text-xs 2xl:text-sm font-semibold ${pctColor}`}>
                             {pct != null ? `${arrow} ${pctText}` : "—"}
                         </div>
                     </div>
