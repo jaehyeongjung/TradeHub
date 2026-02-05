@@ -5,6 +5,8 @@ import {
     createChart,
     CandlestickSeries,
     type IChartApi,
+    type CandlestickData,
+    type UTCTimestamp,
 } from "lightweight-charts";
 import { toKstUtcTimestamp } from "@/lib/time";
 import type { KlineRow, KlineMessage, Interval } from "@/types/binance";
@@ -44,7 +46,7 @@ export default function CoinChart({
     boxId = "chart-1",
     symbol = "BTCUSDT",
     interval: defaultInterval = "1m",
-    historyLimit = 200,
+    historyLimit = 500,
     className,
     fadeDelay = 0,
 }: Props) {
@@ -237,12 +239,17 @@ export default function CoinChart({
             }
         })();
 
-        // 데이터 개수 추적
+        // 데이터 추적
         let dataLength = 0;
+        let oldestTime = 0; // 가장 오래된 캔들 타임스탬프 (ms)
+        let isLoadingMore = false; // 추가 로딩 중 플래그
+        let allDataLoaded = false; // 더 이상 데이터 없음 플래그
 
-        // 미래 영역 스크롤 방지
-        chart.timeScale().subscribeVisibleLogicalRangeChange((range) => {
+        // 스크롤 감지: 미래 방지 + 과거 무한스크롤
+        chart.timeScale().subscribeVisibleLogicalRangeChange(async (range) => {
             if (!range || destroyed) return;
+
+            // 미래 영역 스크롤 방지
             const maxRight = dataLength - 1;
             if (range.to > maxRight) {
                 const visibleBars = range.to - range.from;
@@ -250,6 +257,62 @@ export default function CoinChart({
                     from: maxRight - visibleBars,
                     to: maxRight,
                 });
+            }
+
+            // 과거 데이터 무한스크롤: 왼쪽 끝 근처에서 추가 로드
+            if (range.from < 20 && !isLoadingMore && !allDataLoaded && oldestTime > 0) {
+                isLoadingMore = true;
+                try {
+                    const url = `https://api.binance.com/api/v3/klines?symbol=${sym}&interval=${interval}&endTime=${oldestTime - 1}&limit=${historyLimit}`;
+                    const res = await fetch(url);
+                    const rows = (await res.json()) as KlineRow[];
+
+                    if (destroyed) return;
+
+                    if (!rows || rows.length === 0) {
+                        allDataLoaded = true;
+                        return;
+                    }
+
+                    // 기존 데이터 가져오기
+                    const currentData = candleSeries.data() as CandlestickData<UTCTimestamp>[];
+
+                    // 새 데이터 변환
+                    const newData: CandlestickData<UTCTimestamp>[] = rows.map((d) => ({
+                        time: toKstUtcTimestamp(d[0]) as UTCTimestamp,
+                        open: parseFloat(d[1]),
+                        high: parseFloat(d[2]),
+                        low: parseFloat(d[3]),
+                        close: parseFloat(d[4]),
+                    }));
+
+                    // 중복 제거 후 병합 (새 데이터 + 기존 데이터)
+                    const existingTimes = new Set(currentData.map(d => d.time));
+                    const uniqueNewData = newData.filter(d => !existingTimes.has(d.time));
+
+                    if (uniqueNewData.length === 0) {
+                        allDataLoaded = true;
+                        return;
+                    }
+
+                    const mergedData = [...uniqueNewData, ...currentData];
+                    candleSeries.setData(mergedData);
+
+                    // 상태 업데이트
+                    dataLength = mergedData.length;
+                    oldestTime = rows[0][0] as number;
+
+                    // 스크롤 위치 보정 (새로 추가된 만큼 오른쪽으로)
+                    const addedBars = uniqueNewData.length;
+                    chart.timeScale().setVisibleLogicalRange({
+                        from: range.from + addedBars,
+                        to: range.to + addedBars,
+                    });
+                } catch (e) {
+                    console.error("Failed to load more data:", e);
+                } finally {
+                    isLoadingMore = false;
+                }
             }
         });
 
@@ -262,6 +325,11 @@ export default function CoinChart({
                 if (destroyed) return;
 
                 dataLength = rows.length;
+                // 가장 오래된 캔들 시간 저장 (무한스크롤용)
+                if (rows.length > 0) {
+                    oldestTime = rows[0][0] as number;
+                }
+
                 candleSeries.setData(
                     rows.map((d) => ({
                         time: toKstUtcTimestamp(d[0]),
