@@ -3,10 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { useAtomValue } from "jotai";
 import SymbolPickerModal from "@/components/SymbolPickerModal";
 import { supabase } from "@/lib/supabase-browser";
-import { currencyAtom, exchangeRateAtom, upbitPricesAtom } from "@/store/atoms";
 
 // 코인 로고 URL 생성 (USDT 제거한 base symbol 사용)
 function getCoinLogoUrl(symbol: string): string {
@@ -111,19 +109,12 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
     const [hovered, setHovered] = useState(false);
     const [priceFlash, setPriceFlash] = useState<"up" | "down" | null>(null);
 
-    const currency = useAtomValue(currencyAtom);
-    const exchangeRate = useAtomValue(exchangeRateAtom);
-    const upbitPrices = useAtomValue(upbitPricesAtom);
-
     const wsRef = useRef<WebSocket | null>(null);
     const verRef = useRef(0);
     const reconnectTimer = useRef<number | null>(null);
     const prevPriceRef = useRef<number | null>(null);
 
     const [decimals, setDecimals] = useState<number>(2);
-
-    // 심볼에서 base coin 추출 (btcusdt → btc)
-    const baseCoin = symbol.toUpperCase().replace(/USDT$/, "").toLowerCase();
 
     const loadPrecision = async (sym: string) => {
         const d = await fetchPrecision(sym);
@@ -139,28 +130,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
         [decimals],
     );
 
-    const krwFormatter = useMemo(
-        () =>
-            new Intl.NumberFormat("ko-KR", {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-            }),
-        [],
-    );
-
-    // KRW: 업비트 가격 사용, 없으면 환율 계산
     const getDisplayPrice = (): string => {
-        if (currency === "KRW") {
-            const upbitPrice = upbitPrices[baseCoin];
-            if (upbitPrice) {
-                return `₩${krwFormatter.format(upbitPrice)}`;
-            }
-            // 업비트에 없는 코인은 환율 계산
-            if (price && exchangeRate) {
-                return `₩${krwFormatter.format(price * exchangeRate)}`;
-            }
-            return "₩—";
-        }
         return price != null ? `$${usdFormatter.format(price)}` : "$—";
     };
 
