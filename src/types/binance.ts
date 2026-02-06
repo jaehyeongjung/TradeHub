@@ -46,6 +46,7 @@ export type KlineMessage = {
         h: string;
         l: string;
         c: string;
+        v: string; // base asset volume
         x: boolean; // is closed
     };
 };

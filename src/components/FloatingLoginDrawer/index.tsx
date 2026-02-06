@@ -6,12 +6,14 @@ import { AnimatePresence } from "framer-motion";
 import { useAtom } from "jotai";
 import AuthBox from "@/components/login";
 import CryptoTreemap from "@/components/CryptoTreemap";
-import { treemapOpenAtom } from "@/store/atoms";
+import { treemapOpenAtom, activePageAtom } from "@/store/atoms";
 
 export default function FloatingLoginSidebar() {
     const [open, setOpen] = useState(false);
     const [isDark, setIsDark] = useState(false);
     const [showTreemap, setShowTreemap] = useAtom(treemapOpenAtom);
+    const [activePage, setActivePage] = useAtom(activePageAtom);
+    const isSim = activePage === "sim";
     const pathname = usePathname();
     const closeBtnRef = useRef<HTMLButtonElement | null>(null);
     const lastFocusRef = useRef<HTMLElement | null>(null);
@@ -73,6 +75,34 @@ export default function FloatingLoginSidebar() {
         <>
             {/* FAB: 우하단 떠있는 버튼들 */}
             <div className="fixed bottom-5 right-5 z-[60] flex items-center gap-3">
+                {/* 모의투자 버튼 */}
+                <button
+                    type="button"
+                    onClick={() => setActivePage(isSim ? "main" : "sim")}
+                    aria-label={isSim ? "대시보드로 이동" : "모의투자로 이동"}
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-105 focus:outline-none transition-colors ${
+                        isSim
+                            ? isDark
+                                ? "bg-emerald-600 text-white ring-1 ring-emerald-500/50"
+                                : "bg-emerald-500 text-white ring-1 ring-emerald-400/50 shadow-md"
+                            : isDark
+                                ? "bg-zinc-700 text-amber-400 ring-1 ring-zinc-600/50"
+                                : "bg-white text-amber-500 ring-1 ring-neutral-200 shadow-md"
+                    }`}
+                >
+                    {isSim ? (
+                        /* 홈 아이콘 */
+                        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8z" />
+                        </svg>
+                    ) : (
+                        /* 차트 아이콘 */
+                        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M3 13h2v8H3v-8zm4-6h2v14H7V7zm4-4h2v18h-2V3zm4 8h2v10h-2V11zm4-3h2v13h-2V8z" />
+                        </svg>
+                    )}
+                </button>
+
                 {/* 트리맵 버튼 */}
                 <button
                     type="button"

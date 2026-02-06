@@ -3,6 +3,7 @@ import { DashBoard } from "@/components/DashBorad";
 import MobileSuggestModal from "@/components/MobileSuggestModa";
 import Script from "next/script";
 import ForceTabReturnReload from "@/components/ForceTabReturnReload";
+import PageSlider from "@/components/PageSlider";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -131,10 +132,12 @@ export default function Home() {
                 {JSON.stringify(FAQ_JSONLD)}
             </Script>
 
-            <main className="flex flex-col px-5 bg-black min-w-310">
-                <RealTimeSection />
-                <DashBoard />
-            </main>
+            <PageSlider>
+                <main className="flex flex-col px-5 bg-black min-w-310">
+                    <RealTimeSection />
+                    <DashBoard />
+                </main>
+            </PageSlider>
             <MobileSuggestModal />
             <ForceTabReturnReload />
         </>

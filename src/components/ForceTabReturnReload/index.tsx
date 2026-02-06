@@ -1,6 +1,8 @@
 // components/ForceTabReturnReload.tsx
 "use client";
 import { useEffect, useRef } from "react";
+import { useAtomValue } from "jotai";
+import { activePageAtom } from "@/store/atoms";
 
 // pageshow 이벤트 타입가드
 function hasPersisted(e: unknown): e is { persisted: boolean } {
@@ -11,6 +13,13 @@ function hasPersisted(e: unknown): e is { persisted: boolean } {
 
 export default function ForceTabReturnReload() {
     const wasHiddenRef = useRef(false);
+    const activePage = useAtomValue(activePageAtom);
+    const activePageRef = useRef(activePage);
+
+    // ref를 최신 상태로 유지
+    useEffect(() => {
+        activePageRef.current = activePage;
+    }, [activePage]);
 
     useEffect(() => {
         // ▶ 로드되자마자 __rv 있으면 깨끗이 치우기 (URL만 교체, 페이지는 안 바뀜)
@@ -24,6 +33,9 @@ export default function ForceTabReturnReload() {
         cleanOnce();
 
         const hardReload = () => {
+            // 모의투자 페이지에서는 리로드하지 않음
+            if (activePageRef.current === "sim") return;
+
             const u = new URL(window.location.href);
             // ▶ 덧붙이지 않고 set으로 덮어쓰기 (중복 방지)
             u.searchParams.set("__rv", String(Date.now()));

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {
     createChart,
     CandlestickSeries,
+    HistogramSeries,
     type IChartApi,
     type CandlestickData,
     type UTCTimestamp,
@@ -31,6 +32,8 @@ type Props = {
     historyLimit?: number;
     className?: string;
     fadeDelay?: number;
+    /** 심볼 변경 버튼/심볼 표시/툴팁 숨김 (모의투자용) */
+    hideControls?: boolean;
 };
 
 const INTERVAL_OPTIONS: { value: Interval; label: string }[] = [
@@ -49,11 +52,17 @@ export default function CoinChart({
     historyLimit = 500,
     className,
     fadeDelay = 0,
+    hideControls = false,
 }: Props) {
     const outerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<HTMLDivElement>(null);
     const [sym, setSym] = useState(symbol.toUpperCase());
     const [interval, setInterval] = useState<Interval>(defaultInterval);
+
+    // 외부 symbol prop 변경 시 내부 sym 동기화
+    useEffect(() => {
+        setSym(symbol.toUpperCase());
+    }, [symbol]);
     const [open, setOpen] = useState(false);
     const [hovered, setHovered] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
@@ -190,6 +199,19 @@ export default function CoinChart({
             borderVisible: false,
         });
 
+        // 거래량 히스토그램
+        const volumeSeries = chart.addSeries(HistogramSeries, {
+            priceFormat: { type: "volume" },
+            priceScaleId: "volume",
+            lastValueVisible: false,
+            priceLineVisible: false,
+        });
+        chart.priceScale("volume").applyOptions({
+            scaleMargins: { top: 0.8, bottom: 0 },
+            visible: false,
+            drawTicks: false,
+        });
+
         // tickSize 기준으로 가격 포맷 설정
         (async () => {
             try {
@@ -276,6 +298,7 @@ export default function CoinChart({
 
                     // 기존 데이터 가져오기
                     const currentData = candleSeries.data() as CandlestickData<UTCTimestamp>[];
+                    const currentVolData = volumeSeries.data() as Array<{ time: UTCTimestamp; value: number; color: string }>;
 
                     // 새 데이터 변환
                     const newData: CandlestickData<UTCTimestamp>[] = rows.map((d) => ({
@@ -286,9 +309,20 @@ export default function CoinChart({
                         close: parseFloat(d[4]),
                     }));
 
+                    const newVolData = rows.map((d) => {
+                        const o = parseFloat(d[1]);
+                        const c = parseFloat(d[4]);
+                        return {
+                            time: toKstUtcTimestamp(d[0]) as UTCTimestamp,
+                            value: parseFloat(d[5]),
+                            color: c >= o ? "rgba(38,166,154,0.3)" : "rgba(239,83,80,0.3)",
+                        };
+                    });
+
                     // 중복 제거 후 병합 (새 데이터 + 기존 데이터)
                     const existingTimes = new Set(currentData.map(d => d.time));
                     const uniqueNewData = newData.filter(d => !existingTimes.has(d.time));
+                    const uniqueNewVolData = newVolData.filter(d => !existingTimes.has(d.time));
 
                     if (uniqueNewData.length === 0) {
                         allDataLoaded = true;
@@ -296,7 +330,9 @@ export default function CoinChart({
                     }
 
                     const mergedData = [...uniqueNewData, ...currentData];
+                    const mergedVolData = [...uniqueNewVolData, ...currentVolData];
                     candleSeries.setData(mergedData);
+                    volumeSeries.setData(mergedVolData);
 
                     // 상태 업데이트
                     dataLength = mergedData.length;
@@ -330,14 +366,25 @@ export default function CoinChart({
                     oldestTime = rows[0][0] as number;
                 }
 
-                candleSeries.setData(
-                    rows.map((d) => ({
-                        time: toKstUtcTimestamp(d[0]),
-                        open: parseFloat(d[1]),
-                        high: parseFloat(d[2]),
-                        low: parseFloat(d[3]),
-                        close: parseFloat(d[4]),
-                    }))
+                const candles = rows.map((d) => ({
+                    time: toKstUtcTimestamp(d[0]),
+                    open: parseFloat(d[1]),
+                    high: parseFloat(d[2]),
+                    low: parseFloat(d[3]),
+                    close: parseFloat(d[4]),
+                }));
+                candleSeries.setData(candles);
+
+                volumeSeries.setData(
+                    rows.map((d) => {
+                        const o = parseFloat(d[1]);
+                        const c = parseFloat(d[4]);
+                        return {
+                            time: toKstUtcTimestamp(d[0]),
+                            value: parseFloat(d[5]),
+                            color: c >= o ? "rgba(38,166,154,0.3)" : "rgba(239,83,80,0.3)",
+                        };
+                    })
                 );
                 setChartLoading(false);
             } catch (e) {
@@ -362,6 +409,13 @@ export default function CoinChart({
                         high: parseFloat(k.h),
                         low: parseFloat(k.l),
                         close: parseFloat(k.c),
+                    });
+                    const kOpen = parseFloat(k.o);
+                    const kClose = parseFloat(k.c);
+                    volumeSeries.update({
+                        time: toKstUtcTimestamp(k.t),
+                        value: parseFloat(k.v),
+                        color: kClose >= kOpen ? "rgba(38,166,154,0.3)" : "rgba(239,83,80,0.3)",
                     });
                     // 새 캔들이 확정되면 dataLength 증가
                     if (k.x) dataLength++;
@@ -449,7 +503,7 @@ export default function CoinChart({
                 className={`relative w-full ${className ?? ""}`}
             >
                 {/* 실제 차트 박스 */}
-                <div className="relative w-full h-30 2xl:h-45">
+                <div className={`relative w-full ${className ? "h-full" : "h-30 2xl:h-45"}`}>
                     <div
                         ref={chartRef}
                         className={`w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 cursor-grab active:cursor-grabbing transition-[opacity,transform] duration-700 ${chartLoading ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
@@ -475,24 +529,28 @@ export default function CoinChart({
                         ))}
                     </div>
                     {/* 심볼 표시 */}
-                    <div className="absolute top-2 right-2 px-2 py-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50 z-20">
-                        <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">{sym}</span>
-                    </div>
+                    {!hideControls && (
+                        <div className="absolute top-2 right-2 px-2 py-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50 z-20">
+                            <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">{sym}</span>
+                        </div>
+                    )}
                     {/* 코인 변경 버튼 */}
-                    <button
-                        onClick={() => setOpen(true)}
-                        className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-neutral-900/80 backdrop-blur-sm rounded-lg border border-neutral-700/50 z-20 text-[10px] 2xl:text-xs text-neutral-400 hover:text-amber-300 hover:border-amber-500/50 transition-all cursor-pointer"
-                    >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                        </svg>
-                        변경
-                    </button>
+                    {!hideControls && (
+                        <button
+                            onClick={() => setOpen(true)}
+                            className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-neutral-900/80 backdrop-blur-sm rounded-lg border border-neutral-700/50 z-20 text-[10px] 2xl:text-xs text-neutral-400 hover:text-amber-300 hover:border-amber-500/50 transition-all cursor-pointer"
+                        >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                            변경
+                        </button>
+                    )}
                 </div>
 
                 {/* 툴팁 */}
                 <AnimatePresence>
-                    {hovered && (
+                    {hovered && !hideControls && (
                         <motion.div
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -518,12 +576,14 @@ export default function CoinChart({
                 </AnimatePresence>
             </div>
 
-            <SymbolPickerModal
-                open={open}
-                initialSymbol={sym}
-                onClose={() => setOpen(false)}
-                onSelect={saveSymbol}
-            />
+            {!hideControls && (
+                <SymbolPickerModal
+                    open={open}
+                    initialSymbol={sym}
+                    onClose={() => setOpen(false)}
+                    onSelect={saveSymbol}
+                />
+            )}
         </>
     );
 }
