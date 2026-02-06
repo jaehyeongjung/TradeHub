@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { useAtomValue } from "jotai";
 import SymbolPickerModal from "@/components/SymbolPickerModal";
 import { supabase } from "@/lib/supabase-browser";
+import { currencyAtom, exchangeRateAtom, upbitPricesAtom } from "@/store/atoms";
 
 // 코인 로고 URL 생성 (USDT 제거한 base symbol 사용)
 function getCoinLogoUrl(symbol: string): string {
@@ -109,6 +111,10 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
     const [hovered, setHovered] = useState(false);
     const [priceFlash, setPriceFlash] = useState<"up" | "down" | null>(null);
 
+    const currency = useAtomValue(currencyAtom);
+    const exchangeRate = useAtomValue(exchangeRateAtom);
+    const upbitPrices = useAtomValue(upbitPricesAtom);
+
     const wsRef = useRef<WebSocket | null>(null);
     const verRef = useRef(0);
     const reconnectTimer = useRef<number | null>(null);
@@ -116,12 +122,15 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
 
     const [decimals, setDecimals] = useState<number>(2);
 
+    // 심볼에서 base coin 추출 (btcusdt → btc)
+    const baseCoin = symbol.toUpperCase().replace(/USDT$/, "").toLowerCase();
+
     const loadPrecision = async (sym: string) => {
         const d = await fetchPrecision(sym);
         setDecimals(d);
     };
 
-    const decimalFormatter = useMemo(
+    const usdFormatter = useMemo(
         () =>
             new Intl.NumberFormat("en-US", {
                 minimumFractionDigits: 2,
@@ -130,7 +139,30 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
         [decimals],
     );
 
-    const formatPrice = (v: number) => `$${decimalFormatter.format(v)}`;
+    const krwFormatter = useMemo(
+        () =>
+            new Intl.NumberFormat("ko-KR", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }),
+        [],
+    );
+
+    // KRW: 업비트 가격 사용, 없으면 환율 계산
+    const getDisplayPrice = (): string => {
+        if (currency === "KRW") {
+            const upbitPrice = upbitPrices[baseCoin];
+            if (upbitPrice) {
+                return `₩${krwFormatter.format(upbitPrice)}`;
+            }
+            // 업비트에 없는 코인은 환율 계산
+            if (price && exchangeRate) {
+                return `₩${krwFormatter.format(price * exchangeRate)}`;
+            }
+            return "₩—";
+        }
+        return price != null ? `$${usdFormatter.format(price)}` : "$—";
+    };
 
     // 세션 + 심볼 불러오기
     useEffect(() => {
@@ -307,7 +339,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                             {symbol.toUpperCase()}
                         </h2>
                         <p className={`text-lg 2xl:text-2xl font-mono tabular-nums transition-colors duration-150 rounded px-1 ${pctColor} ${priceFlash === "up" ? "bg-emerald-500/20" : priceFlash === "down" ? "bg-red-500/20" : ""}`}>
-                            {price != null ? formatPrice(price) : "$—"}
+                            {getDisplayPrice()}
                         </p>
                         <div className={`text-xs 2xl:text-sm font-semibold ${pctColor}`}>
                             {pct != null ? `${arrow} ${pctText}` : "—"}

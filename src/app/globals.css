@@ -464,6 +464,136 @@ body {
     min-height: 0;
 }
 
+/* 높이 850px ~ 1000px: gap 줄이기 */
+@media (min-height: 850px) and (max-height: 1000px) {
+    aside[aria-label="거래 정보 위젯"] {
+        gap: 12px !important;
+    }
+    section[aria-label="커뮤니티 게시판 및 채팅"] {
+        height: calc(100vh - 200px) !important;
+        min-height: auto !important;
+    }
+}
+
+/* 높이 700px ~ 849px: gap 고정, 상단부터 배치 */
+@media (min-height: 700px) and (max-height: 849px) {
+    aside[aria-label="거래 정보 위젯"] {
+        justify-content: flex-start !important;
+        gap: 20px !important;
+    }
+    section[aria-label="커뮤니티 게시판 및 채팅"] {
+        height: calc(100vh - 200px) !important;
+        min-height: auto !important;
+    }
+}
+
+/* 높이 700px 이하: 양끝 정렬 */
+@media (max-height: 699px) {
+    aside[aria-label="거래 정보 위젯"] {
+        justify-content: space-between !important;
+        gap: 0 !important;
+    }
+    section[aria-label="커뮤니티 게시판 및 채팅"] {
+        height: calc(100vh - 200px) !important;
+        min-height: auto !important;
+    }
+}
+
+/* 높이 1200px ~ 1299px: 헤더 1.5배 */
+@media (min-height: 1200px) and (max-height: 1299px) {
+    .realtime-section {
+        min-height: 210px !important;
+        height: calc((100vh - 400px) * 0.28) !important;
+        max-height: 280px !important;
+        padding-top: 16px !important;
+        padding-bottom: 16px !important;
+        align-items: stretch !important;
+        overflow: hidden !important;
+    }
+    .realtime-section > div {
+        height: 100% !important;
+        max-height: 100% !important;
+    }
+    .realtime-section > div:nth-of-type(1) > div {
+        height: 100% !important;
+    }
+    .realtime-section > div:nth-of-type(1) button {
+        height: 100% !important;
+    }
+    .realtime-section > div:nth-of-type(2) > div {
+        height: 100% !important;
+    }
+    .realtime-section > div:nth-of-type(2) > div > div {
+        height: 100% !important;
+    }
+    .realtime-section > div:nth-of-type(3) > div {
+        height: 100% !important;
+        max-height: 100% !important;
+        min-height: 0 !important;
+    }
+    section[aria-label="커뮤니티 게시판 및 채팅"] {
+        max-height: 700px !important;
+        height: 700px !important;
+    }
+}
+
+/* 높이 1300px 이상에서 헤더 확대 및 대시보드 높이 제한 */
+@media (min-height: 1300px) {
+    .realtime-section {
+        min-height: 240px !important;
+        height: calc((100vh - 400px) * 0.32) !important;
+        max-height: 320px !important;
+        padding-top: 20px !important;
+        padding-bottom: 20px !important;
+        align-items: stretch !important;
+        overflow: hidden !important;
+    }
+    /* 내부 div 컨테이너들 높이 채우기 */
+    .realtime-section > div {
+        height: 100% !important;
+        max-height: 100% !important;
+    }
+    /* 코인 박스들 컨테이너 */
+    .realtime-section > div:nth-of-type(1) > div {
+        height: 100% !important;
+    }
+    .realtime-section > div:nth-of-type(1) button {
+        height: 100% !important;
+    }
+    /* 코인 박스 폰트 확대 */
+    .realtime-section > div:nth-of-type(1) h2 {
+        font-size: 1.125rem !important;
+    }
+    .realtime-section > div:nth-of-type(1) p {
+        font-size: 1.75rem !important;
+    }
+    .realtime-section > div:nth-of-type(1) .text-xs {
+        font-size: 0.875rem !important;
+    }
+    .realtime-section > div:nth-of-type(1) .w-8 {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+    }
+    /* 차트 컨테이너 */
+    .realtime-section > div:nth-of-type(2) > div {
+        height: 100% !important;
+    }
+    .realtime-section > div:nth-of-type(2) > div > div {
+        height: 100% !important;
+    }
+    /* 고래거래, 청산 컨테이너 - 높이 제한 */
+    .realtime-section > div:nth-of-type(3) > div {
+        height: 100% !important;
+        max-height: 100% !important;
+        min-height: 0 !important;
+    }
+    /* 대시보드 높이 제한 */
+    section[aria-label="커뮤니티 게시판 및 채팅"] {
+        max-height: 750px !important;
+        height: 750px !important;
+    }
+}
+
 /* 높이 1500px 이상에서 SEO 영역 보이도록 높이 제한 */
 @media (min-height: 1500px) {
     section[aria-label="커뮤니티 게시판 및 채팅"] {

@@ -108,7 +108,7 @@ export const DashBoard = () => {
 
                 <aside
                     aria-label="거래 정보 위젯"
-                    className="flex flex-col justify-between 2xl:justify-start 2xl:gap-5 min-w-57 2xl:min-w-80"
+                    className="flex flex-col gap-5 min-w-57 2xl:min-w-80"
                 >
                     <KimchiWidget fadeDelay={200} />
                     <LiveStatsBox fadeDelay={280} />
@@ -116,7 +116,7 @@ export const DashBoard = () => {
                     <YouTubeSeamlessPlayer videoId="j23SO29LNWE" />
                 </aside>
 
-                <div className="flex flex-col gap-3 2xl:gap-5 min-w-115 2xl:min-w-140">
+                <div className="flex flex-col gap-5 min-w-115 2xl:min-w-140">
                     <MarketIndicesWidget fadeDelay={280} />
                     <aside
                         aria-label="실시간 채팅"
