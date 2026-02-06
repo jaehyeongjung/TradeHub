@@ -95,7 +95,10 @@ export default function CoinChart({
         const observer = new MutationObserver(() => {
             setTheme(html.classList.contains("light") ? "light" : "dark");
         });
-        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+        observer.observe(html, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
 
         return () => observer.disconnect();
     }, []);
@@ -110,8 +113,13 @@ export default function CoinChart({
             setUserId(uid);
 
             // 인터벌 불러오기 (로컬스토리지)
-            const savedInterval = localStorage.getItem(`chart:${boxId}:interval`);
-            if (savedInterval && INTERVAL_OPTIONS.some(o => o.value === savedInterval)) {
+            const savedInterval = localStorage.getItem(
+                `chart:${boxId}:interval`,
+            );
+            if (
+                savedInterval &&
+                INTERVAL_OPTIONS.some((o) => o.value === savedInterval)
+            ) {
                 setInterval(savedInterval as Interval);
             }
 
@@ -209,7 +217,6 @@ export default function CoinChart({
         chart.priceScale("volume").applyOptions({
             scaleMargins: { top: 0.8, bottom: 0 },
             visible: false,
-            drawTicks: false,
         });
 
         // tickSize 기준으로 가격 포맷 설정
@@ -224,11 +231,11 @@ export default function CoinChart({
                     mm = precisionCache.current[key].minMove;
                 } else {
                     const res = await fetch(
-                        `https://api.binance.com/api/v3/exchangeInfo?symbol=${key}`
+                        `https://api.binance.com/api/v3/exchangeInfo?symbol=${key}`,
                     );
                     const info = (await res.json()) as BinanceExchangeInfo;
                     const pf = info.symbols?.[0]?.filters?.find(
-                        (f) => f.filterType === "PRICE_FILTER"
+                        (f) => f.filterType === "PRICE_FILTER",
                     );
                     const tick = pf?.tickSize ?? "0.01";
                     dec = decimalsFromTickSize(tick);
@@ -282,7 +289,12 @@ export default function CoinChart({
             }
 
             // 과거 데이터 무한스크롤: 왼쪽 끝 근처에서 추가 로드
-            if (range.from < 20 && !isLoadingMore && !allDataLoaded && oldestTime > 0) {
+            if (
+                range.from < 20 &&
+                !isLoadingMore &&
+                !allDataLoaded &&
+                oldestTime > 0
+            ) {
                 isLoadingMore = true;
                 try {
                     const url = `https://api.binance.com/api/v3/klines?symbol=${sym}&interval=${interval}&endTime=${oldestTime - 1}&limit=${historyLimit}`;
@@ -297,17 +309,24 @@ export default function CoinChart({
                     }
 
                     // 기존 데이터 가져오기
-                    const currentData = candleSeries.data() as CandlestickData<UTCTimestamp>[];
-                    const currentVolData = volumeSeries.data() as Array<{ time: UTCTimestamp; value: number; color: string }>;
+                    const currentData =
+                        candleSeries.data() as CandlestickData<UTCTimestamp>[];
+                    const currentVolData = volumeSeries.data() as Array<{
+                        time: UTCTimestamp;
+                        value: number;
+                        color: string;
+                    }>;
 
                     // 새 데이터 변환
-                    const newData: CandlestickData<UTCTimestamp>[] = rows.map((d) => ({
-                        time: toKstUtcTimestamp(d[0]) as UTCTimestamp,
-                        open: parseFloat(d[1]),
-                        high: parseFloat(d[2]),
-                        low: parseFloat(d[3]),
-                        close: parseFloat(d[4]),
-                    }));
+                    const newData: CandlestickData<UTCTimestamp>[] = rows.map(
+                        (d) => ({
+                            time: toKstUtcTimestamp(d[0]) as UTCTimestamp,
+                            open: parseFloat(d[1]),
+                            high: parseFloat(d[2]),
+                            low: parseFloat(d[3]),
+                            close: parseFloat(d[4]),
+                        }),
+                    );
 
                     const newVolData = rows.map((d) => {
                         const o = parseFloat(d[1]);
@@ -315,14 +334,23 @@ export default function CoinChart({
                         return {
                             time: toKstUtcTimestamp(d[0]) as UTCTimestamp,
                             value: parseFloat(d[5]),
-                            color: c >= o ? "rgba(38,166,154,0.3)" : "rgba(239,83,80,0.3)",
+                            color:
+                                c >= o
+                                    ? "rgba(38,166,154,0.3)"
+                                    : "rgba(239,83,80,0.3)",
                         };
                     });
 
                     // 중복 제거 후 병합 (새 데이터 + 기존 데이터)
-                    const existingTimes = new Set(currentData.map(d => d.time));
-                    const uniqueNewData = newData.filter(d => !existingTimes.has(d.time));
-                    const uniqueNewVolData = newVolData.filter(d => !existingTimes.has(d.time));
+                    const existingTimes = new Set(
+                        currentData.map((d) => d.time),
+                    );
+                    const uniqueNewData = newData.filter(
+                        (d) => !existingTimes.has(d.time),
+                    );
+                    const uniqueNewVolData = newVolData.filter(
+                        (d) => !existingTimes.has(d.time),
+                    );
 
                     if (uniqueNewData.length === 0) {
                         allDataLoaded = true;
@@ -330,7 +358,10 @@ export default function CoinChart({
                     }
 
                     const mergedData = [...uniqueNewData, ...currentData];
-                    const mergedVolData = [...uniqueNewVolData, ...currentVolData];
+                    const mergedVolData = [
+                        ...uniqueNewVolData,
+                        ...currentVolData,
+                    ];
                     candleSeries.setData(mergedData);
                     volumeSeries.setData(mergedVolData);
 
@@ -382,9 +413,12 @@ export default function CoinChart({
                         return {
                             time: toKstUtcTimestamp(d[0]),
                             value: parseFloat(d[5]),
-                            color: c >= o ? "rgba(38,166,154,0.3)" : "rgba(239,83,80,0.3)",
+                            color:
+                                c >= o
+                                    ? "rgba(38,166,154,0.3)"
+                                    : "rgba(239,83,80,0.3)",
                         };
-                    })
+                    }),
                 );
                 setChartLoading(false);
             } catch (e) {
@@ -415,7 +449,10 @@ export default function CoinChart({
                     volumeSeries.update({
                         time: toKstUtcTimestamp(k.t),
                         value: parseFloat(k.v),
-                        color: kClose >= kOpen ? "rgba(38,166,154,0.3)" : "rgba(239,83,80,0.3)",
+                        color:
+                            kClose >= kOpen
+                                ? "rgba(38,166,154,0.3)"
+                                : "rgba(239,83,80,0.3)",
                     });
                     // 새 캔들이 확정되면 dataLength 증가
                     if (k.x) dataLength++;
@@ -503,11 +540,17 @@ export default function CoinChart({
                 className={`relative w-full ${className ?? ""}`}
             >
                 {/* 실제 차트 박스 */}
-                <div className={`relative w-full ${className ? "h-full" : "h-30 2xl:h-45"}`}>
+                <div
+                    className={`relative w-full ${className ? "h-full" : "h-30 2xl:h-45"}`}
+                >
                     <div
                         ref={chartRef}
-                        className={`w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 cursor-grab active:cursor-grabbing transition-[opacity,transform] duration-700 ${chartLoading ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
-                        style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
+                        className={`w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 cursor-grab active:cursor-grabbing transition-[opacity,transform] duration-700 ${chartLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
+                        style={{
+                            transitionDelay: `${fadeDelay}ms`,
+                            transitionTimingFunction:
+                                "cubic-bezier(0.16, 1, 0.3, 1)",
+                        }}
                     />
                     {/* 인터벌 선택 버튼 */}
                     <div className="absolute top-2 left-2 flex gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50 z-20">
@@ -516,7 +559,10 @@ export default function CoinChart({
                                 key={opt.value}
                                 onClick={() => {
                                     setInterval(opt.value);
-                                    localStorage.setItem(`chart:${boxId}:interval`, opt.value);
+                                    localStorage.setItem(
+                                        `chart:${boxId}:interval`,
+                                        opt.value,
+                                    );
                                 }}
                                 className={`px-1.5 py-0.5 text-[10px] 2xl:text-xs rounded-md transition-all cursor-pointer ${
                                     interval === opt.value
@@ -531,7 +577,9 @@ export default function CoinChart({
                     {/* 심볼 표시 */}
                     {!hideControls && (
                         <div className="absolute top-2 right-2 px-2 py-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50 z-20">
-                            <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">{sym}</span>
+                            <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">
+                                {sym}
+                            </span>
                         </div>
                     )}
                     {/* 코인 변경 버튼 */}
@@ -540,8 +588,18 @@ export default function CoinChart({
                             onClick={() => setOpen(true)}
                             className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-neutral-900/80 backdrop-blur-sm rounded-lg border border-neutral-700/50 z-20 text-[10px] 2xl:text-xs text-neutral-400 hover:text-amber-300 hover:border-amber-500/50 transition-all cursor-pointer"
                         >
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            <svg
+                                className="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                                />
                             </svg>
                             변경
                         </button>
@@ -563,10 +621,10 @@ export default function CoinChart({
                             </div>
                             <p className="leading-snug whitespace-nowrap">
                                 • 좌측 상단에서 <b>인터벌</b>을 선택하세요.
-                                <br />
-                                • 우측 하단 <b>변경</b> 버튼으로 코인을 바꿀 수 있습니다.
-                                <br />
-                                • 차트를 <b>드래그</b>해서 과거 데이터를 확인하세요.
+                                <br />• 우측 하단 <b>변경</b> 버튼으로 코인을
+                                바꿀 수 있습니다.
+                                <br />• 차트를 <b>드래그</b>해서 과거 데이터를
+                                확인하세요.
                             </p>
                             {/* 테두리가 있는 삼각형 화살표 */}
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
