@@ -73,9 +73,11 @@ export default function MobilePage() {
                 >
                     TradeHub는 PC 환경에 최적화된 서비스입니다.
                     <br />
-                    더 나은 트레이딩 경험을 위해
+                    실시간 청산, 고래 거래, 트리맵,
                     <br />
-                    PC 브라우저로 접속해주세요.
+                    코인 선물 모의투자 등 다양한 기능을
+                    <br />
+                    PC 브라우저에서 이용해주세요.
                 </p>
 
                 {/* URL Copy */}
@@ -137,7 +139,7 @@ export default function MobilePage() {
                                     className={`text-xs ${isLight ? "text-neutral-600" : "text-neutral-400"}`}
                                 >
                                     구독 코인 가격 · 실시간 포지션 · 뉴스 ·
-                                    실시간 채팅
+                                    실시간 채팅 · 선물 모의투자
                                 </p>
                             </div>
                         </div>

@@ -30,7 +30,7 @@ type BinanceForceOrder = {
 };
 
 // 최소 표시 금액 (USD)
-const MIN_USD_VALUE = 10000; // $10,000 이상만 표시
+const MIN_USD_VALUE = 5000; // $5,000 이상만 표시
 const MAX_ITEMS = 15;
 
 export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number }) {
@@ -160,7 +160,7 @@ export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number 
                     />
                 </div>
                 <span className="text-[10px] 2xl:text-xs text-neutral-500">
-                    $10K+
+                    $5K+
                 </span>
             </div>
 

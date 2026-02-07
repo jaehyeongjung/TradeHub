@@ -13,7 +13,7 @@ const ORG_JSONLD = {
     name: "TradeHub",
     url: SITE,
     logo: `${SITE}/favicon-512.png`,
-    description: "실시간 암호화폐 청산, 고래 거래, 트리맵을 제공하는 트레이딩 대시보드",
+    description: "실시간 암호화폐 청산, 고래 거래, 트리맵, 코인 선물 모의투자를 제공하는 트레이딩 대시보드",
     sameAs: [],
     contactPoint: [
         {
@@ -29,7 +29,7 @@ const SITE_JSONLD = {
     "@type": "WebSite",
     url: SITE,
     name: "TradeHub",
-    description: "바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수를 한 화면에서",
+    description: "바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수, 코인 선물 모의투자를 한 화면에서",
     inLanguage: "ko",
     potentialAction: {
         "@type": "SearchAction",
@@ -58,6 +58,9 @@ const APP_JSONLD = {
         "공포탐욕지수",
         "실시간 채팅",
         "코인 뉴스",
+        "코인 선물 모의투자",
+        "레버리지 모의거래",
+        "롱숏 포지션 연습",
     ],
 };
 
@@ -70,7 +73,7 @@ const FAQ_JSONLD = {
             name: "TradeHub는 무료인가요?",
             acceptedAnswer: {
                 "@type": "Answer",
-                text: "네, TradeHub의 모든 기능은 무료로 제공됩니다. 실시간 청산, 고래 거래, 트리맵, 김치프리미엄 등 모든 기능을 무료로 이용할 수 있습니다.",
+                text: "네, TradeHub의 모든 기능은 무료로 제공됩니다. 실시간 청산, 고래 거래, 트리맵, 김치프리미엄, 코인 선물 모의투자 등 모든 기능을 무료로 이용할 수 있습니다.",
             },
         },
         {
@@ -95,6 +98,14 @@ const FAQ_JSONLD = {
             acceptedAnswer: {
                 "@type": "Answer",
                 text: "트리맵에서는 150개 이상의 암호화폐를 거래량 기준으로 시각화하여 볼 수 있습니다. 박스 크기는 거래량을, 색상은 가격 변동률을 나타냅니다.",
+            },
+        },
+        {
+            "@type": "Question",
+            name: "코인 선물 모의투자는 어떻게 이용하나요?",
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: "TradeHub의 코인 선물 모의투자는 실제 바이낸스 실시간 가격을 기반으로 가상 자금 10,000 USDT로 선물거래를 연습할 수 있는 기능입니다. 롱/숏 포지션, 레버리지(최대 125배), 지정가/시장가/스탑마켓 주문, 익절/손절 설정, 교차/격리 마진 모드를 지원합니다.",
             },
         },
     ],

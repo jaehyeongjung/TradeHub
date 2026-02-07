@@ -36,7 +36,7 @@ export default function SeoFooter() {
                     className="text-base md:text-xl font-semibold text-white"
                 >
                     TradeHub, 코인 트레이더를 위한 올인원 대시보드
-                    <br></br>트리맵 · 실시간 청산 · 고래 거래를 한 화면에서
+                    <br></br>트리맵 · 실시간 청산 · 고래 거래 · 모의투자를 한 화면에서
                 </h2>
                 <p className="mt-5  text-sm md:text-base">
                     TradeHub는 코인 트레이더를 위한 통합 대시보드입니다.
@@ -47,10 +47,11 @@ export default function SeoFooter() {
                     으로 시장을 한눈에 파악하고,
                     <strong className="font-medium"> 실시간 청산</strong>,
                     <strong className="font-medium"> 고래 거래</strong>,
-                    김치프리미엄, 공포탐욕지수, 뉴스, 실시간 채팅까지 제공합니다.
+                    김치프리미엄, 공포탐욕지수, 뉴스, 실시간 채팅, 코인 선물
+                    모의투자까지 제공합니다.
                 </p>
 
-                <div className="mt-6 grid grid-cols-3 gap-4 md:grid-cols-3">
+                <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
                     <article className="rounded-xl bg-zinc-900/60 p-7 ring-1 ring-zinc-800">
                         <h3 className="text-sm font-semibold text-white">
                             실시간 청산 · 고래 거래
@@ -72,6 +73,18 @@ export default function SeoFooter() {
                         </p>
                         <div className="mt-3 space-x-3"></div>
                     </article>
+                    <article className="rounded-xl bg-zinc-900/60 p-7 ring-1 ring-zinc-800">
+                        <h3 className="text-sm font-semibold text-white">
+                            코인 선물 모의투자
+                        </h3>
+                        <p className="mt-2 text-sm">
+                            실시간 바이낸스 가격 기반 선물 모의거래로 롱/숏
+                            포지션, 최대 125배 레버리지, 익절/손절, 교차/격리
+                            마진을 무료로 연습하세요.
+                        </p>
+                        <div className="mt-3"></div>
+                    </article>
+
                     <article className="rounded-xl bg-zinc-900/60 p-7 ring-1 ring-zinc-800">
                         <h3 className="text-sm font-semibold text-white">
                             Contact
@@ -103,7 +116,7 @@ export default function SeoFooter() {
 
                 {/* 작은 각주/브랜딩 */}
                 <p className="mt-8 text-xs text-zinc-500">
-                    TradeHub는 실시간 청산·고래 거래·트리맵·김프·공포탐욕지수·뉴스·채팅을
+                    TradeHub는 실시간 청산·고래 거래·트리맵·김프·공포탐욕지수·뉴스·채팅·코인 선물 모의투자를
                     한 화면에서 제공하는 코인 트레이더 대시보드입니다.
                 </p>
             </div>
