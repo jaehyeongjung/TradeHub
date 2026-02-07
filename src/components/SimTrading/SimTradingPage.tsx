@@ -81,18 +81,6 @@ export default function SimTradingPage() {
         setTimeout(() => setClickedPrice(null), 50);
     };
 
-    if (!userId) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="text-center">
-                    <div className="text-2xl mb-2">🔐</div>
-                    <div className="text-sm text-neutral-400">모의투자를 이용하려면 로그인이 필요합니다</div>
-                    <div className="text-xs text-neutral-600 mt-1">좌측 하단 로그인 버튼을 눌러주세요</div>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto mt-3">
             {/* 메인: 차트 + 호가창 + 주문 */}

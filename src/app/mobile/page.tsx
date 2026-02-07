@@ -118,16 +118,16 @@ export default function MobilePage() {
                     <h2
                         className={`text-sm font-semibold mb-4 ${isLight ? "text-neutral-500" : "text-neutral-500"}`}
                     >
-                        미리보기
+                        주요 기능
                     </h2>
                     <div className="space-y-4">
-                        {/* Image 1 - 메인페이지 */}
+                        {/* Image 1 - 메인 대시보드 */}
                         <div
                             className={`rounded-xl overflow-hidden border ${isLight ? "border-neutral-200" : "border-neutral-800"}`}
                         >
                             <Image
                                 src="/mobile-1.png"
-                                alt="TradeHub 메인페이지"
+                                alt="TradeHub 메인 대시보드"
                                 width={400}
                                 height={225}
                                 className="w-full h-auto"
@@ -136,10 +136,14 @@ export default function MobilePage() {
                                 className={`px-3 py-2 ${isLight ? "bg-neutral-100" : "bg-neutral-900"}`}
                             >
                                 <p
-                                    className={`text-xs ${isLight ? "text-neutral-600" : "text-neutral-400"}`}
+                                    className={`text-xs font-medium ${isLight ? "text-neutral-700" : "text-neutral-300"}`}
                                 >
-                                    구독 코인 가격 · 실시간 포지션 · 뉴스 ·
-                                    실시간 채팅 · 선물 모의투자
+                                    실시간 대시보드
+                                </p>
+                                <p
+                                    className={`text-xs mt-0.5 ${isLight ? "text-neutral-500" : "text-neutral-500"}`}
+                                >
+                                    실시간 시세 · 청산 · 고래 거래 · 김프 · 공포탐욕지수 · 뉴스 · 채팅
                                 </p>
                             </div>
                         </div>
@@ -148,7 +152,7 @@ export default function MobilePage() {
                             className={`rounded-xl overflow-hidden border ${isLight ? "border-neutral-200" : "border-neutral-800"}`}
                         >
                             <Image
-                                src="/main-Image.png"
+                                src="/tree.png"
                                 alt="TradeHub 트리맵"
                                 width={400}
                                 height={225}
@@ -158,9 +162,40 @@ export default function MobilePage() {
                                 className={`px-3 py-2 ${isLight ? "bg-neutral-100" : "bg-neutral-900"}`}
                             >
                                 <p
-                                    className={`text-xs ${isLight ? "text-neutral-600" : "text-neutral-400"}`}
+                                    className={`text-xs font-medium ${isLight ? "text-neutral-700" : "text-neutral-300"}`}
                                 >
-                                    트리맵 · 거래량 기반 코인 시각화
+                                    거래량 트리맵
+                                </p>
+                                <p
+                                    className={`text-xs mt-0.5 ${isLight ? "text-neutral-500" : "text-neutral-500"}`}
+                                >
+                                    150개 코인 거래량 · 등락률 시각화
+                                </p>
+                            </div>
+                        </div>
+                        {/* Image 3 - 선물 모의투자 */}
+                        <div
+                            className={`rounded-xl overflow-hidden border ${isLight ? "border-neutral-200" : "border-neutral-800"}`}
+                        >
+                            <Image
+                                src="/main-Image.png"
+                                alt="TradeHub 선물 모의투자"
+                                width={400}
+                                height={225}
+                                className="w-full h-auto"
+                            />
+                            <div
+                                className={`px-3 py-2 ${isLight ? "bg-neutral-100" : "bg-neutral-900"}`}
+                            >
+                                <p
+                                    className={`text-xs font-medium ${isLight ? "text-neutral-700" : "text-neutral-300"}`}
+                                >
+                                    코인 선물 모의투자
+                                </p>
+                                <p
+                                    className={`text-xs mt-0.5 ${isLight ? "text-neutral-500" : "text-neutral-500"}`}
+                                >
+                                    실시간 가격 기반 롱/숏 · 최대 125배 레버리지 · 익절/손절
                                 </p>
                             </div>
                         </div>
