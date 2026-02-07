@@ -17,6 +17,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editTp, setEditTp] = useState("");
     const [editSl, setEditSl] = useState("");
+    const [tpSlError, setTpSlError] = useState("");
 
     if (positions.length === 0) {
         return (
@@ -169,21 +170,29 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                         </div>
                                         <button
                                             onClick={async () => {
+                                                setTpSlError("");
                                                 const tp = editTp ? parseFloat(editTp) : null;
                                                 const sl = editSl ? parseFloat(editSl) : null;
-                                                await onUpdateTpSl?.(pos.id, tp, sl);
-                                                setEditingId(null);
+                                                try {
+                                                    await onUpdateTpSl?.(pos.id, tp, sl);
+                                                    setEditingId(null);
+                                                } catch (e) {
+                                                    setTpSlError(e instanceof Error ? e.message : "TP/SL 설정 실패");
+                                                }
                                             }}
                                             className="text-[9px] px-2 py-1 bg-amber-500/20 text-amber-300 rounded border border-amber-500/30 hover:bg-amber-500/30 transition-colors cursor-pointer shrink-0"
                                         >
                                             저장
                                         </button>
                                         <button
-                                            onClick={() => setEditingId(null)}
+                                            onClick={() => { setEditingId(null); setTpSlError(""); }}
                                             className="text-[9px] px-1.5 py-1 text-neutral-500 hover:text-neutral-300 cursor-pointer shrink-0"
                                         >
                                             취소
                                         </button>
+                                        {tpSlError && (
+                                            <span className="text-[9px] text-red-400">{tpSlError}</span>
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="flex items-center gap-3 text-[10px]">

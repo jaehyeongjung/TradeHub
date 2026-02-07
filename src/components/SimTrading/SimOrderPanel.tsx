@@ -16,11 +16,13 @@ interface Props {
     onReset: () => void;
     /** 호가창에서 클릭된 가격 */
     clickedPrice: number | null;
+    /** 현재 심볼에 열린 포지션의 마진 모드 (있으면 변경 불가) */
+    lockedMarginMode: MarginMode | null;
 }
 
 const LEVERAGE_PRESETS = [1, 2, 5, 10, 20, 50, 75, 100, 125];
 
-export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice }: Props) {
+export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode }: Props) {
     const [simSymbol, setSimSymbol] = useAtom(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);
     const [marginMode, setMarginMode] = useAtom(simMarginModeAtom);
@@ -36,6 +38,13 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
     const [showTpSl, setShowTpSl] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
+
+    // 기존 포지션의 마진 모드로 강제 동기화
+    useEffect(() => {
+        if (lockedMarginMode) {
+            setMarginMode(lockedMarginMode);
+        }
+    }, [lockedMarginMode, setMarginMode]);
 
     // 호가창 클릭 시 지정가로 전환 + 가격 입력
     useEffect(() => {
@@ -76,6 +85,17 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
         if (amount <= 0) { setError("주문 금액을 입력하세요"); return; }
         if (orderType !== "MARKET" && (!limitPrice || parseFloat(limitPrice) <= 0)) { setError("지정가를 입력하세요"); return; }
         if (margin > balance) { setError("잔고가 부족합니다"); return; }
+
+        // TP/SL 유효성 검증
+        const tp = tpPrice ? parseFloat(tpPrice) : null;
+        const sl = slPrice ? parseFloat(slPrice) : null;
+        if (side === "LONG") {
+            if (tp !== null && tp <= price) { setError("롱 포지션의 TP는 진입가보다 높아야 합니다"); return; }
+            if (sl !== null && sl >= price) { setError("롱 포지션의 SL은 진입가보다 낮아야 합니다"); return; }
+        } else {
+            if (tp !== null && tp >= price) { setError("숏 포지션의 TP는 진입가보다 낮아야 합니다"); return; }
+            if (sl !== null && sl <= price) { setError("숏 포지션의 SL은 진입가보다 높아야 합니다"); return; }
+        }
 
         setSubmitting(true);
         try {
@@ -209,20 +229,30 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                 )}
 
                 {/* 마진 모드 */}
-                <div className="grid grid-cols-2 gap-0 bg-neutral-900 rounded-lg overflow-hidden border border-zinc-800">
-                    {(["CROSS", "ISOLATED"] as MarginMode[]).map((mode) => (
-                        <button
-                            key={mode}
-                            onClick={() => setMarginMode(mode)}
-                            className={`py-1.5 text-[10px] font-bold transition-colors cursor-pointer ${
-                                marginMode === mode
-                                    ? "bg-amber-500/20 text-amber-300"
-                                    : "text-neutral-500 hover:text-neutral-300"
-                            }`}
-                        >
-                            {mode === "CROSS" ? "Cross" : "Isolated"}
-                        </button>
-                    ))}
+                <div className="relative">
+                    <div className="grid grid-cols-2 gap-0 bg-neutral-900 rounded-lg overflow-hidden border border-zinc-800">
+                        {(["CROSS", "ISOLATED"] as MarginMode[]).map((mode) => (
+                            <button
+                                key={mode}
+                                onClick={() => !lockedMarginMode && setMarginMode(mode)}
+                                disabled={!!lockedMarginMode}
+                                className={`py-1.5 text-[10px] font-bold transition-colors ${
+                                    lockedMarginMode ? "cursor-not-allowed" : "cursor-pointer"
+                                } ${
+                                    marginMode === mode
+                                        ? "bg-amber-500/20 text-amber-300"
+                                        : "text-neutral-500 hover:text-neutral-300"
+                                } ${lockedMarginMode ? "opacity-60" : ""}`}
+                            >
+                                {mode === "CROSS" ? "Cross" : "Isolated"}
+                            </button>
+                        ))}
+                    </div>
+                    {lockedMarginMode && (
+                        <div className="text-[9px] text-neutral-600 mt-1">
+                            포지션이 있어 마진 모드 변경 불가
+                        </div>
+                    )}
                 </div>
 
                 {/* 레버리지 */}

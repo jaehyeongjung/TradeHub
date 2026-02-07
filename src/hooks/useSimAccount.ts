@@ -19,6 +19,11 @@ import {
     calcLiqPriceCross,
     updatePositionTpSl,
 } from "@/lib/sim-trading";
+import {
+    playOrderFilledSound,
+    playPositionClosedSound,
+    playLiquidationSound,
+} from "@/lib/sounds";
 import type {
     SimAccount,
     SimPosition,
@@ -116,29 +121,32 @@ export function useSimAccount() {
 
                 if (shouldLiq) {
                     await liquidatePosition(userId, pos.id, effectiveLiqPrice);
+                    playLiquidationSound();
                     changed = true;
                     continue;
                 }
 
-                // TP 체크
+                // TP 체크 (현재 시장가로 체결)
                 if (pos.tp_price) {
                     const hitTp =
                         (pos.side === "LONG" && cp >= pos.tp_price) ||
                         (pos.side === "SHORT" && cp <= pos.tp_price);
                     if (hitTp) {
-                        await closePosition(userId, pos.id, pos.tp_price);
+                        await closePosition(userId, pos.id, cp);
+                        playPositionClosedSound();
                         changed = true;
                         continue;
                     }
                 }
 
-                // SL 체크
+                // SL 체크 (현재 시장가로 체결)
                 if (pos.sl_price) {
                     const hitSl =
                         (pos.side === "LONG" && cp <= pos.sl_price) ||
                         (pos.side === "SHORT" && cp >= pos.sl_price);
                     if (hitSl) {
-                        await closePosition(userId, pos.id, pos.sl_price);
+                        await closePosition(userId, pos.id, cp);
+                        playPositionClosedSound();
                         changed = true;
                         continue;
                     }
@@ -158,6 +166,7 @@ export function useSimAccount() {
 
                 if (shouldFill) {
                     await fillOrder(userId, ord.id, cp);
+                    playOrderFilledSound();
                     changed = true;
                 }
             }
@@ -212,6 +221,7 @@ export function useSimAccount() {
         async (input: OpenPositionInput) => {
             if (!userId) throw new Error("로그인이 필요합니다");
             const result = await openPosition(userId, input);
+            playOrderFilledSound();
             await loadAll();
             return result;
         },
@@ -222,6 +232,7 @@ export function useSimAccount() {
         async (positionId: string, closePrice: number) => {
             if (!userId) throw new Error("로그인이 필요합니다");
             const result = await closePosition(userId, positionId, closePrice);
+            playPositionClosedSound();
             await loadAll();
             return result;
         },
@@ -243,9 +254,31 @@ export function useSimAccount() {
         await loadAll();
     }, [userId, loadAll]);
 
+    // TP/SL 검증용 최신 가격 참조
+    const latestPricesRef = useRef(prices);
+    latestPricesRef.current = prices;
+    const latestPositionsRef = useRef(positionsWithPnl);
+    latestPositionsRef.current = positionsWithPnl;
+
     const handleUpdateTpSl = useCallback(
         async (positionId: string, tpPrice: number | null, slPrice: number | null) => {
             if (!userId) throw new Error("로그인이 필요합니다");
+
+            // 포지션 찾아서 유효성 검증
+            const pos = latestPositionsRef.current.find(p => p.id === positionId);
+            if (!pos) throw new Error("포지션을 찾을 수 없습니다");
+
+            const cp = latestPricesRef.current[pos.symbol];
+            if (!cp) throw new Error("가격 정보를 불러올 수 없습니다");
+
+            if (pos.side === "LONG") {
+                if (tpPrice !== null && tpPrice <= cp) throw new Error("TP는 현재가보다 높아야 합니다");
+                if (slPrice !== null && slPrice >= cp) throw new Error("SL은 현재가보다 낮아야 합니다");
+            } else {
+                if (tpPrice !== null && tpPrice >= cp) throw new Error("TP는 현재가보다 낮아야 합니다");
+                if (slPrice !== null && slPrice <= cp) throw new Error("SL은 현재가보다 높아야 합니다");
+            }
+
             await updatePositionTpSl(userId, positionId, tpPrice, slPrice);
             await loadAll();
         },

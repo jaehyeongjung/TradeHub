@@ -145,6 +145,16 @@ export async function openPosition(
         throw new Error("잔고가 부족합니다");
     }
 
+    // TP/SL 유효성 검증
+    if (tpPrice !== undefined && tpPrice !== null) {
+        if (side === "LONG" && tpPrice <= price) throw new Error("롱 포지션의 TP는 진입가보다 높아야 합니다");
+        if (side === "SHORT" && tpPrice >= price) throw new Error("숏 포지션의 TP는 진입가보다 낮아야 합니다");
+    }
+    if (slPrice !== undefined && slPrice !== null) {
+        if (side === "LONG" && slPrice >= price) throw new Error("롱 포지션의 SL은 진입가보다 낮아야 합니다");
+        if (side === "SHORT" && slPrice <= price) throw new Error("숏 포지션의 SL은 진입가보다 높아야 합니다");
+    }
+
     // 지정가 주문은 바로 체결하지 않고 주문으로 등록
     if (orderType === "LIMIT" || orderType === "STOP_MARKET") {
         const { error } = await supabase.from("sim_orders").insert({
@@ -176,13 +186,30 @@ export async function openPosition(
         };
     }
 
-    // 시장가 즉시 체결 — 기존 같은 심볼+방향 포지션 확인 (병합)
+    // 같은 심볼에 다른 마진 모드 포지션이 있는지 확인
+    const { data: conflictPos } = await supabase
+        .from("sim_positions")
+        .select("margin_mode")
+        .eq("user_id", userId)
+        .eq("symbol", symbol)
+        .eq("status", "OPEN")
+        .neq("margin_mode", marginMode)
+        .limit(1)
+        .maybeSingle();
+
+    if (conflictPos) {
+        const existing = conflictPos.margin_mode === "CROSS" ? "교차(Cross)" : "격리(Isolated)";
+        throw new Error(`이미 ${existing} 모드 포지션이 있습니다. 마진 모드를 변경하려면 기존 포지션을 먼저 청산하세요.`);
+    }
+
+    // 시장가 즉시 체결 — 기존 같은 심볼+방향+마진모드 포지션 확인 (병합)
     const { data: existingPos } = await supabase
         .from("sim_positions")
         .select("*")
         .eq("user_id", userId)
         .eq("symbol", symbol)
         .eq("side", side)
+        .eq("margin_mode", marginMode)
         .eq("status", "OPEN")
         .maybeSingle();
 
@@ -422,13 +449,34 @@ export async function fillOrder(
         .update({ status: "FILLED" })
         .eq("id", orderId);
 
-    // 기존 같은 심볼+방향 포지션 확인 (병합)
+    // 같은 심볼에 다른 마진 모드 포지션이 있는지 확인
+    const { data: conflictPos } = await supabase
+        .from("sim_positions")
+        .select("margin_mode")
+        .eq("user_id", userId)
+        .eq("symbol", order.symbol)
+        .eq("status", "OPEN")
+        .neq("margin_mode", orderMarginMode)
+        .limit(1)
+        .maybeSingle();
+
+    if (conflictPos) {
+        // 충돌 시 주문 취소 처리
+        await supabase
+            .from("sim_orders")
+            .update({ status: "CANCELLED" })
+            .eq("id", orderId);
+        return null;
+    }
+
+    // 기존 같은 심볼+방향+마진모드 포지션 확인 (병합)
     const { data: existingPos } = await supabase
         .from("sim_positions")
         .select("*")
         .eq("user_id", userId)
         .eq("symbol", order.symbol)
         .eq("side", order.side)
+        .eq("margin_mode", orderMarginMode)
         .eq("status", "OPEN")
         .maybeSingle();
 

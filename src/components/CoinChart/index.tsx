@@ -302,13 +302,14 @@ export default function CoinChart({
         chart.timeScale().subscribeVisibleLogicalRangeChange(async (range) => {
             if (!range || destroyed) return;
 
-            // 미래 영역 스크롤 방지
+            // 미래 영역 스크롤 제한 (visible 영역의 1/3까지만 허용)
             const maxRight = dataLength - 1;
-            if (range.to > maxRight) {
-                const visibleBars = range.to - range.from;
+            const visibleBars = range.to - range.from;
+            const maxAllowedRight = maxRight + Math.floor(visibleBars / 3);
+            if (range.to > maxAllowedRight) {
                 chart.timeScale().setVisibleLogicalRange({
-                    from: maxRight - visibleBars,
-                    to: maxRight,
+                    from: maxAllowedRight - visibleBars,
+                    to: maxAllowedRight,
                 });
             }
 

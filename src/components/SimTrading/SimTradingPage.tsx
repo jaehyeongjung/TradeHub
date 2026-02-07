@@ -71,6 +71,9 @@ export default function SimTradingPage() {
         updateTpSl,
     } = useSimAccount();
 
+    // 현재 심볼에 열린 포지션이 있으면 마진 모드 잠금
+    const lockedMarginMode = positions.find(p => p.symbol === simSymbol)?.margin_mode ?? null;
+
     const handleOrderBookClick = (price: number) => {
         // 매번 새로운 참조를 만들어야 useEffect가 반응함
         setClickedPrice(price);
@@ -161,6 +164,7 @@ export default function SimTradingPage() {
                             onSubmit={async (input) => { await openPosition(input); }}
                             onReset={resetAccount}
                             clickedPrice={clickedPrice}
+                            lockedMarginMode={lockedMarginMode}
                         />
                     </div>
                 </div>
