@@ -16,7 +16,7 @@ const SITE = "https://www.tradehub.kr";
 export const metadata: Metadata = {
     metadataBase: new URL(SITE),
     title: {
-        default: "실시간 청산 · 고래 거래 · 트리맵 · 모의투자 | TradeHub",
+        default: "TradeHub — 데모 트레이딩 · 시장 흐름 시각화",
         template: "%s | TradeHub",
     },
     description:
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     openGraph: {
         type: "website",
         url: SITE,
-        title: "실시간 청산 · 고래 거래 · 트리맵 · 모의투자 | TradeHub",
+        title: "TradeHub — 데모 트레이딩 · 시장 흐름 시각화",
         siteName: "TradeHub",
         description: "바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수, 코인 선물 모의투자를 한 화면에서.",
         images: [{ url: "/main-Image.png", width: 1200, height: 630, alt: "TradeHub 실시간 코인 대시보드" }],
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "실시간 청산 · 고래 거래 · 트리맵 · 모의투자 | TradeHub",
+        title: "TradeHub — 데모 트레이딩 · 시장 흐름 시각화",
         description: "바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수, 코인 선물 모의투자를 한 화면에서.",
         images: ["/main-Image.png"],
     },
