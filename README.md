@@ -47,7 +47,10 @@
 
 ## 선물 모의투자
 
-<img width="1432" height="686" alt="선물 모의투자" src="https://github.com/user-attachments/assets/12955b70-0b18-4a74-aeaf-9c7f869924b3" />
+https://github.com/user-attachments/assets/c7a2f28f-6c54-43c2-bdc0-502383b11231
+
+
+
 
 ### 트레이딩 기능
 
