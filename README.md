@@ -43,6 +43,8 @@
 
 ---
 
+<br>
+
 ## 선물 모의투자
 
 <img width="1432" height="686" alt="선물 모의투자" src="https://github.com/user-attachments/assets/12955b70-0b18-4a74-aeaf-9c7f869924b3" />
@@ -59,6 +61,8 @@
 | **포지션 저장** | Supabase 기반 주문/포지션 영속 저장 |
 
 ---
+
+<br>
 
 ## 거래량 트리맵
 
