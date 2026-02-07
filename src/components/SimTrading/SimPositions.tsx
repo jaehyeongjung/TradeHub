@@ -22,8 +22,8 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
     if (positions.length === 0) {
         return (
             <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5">
-                <h3 className="text-xs font-semibold text-neutral-500 mb-2">Positions</h3>
-                <div className="text-[11px] text-neutral-700 text-center py-6">
+                <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Positions</h3>
+                <div className="text-[11px] text-neutral-600 text-center py-6">
                     활성 포지션이 없습니다
                 </div>
             </div>
@@ -31,141 +31,151 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
     }
 
     return (
-        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-4">
-            <h3 className="text-xs font-semibold text-neutral-500 mb-3">
-                Positions <span className="text-amber-400/80 ml-1">{positions.length}</span>
-            </h3>
-            <div className="space-y-2">
+        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden">
+            {/* 헤더 */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
+                <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+                    Positions
+                    <span className="inline-flex items-center justify-center w-5 h-5 ml-2 text-[10px] font-bold bg-amber-500/15 text-amber-400 rounded-full">
+                        {positions.length}
+                    </span>
+                </h3>
+            </div>
+
+            {/* 테이블 헤더 */}
+            <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-2 px-5 py-2 text-[10px] text-neutral-500 border-b border-zinc-800/40">
+                <div>심볼</div>
+                <div className="text-right">규모</div>
+                <div className="text-right">진입가</div>
+                <div className="text-right">현재가</div>
+                <div className="text-right">청산가</div>
+                <div className="text-right">미실현 PnL</div>
+                <div className="text-right w-[52px]"></div>
+            </div>
+
+            {/* 포지션 리스트 */}
+            <div className="divide-y divide-zinc-800/30">
                 {positions.map((pos) => {
                     const cp = prices[pos.symbol] ?? pos.entry_price;
                     const pnl = pos.unrealized_pnl;
                     const roe = calcRoe(pnl, pos.margin);
                     const isProfit = pnl >= 0;
                     const isLong = pos.side === "LONG";
-
-                    // 현재 포지션 규모 (달러)
                     const notional = pos.quantity * cp;
-
-                    // 청산까지 남은 %
                     const liqDist = pos.entry_price > 0
                         ? Math.abs(cp - pos.liq_price) / cp * 100
                         : 0;
 
                     return (
-                        <div
-                            key={pos.id}
-                            className={`relative rounded-xl overflow-hidden border transition-colors ${
-                                isProfit
-                                    ? "border-emerald-500/10 bg-emerald-500/[0.02]"
-                                    : "border-red-500/10 bg-red-500/[0.02]"
-                            }`}
-                        >
-                            {/* 상단: 심볼 + 방향 + PnL + 닫기 */}
-                            <div className="flex items-center justify-between px-4 pt-3 pb-1">
+                        <div key={pos.id} className="group">
+                            {/* 메인 행 */}
+                            <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-2 items-center px-5 py-3 hover:bg-white/[0.015] transition-colors">
+                                {/* 심볼 + 방향 */}
                                 <div className="flex items-center gap-2">
-                                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
-                                        isLong
-                                            ? "bg-emerald-500/15 text-emerald-400"
-                                            : "bg-red-500/15 text-red-400"
-                                    }`}>
-                                        {pos.side}
-                                    </span>
-                                    <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-medium ${
-                                        pos.margin_mode === "CROSS"
-                                            ? "bg-amber-500/10 text-amber-400"
-                                            : "bg-violet-500/10 text-violet-400"
-                                    }`}>
-                                        {pos.margin_mode === "CROSS" ? "Cross" : "Isolated"}
-                                    </span>
-                                    <span className="text-[13px] font-bold text-white">
-                                        {pos.symbol.replace("USDT", "")}
-                                    </span>
-                                    <span className="text-[10px] text-neutral-500 font-mono">{pos.leverage.toFixed(1)}x</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    {/* PnL 크게 */}
-                                    <div className="text-right">
-                                        <div className={`text-[15px] font-bold font-mono tabular-nums ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
-                                            {isProfit ? "+" : ""}{pnl.toFixed(2)}
-                                            <span className="text-[10px] ml-0.5 opacity-60">USDT</span>
+                                    <div className={`w-1 h-8 rounded-full ${isLong ? "bg-emerald-500" : "bg-red-500"}`} />
+                                    <div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-[13px] font-bold text-white">
+                                                {pos.symbol.replace("USDT", "")}
+                                            </span>
+                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                                                isLong
+                                                    ? "bg-emerald-500/15 text-emerald-400"
+                                                    : "bg-red-500/15 text-red-400"
+                                            }`}>
+                                                {pos.side}
+                                            </span>
                                         </div>
-                                        <div className={`text-[11px] font-mono tabular-nums ${isProfit ? "text-emerald-400/70" : "text-red-400/70"}`}>
-                                            {isProfit ? "+" : ""}{roe.toFixed(2)}%
+                                        <div className="flex items-center gap-1.5 mt-0.5">
+                                            <span className="text-[10px] text-amber-400 font-mono font-medium">{Number(pos.leverage).toFixed(0)}x</span>
+                                            <span className={`text-[9px] px-1 py-px rounded ${
+                                                pos.margin_mode === "CROSS"
+                                                    ? "bg-amber-500/10 text-amber-400"
+                                                    : "bg-violet-500/10 text-violet-400"
+                                            }`}>
+                                                {pos.margin_mode === "CROSS" ? "Cross" : "Isolated"}
+                                            </span>
                                         </div>
                                     </div>
+                                </div>
+
+                                {/* 규모 */}
+                                <div className="text-right">
+                                    <div className="text-[12px] text-neutral-200 font-mono tabular-nums">
+                                        ${notional.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    </div>
+                                    <div className="text-[10px] text-neutral-500 font-mono tabular-nums">
+                                        {pos.margin.toFixed(2)} 증거금
+                                    </div>
+                                </div>
+
+                                {/* 진입가 */}
+                                <div className="text-right">
+                                    <div className="text-[12px] text-neutral-300 font-mono tabular-nums">
+                                        {pos.entry_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                    </div>
+                                </div>
+
+                                {/* 현재가 */}
+                                <div className="text-right">
+                                    <div className={`text-[12px] font-mono tabular-nums font-medium ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
+                                        {cp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                    </div>
+                                </div>
+
+                                {/* 청산가 */}
+                                <div className="text-right">
+                                    <div className="text-[12px] text-orange-400 font-mono tabular-nums">
+                                        {pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                    </div>
+                                    <div className={`text-[10px] font-mono tabular-nums ${liqDist < 5 ? "text-orange-400" : "text-neutral-500"}`}>
+                                        {liqDist.toFixed(1)}% 거리
+                                    </div>
+                                </div>
+
+                                {/* PnL */}
+                                <div className="text-right">
+                                    <div className={`text-[14px] font-bold font-mono tabular-nums ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
+                                        {isProfit ? "+" : ""}{pnl.toFixed(2)}
+                                    </div>
+                                    <div className={`text-[11px] font-mono tabular-nums ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
+                                        {isProfit ? "+" : ""}{roe.toFixed(2)}%
+                                    </div>
+                                </div>
+
+                                {/* 청산 버튼 */}
+                                <div className="text-right w-[52px]">
                                     <button
                                         onClick={() => onClose(pos.id, cp)}
-                                        className="text-[10px] px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg border border-zinc-700/50 transition-colors cursor-pointer"
+                                        className="text-[10px] px-3 py-1.5 bg-neutral-800 hover:bg-red-500/20 text-neutral-400 hover:text-red-400 rounded-lg border border-neutral-700/50 transition-all cursor-pointer"
                                     >
                                         청산
                                     </button>
                                 </div>
                             </div>
 
-                            {/* 하단: 상세 정보 */}
-                            <div className="grid grid-cols-6 gap-3 px-4 pb-3 pt-1">
-                                <div>
-                                    <div className="text-[9px] text-neutral-600 mb-0.5">진입가</div>
-                                    <div className="text-[11px] text-neutral-200 font-mono tabular-nums">
-                                        {pos.entry_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="text-[9px] text-neutral-600 mb-0.5">현재가</div>
-                                    <div className="text-[11px] text-white font-mono tabular-nums">
-                                        {cp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="text-[9px] text-neutral-600 mb-0.5">포지션 규모</div>
-                                    <div className="text-[11px] text-neutral-200 font-mono tabular-nums">
-                                        ${notional.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="text-[9px] text-neutral-600 mb-0.5">
-                                        청산가{pos.margin_mode === "CROSS" ? " (실시간)" : ""}
-                                    </div>
-                                    <div className="text-[11px] text-orange-400 font-mono tabular-nums">
-                                        {pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="text-[9px] text-neutral-600 mb-0.5">증거금</div>
-                                    <div className="text-[11px] text-neutral-300 font-mono tabular-nums">
-                                        {pos.margin.toFixed(2)}
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="text-[9px] text-neutral-600 mb-0.5">청산거리</div>
-                                    <div className={`text-[11px] font-mono tabular-nums ${liqDist < 5 ? "text-orange-400" : "text-neutral-400"}`}>
-                                        {liqDist.toFixed(1)}%
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* TP/SL 표시 + 편집 */}
-                            <div className="px-4 pb-2.5">
+                            {/* TP/SL 바 */}
+                            <div className="px-5 pb-2.5">
                                 {editingId === pos.id ? (
-                                    <div className="flex items-center gap-2 text-[10px]">
-                                        <div className="flex items-center gap-1 flex-1">
-                                            <span className="text-neutral-600 shrink-0">TP</span>
+                                    <div className="flex items-center gap-2 bg-neutral-900/50 rounded-lg px-3 py-2">
+                                        <div className="flex items-center gap-1.5 flex-1">
+                                            <span className="text-[10px] text-emerald-400 font-medium shrink-0">TP</span>
                                             <input
                                                 type="number"
                                                 value={editTp}
                                                 onChange={(e) => setEditTp(e.target.value)}
-                                                placeholder="—"
-                                                className="w-full bg-neutral-800 text-emerald-400 text-[10px] font-mono rounded px-1.5 py-1 border border-zinc-700 outline-none placeholder:text-neutral-700"
+                                                placeholder="미설정"
+                                                className="w-full bg-neutral-800 text-emerald-400 text-[11px] font-mono rounded-md px-2 py-1.5 border border-neutral-700/50 outline-none placeholder:text-neutral-600 focus:border-emerald-500"
                                             />
                                         </div>
-                                        <div className="flex items-center gap-1 flex-1">
-                                            <span className="text-neutral-600 shrink-0">SL</span>
+                                        <div className="flex items-center gap-1.5 flex-1">
+                                            <span className="text-[10px] text-red-400 font-medium shrink-0">SL</span>
                                             <input
                                                 type="number"
                                                 value={editSl}
                                                 onChange={(e) => setEditSl(e.target.value)}
-                                                placeholder="—"
-                                                className="w-full bg-neutral-800 text-red-400 text-[10px] font-mono rounded px-1.5 py-1 border border-zinc-700 outline-none placeholder:text-neutral-700"
+                                                placeholder="미설정"
+                                                className="w-full bg-neutral-800 text-red-400 text-[11px] font-mono rounded-md px-2 py-1.5 border border-neutral-700/50 outline-none placeholder:text-neutral-600 focus:border-red-500"
                                             />
                                         </div>
                                         <button
@@ -180,45 +190,50 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                                     setTpSlError(e instanceof Error ? e.message : "TP/SL 설정 실패");
                                                 }
                                             }}
-                                            className="text-[9px] px-2 py-1 bg-amber-500/20 text-amber-300 rounded border border-amber-500/30 hover:bg-amber-500/30 transition-colors cursor-pointer shrink-0"
+                                            className="text-[10px] px-3 py-1.5 bg-amber-500/20 text-amber-300 rounded-md border border-amber-500/30 hover:bg-amber-500/30 transition-colors cursor-pointer shrink-0 font-medium"
                                         >
                                             저장
                                         </button>
                                         <button
                                             onClick={() => { setEditingId(null); setTpSlError(""); }}
-                                            className="text-[9px] px-1.5 py-1 text-neutral-500 hover:text-neutral-300 cursor-pointer shrink-0"
+                                            className="text-[10px] px-2 py-1.5 text-neutral-500 hover:text-neutral-300 cursor-pointer shrink-0"
                                         >
                                             취소
                                         </button>
                                         {tpSlError && (
-                                            <span className="text-[9px] text-red-400">{tpSlError}</span>
+                                            <span className="text-[10px] text-red-500 shrink-0">{tpSlError}</span>
                                         )}
                                     </div>
                                 ) : (
-                                    <div className="flex items-center gap-3 text-[10px]">
-                                        {pos.tp_price ? (
-                                            <span>
-                                                <span className="text-neutral-600">TP </span>
-                                                <span className="text-emerald-400/80 font-mono">${pos.tp_price.toFixed(2)}</span>
-                                            </span>
-                                        ) : (
-                                            <span className="text-neutral-700">TP —</span>
-                                        )}
-                                        {pos.sl_price ? (
-                                            <span>
-                                                <span className="text-neutral-600">SL </span>
-                                                <span className="text-red-400/80 font-mono">${pos.sl_price.toFixed(2)}</span>
-                                            </span>
-                                        ) : (
-                                            <span className="text-neutral-700">SL —</span>
-                                        )}
+                                    <div className="flex items-center gap-4 text-[11px]">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-neutral-500">TP</span>
+                                            {pos.tp_price ? (
+                                                <span className="text-emerald-400 font-mono font-medium">
+                                                    {pos.tp_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                                </span>
+                                            ) : (
+                                                <span className="text-neutral-600">---</span>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-neutral-500">SL</span>
+                                            {pos.sl_price ? (
+                                                <span className="text-red-400 font-mono font-medium">
+                                                    {pos.sl_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                                </span>
+                                            ) : (
+                                                <span className="text-neutral-600">---</span>
+                                            )}
+                                        </div>
                                         <button
                                             onClick={() => {
                                                 setEditingId(pos.id);
                                                 setEditTp(pos.tp_price ? String(pos.tp_price) : "");
                                                 setEditSl(pos.sl_price ? String(pos.sl_price) : "");
+                                                setTpSlError("");
                                             }}
-                                            className="text-[10px] px-2.5 py-1 font-medium bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 hover:text-amber-200 border border-amber-500/30 hover:border-amber-400/50 rounded-md transition-colors cursor-pointer ml-auto"
+                                            className="text-[10px] px-2.5 py-1 font-medium bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 rounded-md transition-colors cursor-pointer ml-auto"
                                         >
                                             TP/SL 설정
                                         </button>

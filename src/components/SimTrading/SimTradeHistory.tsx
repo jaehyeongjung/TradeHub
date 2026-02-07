@@ -7,79 +7,127 @@ interface Props {
 }
 
 export default function SimTradeHistory({ trades }: Props) {
-    return (
-        <div className="bg-neutral-900 rounded-xl border border-neutral-800 p-4">
-            <h3 className="text-xs font-semibold text-neutral-400 mb-3">
-                거래 이력
-            </h3>
-            {trades.length === 0 ? (
-                <div className="text-xs text-neutral-600 text-center py-4">
+    if (trades.length === 0) {
+        return (
+            <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5">
+                <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
+                    Trade History
+                </h3>
+                <div className="text-[11px] text-neutral-600 text-center py-6">
                     거래 이력이 없습니다
                 </div>
-            ) : (
-                <div className="space-y-1 max-h-48 overflow-y-auto">
-                    {trades.map((t) => {
-                        const isLiq = t.type === "LIQUIDATION";
-                        const isOpen = t.type === "OPEN";
-                        const isProfit = t.pnl >= 0;
-                        const date = new Date(t.created_at);
-                        const timeStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+            </div>
+        );
+    }
 
-                        return (
-                            <div
-                                key={t.id}
-                                className="flex items-center justify-between py-1.5 border-b border-neutral-800 last:border-0"
-                            >
-                                <div className="flex items-center gap-2">
-                                    <span
-                                        className={`text-[9px] font-bold px-1 py-0.5 rounded ${
-                                            isLiq
-                                                ? "bg-orange-500/20 text-orange-400"
-                                                : t.side === "LONG"
-                                                  ? "bg-emerald-500/20 text-emerald-400"
-                                                  : "bg-red-500/20 text-red-400"
-                                        }`}
-                                    >
-                                        {isLiq
-                                            ? "청산"
-                                            : isOpen
-                                              ? "진입"
-                                              : "종료"}
-                                    </span>
-                                    <span className="text-[10px] text-white">
+    return (
+        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden">
+            {/* 헤더 */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
+                <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+                    Trade History
+                </h3>
+            </div>
+
+            {/* 테이블 헤더 */}
+            <div className="grid grid-cols-[1fr_0.8fr_1fr_1fr_1fr_0.8fr] gap-2 px-5 py-2 text-[10px] text-neutral-500 border-b border-zinc-800/40">
+                <div>심볼</div>
+                <div className="text-right">유형</div>
+                <div className="text-right">가격</div>
+                <div className="text-right">규모</div>
+                <div className="text-right">손익</div>
+                <div className="text-right">시간</div>
+            </div>
+
+            {/* 거래 리스트 */}
+            <div className="divide-y divide-zinc-800/30 max-h-60 overflow-y-auto">
+                {trades.map((t) => {
+                    const isLiq = t.type === "LIQUIDATION";
+                    const isOpen = t.type === "OPEN";
+                    const isProfit = t.pnl >= 0;
+                    const isLong = t.side === "LONG";
+                    const notional = t.quantity * t.price;
+                    const date = new Date(t.created_at);
+                    const timeStr = `${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getDate().toString().padStart(2, "0")} ${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+
+                    return (
+                        <div
+                            key={t.id}
+                            className="grid grid-cols-[1fr_0.8fr_1fr_1fr_1fr_0.8fr] gap-2 items-center px-5 py-2.5 hover:bg-white/[0.015] transition-colors"
+                        >
+                            {/* 심볼 */}
+                            <div className="flex items-center gap-2">
+                                <div className={`w-1 h-6 rounded-full ${
+                                    isLiq ? "bg-orange-500" : isLong ? "bg-emerald-500" : "bg-red-500"
+                                }`} />
+                                <div>
+                                    <span className="text-[12px] font-bold text-white">
                                         {t.symbol.replace("USDT", "")}
                                     </span>
-                                    <span className="text-[10px] text-neutral-500">
-                                        ${t.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                    </span>
-                                    <span className="text-[9px] text-neutral-600">
-                                        ${(t.quantity * t.price).toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    {!isOpen && (
-                                        <span
-                                            className={`text-[10px] font-medium ${
-                                                isLiq
-                                                    ? "text-orange-400"
-                                                    : isProfit
-                                                      ? "text-emerald-400"
-                                                      : "text-red-400"
-                                            }`}
-                                        >
-                                            {isProfit && !isLiq ? "+" : ""}
-                                            {t.pnl.toFixed(2)}
-                                        </span>
-                                    )}
-                                    <span className="text-[9px] text-neutral-600">
-                                        {timeStr}
+                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ml-1.5 ${
+                                        isLong
+                                            ? "bg-emerald-500/15 text-emerald-400"
+                                            : "bg-red-500/15 text-red-400"
+                                    }`}>
+                                        {t.side}
                                     </span>
                                 </div>
                             </div>
-                        );
-                    })}
-                </div>
-            )}
+
+                            {/* 유형 */}
+                            <div className="text-right">
+                                <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${
+                                    isLiq
+                                        ? "bg-orange-500/15 text-orange-400"
+                                        : isOpen
+                                          ? "bg-blue-500/10 text-blue-400"
+                                          : "bg-neutral-800 text-neutral-400"
+                                }`}>
+                                    {isLiq ? "청산" : isOpen ? "진입" : "종료"}
+                                </span>
+                            </div>
+
+                            {/* 가격 */}
+                            <div className="text-right">
+                                <div className="text-[12px] text-neutral-200 font-mono tabular-nums">
+                                    {t.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                </div>
+                            </div>
+
+                            {/* 규모 */}
+                            <div className="text-right">
+                                <div className="text-[12px] text-neutral-300 font-mono tabular-nums">
+                                    ${notional.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                </div>
+                            </div>
+
+                            {/* 손익 */}
+                            <div className="text-right">
+                                {isOpen ? (
+                                    <span className="text-[11px] text-neutral-600">—</span>
+                                ) : (
+                                    <div className={`text-[12px] font-bold font-mono tabular-nums ${
+                                        isLiq
+                                            ? "text-orange-400"
+                                            : isProfit
+                                              ? "text-emerald-400"
+                                              : "text-red-400"
+                                    }`}>
+                                        {isProfit && !isLiq ? "+" : ""}{t.pnl.toFixed(2)}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* 시간 */}
+                            <div className="text-right">
+                                <div className="text-[10px] text-neutral-500 font-mono tabular-nums">
+                                    {timeStr}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 }
