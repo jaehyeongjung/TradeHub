@@ -14,7 +14,7 @@
 
 **대시보드**
 
-<img width="1440" height="687" alt="스크린샷 2026-02-03 오후 11 42 25" src="https://github.com/user-attachments/assets/5d8d0935-0f11-4ac5-955e-f2a9cc906bbc" />
+<img width="1432" height="686" alt="스크린샷 2026-02-07 오후 7 19 56" src="https://github.com/user-attachments/assets/7954aa1d-5710-4d74-bb29-04c9ebc837d5" />
 
 ----
 
