@@ -119,7 +119,7 @@ export default function SimTradingPage() {
                     {/* 마켓 지표 */}
                     <SimMarketData />
 
-                    <div className="flex gap-3 h-[calc(100vh-320px)]">
+                    <div className="flex gap-3 h-[calc(100vh-350px)]">
                         <div className="flex-1 min-w-0">
                             <CoinChart
                                 boxId="sim-chart"
