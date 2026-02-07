@@ -63,10 +63,12 @@ export default function SimTradingPage() {
         trades,
         loading,
         totalUnrealizedPnl,
+        totalPositionMargin,
         openPosition,
         closePosition,
         cancelOrder,
         resetAccount,
+        updateTpSl,
     } = useSimAccount();
 
     const handleOrderBookClick = (price: number) => {
@@ -134,6 +136,8 @@ export default function SimTradingPage() {
                                 interval="1m"
                                 className="h-full"
                                 hideControls
+                                positions={positions}
+                                onUpdateTpSl={updateTpSl}
                             />
                         </div>
                         <div className="w-[280px] flex-shrink-0">
@@ -141,7 +145,7 @@ export default function SimTradingPage() {
                         </div>
                     </div>
 
-                    <SimPositions positions={positions} onClose={closePosition} />
+                    <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} />
                     <SimOrders orders={orders} onCancel={cancelOrder} />
                     <SimTradeHistory trades={trades} />
                 </div>
@@ -152,6 +156,7 @@ export default function SimTradingPage() {
                         <SimOrderPanel
                             account={account}
                             totalUnrealizedPnl={totalUnrealizedPnl}
+                            totalPositionMargin={totalPositionMargin}
                             loading={loading}
                             onSubmit={async (input) => { await openPosition(input); }}
                             onReset={resetAccount}

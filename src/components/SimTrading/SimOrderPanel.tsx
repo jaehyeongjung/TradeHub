@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useAtom, useAtomValue } from "jotai";
-import { simSymbolAtom, simPricesAtom } from "@/store/atoms";
+import { simSymbolAtom, simPricesAtom, simMarginModeAtom } from "@/store/atoms";
 import { SUPPORTED_SYMBOLS } from "@/hooks/useSimPriceStream";
-import { calcLiqPrice } from "@/lib/sim-trading";
-import type { SimAccount, OpenPositionInput, PositionSide, OrderType } from "@/types/sim-trading";
+import { calcLiqPrice, calcLiqPriceCross } from "@/lib/sim-trading";
+import type { SimAccount, OpenPositionInput, PositionSide, OrderType, MarginMode } from "@/types/sim-trading";
 
 interface Props {
     account: SimAccount | null;
     totalUnrealizedPnl: number;
+    totalPositionMargin: number;
     loading: boolean;
     onSubmit: (input: OpenPositionInput) => Promise<void>;
     onReset: () => void;
@@ -19,9 +20,10 @@ interface Props {
 
 const LEVERAGE_PRESETS = [1, 2, 5, 10, 20, 50, 75, 100, 125];
 
-export default function SimOrderPanel({ account, totalUnrealizedPnl, loading, onSubmit, onReset, clickedPrice }: Props) {
+export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice }: Props) {
     const [simSymbol, setSimSymbol] = useAtom(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);
+    const [marginMode, setMarginMode] = useAtom(simMarginModeAtom);
     const currentPrice = prices[simSymbol] ?? 0;
 
     const [side, setSide] = useState<PositionSide>("LONG");
@@ -44,7 +46,8 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, loading, on
     }, [clickedPrice]);
 
     const balance = account?.balance ?? 0;
-    const equity = balance + totalUnrealizedPnl;
+    // 자산 = 가용잔고 + 포지션 증거금 + 미실현 PnL
+    const equity = balance + totalPositionMargin + totalUnrealizedPnl;
     const totalDeposit = account?.total_deposit ?? 10000;
     const totalPnl = equity - totalDeposit;
     const roe = totalDeposit > 0 ? (totalPnl / totalDeposit) * 100 : 0;
@@ -53,7 +56,14 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, loading, on
     const amount = parseFloat(amountUsdt) || 0;
     const margin = leverage > 0 ? amount / leverage : 0;
     const coinQty = price > 0 ? amount / price : 0;
-    const estLiqPrice = price > 0 && leverage > 0 ? calcLiqPrice(side, price, leverage) : 0;
+    const estLiqPrice = (() => {
+        if (price <= 0 || leverage <= 0) return 0;
+        if (marginMode === "CROSS") {
+            const availBal = Math.max(0, balance - margin - amount * 0.0004);
+            return calcLiqPriceCross(side, price, coinQty, margin, availBal);
+        }
+        return calcLiqPrice(side, price, leverage);
+    })();
 
     const handlePercentage = (pct: number) => {
         const maxUsdt = balance * leverage;
@@ -69,7 +79,7 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, loading, on
 
         setSubmitting(true);
         try {
-            await onSubmit({ symbol: simSymbol, side, orderType, price, quantityUsdt: amount, leverage, tpPrice: tpPrice ? parseFloat(tpPrice) : undefined, slPrice: slPrice ? parseFloat(slPrice) : undefined });
+            await onSubmit({ symbol: simSymbol, side, orderType, price, quantityUsdt: amount, leverage, tpPrice: tpPrice ? parseFloat(tpPrice) : undefined, slPrice: slPrice ? parseFloat(slPrice) : undefined, marginMode });
             setAmountUsdt("");
             setLimitPrice("");
             setTpPrice("");
@@ -91,12 +101,13 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, loading, on
                         리셋
                     </button>
                 </div>
+                {/* 총 자산 */}
                 <div className="flex items-end justify-between">
                     <div>
                         <div className="text-[18px] font-bold text-white font-mono tabular-nums">
                             {loading ? "—" : `${equity.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                         </div>
-                        <div className="text-[10px] text-neutral-500 mt-0.5">USDT</div>
+                        <div className="text-[10px] text-neutral-500 mt-0.5">총 자산 (USDT)</div>
                     </div>
                     <div className="text-right">
                         <div className={`text-xs font-bold tabular-nums ${roe >= 0 ? "text-emerald-400" : "text-red-400"}`}>
@@ -107,6 +118,29 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, loading, on
                         </div>
                     </div>
                 </div>
+                {/* 가용잔고 / 증거금 분리 */}
+                {!loading && (
+                    <div className="flex gap-3 mt-2 pt-2 border-t border-zinc-800/40">
+                        <div className="flex-1">
+                            <div className="text-[9px] text-neutral-600 mb-0.5">가용잔고</div>
+                            <div className="text-[12px] text-neutral-200 font-mono tabular-nums">
+                                {balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
+                        </div>
+                        <div className="flex-1">
+                            <div className="text-[9px] text-neutral-600 mb-0.5">사용 증거금</div>
+                            <div className="text-[12px] text-amber-400/80 font-mono tabular-nums">
+                                {totalPositionMargin.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
+                        </div>
+                        <div className="flex-1">
+                            <div className="text-[9px] text-neutral-600 mb-0.5">미실현 PnL</div>
+                            <div className={`text-[12px] font-mono tabular-nums ${totalUnrealizedPnl >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                                {totalUnrealizedPnl >= 0 ? "+" : ""}{totalUnrealizedPnl.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* 주문 섹션 */}
@@ -173,6 +207,23 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, loading, on
                         className="w-full bg-neutral-900 text-white text-xs rounded-lg px-3 py-2 border border-zinc-800 outline-none placeholder:text-neutral-600 focus:border-zinc-600 transition-colors"
                     />
                 )}
+
+                {/* 마진 모드 */}
+                <div className="grid grid-cols-2 gap-0 bg-neutral-900 rounded-lg overflow-hidden border border-zinc-800">
+                    {(["CROSS", "ISOLATED"] as MarginMode[]).map((mode) => (
+                        <button
+                            key={mode}
+                            onClick={() => setMarginMode(mode)}
+                            className={`py-1.5 text-[10px] font-bold transition-colors cursor-pointer ${
+                                marginMode === mode
+                                    ? "bg-amber-500/20 text-amber-300"
+                                    : "text-neutral-500 hover:text-neutral-300"
+                            }`}
+                        >
+                            {mode === "CROSS" ? "Cross" : "Isolated"}
+                        </button>
+                    ))}
+                </div>
 
                 {/* 레버리지 */}
                 <div>

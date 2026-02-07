@@ -16,6 +16,8 @@ import {
     fillOrder,
     cancelOrder,
     calcUnrealizedPnl,
+    calcLiqPriceCross,
+    updatePositionTpSl,
 } from "@/lib/sim-trading";
 import type {
     SimAccount,
@@ -95,13 +97,25 @@ export function useSimAccount() {
                 const cp = prices[pos.symbol];
                 if (!cp) continue;
 
+                // Cross 모드: 청산가를 실시간 잔고 기준으로 재계산
+                let effectiveLiqPrice = pos.liq_price;
+                if (pos.margin_mode === "CROSS" && account) {
+                    effectiveLiqPrice = calcLiqPriceCross(
+                        pos.side,
+                        pos.entry_price,
+                        pos.quantity,
+                        pos.margin,
+                        account.balance
+                    );
+                }
+
                 // 청산 체크
                 const shouldLiq =
-                    (pos.side === "LONG" && cp <= pos.liq_price) ||
-                    (pos.side === "SHORT" && cp >= pos.liq_price);
+                    (pos.side === "LONG" && cp <= effectiveLiqPrice) ||
+                    (pos.side === "SHORT" && cp >= effectiveLiqPrice);
 
                 if (shouldLiq) {
-                    await liquidatePosition(userId, pos.id, pos.liq_price);
+                    await liquidatePosition(userId, pos.id, effectiveLiqPrice);
                     changed = true;
                     continue;
                 }
@@ -154,9 +168,9 @@ export function useSimAccount() {
 
             checkingRef.current = false;
         })();
-    }, [prices, userId, activePage, positions, orders, loadAll]);
+    }, [prices, userId, activePage, positions, orders, account, loadAll]);
 
-    // 미실현 PnL이 반영된 포지션 (UI용)
+    // 미실현 PnL이 반영된 포지션 (UI용) + Cross 모드 청산가 실시간 갱신
     const positionsWithPnl = positions.map((pos) => {
         const cp = prices[pos.symbol] ?? pos.entry_price;
         const unrealized_pnl = calcUnrealizedPnl(
@@ -165,12 +179,31 @@ export function useSimAccount() {
             cp,
             pos.quantity
         );
-        return { ...pos, unrealized_pnl };
+
+        // Cross 모드: 잔고 변동에 따라 청산가 재계산
+        let liq_price = pos.liq_price;
+        if (pos.margin_mode === "CROSS" && account) {
+            liq_price = calcLiqPriceCross(
+                pos.side,
+                pos.entry_price,
+                pos.quantity,
+                pos.margin,
+                account.balance
+            );
+        }
+
+        return { ...pos, unrealized_pnl, liq_price };
     });
 
     // 총 미실현 PnL
     const totalUnrealizedPnl = positionsWithPnl.reduce(
         (sum, p) => sum + p.unrealized_pnl,
+        0
+    );
+
+    // 포지션에 잠긴 총 증거금
+    const totalPositionMargin = positionsWithPnl.reduce(
+        (sum, p) => sum + p.margin,
         0
     );
 
@@ -210,6 +243,15 @@ export function useSimAccount() {
         await loadAll();
     }, [userId, loadAll]);
 
+    const handleUpdateTpSl = useCallback(
+        async (positionId: string, tpPrice: number | null, slPrice: number | null) => {
+            if (!userId) throw new Error("로그인이 필요합니다");
+            await updatePositionTpSl(userId, positionId, tpPrice, slPrice);
+            await loadAll();
+        },
+        [userId, loadAll]
+    );
+
     return {
         userId,
         account,
@@ -218,10 +260,12 @@ export function useSimAccount() {
         trades,
         loading,
         totalUnrealizedPnl,
+        totalPositionMargin,
         openPosition: handleOpen,
         closePosition: handleClose,
         cancelOrder: handleCancel,
         resetAccount: handleReset,
+        updateTpSl: handleUpdateTpSl,
         reload: loadAll,
     };
 }

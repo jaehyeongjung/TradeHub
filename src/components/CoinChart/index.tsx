@@ -6,11 +6,14 @@ import {
     CandlestickSeries,
     HistogramSeries,
     type IChartApi,
+    type ISeriesApi,
     type CandlestickData,
     type UTCTimestamp,
+    type IPriceLine,
 } from "lightweight-charts";
 import { toKstUtcTimestamp } from "@/lib/time";
 import type { KlineRow, KlineMessage, Interval } from "@/types/binance";
+import type { SimPosition } from "@/types/sim-trading";
 import SymbolPickerModal from "@/components/SymbolPickerModal";
 import { supabase } from "@/lib/supabase-browser";
 import { AnimatePresence, motion } from "framer-motion";
@@ -34,6 +37,10 @@ type Props = {
     fadeDelay?: number;
     /** 심볼 변경 버튼/심볼 표시/툴팁 숨김 (모의투자용) */
     hideControls?: boolean;
+    /** 현재 심볼의 오픈 포지션 목록 (차트에 진입가 라인 표시) */
+    positions?: SimPosition[];
+    /** TP/SL 라인 드래그 완료 시 콜백 */
+    onUpdateTpSl?: (positionId: string, tp: number | null, sl: number | null) => Promise<void>;
 };
 
 const INTERVAL_OPTIONS: { value: Interval; label: string }[] = [
@@ -53,9 +60,21 @@ export default function CoinChart({
     className,
     fadeDelay = 0,
     hideControls = false,
+    positions,
+    onUpdateTpSl,
 }: Props) {
     const outerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<HTMLDivElement>(null);
+    const chartApiRef = useRef<IChartApi | null>(null);
+    const candleSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+    const priceLinesRef = useRef<IPriceLine[]>([]);
+    // TP/SL 드래그용
+    const draggingRef = useRef<{ posId: string; type: "tp" | "sl"; line: IPriceLine } | null>(null);
+    const tpSlLinesRef = useRef<Array<{ posId: string; type: "tp" | "sl"; line: IPriceLine }>>([]);
+    const onUpdateTpSlRef = useRef(onUpdateTpSl);
+    onUpdateTpSlRef.current = onUpdateTpSl;
+    const positionsRef = useRef(positions);
+    positionsRef.current = positions;
     const [sym, setSym] = useState(symbol.toUpperCase());
     const [interval, setInterval] = useState<Interval>(defaultInterval);
 
@@ -103,25 +122,27 @@ export default function CoinChart({
         return () => observer.disconnect();
     }, []);
 
-    // 유저 세션 + 저장된 심볼 불러오기
+    // 유저 세션 + 저장된 심볼 불러오기 (hideControls일 때는 symbol prop만 사용)
     useEffect(() => {
+        // 인터벌은 항상 불러오기
+        const savedInterval = localStorage.getItem(
+            `chart:${boxId}:interval`,
+        );
+        if (
+            savedInterval &&
+            INTERVAL_OPTIONS.some((o) => o.value === savedInterval)
+        ) {
+            setInterval(savedInterval as Interval);
+        }
+
+        if (hideControls) return; // 모의투자 모드에서는 symbol을 prop으로만 제어
+
         let unsub: { subscription: { unsubscribe(): void } } | null = null;
 
         (async () => {
             const { data } = await supabase.auth.getSession();
             const uid = data.session?.user?.id ?? null;
             setUserId(uid);
-
-            // 인터벌 불러오기 (로컬스토리지)
-            const savedInterval = localStorage.getItem(
-                `chart:${boxId}:interval`,
-            );
-            if (
-                savedInterval &&
-                INTERVAL_OPTIONS.some((o) => o.value === savedInterval)
-            ) {
-                setInterval(savedInterval as Interval);
-            }
 
             if (uid) {
                 const { data: row } = await supabase
@@ -161,7 +182,7 @@ export default function CoinChart({
         return () => {
             unsub?.subscription.unsubscribe();
         };
-    }, [boxId]);
+    }, [boxId, hideControls]);
 
     // 차트 생성 + 안전정리
     useEffect(() => {
@@ -191,6 +212,8 @@ export default function CoinChart({
             timeScale: { borderColor: isLight ? "#d0d0d0" : "#2A2A2A" },
         });
 
+        chartApiRef.current = chart;
+
         chart.timeScale().applyOptions({
             timeVisible: true,
             secondsVisible: false,
@@ -206,6 +229,7 @@ export default function CoinChart({
             wickDownColor: "#ef5350",
             borderVisible: false,
         });
+        candleSeriesRef.current = candleSeries;
 
         // 거래량 히스토그램
         const volumeSeries = chart.addSeries(HistogramSeries, {
@@ -489,6 +513,10 @@ export default function CoinChart({
 
         return () => {
             destroyed = true;
+            candleSeriesRef.current = null;
+            chartApiRef.current = null;
+            priceLinesRef.current = [];
+            tpSlLinesRef.current = [];
 
             try {
                 ro?.disconnect();
@@ -515,6 +543,174 @@ export default function CoinChart({
             } catch {}
         };
     }, [sym, interval, historyLimit, theme]);
+
+    // 포지션 진입가 + 청산가 라인 표시
+    useEffect(() => {
+        const series = candleSeriesRef.current;
+        if (!series || !positions) return;
+
+        // 기존 라인 제거
+        for (const line of priceLinesRef.current) {
+            try { series.removePriceLine(line); } catch {}
+        }
+        priceLinesRef.current = [];
+        tpSlLinesRef.current = [];
+
+        // 현재 심볼의 OPEN 포지션만 필터
+        const currentPositions = positions.filter(
+            (p) => p.symbol === sym && p.status === "OPEN"
+        );
+
+        for (const pos of currentPositions) {
+            const isLong = pos.side === "LONG";
+
+            // 진입가 라인
+            const entryLine = series.createPriceLine({
+                price: pos.entry_price,
+                color: isLong ? "#26a69a" : "#ef5350",
+                lineWidth: 1,
+                lineStyle: 1, // Dashed
+                axisLabelVisible: true,
+                title: `${pos.side} 진입 $${pos.entry_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+            });
+            priceLinesRef.current.push(entryLine);
+
+            // 청산가 라인
+            if (pos.liq_price > 0) {
+                const liqLine = series.createPriceLine({
+                    price: pos.liq_price,
+                    color: "#f97316", // orange
+                    lineWidth: 1,
+                    lineStyle: 2, // Dotted
+                    axisLabelVisible: true,
+                    title: `${pos.side} 청산 $${pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+                });
+                priceLinesRef.current.push(liqLine);
+            }
+
+            // TP 라인
+            if (pos.tp_price && pos.tp_price > 0) {
+                const tpLine = series.createPriceLine({
+                    price: pos.tp_price,
+                    color: "#22c55e",
+                    lineWidth: 1,
+                    lineStyle: 2, // Dotted
+                    axisLabelVisible: true,
+                    title: `TP $${pos.tp_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+                });
+                priceLinesRef.current.push(tpLine);
+                tpSlLinesRef.current.push({ posId: pos.id, type: "tp", line: tpLine });
+            }
+
+            // SL 라인
+            if (pos.sl_price && pos.sl_price > 0) {
+                const slLine = series.createPriceLine({
+                    price: pos.sl_price,
+                    color: "#ef4444",
+                    lineWidth: 1,
+                    lineStyle: 2, // Dotted
+                    axisLabelVisible: true,
+                    title: `SL $${pos.sl_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+                });
+                priceLinesRef.current.push(slLine);
+                tpSlLinesRef.current.push({ posId: pos.id, type: "sl", line: slLine });
+            }
+        }
+    }, [positions, sym]);
+
+    // TP/SL 라인 드래그 핸들링
+    useEffect(() => {
+        const el = chartRef.current;
+        if (!el || !onUpdateTpSl) return;
+
+        const DRAG_THRESHOLD_PX = 10;
+
+        const handleMouseDown = (e: MouseEvent) => {
+            const series = candleSeriesRef.current;
+            if (!series || tpSlLinesRef.current.length === 0) return;
+
+            const rect = el.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+
+            for (const item of tpSlLinesRef.current) {
+                const lineY = series.priceToCoordinate(item.line.options().price);
+                if (lineY !== null && Math.abs(y - (lineY as number)) < DRAG_THRESHOLD_PX) {
+                    draggingRef.current = { posId: item.posId, type: item.type, line: item.line };
+                    el.style.cursor = "grabbing";
+                    // 차트 스크롤 비활성화
+                    chartApiRef.current?.applyOptions({ handleScroll: { pressedMouseMove: false } });
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+            }
+        };
+
+        const handleMouseMove = (e: MouseEvent) => {
+            const series = candleSeriesRef.current;
+            if (!series) return;
+
+            if (!draggingRef.current) {
+                // TP/SL 라인 근처에서 커서 변경
+                const rect = el.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                let near = false;
+                for (const item of tpSlLinesRef.current) {
+                    const lineY = series.priceToCoordinate(item.line.options().price);
+                    if (lineY !== null && Math.abs(y - (lineY as number)) < DRAG_THRESHOLD_PX) {
+                        near = true;
+                        break;
+                    }
+                }
+                el.style.cursor = near ? "grab" : "";
+                return;
+            }
+
+            const rect = el.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            const newPrice = series.coordinateToPrice(y);
+            if (newPrice !== null && (newPrice as number) > 0) {
+                const drag = draggingRef.current;
+                drag.line.applyOptions({
+                    price: newPrice as number,
+                    title: `${drag.type.toUpperCase()} $${(newPrice as number).toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+                });
+            }
+        };
+
+        const handleMouseUp = async () => {
+            if (!draggingRef.current) return;
+
+            const drag = draggingRef.current;
+            const finalPrice = drag.line.options().price;
+            draggingRef.current = null;
+            el.style.cursor = "";
+            // 차트 스크롤 재활성화
+            chartApiRef.current?.applyOptions({ handleScroll: { pressedMouseMove: true } });
+
+            const pos = positionsRef.current?.find(p => p.id === drag.posId);
+            if (!pos) return;
+
+            const newTp = drag.type === "tp" ? finalPrice : (pos.tp_price ?? null);
+            const newSl = drag.type === "sl" ? finalPrice : (pos.sl_price ?? null);
+
+            try {
+                await onUpdateTpSlRef.current?.(drag.posId, newTp, newSl);
+            } catch (e) {
+                console.error("Failed to update TP/SL:", e);
+            }
+        };
+
+        el.addEventListener("mousedown", handleMouseDown, true);
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+
+        return () => {
+            el.removeEventListener("mousedown", handleMouseDown, true);
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", handleMouseUp);
+        };
+    }, [positions, sym, onUpdateTpSl]);
 
     const saveSymbol = async (next: string) => {
         const s = next.toUpperCase();

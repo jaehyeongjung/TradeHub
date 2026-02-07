@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useAtomValue } from "jotai";
 import { simPricesAtom } from "@/store/atoms";
 import { calcRoe } from "@/lib/sim-trading";
@@ -8,10 +9,14 @@ import type { SimPosition } from "@/types/sim-trading";
 interface Props {
     positions: SimPosition[];
     onClose: (positionId: string, closePrice: number) => Promise<unknown>;
+    onUpdateTpSl?: (positionId: string, tp: number | null, sl: number | null) => Promise<void>;
 }
 
-export default function SimPositions({ positions, onClose }: Props) {
+export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props) {
     const prices = useAtomValue(simPricesAtom);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editTp, setEditTp] = useState("");
+    const [editSl, setEditSl] = useState("");
 
     if (positions.length === 0) {
         return (
@@ -37,6 +42,9 @@ export default function SimPositions({ positions, onClose }: Props) {
                     const isProfit = pnl >= 0;
                     const isLong = pos.side === "LONG";
 
+                    // 현재 포지션 규모 (달러)
+                    const notional = pos.quantity * cp;
+
                     // 청산까지 남은 %
                     const liqDist = pos.entry_price > 0
                         ? Math.abs(cp - pos.liq_price) / cp * 100
@@ -61,10 +69,17 @@ export default function SimPositions({ positions, onClose }: Props) {
                                     }`}>
                                         {pos.side}
                                     </span>
+                                    <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-medium ${
+                                        pos.margin_mode === "CROSS"
+                                            ? "bg-amber-500/10 text-amber-400"
+                                            : "bg-violet-500/10 text-violet-400"
+                                    }`}>
+                                        {pos.margin_mode === "CROSS" ? "Cross" : "Isolated"}
+                                    </span>
                                     <span className="text-[13px] font-bold text-white">
                                         {pos.symbol.replace("USDT", "")}
                                     </span>
-                                    <span className="text-[10px] text-neutral-500 font-mono">{pos.leverage}x</span>
+                                    <span className="text-[10px] text-neutral-500 font-mono">{pos.leverage.toFixed(1)}x</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     {/* PnL 크게 */}
@@ -87,7 +102,7 @@ export default function SimPositions({ positions, onClose }: Props) {
                             </div>
 
                             {/* 하단: 상세 정보 */}
-                            <div className="grid grid-cols-5 gap-3 px-4 pb-3 pt-1">
+                            <div className="grid grid-cols-6 gap-3 px-4 pb-3 pt-1">
                                 <div>
                                     <div className="text-[9px] text-neutral-600 mb-0.5">진입가</div>
                                     <div className="text-[11px] text-neutral-200 font-mono tabular-nums">
@@ -101,7 +116,15 @@ export default function SimPositions({ positions, onClose }: Props) {
                                     </div>
                                 </div>
                                 <div>
-                                    <div className="text-[9px] text-neutral-600 mb-0.5">청산가</div>
+                                    <div className="text-[9px] text-neutral-600 mb-0.5">포지션 규모</div>
+                                    <div className="text-[11px] text-neutral-200 font-mono tabular-nums">
+                                        ${notional.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div className="text-[9px] text-neutral-600 mb-0.5">
+                                        청산가{pos.margin_mode === "CROSS" ? " (실시간)" : ""}
+                                    </div>
                                     <div className="text-[11px] text-orange-400 font-mono tabular-nums">
                                         {pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                                     </div>
@@ -120,23 +143,79 @@ export default function SimPositions({ positions, onClose }: Props) {
                                 </div>
                             </div>
 
-                            {/* TP/SL 표시 */}
-                            {(pos.tp_price || pos.sl_price) && (
-                                <div className="flex gap-4 px-4 pb-2.5 text-[10px]">
-                                    {pos.tp_price && (
-                                        <span>
-                                            <span className="text-neutral-600">TP </span>
-                                            <span className="text-emerald-400/80 font-mono">${pos.tp_price.toFixed(2)}</span>
-                                        </span>
-                                    )}
-                                    {pos.sl_price && (
-                                        <span>
-                                            <span className="text-neutral-600">SL </span>
-                                            <span className="text-red-400/80 font-mono">${pos.sl_price.toFixed(2)}</span>
-                                        </span>
-                                    )}
-                                </div>
-                            )}
+                            {/* TP/SL 표시 + 편집 */}
+                            <div className="px-4 pb-2.5">
+                                {editingId === pos.id ? (
+                                    <div className="flex items-center gap-2 text-[10px]">
+                                        <div className="flex items-center gap-1 flex-1">
+                                            <span className="text-neutral-600 shrink-0">TP</span>
+                                            <input
+                                                type="number"
+                                                value={editTp}
+                                                onChange={(e) => setEditTp(e.target.value)}
+                                                placeholder="—"
+                                                className="w-full bg-neutral-800 text-emerald-400 text-[10px] font-mono rounded px-1.5 py-1 border border-zinc-700 outline-none placeholder:text-neutral-700"
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-1 flex-1">
+                                            <span className="text-neutral-600 shrink-0">SL</span>
+                                            <input
+                                                type="number"
+                                                value={editSl}
+                                                onChange={(e) => setEditSl(e.target.value)}
+                                                placeholder="—"
+                                                className="w-full bg-neutral-800 text-red-400 text-[10px] font-mono rounded px-1.5 py-1 border border-zinc-700 outline-none placeholder:text-neutral-700"
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={async () => {
+                                                const tp = editTp ? parseFloat(editTp) : null;
+                                                const sl = editSl ? parseFloat(editSl) : null;
+                                                await onUpdateTpSl?.(pos.id, tp, sl);
+                                                setEditingId(null);
+                                            }}
+                                            className="text-[9px] px-2 py-1 bg-amber-500/20 text-amber-300 rounded border border-amber-500/30 hover:bg-amber-500/30 transition-colors cursor-pointer shrink-0"
+                                        >
+                                            저장
+                                        </button>
+                                        <button
+                                            onClick={() => setEditingId(null)}
+                                            className="text-[9px] px-1.5 py-1 text-neutral-500 hover:text-neutral-300 cursor-pointer shrink-0"
+                                        >
+                                            취소
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-3 text-[10px]">
+                                        {pos.tp_price ? (
+                                            <span>
+                                                <span className="text-neutral-600">TP </span>
+                                                <span className="text-emerald-400/80 font-mono">${pos.tp_price.toFixed(2)}</span>
+                                            </span>
+                                        ) : (
+                                            <span className="text-neutral-700">TP —</span>
+                                        )}
+                                        {pos.sl_price ? (
+                                            <span>
+                                                <span className="text-neutral-600">SL </span>
+                                                <span className="text-red-400/80 font-mono">${pos.sl_price.toFixed(2)}</span>
+                                            </span>
+                                        ) : (
+                                            <span className="text-neutral-700">SL —</span>
+                                        )}
+                                        <button
+                                            onClick={() => {
+                                                setEditingId(pos.id);
+                                                setEditTp(pos.tp_price ? String(pos.tp_price) : "");
+                                                setEditSl(pos.sl_price ? String(pos.sl_price) : "");
+                                            }}
+                                            className="text-[10px] px-2.5 py-1 font-medium bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 hover:text-amber-200 border border-amber-500/30 hover:border-amber-400/50 rounded-md transition-colors cursor-pointer ml-auto"
+                                        >
+                                            TP/SL 설정
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     );
                 })}

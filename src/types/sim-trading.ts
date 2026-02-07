@@ -1,4 +1,5 @@
 export type PositionSide = "LONG" | "SHORT";
+export type MarginMode = "CROSS" | "ISOLATED";
 export type PositionStatus = "OPEN" | "CLOSED" | "LIQUIDATED";
 export type OrderType = "MARKET" | "LIMIT" | "STOP_MARKET";
 export type OrderStatus = "PENDING" | "FILLED" | "CANCELLED";
@@ -22,6 +23,7 @@ export interface SimPosition {
     leverage: number;
     margin: number;
     liq_price: number;
+    margin_mode: MarginMode;
     tp_price: number | null;
     sl_price: number | null;
     unrealized_pnl: number;
@@ -40,6 +42,7 @@ export interface SimOrder {
     price: number;
     quantity: number;
     leverage: number;
+    margin_mode: MarginMode;
     tp_price: number | null;
     sl_price: number | null;
     status: OrderStatus;
@@ -70,4 +73,5 @@ export interface OpenPositionInput {
     leverage: number;
     tpPrice?: number;
     slPrice?: number;
+    marginMode?: MarginMode;
 }

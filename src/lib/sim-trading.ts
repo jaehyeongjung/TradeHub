@@ -6,6 +6,7 @@ import type {
     SimTrade,
     OpenPositionInput,
     PositionSide,
+    MarginMode,
 } from "@/types/sim-trading";
 
 const TAKER_FEE = 0.0004; // 0.04%
@@ -103,6 +104,24 @@ export function calcRoe(
     return (pnl / margin) * 100;
 }
 
+/** Cross 모드 청산가 계산: 잔고(available balance)를 effective margin에 포함 */
+export function calcLiqPriceCross(
+    side: PositionSide,
+    entryPrice: number,
+    quantity: number,
+    margin: number,
+    availableBalance: number
+): number {
+    const notional = entryPrice * quantity;
+    const effectiveMargin = margin + availableBalance;
+    if (notional === 0) return 0;
+    const effectiveLev = notional / effectiveMargin;
+    if (side === "LONG") {
+        return entryPrice * (1 - 1 / effectiveLev + MAINTENANCE_MARGIN_RATE);
+    }
+    return entryPrice * (1 + 1 / effectiveLev - MAINTENANCE_MARGIN_RATE);
+}
+
 /* ── 포지션 오픈 ── */
 
 export async function openPosition(
@@ -111,7 +130,7 @@ export async function openPosition(
 ): Promise<{ position: SimPosition; account: SimAccount }> {
     const account = await getOrCreateAccount(userId);
 
-    const { symbol, side, orderType, price, quantityUsdt, leverage, tpPrice, slPrice } = input;
+    const { symbol, side, orderType, price, quantityUsdt, leverage, tpPrice, slPrice, marginMode = "CROSS" } = input;
 
     // 코인 수량
     const quantity = quantityUsdt / price;
@@ -136,6 +155,7 @@ export async function openPosition(
             price,
             quantity,
             leverage,
+            margin_mode: marginMode,
             tp_price: tpPrice ?? null,
             sl_price: slPrice ?? null,
         });
@@ -156,29 +176,90 @@ export async function openPosition(
         };
     }
 
-    // 시장가 즉시 체결
-    const liqPrice = calcLiqPrice(side, price, leverage);
-
-    const { data: position, error: posErr } = await supabase
+    // 시장가 즉시 체결 — 기존 같은 심볼+방향 포지션 확인 (병합)
+    const { data: existingPos } = await supabase
         .from("sim_positions")
-        .insert({
-            user_id: userId,
-            symbol,
-            side,
-            entry_price: price,
-            quantity,
-            leverage,
-            margin,
-            liq_price: liqPrice,
-            tp_price: tpPrice ?? null,
-            sl_price: slPrice ?? null,
-        })
-        .select()
-        .single();
+        .select("*")
+        .eq("user_id", userId)
+        .eq("symbol", symbol)
+        .eq("side", side)
+        .eq("status", "OPEN")
+        .maybeSingle();
 
-    if (posErr) throw posErr;
+    let position: SimPosition;
 
-    // 거래 기록
+    if (existingPos) {
+        // 기존 포지션에 병합
+        const old = existingPos as SimPosition;
+        const newQty = old.quantity + quantity;
+        const newEntryPrice = (old.quantity * old.entry_price + quantity * price) / newQty;
+        const newMargin = old.margin + margin;
+        const newLeverage = (old.margin * old.leverage + margin * leverage) / (old.margin + margin);
+        const mergedMarginMode = marginMode; // 새 주문의 마진 모드 사용
+
+        let newLiqPrice: number;
+        const remainingBalance = account.balance - totalCost;
+        if (mergedMarginMode === "CROSS") {
+            newLiqPrice = calcLiqPriceCross(side, newEntryPrice, newQty, newMargin, remainingBalance);
+        } else {
+            newLiqPrice = calcLiqPrice(side, newEntryPrice, newLeverage);
+        }
+
+        // TP/SL: 새 주문에 있으면 덮어쓰기, 없으면 기존 유지
+        const mergedTp = tpPrice ?? old.tp_price;
+        const mergedSl = slPrice ?? old.sl_price;
+
+        const { data: updated, error: upErr } = await supabase
+            .from("sim_positions")
+            .update({
+                entry_price: newEntryPrice,
+                quantity: newQty,
+                leverage: newLeverage,
+                margin: newMargin,
+                liq_price: newLiqPrice,
+                margin_mode: mergedMarginMode,
+                tp_price: mergedTp,
+                sl_price: mergedSl,
+            })
+            .eq("id", old.id)
+            .select()
+            .single();
+
+        if (upErr) throw upErr;
+        position = updated as SimPosition;
+    } else {
+        // 새 포지션 생성
+        const remainingBalance = account.balance - totalCost;
+        let liqPrice: number;
+        if (marginMode === "CROSS") {
+            liqPrice = calcLiqPriceCross(side, price, quantity, margin, remainingBalance);
+        } else {
+            liqPrice = calcLiqPrice(side, price, leverage);
+        }
+
+        const { data: created, error: posErr } = await supabase
+            .from("sim_positions")
+            .insert({
+                user_id: userId,
+                symbol,
+                side,
+                entry_price: price,
+                quantity,
+                leverage,
+                margin,
+                liq_price: liqPrice,
+                margin_mode: marginMode,
+                tp_price: tpPrice ?? null,
+                sl_price: slPrice ?? null,
+            })
+            .select()
+            .single();
+
+        if (posErr) throw posErr;
+        position = created as SimPosition;
+    }
+
+    // 거래 기록 (추가 매수 이력 추적용 — 병합 시에도 별도 INSERT)
     await supabase.from("sim_trades").insert({
         user_id: userId,
         position_id: position.id,
@@ -331,9 +412,9 @@ export async function fillOrder(
     if (!ord || ord.status !== "PENDING") return null;
 
     const order = ord as SimOrder;
-    const liqPrice = calcLiqPrice(order.side, fillPrice, order.leverage);
     const margin = order.quantity * fillPrice / order.leverage;
     const fee = order.quantity * fillPrice * TAKER_FEE;
+    const orderMarginMode: MarginMode = order.margin_mode ?? "CROSS";
 
     // 주문 체결
     await supabase
@@ -341,40 +422,98 @@ export async function fillOrder(
         .update({ status: "FILLED" })
         .eq("id", orderId);
 
-    // 포지션 생성
-    const { data: position } = await supabase
+    // 기존 같은 심볼+방향 포지션 확인 (병합)
+    const { data: existingPos } = await supabase
         .from("sim_positions")
-        .insert({
-            user_id: userId,
-            symbol: order.symbol,
-            side: order.side,
-            entry_price: fillPrice,
-            quantity: order.quantity,
-            leverage: order.leverage,
-            margin,
-            liq_price: liqPrice,
-            tp_price: order.tp_price,
-            sl_price: order.sl_price,
-        })
-        .select()
-        .single();
+        .select("*")
+        .eq("user_id", userId)
+        .eq("symbol", order.symbol)
+        .eq("side", order.side)
+        .eq("status", "OPEN")
+        .maybeSingle();
 
-    // 거래 기록
-    if (position) {
-        await supabase.from("sim_trades").insert({
-            user_id: userId,
-            position_id: position.id,
-            symbol: order.symbol,
-            side: order.side,
-            type: "OPEN",
-            price: fillPrice,
-            quantity: order.quantity,
-            pnl: 0,
-            fee,
-        });
+    let position: SimPosition;
+
+    if (existingPos) {
+        const old = existingPos as SimPosition;
+        const newQty = old.quantity + order.quantity;
+        const newEntryPrice = (old.quantity * old.entry_price + order.quantity * fillPrice) / newQty;
+        const newMargin = old.margin + margin;
+        const newLeverage = (old.margin * old.leverage + margin * order.leverage) / (old.margin + margin);
+        const mergedMarginMode = orderMarginMode;
+
+        let newLiqPrice: number;
+        if (mergedMarginMode === "CROSS") {
+            const account = await getOrCreateAccount(userId);
+            newLiqPrice = calcLiqPriceCross(order.side, newEntryPrice, newQty, newMargin, account.balance);
+        } else {
+            newLiqPrice = calcLiqPrice(order.side, newEntryPrice, newLeverage);
+        }
+
+        const mergedTp = order.tp_price ?? old.tp_price;
+        const mergedSl = order.sl_price ?? old.sl_price;
+
+        const { data: updated } = await supabase
+            .from("sim_positions")
+            .update({
+                entry_price: newEntryPrice,
+                quantity: newQty,
+                leverage: newLeverage,
+                margin: newMargin,
+                liq_price: newLiqPrice,
+                margin_mode: mergedMarginMode,
+                tp_price: mergedTp,
+                sl_price: mergedSl,
+            })
+            .eq("id", old.id)
+            .select()
+            .single();
+
+        position = updated as SimPosition;
+    } else {
+        let liqPrice: number;
+        if (orderMarginMode === "CROSS") {
+            const account = await getOrCreateAccount(userId);
+            liqPrice = calcLiqPriceCross(order.side, fillPrice, order.quantity, margin, account.balance);
+        } else {
+            liqPrice = calcLiqPrice(order.side, fillPrice, order.leverage);
+        }
+
+        const { data: created } = await supabase
+            .from("sim_positions")
+            .insert({
+                user_id: userId,
+                symbol: order.symbol,
+                side: order.side,
+                entry_price: fillPrice,
+                quantity: order.quantity,
+                leverage: order.leverage,
+                margin,
+                liq_price: liqPrice,
+                margin_mode: orderMarginMode,
+                tp_price: order.tp_price,
+                sl_price: order.sl_price,
+            })
+            .select()
+            .single();
+
+        position = created as SimPosition;
     }
 
-    return position as SimPosition | null;
+    // 거래 기록
+    await supabase.from("sim_trades").insert({
+        user_id: userId,
+        position_id: position.id,
+        symbol: order.symbol,
+        side: order.side,
+        type: "OPEN",
+        price: fillPrice,
+        quantity: order.quantity,
+        pnl: 0,
+        fee,
+    });
+
+    return position;
 }
 
 /* ── 주문 취소 ── */
@@ -419,6 +558,22 @@ export async function cancelOrder(
         .single();
 
     return updated as SimAccount;
+}
+
+/* ── TP/SL 수정 ── */
+
+export async function updatePositionTpSl(
+    userId: string,
+    positionId: string,
+    tpPrice: number | null,
+    slPrice: number | null
+): Promise<void> {
+    await supabase
+        .from("sim_positions")
+        .update({ tp_price: tpPrice, sl_price: slPrice })
+        .eq("id", positionId)
+        .eq("user_id", userId)
+        .eq("status", "OPEN");
 }
 
 /* ── 데이터 조회 ── */

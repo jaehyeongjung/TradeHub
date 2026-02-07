@@ -52,6 +52,9 @@ export default function SimTradeHistory({ trades }: Props) {
                                     <span className="text-[10px] text-neutral-500">
                                         ${t.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                                     </span>
+                                    <span className="text-[9px] text-neutral-600">
+                                        ${(t.quantity * t.price).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                    </span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     {!isOpen && (

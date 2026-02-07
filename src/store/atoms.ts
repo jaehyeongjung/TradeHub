@@ -1,6 +1,7 @@
 "use client";
 
 import { atom } from "jotai";
+import type { MarginMode } from "@/types/sim-trading";
 
 /**
  * 트리맵 오버레이 열림 상태
@@ -19,3 +20,6 @@ export const simSymbolAtom = atom("BTCUSDT");
 
 /** 실시간 가격 캐시 { BTCUSDT: 98000.5, ... } */
 export const simPricesAtom = atom<Record<string, number>>({});
+
+/** 마진 모드 (Cross / Isolated) */
+export const simMarginModeAtom = atom<MarginMode>("CROSS");
