@@ -484,7 +484,7 @@ body {
         gap: 12px !important;
     }
     section[aria-label="커뮤니티 게시판 및 채팅"] {
-        height: calc(100vh - 200px) !important;
+        height: calc(100vh - 330px) !important;
         min-height: auto !important;
     }
 }
