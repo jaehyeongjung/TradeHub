@@ -8,16 +8,19 @@
 
 > “실시간 Hot 코인·실시간 채팅·코인 뉴스·코인 시세/차트·Top Trader의 포지션을 한 화면에서 볼 수 있는 PC 기반 서비스”
 >  
-> <sub>⚠️ **PC 버전만 지원** — 대부분의 트레이더는 PC 환경에서 시세를 확인하고 분석하기 때문에, 초기 MVP 단계에서는 **데스크톱 UX 최적화**에 집중했습니다.</sub>
+
 
 <br>
 
-**Dark&Light Mode**
+**대시보드**
 
 <img width="1440" height="687" alt="스크린샷 2026-02-03 오후 11 42 25" src="https://github.com/user-attachments/assets/5d8d0935-0f11-4ac5-955e-f2a9cc906bbc" />
 
-<img width="1440" height="687" alt="스크린샷 2026-02-03 오후 11 49 03" src="https://github.com/user-attachments/assets/7f080d38-9266-42e7-ae44-f3f47f41bd0f" />
+----
 
+**선물 모의투자**
+
+<img width="1432" height="686" alt="스크린샷 2026-02-07 오후 7 20 26" src="https://github.com/user-attachments/assets/12955b70-0b18-4a74-aeaf-9c7f869924b3" />
 
 --- 
 
