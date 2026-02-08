@@ -2,9 +2,12 @@
 
 # TradeHub
 
-> 코인 트레이더에게 필요한 정보를 한 화면에서 제공합니다.  
-> 실시간 시세, 거액 체결 내역, 청산 알림부터 김치프리미엄, 공포탐욕지수까지  
-> 시장 분석에 필요한 모든 데이터를 실시간으로 확인하세요.
+실시간 암호화폐 선물 모의투자 플랫폼
+
+선물 거래를 실전처럼 연습하고, 
+
+시장 분석에 필요한 모든 데이터를 실시간으로 확인하세요.
+
 
 <br>
 
@@ -15,6 +18,28 @@
 </p>
 
 <br>
+
+## 선물 모의투자
+
+https://github.com/user-attachments/assets/a8d60177-9063-4fdf-bd52-90e0d4b04e31
+
+
+### 트레이딩 기능
+
+| 항목 | 설명 |
+|------|------|
+| **지원 종목** | BTC, ETH, SOL, BNB, XRP, DOGE, ADA, AVAX, DOT, MATIC (USDT 페어) |
+| **실시간 시세** | Binance `@ticker` combined stream (WebSocket) |
+| **시장 데이터** | 펀딩비, Open Interest, 24h 통계, 롱숏비율 — 15초 폴링 |
+| **차트** | lightweight-charts 기반 캔들스틱 + 거래량 히스토그램 |
+| **TP/SL 관리** | 차트 위 드래그로 조절, Supabase 실시간 동기화 |
+| **포지션 저장** | Supabase 기반 주문/포지션 영속 저장 |
+
+<br>
+
+
+
+
 
 ## 대시보드
 
@@ -40,28 +65,6 @@
 **성능 최적화**
 - 폴링 기반 컴포넌트는 탭 비활성 시 자동 중지 (`useVisibilityPolling`)
 - WebSocket 연결 끊김 시 3초 후 자동 재연결
-
----
-
-<br>
-
-## 선물 모의투자
-
-https://github.com/user-attachments/assets/c7a2f28f-6c54-43c2-bdc0-502383b11231
-
-
-
-
-### 트레이딩 기능
-
-| 항목 | 설명 |
-|------|------|
-| **지원 종목** | BTC, ETH, SOL, BNB, XRP, DOGE, ADA, AVAX, DOT, MATIC (USDT 페어) |
-| **실시간 시세** | Binance `@ticker` combined stream (WebSocket) |
-| **시장 데이터** | 펀딩비, Open Interest, 24h 통계, 롱숏비율 — 15초 폴링 |
-| **차트** | lightweight-charts 기반 캔들스틱 + 거래량 히스토그램 |
-| **TP/SL 관리** | 차트 위 드래그로 조절, Supabase 실시간 동기화 |
-| **포지션 저장** | Supabase 기반 주문/포지션 영속 저장 |
 
 ---
 
