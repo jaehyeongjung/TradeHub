@@ -13,7 +13,7 @@ export const treemapOpenAtom = atom(false);
 /* ── 모의투자 관련 atoms ── */
 
 /** 현재 활성 페이지: 메인 대시보드 vs 모의투자 */
-export const activePageAtom = atom<"main" | "sim">("main");
+export const activePageAtom = atom<"main" | "sim">("sim");
 
 /** 모의투자에서 선택된 심볼 */
 export const simSymbolAtom = atom("BTCUSDT");

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAtom } from "jotai";
 import AuthBox from "@/components/login";
 import CryptoTreemap from "@/components/CryptoTreemap";
@@ -76,10 +76,30 @@ export default function FloatingLoginSidebar() {
             {/* FAB: 우하단 떠있는 버튼들 */}
             <div className="fixed bottom-5 right-5 z-[60] flex items-center gap-3">
                 {/* 모의투자 버튼 */}
-                <button
+                <motion.button
                     type="button"
                     onClick={() => setActivePage(isSim ? "main" : "sim")}
                     aria-label={isSim ? "대시보드로 이동" : "모의투자로 이동"}
+                    initial={{ scale: 1 }}
+                    animate={isSim ? {
+                        scale: [1, 1.12, 0.97, 1.1, 0.98, 1.08, 0.99, 1.06, 1, 1.04, 1, 1.03, 1],
+                        boxShadow: [
+                            "0 0 0px rgba(16,185,129,0)",
+                            "0 0 18px rgba(16,185,129,0.7)",
+                            "0 0 4px rgba(16,185,129,0.2)",
+                            "0 0 16px rgba(16,185,129,0.6)",
+                            "0 0 4px rgba(16,185,129,0.2)",
+                            "0 0 14px rgba(16,185,129,0.5)",
+                            "0 0 3px rgba(16,185,129,0.15)",
+                            "0 0 12px rgba(16,185,129,0.4)",
+                            "0 0 2px rgba(16,185,129,0.1)",
+                            "0 0 10px rgba(16,185,129,0.3)",
+                            "0 0 2px rgba(16,185,129,0.1)",
+                            "0 0 6px rgba(16,185,129,0.2)",
+                            "0 0 0px rgba(16,185,129,0)",
+                        ],
+                    } : { scale: 1 }}
+                    transition={{ duration: 7, ease: "easeOut", delay: 0.3 }}
                     className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-105 focus:outline-none transition-colors ${
                         isSim
                             ? isDark
@@ -101,7 +121,7 @@ export default function FloatingLoginSidebar() {
                             <path fill="currentColor" d="M3 13h2v8H3v-8zm4-6h2v14H7V7zm4-4h2v18h-2V3zm4 8h2v10h-2V11zm4-3h2v13h-2V8z" />
                         </svg>
                     )}
-                </button>
+                </motion.button>
 
                 {/* 트리맵 버튼 */}
                 <button
