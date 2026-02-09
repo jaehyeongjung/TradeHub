@@ -4,6 +4,20 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useAtomValue } from "jotai";
 import { simSymbolAtom, simPricesAtom, activePageAtom } from "@/store/atoms";
 
+function useTheme() {
+    const [isLight, setIsLight] = useState(false);
+    useEffect(() => {
+        const html = document.documentElement;
+        setIsLight(html.classList.contains("light"));
+        const observer = new MutationObserver(() => {
+            setIsLight(html.classList.contains("light"));
+        });
+        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
+    return isLight;
+}
+
 interface FundingInfo {
     fundingRate: number;
     nextFundingTime: number;
@@ -33,6 +47,7 @@ export default function SimMarketData() {
     const activePage = useAtomValue(activePageAtom);
     const prices = useAtomValue(simPricesAtom);
     const currentPrice = prices[simSymbol] ?? 0;
+    const isLight = useTheme();
 
     const [funding, setFunding] = useState<FundingInfo | null>(null);
     const [ticker, setTicker] = useState<TickerInfo | null>(null);
@@ -132,67 +147,70 @@ export default function SimMarketData() {
     const longPct = lsRatio ? Math.round(lsRatio.longAccount * 100) : 50;
     const shortPct = 100 - longPct;
 
+    const labelCls = `text-[11px] mb-0.5 ${isLight ? "text-neutral-500" : "text-neutral-400"}`;
+    const valueCls = `text-[13px] font-mono tabular-nums font-medium ${isLight ? "text-neutral-900" : "text-white"}`;
+
     return (
-        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 px-4 py-3">
+        <div className={`rounded-2xl border px-5 py-3.5 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-950 border-zinc-800"}`}>
             <div className="grid grid-cols-7 gap-4">
                 {/* 24h 변동 */}
                 <div>
-                    <div className="text-[9px] text-neutral-600 mb-0.5">24h 변동</div>
-                    <div className={`text-[12px] font-bold font-mono tabular-nums ${(ticker?.priceChangePct ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                    <div className={labelCls}>24h 변동</div>
+                    <div className={`text-[13px] font-bold font-mono tabular-nums ${(ticker?.priceChangePct ?? 0) >= 0 ? (isLight ? "text-emerald-600" : "text-emerald-400") : (isLight ? "text-red-600" : "text-red-400")}`}>
                         {ticker ? `${ticker.priceChangePct >= 0 ? "+" : ""}${ticker.priceChangePct.toFixed(2)}%` : "—"}
                     </div>
                 </div>
 
                 {/* 24h 고가 */}
                 <div>
-                    <div className="text-[9px] text-neutral-600 mb-0.5">24h 고가</div>
-                    <div className="text-[12px] text-white font-mono tabular-nums">
+                    <div className={labelCls}>24h 고가</div>
+                    <div className={valueCls}>
                         {ticker ? ticker.high.toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—"}
                     </div>
                 </div>
 
                 {/* 24h 저가 */}
                 <div>
-                    <div className="text-[9px] text-neutral-600 mb-0.5">24h 저가</div>
-                    <div className="text-[12px] text-white font-mono tabular-nums">
+                    <div className={labelCls}>24h 저가</div>
+                    <div className={valueCls}>
                         {ticker ? ticker.low.toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—"}
                     </div>
                 </div>
 
                 {/* 24h 거래대금 */}
                 <div>
-                    <div className="text-[9px] text-neutral-600 mb-0.5">24h 거래대금</div>
-                    <div className="text-[12px] text-white font-mono tabular-nums">
+                    <div className={labelCls}>24h 거래대금</div>
+                    <div className={valueCls}>
                         {ticker ? `$${formatVolume(ticker.quoteVolume)}` : "—"}
                     </div>
                 </div>
 
                 {/* 펀딩비 */}
                 <div>
-                    <div className="text-[9px] text-neutral-600 mb-0.5">펀딩비 / {countdown || "—"}</div>
-                    <div className={`text-[12px] font-bold font-mono tabular-nums ${(funding?.fundingRate ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                    <div className={labelCls}>펀딩비 / {countdown || "—"}</div>
+                    <div className={`text-[13px] font-bold font-mono tabular-nums ${(funding?.fundingRate ?? 0) >= 0 ? (isLight ? "text-emerald-600" : "text-emerald-400") : (isLight ? "text-red-600" : "text-red-400")}`}>
                         {funding ? `${funding.fundingRate >= 0 ? "+" : ""}${funding.fundingRate.toFixed(4)}%` : "—"}
                     </div>
                 </div>
 
                 {/* 미결제약정 */}
                 <div>
-                    <div className="text-[9px] text-neutral-600 mb-0.5">미결제약정</div>
-                    <div className="text-[12px] text-white font-mono tabular-nums">
+                    <div className={labelCls}>미결제약정</div>
+                    <div className={valueCls}>
                         {oi ? `$${formatVolume(oi.openInterest * currentPrice)}` : "—"}
                     </div>
                 </div>
 
                 {/* 롱/숏 비율 */}
                 <div>
-                    <div className="text-[9px] text-neutral-600 mb-0.5">롱/숏 비율</div>
+                    <div className={labelCls}>롱/숏 비율</div>
                     <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] text-emerald-400 font-mono font-medium">{longPct}%</span>
-                        <div className="flex-1 flex h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-emerald-500" style={{ width: `${longPct}%` }} />
-                            <div className="bg-red-500" style={{ width: `${shortPct}%` }} />
+                        <span className={`text-[12px] font-mono font-medium ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>{longPct}%</span>
+                        <div className="flex-1 flex gap-[2px] h-1.5">
+                            <div className="bg-emerald-500/60 rounded-full transition-all duration-300" style={{ width: `${longPct}%` }} />
+                            <div className="bg-red-400/80 rounded-full transition-all duration-300" style={{ width: `${shortPct}%` }} />
                         </div>
-                        <span className="text-[11px] text-red-400 font-mono font-medium">{shortPct}%</span>
+                        <span className={`text-[12px] font-mono font-medium ${isLight ? "text-red-600" : "text-red-400"}`}>{shortPct}%</span>
                     </div>
                 </div>
             </div>

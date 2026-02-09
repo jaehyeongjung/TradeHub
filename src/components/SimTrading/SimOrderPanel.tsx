@@ -37,6 +37,7 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
     const [slPrice, setSlPrice] = useState("");
     const [showTpSl, setShowTpSl] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+
     const [error, setError] = useState("");
 
     // 기존 포지션의 마진 모드로 강제 동기화
@@ -261,7 +262,7 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                         <span className="text-[10px] text-neutral-500">레버리지</span>
                         <span className="text-xs font-bold text-amber-400 font-mono">{leverage}x</span>
                     </div>
-                    <input type="range" min={1} max={125} value={leverage} onChange={(e) => setLeverage(Number(e.target.value))} className="w-full accent-amber-500 h-1" />
+                    <input type="range" min={1} max={125} value={leverage} onChange={(e) => setLeverage(Number(e.target.value))} className="w-full accent-amber-500 h-1 cursor-pointer" />
                     <div className="flex gap-0.5 mt-1.5">
                         {LEVERAGE_PRESETS.map((l) => (
                             <button

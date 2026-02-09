@@ -43,7 +43,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
             </div>
 
             {/* 테이블 헤더 */}
-            <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-2 px-5 py-2 text-[10px] text-neutral-500 border-b border-zinc-800/40">
+            <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-2 px-5 py-2 text-[11px] text-neutral-500 border-b border-zinc-800/40">
                 <div>심볼</div>
                 <div className="text-right">규모</div>
                 <div className="text-right">진입가</div>
@@ -75,10 +75,10 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                     <div className={`w-1 h-8 rounded-full ${isLong ? "bg-emerald-500" : "bg-red-500"}`} />
                                     <div>
                                         <div className="flex items-center gap-1.5">
-                                            <span className="text-[13px] font-bold text-white">
+                                            <span className="text-[14px] font-bold text-white">
                                                 {pos.symbol.replace("USDT", "")}
                                             </span>
-                                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                                                 isLong
                                                     ? "bg-emerald-500/15 text-emerald-400"
                                                     : "bg-red-500/15 text-red-400"
@@ -87,13 +87,16 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-1.5 mt-0.5">
-                                            <span className="text-[10px] text-amber-400 font-mono font-medium">{Number(pos.leverage).toFixed(0)}x</span>
-                                            <span className={`text-[9px] px-1 py-px rounded ${
+                                            <span className="text-[11px] text-amber-400 font-mono font-medium">{Number(pos.leverage).toFixed(0)}x</span>
+                                            <span className={`text-[10px] px-1 py-px rounded ${
                                                 pos.margin_mode === "CROSS"
                                                     ? "bg-amber-500/10 text-amber-400"
                                                     : "bg-violet-500/10 text-violet-400"
                                             }`}>
                                                 {pos.margin_mode === "CROSS" ? "Cross" : "Isolated"}
+                                            </span>
+                                            <span className="text-[11px] text-neutral-400 font-mono">
+                                                {pos.quantity.toFixed(pos.quantity >= 1 ? 4 : 6)} {pos.symbol.replace("USDT", "")}
                                             </span>
                                         </div>
                                     </div>
@@ -101,44 +104,44 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
 
                                 {/* 규모 */}
                                 <div className="text-right">
-                                    <div className="text-[12px] text-neutral-200 font-mono tabular-nums">
+                                    <div className="text-[13px] text-neutral-200 font-mono tabular-nums">
                                         ${notional.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                     </div>
-                                    <div className="text-[10px] text-neutral-500 font-mono tabular-nums">
+                                    <div className="text-[11px] text-neutral-500 font-mono tabular-nums">
                                         {pos.margin.toFixed(2)} 증거금
                                     </div>
                                 </div>
 
                                 {/* 진입가 */}
                                 <div className="text-right">
-                                    <div className="text-[12px] text-neutral-300 font-mono tabular-nums">
+                                    <div className="text-[13px] text-neutral-300 font-mono tabular-nums">
                                         {pos.entry_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                                     </div>
                                 </div>
 
                                 {/* 현재가 */}
                                 <div className="text-right">
-                                    <div className={`text-[12px] font-mono tabular-nums font-medium ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
+                                    <div className={`text-[13px] font-mono tabular-nums font-medium ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
                                         {cp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                                     </div>
                                 </div>
 
                                 {/* 청산가 */}
                                 <div className="text-right">
-                                    <div className="text-[12px] text-orange-400 font-mono tabular-nums">
+                                    <div className="text-[13px] text-orange-400 font-mono tabular-nums">
                                         {pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                                     </div>
-                                    <div className={`text-[10px] font-mono tabular-nums ${liqDist < 5 ? "text-orange-400" : "text-neutral-500"}`}>
+                                    <div className={`text-[11px] font-mono tabular-nums ${liqDist < 5 ? "text-orange-400" : "text-neutral-500"}`}>
                                         {liqDist.toFixed(1)}% 거리
                                     </div>
                                 </div>
 
                                 {/* PnL */}
                                 <div className="text-right">
-                                    <div className={`text-[14px] font-bold font-mono tabular-nums ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
+                                    <div className={`text-[15px] font-bold font-mono tabular-nums ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
                                         {isProfit ? "+" : ""}{pnl.toFixed(2)}
                                     </div>
-                                    <div className={`text-[11px] font-mono tabular-nums ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
+                                    <div className={`text-[12px] font-mono tabular-nums ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
                                         {isProfit ? "+" : ""}{roe.toFixed(2)}%
                                     </div>
                                 </div>
@@ -147,7 +150,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                 <div className="text-right w-[52px]">
                                     <button
                                         onClick={() => onClose(pos.id, cp)}
-                                        className="text-[10px] px-3 py-1.5 bg-neutral-800 hover:bg-red-500/20 text-neutral-400 hover:text-red-400 rounded-lg border border-neutral-700/50 transition-all cursor-pointer"
+                                        className="text-[11px] px-3 py-1.5 bg-neutral-800 hover:bg-red-500/20 text-neutral-400 hover:text-red-400 rounded-lg border border-neutral-700/50 transition-all cursor-pointer"
                                     >
                                         청산
                                     </button>
@@ -205,7 +208,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                         )}
                                     </div>
                                 ) : (
-                                    <div className="flex items-center gap-4 text-[11px]">
+                                    <div className="flex items-center gap-4 text-[12px]">
                                         <div className="flex items-center gap-1.5">
                                             <span className="text-neutral-500">TP</span>
                                             {pos.tp_price ? (

@@ -12,7 +12,10 @@ function useTheme() {
         const observer = new MutationObserver(() => {
             setIsLight(html.classList.contains("light"));
         });
-        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+        observer.observe(html, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
         return () => observer.disconnect();
     }, []);
     return isLight;
@@ -76,7 +79,9 @@ export default function SimOrderBook({ onPriceClick }: Props) {
             };
 
             ws.onerror = () => {
-                try { ws.close(); } catch {}
+                try {
+                    ws.close();
+                } catch {}
             };
 
             wsRef.current = ws;
@@ -103,7 +108,7 @@ export default function SimOrderBook({ onPriceClick }: Props) {
 
     const sortedAsks = useMemo(
         () => [...asks].sort((a, b) => parseFloat(b[0]) - parseFloat(a[0])),
-        [asks]
+        [asks],
     );
 
     const asksCum = useMemo(() => {
@@ -135,7 +140,8 @@ export default function SimOrderBook({ onPriceClick }: Props) {
     const totalBidQty = bidsCum[bidsCum.length - 1] ?? 0;
     const totalAskQty = asksCum[0] ?? 0;
     const totalQty = totalBidQty + totalAskQty;
-    const bidPct = totalQty > 0 ? Math.round((totalBidQty / totalQty) * 100) : 50;
+    const bidPct =
+        totalQty > 0 ? Math.round((totalBidQty / totalQty) * 100) : 50;
     const askPct = 100 - bidPct;
 
     const formatPrice = useCallback((p: number) => {
@@ -155,22 +161,32 @@ export default function SimOrderBook({ onPriceClick }: Props) {
     };
 
     return (
-        <div className={`rounded-xl border flex flex-col h-full overflow-hidden select-none ${
-            isLight ? "bg-white border-neutral-200" : "bg-[#0b0e11] border-neutral-800"
-        }`}>
+        <div
+            className={`rounded-xl border flex flex-col h-full overflow-hidden select-none ${
+                isLight
+                    ? "bg-white border-neutral-200"
+                    : "bg-[#0b0e11] border-neutral-800"
+            }`}
+        >
             {/* 헤더 */}
-            <div className={`flex items-center justify-between px-3 py-2 border-b ${
-                isLight ? "border-neutral-200" : "border-neutral-800/80"
-            }`}>
-                <span className={`text-[11px] font-bold tracking-wide ${isLight ? "text-neutral-900" : "text-white"}`}>
+            <div
+                className={`flex items-center justify-between px-3 py-2 border-b ${
+                    isLight ? "border-neutral-200" : "border-neutral-800/80"
+                }`}
+            >
+                <span
+                    className={`text-[11px] font-bold tracking-wide ${isLight ? "text-neutral-900" : "text-white"}`}
+                >
                     Order Book
                 </span>
             </div>
 
             {/* 컬럼 헤더 */}
-            <div className={`flex items-center px-3 py-1.5 text-[10px] text-neutral-500 border-b ${
-                isLight ? "border-neutral-200/60" : "border-neutral-800/40"
-            }`}>
+            <div
+                className={`flex items-center px-3 py-1.5 text-[10px] text-neutral-500 border-b ${
+                    isLight ? "border-neutral-200/60" : "border-neutral-800/40"
+                }`}
+            >
                 <span className="flex-[2]">Price({coinName})</span>
                 <span className="flex-[2] text-right">Qty({coinName})</span>
                 <span className="flex-[2] text-right">Total({coinName})</span>
@@ -189,28 +205,42 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                             key={`a-${i}`}
                             onClick={() => handleRowClick(price)}
                             className={`relative flex items-center px-3 h-[22px] cursor-pointer transition-colors ${
-                                isLight ? "hover:bg-neutral-100 active:bg-neutral-200" : "hover:bg-white/[0.06] active:bg-white/[0.1]"
+                                isLight
+                                    ? "hover:bg-neutral-100 active:bg-neutral-200"
+                                    : "hover:bg-white/[0.06] active:bg-white/[0.1]"
                             }`}
                         >
                             <div
                                 className={`absolute right-0 top-0 bottom-0 transition-[width] duration-100 ${
-                                    isLight ? "bg-red-500/[0.06]" : "bg-red-500/[0.08]"
+                                    isLight
+                                        ? "bg-red-500/[0.06]"
+                                        : "bg-red-500/[0.08]"
                                 }`}
                                 style={{ width: `${barWidth}%` }}
                             />
-                            <span className={`flex-[2] text-[11px] font-mono relative z-10 tabular-nums ${
-                                isLight ? "text-red-600" : "text-red-400"
-                            }`}>
+                            <span
+                                className={`flex-[2] text-[11px] font-mono relative z-10 tabular-nums ${
+                                    isLight ? "text-red-600" : "text-red-400"
+                                }`}
+                            >
                                 {formatPrice(price)}
                             </span>
-                            <span className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
-                                isLight ? "text-neutral-700" : "text-neutral-300"
-                            }`}>
+                            <span
+                                className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
+                                    isLight
+                                        ? "text-neutral-700"
+                                        : "text-neutral-300"
+                                }`}
+                            >
                                 {formatQty(qty)}
                             </span>
-                            <span className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
-                                isLight ? "text-neutral-500" : "text-neutral-400"
-                            }`}>
+                            <span
+                                className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
+                                    isLight
+                                        ? "text-neutral-500"
+                                        : "text-neutral-400"
+                                }`}
+                            >
                                 {formatQty(cum)}
                             </span>
                         </div>
@@ -219,36 +249,59 @@ export default function SimOrderBook({ onPriceClick }: Props) {
             </div>
 
             {/* 현재가 */}
-            <div className={`flex items-center px-3 py-2 border-y ${
-                isLight ? "border-neutral-200 bg-neutral-50" : "border-neutral-700/60 bg-neutral-900/80"
-            }`}>
+            <div
+                className={`flex items-center px-3 py-2 border-y ${
+                    isLight
+                        ? "border-neutral-200 bg-neutral-50"
+                        : "border-neutral-700/60 bg-neutral-900/80"
+                }`}
+            >
                 <div className="flex items-center gap-1.5">
                     <svg
                         width="14"
                         height="14"
                         viewBox="0 0 24 24"
-                        className={priceUp
-                            ? (isLight ? "text-emerald-600" : "text-emerald-400")
-                            : (isLight ? "text-red-600" : "text-red-400")
+                        className={
+                            priceUp
+                                ? isLight
+                                    ? "text-emerald-600"
+                                    : "text-emerald-400"
+                                : isLight
+                                  ? "text-red-600"
+                                  : "text-red-400"
                         }
                     >
                         <path
                             fill="currentColor"
-                            d={priceUp ? "M7 14l5-5 5 5H7z" : "M7 10l5 5 5-5H7z"}
+                            d={
+                                priceUp
+                                    ? "M7 14l5-5 5 5H7z"
+                                    : "M7 10l5 5 5-5H7z"
+                            }
                         />
                     </svg>
                     <span
                         className={`text-[15px] font-bold font-mono tabular-nums ${
                             priceUp
-                                ? (isLight ? "text-emerald-600" : "text-emerald-400")
-                                : (isLight ? "text-red-600" : "text-red-400")
+                                ? isLight
+                                    ? "text-emerald-600"
+                                    : "text-emerald-400"
+                                : isLight
+                                  ? "text-red-600"
+                                  : "text-red-400"
                         }`}
                     >
                         {currentPrice > 0 ? formatPrice(currentPrice) : "—"}
                     </span>
                 </div>
                 <span className="ml-auto text-[10px] text-neutral-500 font-mono">
-                    ≈{currentPrice > 0 ? currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}{" "}
+                    ≈
+                    {currentPrice > 0
+                        ? currentPrice.toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                          })
+                        : "—"}{" "}
                     USD
                 </span>
             </div>
@@ -266,28 +319,44 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                             key={`b-${i}`}
                             onClick={() => handleRowClick(price)}
                             className={`relative flex items-center px-3 h-[22px] cursor-pointer transition-colors ${
-                                isLight ? "hover:bg-neutral-100 active:bg-neutral-200" : "hover:bg-white/[0.06] active:bg-white/[0.1]"
+                                isLight
+                                    ? "hover:bg-neutral-100 active:bg-neutral-200"
+                                    : "hover:bg-white/[0.06] active:bg-white/[0.1]"
                             }`}
                         >
                             <div
                                 className={`absolute right-0 top-0 bottom-0 transition-[width] duration-100 ${
-                                    isLight ? "bg-emerald-500/[0.06]" : "bg-emerald-500/[0.08]"
+                                    isLight
+                                        ? "bg-emerald-500/[0.06]"
+                                        : "bg-emerald-500/[0.08]"
                                 }`}
                                 style={{ width: `${barWidth}%` }}
                             />
-                            <span className={`flex-[2] text-[11px] font-mono relative z-10 tabular-nums ${
-                                isLight ? "text-emerald-600" : "text-emerald-400"
-                            }`}>
+                            <span
+                                className={`flex-[2] text-[11px] font-mono relative z-10 tabular-nums ${
+                                    isLight
+                                        ? "text-emerald-600"
+                                        : "text-emerald-400"
+                                }`}
+                            >
                                 {formatPrice(price)}
                             </span>
-                            <span className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
-                                isLight ? "text-neutral-700" : "text-neutral-300"
-                            }`}>
+                            <span
+                                className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
+                                    isLight
+                                        ? "text-neutral-700"
+                                        : "text-neutral-300"
+                                }`}
+                            >
                                 {formatQty(qty)}
                             </span>
-                            <span className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
-                                isLight ? "text-neutral-500" : "text-neutral-400"
-                            }`}>
+                            <span
+                                className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
+                                    isLight
+                                        ? "text-neutral-500"
+                                        : "text-neutral-400"
+                                }`}
+                            >
                                 {formatQty(cum)}
                             </span>
                         </div>
@@ -296,23 +365,41 @@ export default function SimOrderBook({ onPriceClick }: Props) {
             </div>
 
             {/* 매수/매도 비율 바 */}
-            <div className={`px-3 py-2 border-t ${isLight ? "border-neutral-200/60" : "border-neutral-800/60"}`}>
+            <div
+                className={`px-3 py-2 border-t ${isLight ? "border-neutral-200/60" : "border-neutral-800/60"}`}
+            >
                 <div className="flex items-center justify-between text-[10px] mb-1">
                     <span className="text-neutral-500">B</span>
                     <div className="flex items-center gap-2">
-                        <span className={`font-medium ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>{bidPct}%</span>
-                        <span className={isLight ? "text-neutral-400" : "text-neutral-600"}>/</span>
-                        <span className={`font-medium ${isLight ? "text-red-600" : "text-red-400"}`}>{askPct}%</span>
+                        <span
+                            className={`font-medium ${isLight ? "text-emerald-600" : "text-emerald-400"}`}
+                        >
+                            {bidPct}%
+                        </span>
+                        <span
+                            className={
+                                isLight
+                                    ? "text-neutral-400"
+                                    : "text-neutral-600"
+                            }
+                        >
+                            /
+                        </span>
+                        <span
+                            className={`font-medium ${isLight ? "text-red-600" : "text-red-400"}`}
+                        >
+                            {askPct}%
+                        </span>
                     </div>
                     <span className="text-neutral-500">S</span>
                 </div>
-                <div className="flex h-1 rounded-full overflow-hidden">
+                <div className="flex gap-[2px] h-1.5">
                     <div
-                        className="bg-emerald-500 transition-all duration-300"
+                        className="bg-emerald-500/60 rounded-full transition-all duration-300"
                         style={{ width: `${bidPct}%` }}
                     />
                     <div
-                        className="bg-red-500 transition-all duration-300"
+                        className="bg-red-400/80 rounded-full transition-all duration-300"
                         style={{ width: `${askPct}%` }}
                     />
                 </div>
