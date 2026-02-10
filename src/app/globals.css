@@ -459,6 +459,58 @@ html.light .text-amber-300 {
     color: #B45309 !important;
 }
 
+/* ============================================
+   Landing page animations
+   ============================================ */
+@keyframes landing-fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(32px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes landing-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes landing-glow-pulse {
+    0%, 100% { box-shadow: 0 0 24px rgba(20, 184, 166, 0.25); }
+    50% { box-shadow: 0 0 40px rgba(20, 184, 166, 0.45); }
+}
+
+.landing-up {
+    animation: landing-fade-up 0.7s ease-out both;
+}
+
+.landing-fade {
+    animation: landing-fade-in 0.8s ease-out both;
+}
+
+.landing-cta-glow {
+    animation: landing-glow-pulse 3s ease-in-out infinite;
+}
+
+/* Landing page light mode overrides */
+html.light .landing-badge {
+    background-color: #F2F4F6 !important;
+    color: #4E5968 !important;
+    --tw-ring-color: #D1D6DB !important;
+}
+
+html.light .landing-card {
+    background-color: #FFFFFF !important;
+    --tw-ring-color: #E5E8EB !important;
+}
+
+html.light .landing-icon-box {
+    background-color: #F2F4F6 !important;
+}
+
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);

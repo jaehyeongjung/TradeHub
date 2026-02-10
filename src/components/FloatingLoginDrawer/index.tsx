@@ -1,20 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtom } from "jotai";
 import AuthBox from "@/components/login";
 import CryptoTreemap from "@/components/CryptoTreemap";
-import { treemapOpenAtom, activePageAtom } from "@/store/atoms";
+import { treemapOpenAtom } from "@/store/atoms";
 
 export default function FloatingLoginSidebar() {
     const [open, setOpen] = useState(false);
     const [isDark, setIsDark] = useState(false);
     const [showTreemap, setShowTreemap] = useAtom(treemapOpenAtom);
-    const [activePage, setActivePage] = useAtom(activePageAtom);
-    const isSim = activePage === "sim";
+    const router = useRouter();
     const pathname = usePathname();
+    const isSim = pathname === "/trading";
     const closeBtnRef = useRef<HTMLButtonElement | null>(null);
     const lastFocusRef = useRef<HTMLElement | null>(null);
 
@@ -78,7 +78,7 @@ export default function FloatingLoginSidebar() {
                 {/* 모의투자 버튼 */}
                 <motion.button
                     type="button"
-                    onClick={() => setActivePage(isSim ? "main" : "sim")}
+                    onClick={() => router.push(isSim ? "/dashboard" : "/trading")}
                     aria-label={isSim ? "대시보드로 이동" : "모의투자로 이동"}
                     initial={{ scale: 1 }}
                     animate={isSim ? {

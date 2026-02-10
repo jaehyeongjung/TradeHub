@@ -30,6 +30,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: "hourly",
             priority: 1,
         },
+        {
+            url: `${base}/dashboard`,
+            lastModified: new Date(),
+            changeFrequency: "hourly",
+            priority: 0.8,
+        },
+        {
+            url: `${base}/trading`,
+            lastModified: new Date(),
+            changeFrequency: "hourly",
+            priority: 0.9,
+        },
         ...newsSitemap,
         ...postsSitemap,
     ];
