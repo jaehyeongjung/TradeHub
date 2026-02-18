@@ -249,13 +249,13 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
                 </div>
                 <button
                     onClick={onClose}
-                    className={`w-10 h-10 flex items-center justify-center rounded-xl backdrop-blur-md border transition-all cursor-pointer shadow-lg ${
+                    className={`w-12 h-12 flex items-center justify-center rounded-xl backdrop-blur-md border-2 transition-all cursor-pointer shadow-xl group ${
                         isLight
-                            ? "bg-white/90 border-neutral-300/50 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100"
-                            : "bg-neutral-900/90 border-neutral-700/50 text-neutral-400 hover:text-white hover:bg-neutral-800"
-                    }`}
+                            ? "bg-white border-red-300/60 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-red-200/50"
+                            : "bg-neutral-900/95 border-red-500/40 text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-red-500/30"
+                    } hover:shadow-2xl hover:scale-105 active:scale-95`}
                 >
-                    <svg width="18" height="18" viewBox="0 0 24 24">
+                    <svg width="22" height="22" viewBox="0 0 24 24" className="transition-transform group-hover:rotate-90 duration-200">
                         <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                     </svg>
                 </button>

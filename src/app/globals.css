@@ -511,6 +511,60 @@ html.light .landing-icon-box {
     background-color: #F2F4F6 !important;
 }
 
+/* ============================================
+   랜딩 페이지 (/) 라이트모드 오버라이드
+   ============================================ */
+/* 노이즈 오버레이 숨김 */
+html.light .landing-noise {
+    display: none !important;
+}
+
+/* 내비게이션: mix-blend-difference 제거 (라이트에서 색상 왜곡 방지) */
+html.light .landing-nav {
+    mix-blend-mode: normal !important;
+}
+
+html.light .landing-nav .landing-launch {
+    border-color: rgba(2, 192, 118, 0.5) !important;
+}
+
+/* CTA 버튼: 라이트에서 다크 배경 + 흰 텍스트로 반전 */
+html.light .landing-cta {
+    background-color: #191F28 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 50px rgba(2, 192, 118, 0.15) !important;
+}
+
+/* Freedom 카드 (03): hover 시 다크로 반전 */
+html.light .landing-freedom {
+    background-color: #F2F4F6 !important;
+}
+
+html.light .landing-freedom:hover {
+    background-color: #191F28 !important;
+    color: #FFFFFF !important;
+}
+
+html.light .landing-freedom .landing-freedom-label {
+    color: #B0B8C1 !important;
+}
+
+html.light .landing-freedom:hover .landing-freedom-label {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+html.light .landing-freedom .landing-freedom-desc {
+    color: #8B95A1 !important;
+}
+
+html.light .landing-freedom:hover .landing-freedom-desc {
+    color: #FFFFFF !important;
+}
+
+html.light .landing-freedom:hover h3 {
+    color: #FFFFFF !important;
+}
+
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
