@@ -274,7 +274,7 @@ export default function SimTradingPage() {
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                     filter: drop-shadow(0 0 24px rgba(2,192,118,0.18));
-                    animation: hero-no-shine 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                    animation: hero-no-shine 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
                 }
                 @keyframes hero-no-shine {
                     0%, 20% { background-position: 100% center; }
@@ -313,24 +313,6 @@ function HeroStat({
 }
 
 function HeroNO() {
-    const [isLight, setIsLight] = useState(false);
-
-    useEffect(() => {
-        const check = () =>
-            setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const obs = new MutationObserver(check);
-        obs.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ["class"],
-        });
-        return () => obs.disconnect();
-    }, []);
-
-    if (isLight) {
-        return <span className="text-[#E5E8EB]">NO</span>;
-    }
-
     return <span className="hero-no-text">NO</span>;
 }
 

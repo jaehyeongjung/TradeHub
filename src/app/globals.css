@@ -528,6 +528,23 @@ html.light .landing-nav .landing-launch {
     border-color: rgba(2, 192, 118, 0.5) !important;
 }
 
+/* Hero "NO" 텍스트: 라이트모드 그린 스파클 */
+html.light .hero-no-text {
+    background-image: linear-gradient(
+        90deg,
+        #D1D6DB 0%,
+        #D1D6DB 41%,
+        #8B95A1 44%,
+        #02C076 47.5%,
+        #00e68a 50%,
+        #02C076 52.5%,
+        #8B95A1 56%,
+        #D1D6DB 59%,
+        #D1D6DB 100%
+    ) !important;
+    filter: drop-shadow(0 0 16px rgba(2, 192, 118, 0.1)) !important;
+}
+
 /* CTA 버튼: 라이트에서 다크 배경 + 흰 텍스트로 반전 */
 html.light .landing-cta {
     background-color: #191F28 !important;
