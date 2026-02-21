@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllNewsIds } from "@/lib/news";
 import { getAllPostIds } from "@/lib/posts";
+import { guides } from "@/lib/guides";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const base = "https://www.tradehub.kr";
@@ -23,6 +24,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.6,
     }));
 
+    // 가이드 페이지
+    const guideSitemap: MetadataRoute.Sitemap = guides.map((guide) => ({
+        url: `${base}/guide/${guide.slug}`,
+        lastModified: new Date(guide.updatedAt),
+        changeFrequency: "monthly",
+        priority: 0.8,
+    }));
+
     return [
         {
             url: `${base}/`,
@@ -42,6 +51,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: "hourly",
             priority: 0.9,
         },
+        {
+            url: `${base}/guide`,
+            lastModified: new Date(),
+            changeFrequency: "weekly",
+            priority: 0.7,
+        },
+        ...guideSitemap,
         ...newsSitemap,
         ...postsSitemap,
     ];

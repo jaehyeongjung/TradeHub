@@ -18,7 +18,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
     // 모바일 감지 및 리다이렉트
     useEffect(() => {
-        if (pathname === "/mobile") return; // 이미 모바일 페이지면 스킵
+        if (pathname === "/mobile" || pathname?.startsWith("/guide")) return;
 
         if (isMobileDevice()) {
             router.replace("/mobile");

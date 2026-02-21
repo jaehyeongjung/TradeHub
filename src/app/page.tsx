@@ -1,67 +1,32 @@
-"use client"; // 실시간 데이터 페칭을 위해 클라이언트 컴포넌트 사용
-
-import { useState, useEffect } from "react";
-import Script from "next/script";
 import Link from "next/link";
+import LiveMarketStats from "@/components/Landing/LiveMarketStats";
 
 const SITE = "https://www.tradehub.kr";
 
-export default function SimTradingPage() {
-    // 실시간 상태 관리
-    const [btcPrice, setBtcPrice] = useState<number>(0);
-    const [volume, setVolume] = useState<string>("---,---");
-    const [isRising, setIsRising] = useState<boolean>(false);
+const MAIN_JSONLD = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "TradeHub",
+    url: SITE,
+    description:
+        "비트코인 모의투자와 실시간 시장 분석을 한 화면에서 제공하는 트레이딩 대시보드",
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Web Browser",
+    inLanguage: "ko",
+    offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "KRW",
+    },
+};
 
-    useEffect(() => {
-        // 바이낸스 데이터 페칭 (가격 및 24시간 거래량)
-        const fetchMarketData = async () => {
-            try {
-                const res = await fetch(
-                    "https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT",
-                );
-                const data = await res.json();
-
-                const currentPrice = parseFloat(data.lastPrice);
-
-                // 가격 상승 체크 (플래시 효과용)
-                if (currentPrice > btcPrice && btcPrice !== 0) {
-                    setIsRising(true);
-                    setTimeout(() => setIsRising(false), 500);
-                }
-
-                setBtcPrice(currentPrice);
-                // ACTIVE TRADERS 대신 실제 24시간 거래량(BTC 수량) 반영
-                setVolume(
-                    parseFloat(data.volume).toLocaleString(undefined, {
-                        maximumFractionDigits: 0,
-                    }),
-                );
-            } catch (e) {
-                console.error("Data fetch error", e);
-            }
-        };
-
-        fetchMarketData();
-        const interval = setInterval(fetchMarketData, 1500); // 1.5초마다 갱신
-
-        return () => clearInterval(interval);
-    }, [btcPrice]);
-
+export default function LandingPage() {
     return (
         <div className="min-h-screen bg-black text-white selection:bg-[#02C076] selection:text-black font-sans tracking-tight antialiased">
-            <Script
-                id="ld-main"
+            <script
                 type="application/ld+json"
-                strategy="afterInteractive"
-            >
-                {JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "WebApplication",
-                    name: "TradeHub",
-                    url: SITE,
-                    description: "High-end Crypto Simulator",
-                })}
-            </Script>
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(MAIN_JSONLD) }}
+            />
 
             {/* Grainy Noise Overlay */}
             <div className="landing-noise fixed inset-0 z-[9999] pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/asfalt-light.png')]" />
@@ -133,30 +98,7 @@ export default function SimTradingPage() {
                             <div className="absolute inset-0 bg-[#02C076] translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500" />
                         </Link>
 
-                        <div className="flex flex-col items-end text-right">
-                            <span className="text-[10px] font-black tracking-[0.5em] text-zinc-500 mb-4 uppercase">
-                                Live Market Status
-                            </span>
-                            <div className="flex gap-12">
-                                <HeroStat
-                                    label="BTC/USDT"
-                                    value={btcPrice.toLocaleString(undefined, {
-                                        minimumFractionDigits: 1,
-                                    })}
-                                    color={
-                                        isRising
-                                            ? "text-white scale-105"
-                                            : "text-[#02C076]"
-                                    }
-                                    isRising={isRising}
-                                />
-                                <HeroStat
-                                    label="24H VOL (BTC)"
-                                    value={volume}
-                                    color="text-white"
-                                />
-                            </div>
-                        </div>
+                        <LiveMarketStats />
                     </div>
                 </section>
 
@@ -203,7 +145,7 @@ export default function SimTradingPage() {
                     </div>
                 </section>
 
-                {/* Section 4: Features - 줄바꿈 적용 */}
+                {/* Section 4: Features */}
                 <section className="py-40 flex flex-col md:flex-row gap-20 items-start">
                     <div className="md:w-1/3 sticky top-40">
                         <h2 className="text-4xl font-[1000] tracking-[-0.08em] uppercase leading-tight">
@@ -248,13 +190,6 @@ export default function SimTradingPage() {
             <style
                 dangerouslySetInnerHTML={{
                     __html: `
-                @keyframes flash {
-                    0% { opacity: 1; filter: brightness(1); }
-                    50% { opacity: 0.7; filter: brightness(2) drop-shadow(0 0 10px #02C076); }
-                    100% { opacity: 1; filter: brightness(1); }
-                }
-                .animate-flash { animation: flash 0.4s ease-out; }
-
                 .hero-no-text {
                     padding-right: 0.06em;
                     background: linear-gradient(
@@ -283,31 +218,6 @@ export default function SimTradingPage() {
             `,
                 }}
             />
-        </div>
-    );
-}
-
-function HeroStat({
-    label,
-    value,
-    color,
-    isRising,
-}: {
-    label: string;
-    value: string;
-    color: string;
-    isRising?: boolean;
-}) {
-    return (
-        <div className="flex flex-col items-end min-w-[120px]">
-            <span className="text-[9px] font-black tracking-widest text-zinc-500 mb-2 uppercase italic">
-                {label}
-            </span>
-            <span
-                className={`text-4xl md:text-6xl font-[1000] tracking-tighter ${color} transition-all duration-300 tabular-nums ${isRising ? "animate-flash" : ""}`}
-            >
-                {value}
-            </span>
         </div>
     );
 }

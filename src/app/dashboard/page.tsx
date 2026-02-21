@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { RealTimeSection } from "@/components/RealTimeSection";
 import { DashBoard } from "@/components/DashBorad";
 import MobileSuggestModal from "@/components/MobileSuggestModa";
@@ -5,6 +6,28 @@ import Script from "next/script";
 import ForceTabReturnReload from "@/components/ForceTabReturnReload";
 
 const SITE = "https://www.tradehub.kr";
+
+export const metadata: Metadata = {
+    title: "실시간 코인 대시보드 — 청산 · 고래 · 트리맵 · 김프",
+    description:
+        "바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수를 한 화면에서 무료로 확인하세요.",
+    alternates: { canonical: "/dashboard" },
+    openGraph: {
+        title: "실시간 코인 대시보드 — 청산 · 고래 · 트리맵 · 김프 | TradeHub",
+        description:
+            "바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수를 한 화면에서 무료로 확인하세요.",
+        url: `${SITE}/dashboard`,
+        type: "website",
+        images: [{ url: "/main-Image.png", width: 1200, height: 630, alt: "TradeHub 실시간 대시보드" }],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "실시간 코인 대시보드 — 청산 · 고래 · 트리맵 · 김프 | TradeHub",
+        description:
+            "바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수를 한 화면에서 무료로 확인하세요.",
+        images: ["/main-Image.png"],
+    },
+};
 
 const ORG_JSONLD = {
     "@context": "https://schema.org",

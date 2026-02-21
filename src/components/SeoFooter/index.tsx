@@ -58,7 +58,7 @@ export default function SeoFooter() {
                     까지 제공합니다.
                 </p>
 
-                <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+                <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-5">
                     <article className="rounded-xl bg-zinc-900/60 p-7 ring-1 ring-zinc-800">
                         <h3 className="text-sm font-semibold text-white">
                             실시간 청산 · 고래 거래
@@ -95,6 +95,34 @@ export default function SeoFooter() {
                             교차/격리 마진을 무료로 연습하세요.
                         </p>
                         <div className="mt-3"></div>
+                    </article>
+
+                    <article className="rounded-xl bg-zinc-900/60 p-7 ring-1 ring-zinc-800">
+                        <h3 className="text-sm font-semibold text-white">
+                            투자 가이드
+                        </h3>
+                        <ul className="mt-2 text-sm leading-7">
+                            <li>
+                                <Link href="/guide/kimchi-premium" className="text-teal-400 hover:underline">
+                                    김치프리미엄이란?
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/guide/fear-greed-index" className="text-teal-400 hover:underline">
+                                    공포탐욕지수 보는법
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/guide/bitcoin-paper-trading" className="text-teal-400 hover:underline">
+                                    비트코인 모의투자 하는법
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/guide" className="text-zinc-400 hover:text-teal-400">
+                                    전체 가이드 보기 →
+                                </Link>
+                            </li>
+                        </ul>
                     </article>
 
                     <article className="rounded-xl bg-zinc-900/60 p-7 ring-1 ring-zinc-800">
