@@ -18,7 +18,17 @@ type TabKey = "board" | "news";
 export const DashBoard = () => {
     const postRef = useRef<PostBoardHandle>(null);
     const [mounted, setMounted] = useState(false);
+    const [isLight, setIsLight] = useState(false);
+
     useEffect(() => { setMounted(true); }, []);
+
+    useEffect(() => {
+        const check = () => setIsLight(document.documentElement.classList.contains("light"));
+        check();
+        const observer = new MutationObserver(check);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
 
     const router = useRouter();
 
@@ -51,42 +61,57 @@ export const DashBoard = () => {
                 <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950 border border-zinc-800">
                     {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
                     <div className={`relative z-20 flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14 transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: "50ms", transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-                        <div className="inline-flex items-center rounded-xl bg-neutral-800/50 p-1 shrink-0">
+                        {/* 탭 버튼 */}
+                        <div className={`inline-flex items-center rounded-xl p-1 shrink-0 ${isLight ? "bg-neutral-100 border border-neutral-200" : "bg-neutral-800/60 border border-neutral-800"}`}>
                             <button
                                 onClick={() => switchTab("board")}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg cursor-pointer transition-all ${
+                                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg cursor-pointer transition-all ${
                                     activeTab === "board"
-                                        ? "bg-neutral-700 text-white shadow-sm"
-                                        : "text-neutral-400 hover:text-neutral-200"
+                                        ? isLight
+                                            ? "bg-white text-neutral-800 shadow-sm border border-neutral-200"
+                                            : "bg-neutral-700 text-white shadow-sm"
+                                        : isLight
+                                            ? "text-neutral-500 hover:text-neutral-700"
+                                            : "text-neutral-500 hover:text-neutral-300"
                                 }`}
                             >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                                 <span className="whitespace-nowrap">게시판</span>
                             </button>
                             <button
                                 onClick={() => switchTab("news")}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-all cursor-pointer ${
+                                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
                                     activeTab === "news"
-                                        ? "bg-neutral-700 text-white shadow-sm"
-                                        : "text-neutral-400 hover:text-neutral-200"
+                                        ? isLight
+                                            ? "bg-white text-neutral-800 shadow-sm border border-neutral-200"
+                                            : "bg-neutral-700 text-white shadow-sm"
+                                        : isLight
+                                            ? "text-neutral-500 hover:text-neutral-700"
+                                            : "text-neutral-500 hover:text-neutral-300"
                                 }`}
                             >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
                                 </svg>
                                 <span className="whitespace-nowrap">뉴스</span>
                             </button>
                         </div>
+
                         <div className="flex-1 min-w-0">
                             <HotSymbolsTicker fadeDelay={150} />
                         </div>
+
                         <div className="ml-auto shrink-0 mr-1">
                             {activeTab === "board" && (
                                 <button
                                     onClick={() => postRef.current?.openWrite()}
-                                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] shadow-sm transition-all cursor-pointer"
+                                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium shadow-sm transition-all cursor-pointer active:scale-[0.98] ${
+                                        isLight
+                                            ? "bg-emerald-500 text-white hover:bg-emerald-600 active:bg-emerald-700"
+                                            : "bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700"
+                                    }`}
                                 >
                                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

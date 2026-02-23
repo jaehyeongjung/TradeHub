@@ -167,7 +167,7 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                                         >
                                             {/* 콘텐츠 */}
                                             <div className="flex-1 min-w-0">
-                                                {/* 소스 pill + 심볼 + 시간 */}
+                                                {/* 소스 pill + 심볼 */}
                                                 <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
                                                     <span className={`text-[9px] font-semibold px-1.5 py-[2px] rounded-md ${sourcePill}`}>
                                                         {n.source}
@@ -177,9 +177,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                                                             {sym}
                                                         </span>
                                                     ))}
-                                                    <span className={`text-[9px] ml-auto tabular-nums ${timeColor}`}>
-                                                        {formatRelativeTime(n.published_at)}
-                                                    </span>
                                                 </div>
                                                 {/* 제목 */}
                                                 <button
@@ -191,21 +188,26 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                                                 </button>
                                             </div>
 
-                                            {/* 버튼 */}
-                                            <div className="flex items-start gap-1 shrink-0 mt-0.5">
-                                                <button
-                                                    className={`text-[10px] font-medium px-2 py-1 rounded-lg cursor-pointer transition-colors active:scale-[0.97] ${openBtn}`}
-                                                    onClick={() => openViewer(n)}
-                                                >
-                                                    열기
-                                                </button>
-                                                <button
-                                                    disabled={!userId}
-                                                    onClick={() => shareToChat(n)}
-                                                    className={`text-[10px] font-medium px-2 py-1 rounded-lg transition-colors active:scale-[0.97] ${userId ? shareBtn : shareBtnDisabled}`}
-                                                >
-                                                    공유
-                                                </button>
+                                            {/* 시간 + 버튼 */}
+                                            <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                                <span className={`text-[9px] tabular-nums ${timeColor}`}>
+                                                    {formatRelativeTime(n.published_at)}
+                                                </span>
+                                                <div className="flex items-center gap-1">
+                                                    <button
+                                                        className={`text-[10px] font-medium px-2 py-1 rounded-lg cursor-pointer transition-colors active:scale-[0.97] ${openBtn}`}
+                                                        onClick={() => openViewer(n)}
+                                                    >
+                                                        열기
+                                                    </button>
+                                                    <button
+                                                        disabled={!userId}
+                                                        onClick={() => shareToChat(n)}
+                                                        className={`text-[10px] font-medium px-2 py-1 rounded-lg transition-colors active:scale-[0.97] ${userId ? shareBtn : shareBtnDisabled}`}
+                                                    >
+                                                        공유
+                                                    </button>
+                                                </div>
                                             </div>
                                         </li>
                                     ))}

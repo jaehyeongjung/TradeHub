@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 type Props = {
@@ -20,22 +20,46 @@ export default function FearGreedGauge({
 }: Props) {
     const v = Math.max(0, Math.min(100, value));
     const [isHovered, setIsHovered] = useState(false);
+    const [isLight, setIsLight] = useState(false);
 
-    // 상태 텍스트 및 색상
+    useEffect(() => {
+        const check = () => setIsLight(document.documentElement.classList.contains("light"));
+        check();
+        const observer = new MutationObserver(check);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
+
     const getStateInfo = (val: number) => {
-        if (val < 25) return { text: "극도의 공포", color: "text-red-400", bg: "bg-red-500", bgLight: "bg-red-500/10" };
-        if (val < 45) return { text: "공포", color: "text-orange-400", bg: "bg-orange-500", bgLight: "bg-orange-500/10" };
-        if (val < 55) return { text: "중립", color: "text-yellow-400", bg: "bg-yellow-500", bgLight: "bg-yellow-500/10" };
-        if (val < 75) return { text: "탐욕", color: "text-lime-400", bg: "bg-lime-500", bgLight: "bg-lime-500/10" };
-        return { text: "극도의 탐욕", color: "text-emerald-400", bg: "bg-emerald-500", bgLight: "bg-emerald-500/10" };
+        if (val < 25) return { text: "극도의 공포", color: "text-red-400", barColor: "bg-red-500", bgLight: isLight ? "bg-red-50 text-red-600" : "bg-red-500/10 text-red-400" };
+        if (val < 45) return { text: "공포", color: "text-orange-400", barColor: "bg-orange-500", bgLight: isLight ? "bg-orange-50 text-orange-600" : "bg-orange-500/10 text-orange-400" };
+        if (val < 55) return { text: "중립", color: "text-yellow-400", barColor: "bg-yellow-500", bgLight: isLight ? "bg-yellow-50 text-yellow-600" : "bg-yellow-500/10 text-yellow-400" };
+        if (val < 75) return { text: "탐욕", color: "text-lime-400", barColor: "bg-lime-500", bgLight: isLight ? "bg-lime-50 text-lime-600" : "bg-lime-500/10 text-lime-400" };
+        return { text: "극도의 탐욕", color: "text-emerald-400", barColor: "bg-emerald-500", bgLight: isLight ? "bg-emerald-50 text-emerald-600" : "bg-emerald-500/10 text-emerald-400" };
     };
 
     const state = getStateInfo(v);
     const displayLabel = subLabel ?? state.text;
 
+    const cardClass = isLight
+        ? "rounded-2xl border border-neutral-200 bg-white p-4 2xl:p-5"
+        : "rounded-2xl border border-neutral-800 bg-neutral-900 p-4 2xl:p-5";
+
+    const heroNumClass = isLight
+        ? `text-4xl 2xl:text-5xl font-bold tabular-nums ${state.color}`
+        : `text-4xl 2xl:text-5xl font-bold tabular-nums ${state.color}`;
+
+    const subNumClass = isLight ? "text-neutral-400 text-sm" : "text-neutral-500 text-sm";
+    const headerLabelClass = isLight ? "text-xs 2xl:text-sm text-neutral-500 font-medium" : "text-xs 2xl:text-sm text-neutral-400 font-medium";
+    const trackClass = isLight ? "bg-neutral-200" : "bg-neutral-800";
+    const edgeLabelClass = isLight ? "text-[10px] 2xl:text-xs text-neutral-400" : "text-[10px] 2xl:text-xs text-neutral-500";
+    const tooltipClass = isLight
+        ? "absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-[240px] text-[11px] bg-white border border-neutral-200 text-neutral-600 rounded-xl py-3 px-4 shadow-lg z-50 pointer-events-none"
+        : "absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-[240px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-xl py-3 px-4 shadow-xl z-50 pointer-events-none";
+
     return (
         <div
-            className="relative rounded-2xl border border-neutral-800 bg-neutral-900 p-4 2xl:p-5 text-white"
+            className={`relative ${cardClass}`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
@@ -45,53 +69,45 @@ export default function FearGreedGauge({
             >
                 {/* 헤더 */}
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xs 2xl:text-sm text-neutral-400 font-medium">
-                        {title}
-                    </h3>
-                    <div className={`px-2 py-0.5 rounded-full text-[10px] 2xl:text-xs font-medium ${state.bgLight} ${state.color}`}>
+                    <h3 className={headerLabelClass}>{title}</h3>
+                    <div className={`px-2 py-0.5 rounded-full text-[10px] 2xl:text-xs font-medium ${state.bgLight}`}>
                         {displayLabel}
                     </div>
                 </div>
 
                 {/* 메인 숫자 */}
                 <div className="flex items-baseline gap-2 mb-4">
-                    <span className={`text-4xl 2xl:text-5xl font-bold tabular-nums ${state.color}`}>
-                        {v}
-                    </span>
-                    <span className="text-neutral-500 text-sm">/100</span>
+                    <span className={heroNumClass}>{v}</span>
+                    <span className={subNumClass}>/100</span>
                 </div>
 
                 {/* 프로그레스 바 */}
                 <div className="space-y-2">
-                    <div className="relative h-2 rounded-full bg-neutral-800 overflow-hidden">
-                        {/* 그라데이션 배경 (전체) */}
+                    <div className={`relative h-1.5 rounded-full overflow-hidden ${trackClass}`}>
+                        {/* 그라데이션 전체 배경 (스펙트럼 맥락) */}
                         <div
-                            className="absolute inset-0 opacity-30"
-                            style={{
-                                background: "linear-gradient(to right, #ef4444, #f97316, #eab308, #84cc16, #22c55e)"
-                            }}
+                            className="absolute inset-0 opacity-25 rounded-full"
+                            style={{ background: "linear-gradient(to right, #ef4444, #f97316, #eab308, #84cc16, #22c55e)" }}
                         />
                         {/* 진행 바 */}
                         <motion.div
                             className="absolute left-0 top-0 bottom-0 rounded-full"
-                            style={{
-                                background: "linear-gradient(to right, #ef4444, #f97316, #eab308, #84cc16, #22c55e)"
-                            }}
+                            style={{ background: "linear-gradient(to right, #ef4444, #f97316, #eab308, #84cc16, #22c55e)" }}
                             initial={{ width: 0 }}
                             animate={{ width: `${v}%` }}
                             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                         />
-                        {/* 인디케이터 */}
+                        {/* 인디케이터 dot */}
                         <motion.div
-                            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white shadow-lg border-2 border-neutral-900"
+                            className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full shadow-md ${isLight ? "bg-white border-2 border-neutral-300" : "bg-white border-2 border-neutral-900"}`}
                             initial={{ left: 0 }}
-                            animate={{ left: `calc(${v}% - 6px)` }}
+                            animate={{ left: `calc(${v}% - 5px)` }}
                             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                         />
                     </div>
 
                     {/* 레이블 */}
-                    <div className="flex justify-between text-[10px] 2xl:text-xs text-neutral-500">
+                    <div className={`flex justify-between ${edgeLabelClass}`}>
                         <span>공포</span>
                         <span>탐욕</span>
                     </div>
@@ -106,14 +122,13 @@ export default function FearGreedGauge({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 6 }}
                         transition={{ duration: 0.18 }}
-                        className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-[240px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-xl py-3 px-4 shadow-xl z-50 pointer-events-none"
+                        className={tooltipClass}
                     >
-                        <p className="text-neutral-400 leading-relaxed">
+                        <p className="leading-relaxed">
                             가격 변동성, 거래량, 소셜 트렌드 등을 종합해 시장 심리를 0~100으로 표현합니다.
                         </p>
-                        {/* 화살표 */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[6px] w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-neutral-700" />
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[4px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent border-b-neutral-900" />
+                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[6px] w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent ${isLight ? "border-b-neutral-200" : "border-b-neutral-700"}`} />
+                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[4px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent ${isLight ? "border-b-white" : "border-b-neutral-900"}`} />
                     </motion.div>
                 )}
             </AnimatePresence>

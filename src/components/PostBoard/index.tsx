@@ -22,44 +22,34 @@ type Post = {
     created_at: string;
 };
 
-// Custom Modal Component
 const CustomModal: React.FC<{
     message: string;
     onConfirm: () => void;
     onCancel: () => void;
     isConfirm: boolean;
-}> = ({ message, onConfirm, onCancel, isConfirm }) => {
-    // 키보드 이벤트 처리
+    isLight: boolean;
+}> = ({ message, onConfirm, onCancel, isConfirm, isLight }) => {
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            onConfirm();
-        } else if (e.key === "Escape") {
-            e.preventDefault();
-            onCancel();
-        }
+        if (e.key === "Enter") { e.preventDefault(); onConfirm(); }
+        else if (e.key === "Escape") { e.preventDefault(); onCancel(); }
     };
 
     return (
         <div
-            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center z-50 p-4"
             onKeyDown={handleKeyDown}
             tabIndex={-1}
             ref={(el) => el?.focus()}
         >
-            <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-6 shadow-2xl max-w-sm w-full outline-none">
-                <p className="text-white mb-6 text-base whitespace-pre-wrap">
+            <div className={`rounded-2xl p-6 shadow-2xl max-w-sm w-full outline-none ${isLight ? "bg-white border border-neutral-200" : "bg-neutral-900 border border-neutral-800"}`}>
+                <p className={`mb-6 text-sm leading-relaxed ${isLight ? "text-neutral-700" : "text-neutral-200"}`}>
                     {message}
                 </p>
-                <div
-                    className={`flex ${
-                        isConfirm ? "justify-between" : "justify-center"
-                    } gap-3`}
-                >
+                <div className={`flex ${isConfirm ? "justify-between" : "justify-center"} gap-3`}>
                     {isConfirm && (
                         <button
                             onClick={onCancel}
-                            className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-neutral-700 text-white hover:bg-neutral-600 active:bg-neutral-800 active:scale-[0.98] transition-all cursor-pointer"
+                            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${isLight ? "bg-neutral-100 text-neutral-600 hover:bg-neutral-200" : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"}`}
                         >
                             취소
                         </button>
@@ -67,7 +57,7 @@ const CustomModal: React.FC<{
                     <button
                         onClick={onConfirm}
                         autoFocus
-                        className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] transition-all cursor-pointer"
+                        className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] transition-all cursor-pointer"
                     >
                         {isConfirm ? "확인" : "닫기"}
                     </button>
@@ -77,14 +67,12 @@ const CustomModal: React.FC<{
     );
 };
 
-// 부모가 호출할 수 있는 메서드 타입
 export type PostBoardHandle = {
     openWrite: () => void;
     backToList: () => void;
 };
 
 type Props = {
-    /** 내부에 예전처럼 '글쓰기' 버튼을 보여주고 싶을 때만 true */
     showInternalWriteButton?: boolean;
     fadeDelay?: number;
 };
@@ -96,39 +84,36 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
     const { showToast } = useToast();
     const [posts, setPosts] = useState<Post[]>([]);
     const [postsLoaded, setPostsLoaded] = useState(false);
-    const [mode, setMode] = useState<"list" | "write" | "detail" | "edit">(
-        "list"
-    );
+    const [mode, setMode] = useState<"list" | "write" | "detail" | "edit">("list");
     const [selected, setSelected] = useState<Post | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
+    const [isLight, setIsLight] = useState(false);
     const [modal, setModal] = useState<{
         message: string;
         isConfirm: boolean;
         onConfirm?: () => void;
     } | null>(null);
 
-    // 부모에서 openWrite()/backToList() 호출 가능
-    useImperativeHandle(
-        ref,
-        () => ({
-            openWrite: () => setMode("write"),
-            backToList: () => setMode("list"),
-        }),
-        []
-    );
+    useEffect(() => {
+        const check = () => setIsLight(document.documentElement.classList.contains("light"));
+        check();
+        const observer = new MutationObserver(check);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
 
-    // 로그인 세션 + 구독
+    useImperativeHandle(ref, () => ({
+        openWrite: () => setMode("write"),
+        backToList: () => setMode("list"),
+    }), []);
+
     useEffect(() => {
         supabase.auth.getSession().then(({ data }) => {
             setUserId(data.session?.user?.id ?? null);
         });
-
-        const { data: sub } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
-                setUserId(session?.user?.id ?? null);
-            }
-        );
-
+        const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUserId(session?.user?.id ?? null);
+        });
         return () => sub.subscription.unsubscribe();
     }, []);
 
@@ -141,62 +126,27 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
         setPostsLoaded(true);
     };
 
-    useEffect(() => {
-        loadPosts();
-    }, []);
+    useEffect(() => { loadPosts(); }, []);
 
-    // 생성
-    const handleCreate = async (
-        title: string,
-        body: string,
-        imageUrl?: string
-    ) => {
-        if (!userId) {
-            setModal({ message: "로그인이 필요합니다.", isConfirm: false });
-            return;
-        }
+    const handleCreate = async (title: string, body: string, imageUrl?: string) => {
+        if (!userId) { setModal({ message: "로그인이 필요합니다.", isConfirm: false }); return; }
         const safeTitle = sanitizeText(title, 200);
         const safeBody = sanitizeText(body, 5000);
-        if (!safeTitle || !safeBody) {
-            setModal({ message: "제목과 내용을 입력해주세요.", isConfirm: false });
-            return;
-        }
-        const { error } = await supabase
-            .from("posts")
-            .insert([
-                { title: safeTitle, body: safeBody, image_url: imageUrl ?? null, user_id: userId },
-            ]);
-        if (error) {
-            setModal({ message: error.message, isConfirm: false });
-            return;
-        }
+        if (!safeTitle || !safeBody) { setModal({ message: "제목과 내용을 입력해주세요.", isConfirm: false }); return; }
+        const { error } = await supabase.from("posts").insert([{ title: safeTitle, body: safeBody, image_url: imageUrl ?? null, user_id: userId }]);
+        if (error) { setModal({ message: error.message, isConfirm: false }); return; }
         await loadPosts();
         setMode("list");
         showToast("게시물이 작성되었습니다");
     };
 
-    // 업데이트
-    const handleUpdate = async (
-        title: string,
-        body: string,
-        imageUrl?: string
-    ) => {
+    const handleUpdate = async (title: string, body: string, imageUrl?: string) => {
         if (!selected) return;
         const safeTitle = sanitizeText(title, 200);
         const safeBody = sanitizeText(body, 5000);
-        if (!safeTitle || !safeBody) {
-            setModal({ message: "제목과 내용을 입력해주세요.", isConfirm: false });
-            return;
-        }
-        const { error } = await supabase
-            .from("posts")
-            .update({ title: safeTitle, body: safeBody, image_url: imageUrl ?? null })
-            .eq("id", selected.id)
-            .eq("user_id", userId);
-        if (error) {
-            setModal({ message: error.message, isConfirm: false });
-            return;
-        }
+        if (!safeTitle || !safeBody) { setModal({ message: "제목과 내용을 입력해주세요.", isConfirm: false }); return; }
+        const { error } = await supabase.from("posts").update({ title: safeTitle, body: safeBody, image_url: imageUrl ?? null }).eq("id", selected.id).eq("user_id", userId);
+        if (error) { setModal({ message: error.message, isConfirm: false }); return; }
         await loadPosts();
         const fresh = posts.find((p) => p.id === selected.id);
         setSelected(fresh ?? null);
@@ -204,22 +154,14 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
         showToast("게시물이 수정되었습니다");
     };
 
-    // 삭제
     const handleDelete = async (id: string) => {
         setModal({
             message: "게시물을 삭제할까요?",
             isConfirm: true,
             onConfirm: async () => {
                 setModal(null);
-                const { error } = await supabase
-                    .from("posts")
-                    .delete()
-                    .eq("id", id)
-                    .eq("user_id", userId);
-                if (error) {
-                    setModal({ message: error.message, isConfirm: false });
-                    return;
-                }
+                const { error } = await supabase.from("posts").delete().eq("id", id).eq("user_id", userId);
+                if (error) { setModal({ message: error.message, isConfirm: false }); return; }
                 await loadPosts();
                 setMode("list");
                 setSelected(null);
@@ -228,142 +170,120 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
         });
     };
 
-    // 상대 시간 포맷
     const formatRelativeTime = (dateStr: string): string => {
         const diff = Date.now() - new Date(dateStr).getTime();
-        const seconds = Math.floor(diff / 1000);
-        if (seconds < 60) return "방금";
-        const minutes = Math.floor(seconds / 60);
-        if (minutes < 60) return `${minutes}분 전`;
-        const hours = Math.floor(minutes / 60);
-        if (hours < 24) return `${hours}시간 전`;
-        const days = Math.floor(hours / 24);
-        if (days < 7) return `${days}일 전`;
+        const s = Math.floor(diff / 1000);
+        if (s < 60) return "방금";
+        const m = Math.floor(s / 60);
+        if (m < 60) return `${m}분 전`;
+        const h = Math.floor(m / 60);
+        if (h < 24) return `${h}시간 전`;
+        const d = Math.floor(h / 24);
+        if (d < 7) return `${d}일 전`;
         return new Date(dateStr).toLocaleDateString();
     };
 
-    // 썸네일 (목록)
+    // 스타일 변수
+    const dividerColor = isLight ? "border-neutral-100" : "border-neutral-800";
+    const titleColor = isLight ? "text-neutral-800 group-hover:text-teal-600" : "text-neutral-100 group-hover:text-white";
+    const bodyColor = isLight ? "text-neutral-500" : "text-neutral-400";
+    const metaColor = isLight ? "text-neutral-400" : "text-neutral-500";
+    const articleBg = isLight ? "bg-neutral-50 border border-neutral-100" : "bg-neutral-800/30 border border-neutral-800/50";
+    const backBtnClass = isLight
+        ? "flex items-center gap-1 text-sm text-neutral-500 px-3 py-1.5 rounded-xl cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-all"
+        : "flex items-center gap-1 text-sm text-neutral-400 px-3 py-1.5 rounded-xl cursor-pointer hover:bg-neutral-800 hover:text-neutral-200 transition-all";
+    const editBtnClass = isLight
+        ? "flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl text-neutral-600 bg-neutral-100 cursor-pointer hover:bg-neutral-200 transition-all"
+        : "flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl text-neutral-300 bg-neutral-800 cursor-pointer hover:bg-neutral-700 transition-all";
+
     const Thumb = ({ url }: { url?: string | null }) =>
         url ? (
-            <div className="w-16 h-16 2xl:w-20 2xl:h-20 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-800">
-                <Image
-                    src={url}
-                    alt="thumb"
-                    width={80}
-                    height={80}
-                    className="object-cover w-full h-full"
-                    unoptimized
-                />
+            <div className={`w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 ${isLight ? "bg-neutral-100" : "bg-neutral-800"}`}>
+                <Image src={url} alt="thumb" width={56} height={56} className="object-cover w-full h-full" unoptimized />
             </div>
         ) : null;
 
-    // 본문 이미지 (상세)
     const DetailImage = ({ url }: { url?: string | null }) =>
         url ? (
-            <div className="mt-4 rounded-lg overflow-hidden bg-neutral-900/50">
-                <Image
-                    src={url}
-                    alt="이미지"
-                    width={600}
-                    height={400}
-                    className="max-h-96 w-full object-contain"
-                    unoptimized
-                />
+            <div className={`mt-4 rounded-2xl overflow-hidden ${isLight ? "bg-neutral-100" : "bg-neutral-900/50"}`}>
+                <Image src={url} alt="이미지" width={600} height={400} className="max-h-96 w-full object-contain" unoptimized />
             </div>
         ) : null;
 
     return (
         <>
-            <style
-                dangerouslySetInnerHTML={{
-                    __html: `
-          .scrollbar-hide::-webkit-scrollbar{width:0!important;height:0!important;display:none}
-          .scrollbar-hide{scrollbar-width:none;-ms-overflow-style:none}
-        `,
-                }}
-            />
-
-            <div className={`p-3 h-full flex flex-col min-h-0 transition-[opacity,transform] duration-700 ${postsLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
+            <div
+                className={`p-3 h-full flex flex-col min-h-0 transition-[opacity,transform] duration-700 ${postsLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
+            >
                 {/* 목록 */}
                 {mode === "list" && (
                     <div className="flex-1 overflow-auto scrollbar-hide">
-                        {/* 내부 글쓰기 버튼은 기본 숨김 (부모에서 우측 상단 버튼 사용) */}
                         {showInternalWriteButton && (
                             <button
                                 onClick={() => setMode("write")}
-                                className="mb-3 border rounded px-3 py-1 bg-black text-gray-100 cursor-pointer"
+                                className="mb-3 text-xs px-3 py-1.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 transition cursor-pointer"
                             >
-                               <span className="whitespace-nowrap">글쓰기</span> 
+                                글쓰기
                             </button>
                         )}
 
-                        {/* 스켈레톤 로딩 */}
+                        {/* 스켈레톤 */}
                         {!postsLoaded && (
-                            <div className="space-y-2">
-                                {[...Array(4)].map((_, i) => (
-                                    <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-neutral-800/30 animate-pulse">
-                                        <div className="w-16 h-16 rounded-lg bg-neutral-700" />
-                                        <div className="flex-1">
-                                            <div className="h-4 w-3/4 bg-neutral-700 rounded mb-2" />
-                                            <div className="h-3 w-full bg-neutral-700 rounded mb-1" />
-                                            <div className="h-3 w-2/3 bg-neutral-700 rounded mb-3" />
-                                            <div className="flex gap-2">
-                                                <div className="h-3 w-16 bg-neutral-700 rounded" />
-                                                <div className="h-3 w-12 bg-neutral-700 rounded" />
-                                            </div>
+                            <div className="space-y-0">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className={`flex items-start gap-3 py-3 border-b ${dividerColor} animate-pulse`}>
+                                        <div className="flex-1 space-y-2">
+                                            <div className={`h-3.5 w-3/4 rounded ${isLight ? "bg-neutral-200" : "bg-neutral-800"}`} />
+                                            <div className={`h-3 w-full rounded ${isLight ? "bg-neutral-200" : "bg-neutral-800"}`} />
+                                            <div className={`h-2.5 w-24 rounded ${isLight ? "bg-neutral-200" : "bg-neutral-800"}`} />
                                         </div>
+                                        <div className={`w-14 h-14 rounded-xl ${isLight ? "bg-neutral-200" : "bg-neutral-800"}`} />
                                     </div>
                                 ))}
                             </div>
                         )}
 
                         {postsLoaded && posts.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-12 text-neutral-500">
-                                <svg className="w-12 h-12 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className={`flex flex-col items-center justify-center py-12 ${metaColor}`}>
+                                <svg className="w-10 h-10 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                                 </svg>
-                                <p className="text-sm">아직 게시물이 없습니다</p>
+                                <p className="text-xs">아직 게시물이 없습니다</p>
                                 <button
                                     onClick={() => setMode("write")}
-                                    className="mt-3 text-sm text-emerald-500 hover:text-emerald-400 transition-colors cursor-pointer"
+                                    className="mt-3 text-xs text-emerald-500 hover:text-emerald-400 transition-colors cursor-pointer"
                                 >
                                     첫 글 작성하기
                                 </button>
                             </div>
                         ) : postsLoaded && (
-                            posts.map((p) => (
-                                <div
-                                    key={p.id}
-                                    className="group flex items-start gap-3 p-3 mb-2 rounded-xl bg-neutral-800/30 hover:bg-neutral-800/60 border border-transparent hover:border-neutral-700/50 cursor-pointer transition-all duration-200"
-                                    onClick={() => {
-                                        setSelected(p);
-                                        setMode("detail");
-                                    }}
-                                >
-                                    <Thumb url={p.image_url} />
-                                    <div className="flex-1 min-w-0">
-                                        <h3 className="font-semibold text-sm text-neutral-100 truncate group-hover:text-white transition-colors">
-                                            {p.title}
-                                        </h3>
-                                        <p className="text-xs text-neutral-400 line-clamp-2 mt-1 leading-relaxed">
-                                            {p.body}
-                                        </p>
-                                        <div className="flex items-center gap-2 mt-2 text-[10px] text-neutral-500">
-                                            <span className="flex items-center gap-1">
-                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                </svg>
-                                                {p.user_id.slice(0, 6)}
-                                            </span>
-                                            <span>·</span>
-                                            <span>{formatRelativeTime(p.created_at)}</span>
+                            <ul className="pr-1">
+                                {posts.map((p) => (
+                                    <li
+                                        key={p.id}
+                                        className={`group flex items-center gap-3 py-3 border-b last:border-b-0 cursor-pointer transition-colors ${dividerColor} ${isLight ? "hover:bg-neutral-50" : "hover:bg-neutral-800/20"}`}
+                                        onClick={() => { setSelected(p); setMode("detail"); }}
+                                    >
+                                        <Thumb url={p.image_url} />
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className={`font-semibold text-sm truncate transition-colors mb-0.5 ${titleColor}`}>
+                                                {p.title}
+                                            </h3>
+                                            <p className={`text-xs line-clamp-1 leading-relaxed ${bodyColor}`}>
+                                                {p.body}
+                                            </p>
+                                            <div className={`flex items-center gap-1.5 mt-1.5 text-[10px] ${metaColor}`}>
+                                                <span className={`font-mono px-1.5 py-[1px] rounded text-[9px] ${isLight ? "bg-neutral-100" : "bg-neutral-800"}`}>
+                                                    {p.user_id.slice(0, 6)}
+                                                </span>
+                                                <span>·</span>
+                                                <span>{formatRelativeTime(p.created_at)}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <svg className="w-4 h-4 text-neutral-600 group-hover:text-neutral-400 transition-colors flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </div>
-                            ))
+                                    </li>
+                                ))}
+                            </ul>
                         )}
                     </div>
                 )}
@@ -371,12 +291,9 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                 {/* 상세 */}
                 {mode === "detail" && selected && (
                     <div className="flex-1 overflow-auto scrollbar-hide">
-                        {/* 헤더 */}
+                        {/* 네비 */}
                         <div className="flex items-center justify-between mb-4">
-                            <button
-                                className="flex items-center gap-1 text-sm text-neutral-400 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-neutral-800 hover:text-neutral-200 transition-all"
-                                onClick={() => setMode("list")}
-                            >
+                            <button className={backBtnClass} onClick={() => setMode("list")}>
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                 </svg>
@@ -385,17 +302,14 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
 
                             {userId && userId === selected.user_id && (
                                 <div className="flex gap-2">
-                                    <button
-                                        className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg text-neutral-300 bg-neutral-800 cursor-pointer hover:bg-neutral-700 transition-all"
-                                        onClick={() => setMode("edit")}
-                                    >
+                                    <button className={editBtnClass} onClick={() => setMode("edit")}>
                                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                         수정
                                     </button>
                                     <button
-                                        className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg text-red-400 bg-red-500/10 cursor-pointer hover:bg-red-500/20 transition-all"
+                                        className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl text-red-400 bg-red-500/10 cursor-pointer hover:bg-red-500/20 transition-all"
                                         onClick={() => handleDelete(selected.id)}
                                     >
                                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -407,24 +321,21 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                             )}
                         </div>
 
-                        {/* 본문 */}
-                        <article className="bg-neutral-800/30 rounded-xl p-4 2xl:p-5">
-                            <h2 className="text-xl 2xl:text-2xl font-bold text-white mb-3">
+                        {/* 본문 카드 */}
+                        <article className={`rounded-2xl p-4 2xl:p-5 ${articleBg}`}>
+                            <h2 className={`text-lg 2xl:text-xl font-bold mb-3 leading-snug ${isLight ? "text-neutral-800" : "text-white"}`}>
                                 {selected.title}
                             </h2>
 
-                            <div className="flex items-center gap-3 pb-3 mb-4 border-b border-neutral-700/50 text-xs text-neutral-500">
-                                <span className="flex items-center gap-1">
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
+                            <div className={`flex items-center gap-2 pb-3 mb-4 border-b text-[10px] ${dividerColor} ${metaColor}`}>
+                                <span className={`font-mono px-1.5 py-[2px] rounded ${isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-400"}`}>
                                     {selected.user_id.slice(0, 8)}
                                 </span>
                                 <span>·</span>
                                 <span>{formatRelativeTime(selected.created_at)}</span>
                             </div>
 
-                            <p className="whitespace-pre-wrap text-neutral-300 leading-relaxed">
+                            <p className={`whitespace-pre-wrap text-sm leading-relaxed ${isLight ? "text-neutral-600" : "text-neutral-300"}`}>
                                 {selected.body}
                             </p>
                             <DetailImage url={selected.image_url} />
@@ -432,17 +343,14 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
 
                         {/* 댓글 */}
                         <div className="mt-4">
-                            <Comments postId={selected.id} userId={userId} />
+                            <Comments postId={selected.id} userId={userId} isLight={isLight} />
                         </div>
                     </div>
                 )}
 
                 {/* 글쓰기 */}
                 {mode === "write" && (
-                    <WriteForm
-                        onCancel={() => setMode("list")}
-                        onSubmit={handleCreate}
-                    />
+                    <WriteForm onCancel={() => setMode("list")} onSubmit={handleCreate} isLight={isLight} />
                 )}
 
                 {/* 수정 */}
@@ -453,17 +361,18 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                         initialImage={selected.image_url ?? undefined}
                         onCancel={() => setMode("detail")}
                         onSubmit={handleUpdate}
+                        isLight={isLight}
                     />
                 )}
             </div>
 
-            {/* Custom Modal */}
             {modal && (
                 <CustomModal
                     message={modal.message}
                     isConfirm={modal.isConfirm}
                     onConfirm={modal.onConfirm || (() => setModal(null))}
                     onCancel={() => setModal(null)}
+                    isLight={isLight}
                 />
             )}
         </>

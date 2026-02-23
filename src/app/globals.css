@@ -942,3 +942,11 @@ body {
         font-size: 1.1rem !important;
     }
 }
+
+/* ============================================
+   BGM 플레이어 사운드웨이브 애니메이션
+   ============================================ */
+@keyframes soundwave {
+    0%, 100% { transform: scaleY(0.5); }
+    50% { transform: scaleY(1); }
+}
