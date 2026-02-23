@@ -106,8 +106,8 @@ export default function FloatingLoginSidebar() {
                                 ? "bg-emerald-600 text-white ring-1 ring-emerald-500/50"
                                 : "bg-emerald-500 text-white ring-1 ring-emerald-400/50 shadow-md"
                             : isDark
-                                ? "bg-zinc-700 text-amber-400 ring-1 ring-zinc-600/50"
-                                : "bg-white text-amber-500 ring-1 ring-neutral-200 shadow-md"
+                                ? "bg-amber-500 text-white ring-1 ring-amber-400/60 shadow-amber-500/30 shadow-lg"
+                                : "bg-emerald-500 text-white ring-1 ring-emerald-400/50 shadow-md"
                     }`}
                 >
                     {isSim ? (
