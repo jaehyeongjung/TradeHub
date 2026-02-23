@@ -105,17 +105,17 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
     const current = list.length ? list[idx] : null;
 
     const badgeClass = isLight
-        ? "bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100"
-        : "bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/15";
-    const tickerBaseColor = isLight ? "text-neutral-700" : "text-neutral-200";
+        ? "bg-neutral-100 text-neutral-800 border border-neutral-300 hover:bg-neutral-200"
+        : "bg-neutral-800 text-neutral-300 border border-neutral-700 hover:bg-neutral-700";
+    const tickerBaseColor = isLight ? "text-neutral-800" : "text-neutral-200";
     const tooltipBg = isLight
-        ? "bg-white border-neutral-200 text-neutral-600 shadow-lg"
+        ? "bg-white border-neutral-200 text-neutral-700 shadow-lg"
         : "bg-neutral-900 border-neutral-700 text-neutral-300 shadow-xl";
-    const dividerColor = isLight ? "border-neutral-100" : "border-neutral-800";
-    const colLabelColor = isLight ? "text-neutral-400" : "text-neutral-600";
-    const rankColor = isLight ? "text-neutral-400" : "text-neutral-600";
-    const symColor = isLight ? "text-neutral-700" : "text-neutral-200";
-    const priceColor = isLight ? "text-neutral-500" : "text-neutral-400";
+    const dividerColor = isLight ? "border-neutral-200" : "border-neutral-800";
+    const colLabelColor = isLight ? "text-neutral-500" : "text-neutral-600";
+    const rankColor = isLight ? "text-neutral-500" : "text-neutral-600";
+    const symColor = isLight ? "text-neutral-800" : "text-neutral-200";
+    const priceColor = isLight ? "text-neutral-600" : "text-neutral-400";
     const arrowBorder = isLight ? "border-b-neutral-200" : "border-b-neutral-700";
     const arrowFill = isLight ? "border-b-white" : "border-b-neutral-900";
 
@@ -130,8 +130,11 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
             >
-                <p className={`text-[11px] 2xl:text-xs font-bold px-3 py-1.5 rounded-full select-none cursor-pointer transition-colors whitespace-nowrap ${badgeClass}`}>
-                    🔥 Hot Coin
+                <p className={`flex items-center gap-1.5 text-[11px] 2xl:text-xs font-semibold px-3 py-1.5 rounded-full select-none cursor-pointer transition-colors whitespace-nowrap ${badgeClass}`}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-orange-400">
+                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                    </svg>
+                    인기 코인
                 </p>
 
                 <AnimatePresence>
@@ -169,8 +172,8 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                                 transition={{ duration: 0.22 }}
                                 className={`flex items-center gap-2 whitespace-nowrap ${tickerBaseColor}`}
                             >
-                                <span className={`text-[10px] tabular-nums w-7 shrink-0 ${rankColor}`}>
-                                    #{idx + 1}
+                                <span className={`text-[10px] tabular-nums w-6 text-right shrink-0 ${rankColor}`}>
+                                    {idx + 1}
                                 </span>
                                 <span className={`font-semibold font-mono text-[13px] 2xl:text-sm ${symColor}`}>
                                     {prettySym(current.symbol)}
@@ -201,13 +204,19 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                         >
                             {/* 패널 헤더 */}
                             <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: isLight ? "#f0f0f0" : "#262626" }}>
-                                <span className="font-bold text-amber-500 text-xs">🔥 Hot Coin Top 15</span>
+                                <div className="flex items-center gap-1.5">
+                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" className="text-orange-400 shrink-0">
+                                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+                                    </svg>
+                                    <span className={`font-bold text-xs ${isLight ? "text-neutral-700" : "text-neutral-200"}`}>인기 코인</span>
+                                    <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-500"}`}>TOP 15</span>
+                                </div>
                                 <span className={`text-[9px] ${colLabelColor}`}>30초 갱신</span>
                             </div>
 
                             {/* 컬럼 헤더 */}
                             <div className={`flex items-center px-4 py-2 border-b ${dividerColor}`}>
-                                <span className={`text-[9px] font-medium w-6 mr-3 shrink-0 ${colLabelColor}`}>#</span>
+                                <span className={`text-[9px] font-medium w-5 mr-3 shrink-0 text-right ${colLabelColor}`}>#</span>
                                 <span className={`text-[9px] font-medium flex-1 ${colLabelColor}`}>코인</span>
                                 <span className={`text-[9px] font-medium w-20 text-right ${colLabelColor}`}>가격</span>
                                 <span className={`text-[9px] font-medium w-16 text-right ${colLabelColor}`}>24h</span>
@@ -229,7 +238,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                                             }`}
                                         >
                                             {isActive && <div className="absolute left-0 inset-y-0 w-[2px] bg-amber-500 rounded-r" />}
-                                            <span className={`text-[10px] tabular-nums w-6 mr-3 shrink-0 font-medium ${
+                                            <span className={`text-[10px] tabular-nums w-5 mr-3 shrink-0 font-medium text-right ${
                                                 isActive ? "text-amber-500" : rankColor
                                             }`}>
                                                 {i + 1}
