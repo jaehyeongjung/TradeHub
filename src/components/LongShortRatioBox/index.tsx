@@ -9,10 +9,10 @@ type Period = "5m" | "15m" | "30m" | "1h" | "2h" | "4h" | "6h" | "12h" | "1d";
 type Source = "global" | "top-trader" | "taker";
 
 type Props = {
-  symbol?: string;      // ex) "BTCUSDT"
+  symbol?: string;
   period?: Period;
   source?: Source;
-  pollMs?: number;      // 폴링 주기(ms) 기본 60초
+  pollMs?: number;
 };
 
 type RatioRow = {
@@ -20,9 +20,9 @@ type RatioRow = {
   longShortRatio: string;
   longAccount?: string;
   shortAccount?: string;
-  longShortRatioBuy?: string;   // taker 전용
-  longShortRatioSell?: string;  // taker 전용
-  timestamp: number;            // ms
+  longShortRatioBuy?: string;
+  longShortRatioSell?: string;
+  timestamp: number;
 };
 
 function toErrorMessage(err: unknown): string {
@@ -35,14 +35,24 @@ function isRatioRowArray(x: unknown): x is RatioRow[] {
     x.every((r) => r && typeof r === "object" && typeof (r as { timestamp?: unknown }).timestamp === "number");
 }
 
-// 툴팁 설명 (HTML 줄바꿈 포함)
+function formatRelativeTime(ts: number): string {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return "방금 업데이트";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}분 전 업데이트`;
+  return `${Math.floor(m / 60)}시간 전 업데이트`;
+}
+
+const SOURCE_LABEL: Record<Source, string> = {
+  global: "Global",
+  "top-trader": "Top Trader",
+  taker: "Taker",
+};
+
 const DESCRIPTION_MAP: Record<Source, string> = {
-  global:
-    "바이낸스 모든 계정의 롱/숏 비율<br/>시장 전체의 포지션 성향을 파악할 때 사용합니다.",
-  "top-trader":
-    "바이낸스 상위 10% 트레이더 롱/숏 비율<br/>숙련된 트레이더들의 방향성을 참고합니다.",
-  taker:
-    "테이커(시장가) 매수/매도 비율<br/>즉각적인 공격적 주문 흐름을 반영합니다.",
+  global: "바이낸스 모든 계정의 롱/숏 비율\n시장 전체의 포지션 성향을 파악할 때 사용합니다.",
+  "top-trader": "바이낸스 상위 10% 트레이더 롱/숏 비율\n숙련된 트레이더들의 방향성을 참고합니다.",
+  taker: "테이커(시장가) 매수/매도 비율\n즉각적인 공격적 주문 흐름을 반영합니다.",
 };
 
 export default function LongShortRatioBox({
@@ -57,18 +67,23 @@ export default function LongShortRatioBox({
   const [shortPct, setShortPct] = useState<number | null>(null);
   const [ts, setTs] = useState<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [isLight, setIsLight] = useState(false);
   const isTreemapOpen = useAtomValue(treemapOpenAtom);
+
+  useEffect(() => {
+    const check = () => setIsLight(document.documentElement.classList.contains("light"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   const endpoint = useMemo(() => {
     switch (source) {
-      case "global":
-        return "https://fapi.binance.com/futures/data/globalLongShortAccountRatio";
-      case "top-trader":
-        return "https://fapi.binance.com/futures/data/topLongShortPositionRatio";
-      case "taker":
-        return "https://fapi.binance.com/futures/data/takerlongshortRatio";
-      default:
-        return "";
+      case "global": return "https://fapi.binance.com/futures/data/globalLongShortAccountRatio";
+      case "top-trader": return "https://fapi.binance.com/futures/data/topLongShortPositionRatio";
+      case "taker": return "https://fapi.binance.com/futures/data/takerlongshortRatio";
+      default: return "";
     }
   }, [source]);
 
@@ -78,28 +93,22 @@ export default function LongShortRatioBox({
       const url = `${endpoint}?symbol=${symbol}&period=${period}&limit=30`;
       const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
       const json: unknown = await res.json();
       if (!isRatioRowArray(json) || json.length === 0) throw new Error("empty");
-
       const latest = json[json.length - 1];
       setTs(latest.timestamp);
-
       if (source === "taker") {
         const buy = Number.parseFloat(latest.longShortRatioBuy ?? "0");
         const long = Number.isFinite(buy) ? (buy / (buy + 1)) * 100 : NaN;
-        const short = 100 - long;
         setLongPct(Number.isFinite(long) ? long : null);
-        setShortPct(Number.isFinite(short) ? short : null);
+        setShortPct(Number.isFinite(long) ? 100 - long : null);
       } else {
         const lsr = Number.parseFloat(latest.longShortRatio);
         if (!Number.isFinite(lsr)) throw new Error("invalid longShortRatio");
         const long = (lsr / (1 + lsr)) * 100;
-        const short = 100 - long;
         setLongPct(long);
-        setShortPct(short);
+        setShortPct(100 - long);
       }
-
       setLoading(false);
     } catch (e) {
       setErr(toErrorMessage(e));
@@ -108,9 +117,7 @@ export default function LongShortRatioBox({
   }
 
   useEffect(() => {
-    // 트리맵 열려있으면 폴링 중단
     if (isTreemapOpen) return;
-
     setLoading(true);
     void fetchRatio();
     if (pollMs > 0) {
@@ -120,79 +127,101 @@ export default function LongShortRatioBox({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol, period, source, pollMs, isTreemapOpen]);
 
-  const description = DESCRIPTION_MAP[source];
+  const isLongDominant = longPct !== null && longPct >= 50;
+  const accentBg = longPct === null ? (isLight ? "bg-neutral-300" : "bg-neutral-600")
+    : isLongDominant ? "bg-emerald-500" : "bg-red-500";
+
+  const cardBg = isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800";
+  const labelColor = isLight ? "text-neutral-400" : "text-neutral-500";
+  const pillBg = isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-400";
+  const tooltipBg = isLight
+    ? "bg-white border-neutral-200 text-neutral-600 shadow-lg"
+    : "bg-neutral-900 border-neutral-700 text-neutral-300 shadow-xl";
+  const arrowBorder = isLight ? "border-b-neutral-200" : "border-b-neutral-700";
+  const arrowFill = isLight ? "border-b-white" : "border-b-neutral-900";
 
   return (
     <div
-      className="relative flex-1 min-w-0 min-h-30 2xl:min-h-45 border border-neutral-800 rounded-lg shadow-sm p-2 2xl:p-4 cursor-default bg-neutral-900 flex flex-col justify-center"
+      className={`relative flex-1 min-w-0 min-h-30 2xl:min-h-45 rounded-2xl border overflow-hidden cursor-default ${cardBg}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* 헤더 */}
-      <div className="flex items-center justify-between mb-1 2xl:mb-2">
-        <div className="font-semibold text-sm 2xl:text-base text-neutral-100">{symbol}</div>
-        <div className="text-[11px] 2xl:text-xs text-neutral-300">
-          {source === "global" && "Global"}
-          {source === "top-trader" && "Top Trader"}
-          {source === "taker" && "Taker"}
-          {" · "}
-          {period}
-        </div>
-      </div>
+      {/* 방향 accent 바 */}
+      <div className={`absolute left-0 inset-y-0 w-[3px] transition-colors duration-500 ${accentBg}`} />
 
-      {/* 바디 */}
-      {loading ? (
-        <div className="h-[72px] 2xl:h-[90px] rounded-md bg-neutral-800 animate-pulse" />
-      ) : err ? (
-        <div className="text-sm text-amber-500">⚠ {err}</div>
-      ) : (
-        <>
-          <div className="mt-1 2xl:mt-2">
-            <div className="h-6 2xl:h-8 w-full bg-neutral-800 rounded-full overflow-hidden relative">
-              <div className="absolute inset-0 bg-red-500/80" />
+      <div className="pl-5 pr-4 pt-4 pb-4 2xl:pl-6 2xl:pr-5 2xl:pt-5 2xl:pb-5 h-full flex flex-col justify-between">
+
+        {/* 헤더 */}
+        <div className="flex items-center justify-between mb-3">
+          <span className={`text-[11px] 2xl:text-xs font-medium ${labelColor}`}>롱/숏 비율</span>
+          <div className="flex items-center gap-1.5">
+            <span className={`text-[9px] 2xl:text-[10px] font-medium px-2 py-0.5 rounded-full ${pillBg}`}>
+              {SOURCE_LABEL[source]}
+            </span>
+            <span className={`text-[9px] 2xl:text-[10px] font-medium px-1.5 py-0.5 rounded-full ${pillBg}`}>
+              {period}
+            </span>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className={`flex-1 rounded-xl animate-pulse ${isLight ? "bg-neutral-100" : "bg-neutral-800"}`} />
+        ) : err ? (
+          <div className="text-xs text-amber-500 flex-1 flex items-center">데이터 없음</div>
+        ) : (
+          <>
+            {/* 히어로 숫자 */}
+            <div className="flex items-end justify-between mb-3">
+              <div>
+                <div className={`text-[9px] 2xl:text-[10px] font-medium mb-0.5 ${labelColor}`}>Long</div>
+                <div className="text-2xl 2xl:text-3xl font-bold tabular-nums leading-none text-emerald-400">
+                  {longPct?.toFixed(1)}%
+                </div>
+              </div>
+              <div className="text-right">
+                <div className={`text-[9px] 2xl:text-[10px] font-medium mb-0.5 ${labelColor}`}>Short</div>
+                <div className="text-2xl 2xl:text-3xl font-bold tabular-nums leading-none text-red-400">
+                  {shortPct?.toFixed(1)}%
+                </div>
+              </div>
+            </div>
+
+            {/* 분할 바 */}
+            <div className={`h-1.5 rounded-full overflow-hidden ${isLight ? "bg-red-100" : "bg-red-500/20"}`}>
               <motion.div
-                className="absolute left-0 top-0 bottom-0 bg-emerald-500"
+                className="h-full bg-emerald-500 rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.max(0, Math.min(100, longPct ?? 0))}%` }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
               />
             </div>
-            <div className="flex justify-between text-[12px] 2xl:text-sm mt-1 2xl:mt-2">
-              <span className="text-emerald-400 font-medium">
-                Long {longPct?.toFixed(2)}%
-              </span>
-              <span className="text-red-400 font-medium">
-                Short {shortPct?.toFixed(2)}%
-              </span>
-            </div>
-          </div>
 
-          <div className="mt-1 2xl:mt-2 text-[11px] 2xl:text-xs text-neutral-400">
-            {ts ? new Date(ts).toLocaleString() : ""}
-          </div>
-        </>
-      )}
+            {/* 타임스탬프 */}
+            {ts && (
+              <div className={`mt-2 text-[9px] 2xl:text-[10px] ${labelColor}`}>
+                {formatRelativeTime(ts)}
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
-      {/* 💬 커스텀 툴팁 (HotCoin과 동일 스타일) */}
+      {/* 툴팁 */}
       <AnimatePresence>
         {isHovered && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.2 }}
-            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[220px] 2xl:w-[260px] text-[11px] 2xl:text-xs bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-3 px-4 2xl:py-4 2xl:px-5 shadow-lg z-50 pointer-events-none"
+            transition={{ duration: 0.18 }}
+            className={`absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[230px] text-[11px] rounded-xl py-3.5 px-4 z-50 pointer-events-none border ${tooltipBg}`}
           >
-            <div className="font-semibold text-amber-300 mb-1 2xl:mb-2">
-              지표 설명 ({source === "top-trader" ? "Top Trader" : source === "global" ? "Global" : "Taker"})
-            </div>
-            <p
-              className="leading-snug"
-              dangerouslySetInnerHTML={{ __html: description }}
-            />
-            {/* 위쪽 화살표 */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
+            <div className="font-semibold text-amber-500 mb-1.5">지표 설명</div>
+            <p className="leading-relaxed whitespace-pre-line text-[10px]">
+              {DESCRIPTION_MAP[source]}
+            </p>
+            <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent ${arrowBorder}`} />
+            <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent ${arrowFill}`} />
           </motion.div>
         )}
       </AnimatePresence>

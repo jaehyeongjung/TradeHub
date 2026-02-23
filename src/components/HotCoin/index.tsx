@@ -105,8 +105,8 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
     const current = list.length ? list[idx] : null;
 
     const badgeClass = isLight
-        ? "bg-neutral-100 text-neutral-800 border border-neutral-300 hover:bg-neutral-200"
-        : "bg-neutral-800 text-neutral-300 border border-neutral-700 hover:bg-neutral-700";
+        ? "bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100"
+        : "bg-orange-500/15 text-orange-400 border border-orange-500/25 hover:bg-orange-500/20";
     const tickerBaseColor = isLight ? "text-neutral-800" : "text-neutral-200";
     const tooltipBg = isLight
         ? "bg-white border-neutral-200 text-neutral-700 shadow-lg"
@@ -130,11 +130,9 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
             >
-                <p className={`flex items-center gap-1.5 text-[11px] 2xl:text-xs font-semibold px-3 py-1.5 rounded-full select-none cursor-pointer transition-colors whitespace-nowrap ${badgeClass}`}>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 text-orange-400">
-                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
-                    </svg>
-                    인기 코인
+                <p className={`flex items-center gap-1.5 text-[11px] 2xl:text-xs font-bold px-3 py-1.5 rounded-full select-none cursor-pointer transition-colors whitespace-nowrap tracking-wide ${badgeClass}`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse shrink-0" />
+                    HOT
                 </p>
 
                 <AnimatePresence>
@@ -205,10 +203,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                             {/* 패널 헤더 */}
                             <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: isLight ? "#f0f0f0" : "#262626" }}>
                                 <div className="flex items-center gap-1.5">
-                                    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" className="text-orange-400 shrink-0">
-                                        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
-                                    </svg>
-                                    <span className={`font-bold text-xs ${isLight ? "text-neutral-700" : "text-neutral-200"}`}>인기 코인</span>
+                                    <span className={`font-bold text-xs tracking-wide ${isLight ? "text-neutral-700" : "text-neutral-200"}`}>HOT</span>
                                     <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-500"}`}>TOP 15</span>
                                 </div>
                                 <span className={`text-[9px] ${colLabelColor}`}>30초 갱신</span>
