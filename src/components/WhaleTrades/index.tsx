@@ -94,7 +94,7 @@ export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                     const quantity = parseFloat(d.q);
                     const usdValue = price * quantity;
                     if (usdValue < MIN_USD_VALUE) return;
-                    setTrades((prev) => [{ id: `${d.s}-${d.a}-${Date.now()}`, symbol: d.s.replace("USDT", ""), side: d.m ? "SELL" : "BUY", price, quantity, usdValue, timestamp: d.T }, ...prev].slice(0, MAX_ITEMS));
+                    setTrades((prev) => [{ id: `${d.s}-${d.a}-${Date.now()}`, symbol: d.s.replace("USDT", ""), side: (d.m ? "SELL" : "BUY") as "BUY" | "SELL", price, quantity, usdValue, timestamp: d.T }, ...prev].slice(0, MAX_ITEMS));
                 } catch {}
             };
             ws.onclose = () => { if (!destroyed) { setIsConnected(false); reconnectTimerRef.current = window.setTimeout(connect, 3000); } };
