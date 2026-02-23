@@ -7,15 +7,11 @@ import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
 import { treemapOpenAtom } from "@/store/atoms";
 import AnimatedNumber from "@/components/AnimatedNumber";
 
-/** 브라우저 당 고정되는 익명 디바이스 ID */
 function getDeviceId() {
     if (typeof window === "undefined") return "server";
     const KEY = "th_device_id";
     let id = localStorage.getItem(KEY);
-    if (!id) {
-        id = crypto.randomUUID();
-        localStorage.setItem(KEY, id);
-    }
+    if (!id) { id = crypto.randomUUID(); localStorage.setItem(KEY, id); }
     return id;
 }
 
@@ -24,89 +20,78 @@ export default function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } =
     const [onlineNow, setOnlineNow] = useState<number>(0);
     const [ready, setReady] = useState(false);
     const [connected, setConnected] = useState<boolean>(false);
+    const [isLight, setIsLight] = useState(false);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
     const today = new Date().toISOString().slice(0, 10);
 
-    // 오늘 방문(유니크) 기록: 마운트 시 1번만 upsert
     useEffect(() => {
-        const upsertVisit = async () => {
-            await supabase
-                .from("visits")
-                .upsert([{ day: today, device_id: deviceIdRef.current }], {
-                    onConflict: "day,device_id",
-                });
-        };
-        void upsertVisit();
+        const check = () => setIsLight(document.documentElement.classList.contains("light"));
+        check();
+        const observer = new MutationObserver(check);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        void supabase.from("visits").upsert([{ day: today, device_id: deviceIdRef.current }], { onConflict: "day,device_id" });
     }, [today]);
 
-    // 현재 접속자 수 조회 (최근 60초 내 활동)
     const fetchOnline = useCallback(async () => {
         const { count, error } = await supabase
             .from("presence")
             .select("device_id", { count: "exact", head: true })
             .gt("last_seen", new Date(Date.now() - 60_000).toISOString());
-
-        if (!error) {
-            setOnlineNow(count ?? 0);
-            setReady(true);
-        }
+        if (!error) { setOnlineNow(count ?? 0); setReady(true); }
     }, []);
 
-    // presence heartbeat + 접속자 조회 (탭 활성화 시에만)
     const heartbeatAndFetch = useCallback(async () => {
-        // heartbeat 전송
-        await supabase.from("presence").upsert(
-            [
-                {
-                    device_id: deviceIdRef.current,
-                    last_seen: new Date().toISOString(),
-                },
-            ],
-            { onConflict: "device_id" },
-        );
-        // 접속자 수 조회
+        await supabase.from("presence").upsert([{ device_id: deviceIdRef.current, last_seen: new Date().toISOString() }], { onConflict: "device_id" });
         await fetchOnline();
     }, [fetchOnline]);
 
-    // 탭 비활성화 또는 트리맵 열림 시 폴링 중단
-    useVisibilityPolling({
-        interval: 15_000,
-        onPoll: heartbeatAndFetch,
-        immediate: true,
-        enabled: !isTreemapOpen,
-    });
+    useVisibilityPolling({ interval: 15_000, onPoll: heartbeatAndFetch, immediate: true, enabled: !isTreemapOpen });
 
-    // Realtime 구독 (presence 변경 시 즉시 반영)
     useEffect(() => {
         const channel = supabase
             .channel("presence-watch")
-            .on(
-                "postgres_changes",
-                { schema: "public", table: "presence", event: "*" },
-                () => void fetchOnline(),
-            )
-            .subscribe((status) => {
-                setConnected(status === "SUBSCRIBED");
-            });
-
-        return () => {
-            void supabase.removeChannel(channel);
-        };
+            .on("postgres_changes", { schema: "public", table: "presence", event: "*" }, () => void fetchOnline())
+            .subscribe((status) => setConnected(status === "SUBSCRIBED"));
+        return () => { void supabase.removeChannel(channel); };
     }, [fetchOnline]);
 
+    const cardBg = isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800";
+    const labelColor = isLight ? "text-neutral-400" : "text-neutral-500";
+    const numColor = isLight ? "text-neutral-700" : "text-neutral-100";
+    const unitColor = isLight ? "text-neutral-400" : "text-neutral-400";
+
     return (
-        <div className={`flex items-center gap-3 2xl:gap-4 rounded-2xl border border-neutral-800 p-3 2xl:p-4 shadow-sm justify-center bg-neutral-900 transition-[opacity,transform] duration-700 ${ready ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-            <span className="text-xs 2xl:text-sm flex gap-2 whitespace-nowrap text-gray-300">
-                <b>현재 접속 </b>
-                <b><AnimatedNumber value={onlineNow} suffix="명" /></b>
-            </span>
-            <span
-                className={`inline-block h-2 w-2 2xl:h-3 2xl:w-3 rounded-full ${
-                    connected ? "bg-emerald-500" : "bg-gray-300"
-                }`}
-                title={connected ? "Realtime connected" : "Disconnected"}
-            />
+        <div
+            className={`rounded-2xl border px-4 py-3 2xl:px-5 2xl:py-3.5 flex items-center justify-between transition-[opacity,transform] duration-700 ${cardBg} ${ready ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+            style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
+        >
+            <div>
+                <div className={`text-[10px] 2xl:text-[11px] font-medium mb-0.5 ${labelColor}`}>
+                    지금 함께 보는 중
+                </div>
+                <div className="flex items-baseline gap-1">
+                    <span className={`text-2xl 2xl:text-3xl font-bold tabular-nums leading-none ${numColor}`}>
+                        <AnimatedNumber value={onlineNow} />
+                    </span>
+                    <span className={`text-xs 2xl:text-sm font-medium ${unitColor}`}>명</span>
+                </div>
+            </div>
+
+            {connected ? (
+                <span className="flex items-center gap-1 text-[9px] 2xl:text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    LIVE
+                </span>
+            ) : (
+                <span className={`text-[9px] font-medium px-2 py-1 rounded-full ${isLight ? "bg-neutral-100 text-neutral-400" : "bg-neutral-800 text-neutral-500"}`}>
+                    연결 중
+                </span>
+            )}
         </div>
     );
 }

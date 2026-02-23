@@ -441,27 +441,6 @@ html.light .focus\:ring-amber-500\/25:focus {
     --tw-ring-color: rgba(217, 119, 6, 0.2) !important;
 }
 
-/* ============================================
-   Hot Coin 배지
-   ============================================ */
-.hotcoin-badge {
-    background-color: #262626;
-    color: #FCD34D;
-}
-
-.hotcoin-badge:hover {
-    background-color: #404040;
-}
-
-html.light .hotcoin-badge {
-    background-color: #E5E8EB !important;
-    color: #191F28 !important;
-    border: 1px solid #D1D6DB !important;
-}
-
-html.light .hotcoin-badge:hover {
-    background-color: #D1D6DB !important;
-}
 
 /* 앰버 텍스트 - 라이트모드에서 더 진하게 */
 html.light .text-amber-300 {

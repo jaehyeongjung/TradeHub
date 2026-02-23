@@ -26,12 +26,18 @@ function isHotCandidate(sym: string) {
 function scoreOf(t: Ticker24h) {
     const vol = Number(t.quoteVolume) || 0;
     const pct = Math.abs(Number(t.priceChangePercent) || 0) / 100;
-
-    // 거래량 최소 필터 (300만 달러 미만 제외)
     if (vol < 3000000) return 0;
-
-    // √거래량 × 등락률² (거래량 있으면서 변동성 큰 코인 우선)
     return Math.sqrt(vol) * Math.pow(pct, 2) * 1000000;
+}
+
+function prettySym(sym: string) {
+    return sym.replace(/USDT$/, "");
+}
+
+function formatPrice(p: number) {
+    if (p >= 1000) return p.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    if (p >= 1) return p.toFixed(2);
+    return p.toPrecision(3);
 }
 
 export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {}) {
@@ -39,11 +45,19 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
     const [idx, setIdx] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
     const [showListTooltip, setShowListTooltip] = useState(false);
+    const [isLight, setIsLight] = useState(false);
     const timerRef = useRef<number | null>(null);
     const listTooltipRef = useRef<HTMLDivElement>(null);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
-    // 바깥 클릭 시 툴팁 닫기
+    useEffect(() => {
+        const check = () => setIsLight(document.documentElement.classList.contains("light"));
+        check();
+        const observer = new MutationObserver(check);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
+
     useEffect(() => {
         if (!showListTooltip) return;
         const handleClick = (e: MouseEvent) => {
@@ -55,69 +69,69 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
         return () => document.removeEventListener("click", handleClick);
     }, [showListTooltip]);
 
-    // 30초마다 전체 리스트 갱신 (트리맵 열려있으면 중단)
     useEffect(() => {
         if (isTreemapOpen) return;
-
         let aborted = false;
         const load = async () => {
             try {
-                const res = await fetch(
-                    "https://api.binance.com/api/v3/ticker/24hr",
-                    {
-                        cache: "no-store",
-                    }
-                );
+                const res = await fetch("https://api.binance.com/api/v3/ticker/24hr", { cache: "no-store" });
                 if (!res.ok) return;
                 const all = (await res.json()) as Ticker24h[];
-
                 const filtered = all
                     .filter((t) => isHotCandidate(t.symbol))
                     .sort((a, b) => scoreOf(b) - scoreOf(a))
                     .slice(0, 30);
-
                 if (!aborted) setList(filtered);
             } catch {}
         };
-
         load();
         const intv = window.setInterval(load, 30_000);
-        return () => {
-            aborted = true;
-            clearInterval(intv);
-        };
+        return () => { aborted = true; clearInterval(intv); };
     }, [isTreemapOpen]);
 
-    // 2초마다 다음 항목으로 (Top 15만 회전, 트리맵 열려있으면 중단)
     useEffect(() => {
         if (isTreemapOpen) {
             if (timerRef.current) window.clearInterval(timerRef.current);
             timerRef.current = null;
             return;
         }
-
         if (timerRef.current) window.clearInterval(timerRef.current);
         timerRef.current = window.setInterval(() => {
-            setIdx((i) =>
-                list.length ? (i + 1) % Math.min(list.length, 15) : 0
-            );
+            setIdx((i) => list.length ? (i + 1) % Math.min(list.length, 15) : 0);
         }, 2000);
-        return () => {
-            if (timerRef.current) window.clearInterval(timerRef.current);
-        };
+        return () => { if (timerRef.current) window.clearInterval(timerRef.current); };
     }, [list, isTreemapOpen]);
 
     const current = list.length ? list[idx] : null;
 
+    const badgeClass = isLight
+        ? "bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100"
+        : "bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/15";
+    const tickerBaseColor = isLight ? "text-neutral-700" : "text-neutral-200";
+    const tooltipBg = isLight
+        ? "bg-white border-neutral-200 text-neutral-600 shadow-lg"
+        : "bg-neutral-900 border-neutral-700 text-neutral-300 shadow-xl";
+    const dividerColor = isLight ? "border-neutral-100" : "border-neutral-800";
+    const colLabelColor = isLight ? "text-neutral-400" : "text-neutral-600";
+    const rankColor = isLight ? "text-neutral-400" : "text-neutral-600";
+    const symColor = isLight ? "text-neutral-700" : "text-neutral-200";
+    const priceColor = isLight ? "text-neutral-500" : "text-neutral-400";
+    const arrowBorder = isLight ? "border-b-neutral-200" : "border-b-neutral-700";
+    const arrowFill = isLight ? "border-b-white" : "border-b-neutral-900";
+
     return (
-        <div className={`relative flex items-center gap-3 2xl:gap-4 text-sm 2xl:text-base ml-10 text-neutral-200 transition-[opacity,transform] duration-700 ${current ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
+        <div
+            className={`relative flex items-center gap-3 2xl:gap-4 ml-10 transition-[opacity,transform] duration-700 ${current ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+            style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
+        >
+            {/* Hot Coin 배지 */}
             <div
                 className="relative"
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
             >
-                <p className="hotcoin-badge text-[12px] 2xl:text-sm px-3 2xl:px-4 py-2 2xl:py-2.5 min-h-[36px] 2xl:min-h-[44px] flex items-center rounded-full select-none cursor-pointer shadow-sm transition-colors">
-                    <span className="whitespace-nowrap">🔥 Hot Coin</span>
+                <p className={`text-[11px] 2xl:text-xs font-bold px-3 py-1.5 rounded-full select-none cursor-pointer transition-colors whitespace-nowrap ${badgeClass}`}>
+                    🔥 Hot Coin
                 </p>
 
                 <AnimatePresence>
@@ -127,17 +141,12 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[210px] 2xl:w-[260px] text-[11px] 2xl:text-xs bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg px-4 2xl:px-5 py-3 2xl:py-4 shadow-xl z-[100]"
+                            className={`absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[200px] text-[11px] rounded-xl px-4 py-3 z-[100] border pointer-events-none ${tooltipBg}`}
                         >
-                            <div className="font-semibold text-amber-300 mb-1 2xl:mb-2">
-                                기준 설명
-                            </div>
-                            <ul className="space-y-[2px] leading-tight">
-                                <li>24h 거래대금(USDT) + 등락률 보너스</li>
-                            </ul>
-                            {/* 테두리가 있는 삼각형 화살표 */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
+                            <div className="font-semibold text-amber-500 mb-1">기준 설명</div>
+                            <p className="leading-relaxed text-[10px]">24h 거래대금(USDT) + 등락률 가중 점수</p>
+                            <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent ${arrowBorder}`} />
+                            <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent ${arrowFill}`} />
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -146,102 +155,112 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
             {/* 실시간 회전 코인 */}
             <div
                 ref={listTooltipRef}
-                className="relative w-[300px] 2xl:w-[380px] cursor-pointer"
+                className="relative w-[280px] 2xl:w-[360px] cursor-pointer"
                 onClick={() => setShowListTooltip(!showListTooltip)}
             >
                 <div className="overflow-hidden">
-                <div>
-                <AnimatePresence mode="popLayout">
-                    {current && (
-                        <motion.div
-                            key={current.symbol + idx}
-                            initial={{ y: 16, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            exit={{ y: -16, opacity: 0 }}
-                            transition={{ duration: 0.25 }}
-                            className="whitespace-nowrap"
-                            title={`${current.symbol} · ${Number(
-                                current.priceChangePercent
-                            ).toFixed(2)}% · $${Number(
-                                current.lastPrice
-                            ).toLocaleString()}`}
-                        >
-                            <b className="text-emerald-400 mr-1">
-                                Top {idx + 1}
-                            </b>
-                            <span className="font-mono">
-                                {prettySym(current.symbol)}
-                            </span>
-                            <span className="mx-2 text-neutral-500">·</span>
-                            <span
-                                className={
-                                    Number(current.priceChangePercent) >= 0
-                                        ? "text-emerald-400"
-                                        : "text-red-400"
-                                }
+                    <AnimatePresence mode="popLayout">
+                        {current && (
+                            <motion.div
+                                key={current.symbol + idx}
+                                initial={{ y: 14, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -14, opacity: 0 }}
+                                transition={{ duration: 0.22 }}
+                                className={`flex items-center gap-2 whitespace-nowrap ${tickerBaseColor}`}
                             >
-                                {Number(current.priceChangePercent) >= 0
-                                    ? "▲"
-                                    : "▼"}{" "}
-                                {Number(current.priceChangePercent).toFixed(2)}%
-                            </span>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                </div>
+                                <span className={`text-[10px] tabular-nums w-7 shrink-0 ${rankColor}`}>
+                                    #{idx + 1}
+                                </span>
+                                <span className={`font-semibold font-mono text-[13px] 2xl:text-sm ${symColor}`}>
+                                    {prettySym(current.symbol)}
+                                </span>
+                                <span className={`text-[10px] ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>/USDT</span>
+                                <span className={`text-[10px] 2xl:text-[11px] font-bold px-1.5 py-[2px] rounded font-mono tabular-nums ${
+                                    Number(current.priceChangePercent) >= 0
+                                        ? "text-emerald-400 bg-emerald-500/10"
+                                        : "text-red-400 bg-red-500/10"
+                                }`}>
+                                    {Number(current.priceChangePercent) >= 0 ? "▲" : "▼"}{" "}
+                                    {Math.abs(Number(current.priceChangePercent)).toFixed(2)}%
+                                </span>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
-                {/* Top 15 전체 리스트 툴팁 */}
+                {/* Top 15 전체 리스트 패널 */}
                 <AnimatePresence>
                     {showListTooltip && list.length > 0 && (
                         <motion.div
-                            initial={{ opacity: 0, y: 6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 6 }}
+                            initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 6, scale: 0.98 }}
                             transition={{ duration: 0.18 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[280px] 2xl:w-[340px] text-[11px] 2xl:text-xs bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 2xl:py-5 px-5 2xl:px-6 shadow-xl z-[100] pointer-events-none"
+                            className={`absolute left-0 top-[calc(100%+16px)] w-[320px] 2xl:w-[380px] text-[11px] rounded-2xl overflow-hidden z-[100] border ${tooltipBg}`}
                         >
-                            <div className="font-semibold text-amber-300 mb-2 2xl:mb-3 2xl:text-sm">
-                                🔥 Hot Coin Top 15
+                            {/* 패널 헤더 */}
+                            <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: isLight ? "#f0f0f0" : "#262626" }}>
+                                <span className="font-bold text-amber-500 text-xs">🔥 Hot Coin Top 15</span>
+                                <span className={`text-[9px] ${colLabelColor}`}>30초 갱신</span>
                             </div>
-                            <div className="space-y-0.5 2xl:space-y-1 pb-1">
-                                {list.slice(0, 15).map((item, i) => (
-                                    <div
-                                        key={item.symbol}
-                                        className={`flex items-center justify-between py-1 2xl:py-1.5 ${
-                                            i === idx ? 'text-amber-300 font-semibold' : ''
-                                        }`}
-                                    >
-                                        <span className="text-[10px] 2xl:text-[11px] text-neutral-500 mr-2 w-[14px] text-right">
-                                            {i + 1}
-                                        </span>
-                                        <span className="flex-1 font-mono">
-                                            {prettySym(item.symbol)}
-                                        </span>
-                                        <span
-                                            className={
-                                                Number(item.priceChangePercent) >= 0
-                                                    ? "text-emerald-400"
-                                                    : "text-red-400"
-                                            }
+
+                            {/* 컬럼 헤더 */}
+                            <div className={`flex items-center px-4 py-2 border-b ${dividerColor}`}>
+                                <span className={`text-[9px] font-medium w-6 mr-3 shrink-0 ${colLabelColor}`}>#</span>
+                                <span className={`text-[9px] font-medium flex-1 ${colLabelColor}`}>코인</span>
+                                <span className={`text-[9px] font-medium w-20 text-right ${colLabelColor}`}>가격</span>
+                                <span className={`text-[9px] font-medium w-16 text-right ${colLabelColor}`}>24h</span>
+                            </div>
+
+                            {/* 리스트 */}
+                            <div>
+                                {list.slice(0, 15).map((item, i) => {
+                                    const pct = Number(item.priceChangePercent);
+                                    const isPos = pct >= 0;
+                                    const isActive = i === idx;
+                                    return (
+                                        <div
+                                            key={item.symbol}
+                                            className={`relative flex items-center px-4 py-[6px] transition-colors ${
+                                                isActive
+                                                    ? isLight ? "bg-amber-50" : "bg-amber-500/5"
+                                                    : isLight ? "hover:bg-neutral-50" : "hover:bg-neutral-800/50"
+                                            }`}
                                         >
-                                            {Number(item.priceChangePercent) >= 0 ? "▲" : "▼"}{" "}
-                                            {Number(item.priceChangePercent).toFixed(2)}%
-                                        </span>
-                                    </div>
-                                ))}
+                                            {isActive && <div className="absolute left-0 inset-y-0 w-[2px] bg-amber-500 rounded-r" />}
+                                            <span className={`text-[10px] tabular-nums w-6 mr-3 shrink-0 font-medium ${
+                                                isActive ? "text-amber-500" : rankColor
+                                            }`}>
+                                                {i + 1}
+                                            </span>
+                                            <span className={`flex-1 font-mono font-semibold text-[11px] 2xl:text-xs ${
+                                                isActive
+                                                    ? isLight ? "text-amber-700" : "text-amber-300"
+                                                    : symColor
+                                            }`}>
+                                                {prettySym(item.symbol)}
+                                            </span>
+                                            <span className={`text-[10px] font-mono w-20 text-right tabular-nums ${priceColor}`}>
+                                                ${formatPrice(Number(item.lastPrice))}
+                                            </span>
+                                            <span className={`text-[10px] font-mono font-bold w-16 text-right tabular-nums ${
+                                                isPos ? "text-emerald-400" : "text-red-400"
+                                            }`}>
+                                                {isPos ? "▲" : "▼"} {Math.abs(pct).toFixed(2)}%
+                                            </span>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                            {/* 테두리가 있는 삼각형 화살표 */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
+
+                            {/* 화살표 */}
+                            <div className={`absolute top-0 left-8 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent ${arrowBorder}`} />
+                            <div className={`absolute top-0 left-8 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent ${arrowFill}`} />
                         </motion.div>
                     )}
                 </AnimatePresence>
             </div>
         </div>
     );
-}
-
-function prettySym(sym: string) {
-    return sym.replace(/USDT$/, "") + "/USDT";
 }
