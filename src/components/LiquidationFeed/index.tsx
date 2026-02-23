@@ -64,7 +64,7 @@ export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number 
                     setLiquidations((prev) => [{
                         id: `${o.s}-${o.T}-${Math.random()}`,
                         symbol: o.s.replace("USDT", ""),
-                        side: o.S === "SELL" ? "LONG" : "SHORT",
+                        side: (o.S === "SELL" ? "LONG" : "SHORT") as "LONG" | "SHORT",
                         quantity, price, usdValue, timestamp: o.T,
                     }, ...prev].slice(0, MAX_ITEMS));
                 } catch {}
