@@ -74,6 +74,15 @@ html.light .text-white {
     color: #191F28 !important;
 }
 
+/* 유색 배경 버튼(emerald, amber, red)의 text-white는 흰색 유지 */
+html.light .bg-emerald-600.text-white,
+html.light .bg-emerald-500.text-white,
+html.light .bg-amber-500.text-white,
+html.light .bg-red-500.text-white,
+html.light .bg-red-600.text-white {
+    color: #FFFFFF !important;
+}
+
 html.light .text-gray-100,
 html.light .text-neutral-100,
 html.light .text-zinc-100 {

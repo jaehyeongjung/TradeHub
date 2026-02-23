@@ -449,7 +449,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                     포지션 로딩중...
                                 </span>
                             ) : (
-                                <span className="font-semibold flex items-center gap-2">
+                                <span className="font-semibold flex items-center gap-2 text-neutral-200">
                                     My Position:{" "}
                                     <b
                                         className={
