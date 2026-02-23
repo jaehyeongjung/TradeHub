@@ -101,13 +101,9 @@ export default function FloatingLoginSidebar() {
                     } : { scale: 1 }}
                     transition={{ duration: 7, ease: "easeOut", delay: 0.3 }}
                     className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-105 focus:outline-none transition-colors ${
-                        isSim
-                            ? isDark
-                                ? "bg-emerald-600 text-white ring-1 ring-emerald-500/50"
-                                : "bg-emerald-500 text-white ring-1 ring-emerald-400/50 shadow-md"
-                            : isDark
-                                ? "bg-amber-500 text-white ring-1 ring-amber-400/60 shadow-amber-500/30 shadow-lg"
-                                : "bg-emerald-500 text-white ring-1 ring-emerald-400/50 shadow-md"
+                        isDark
+                            ? "bg-amber-500 text-white ring-1 ring-amber-400/60 shadow-amber-500/30 shadow-lg"
+                            : "bg-emerald-500 text-white ring-1 ring-emerald-400/50 shadow-md"
                     }`}
                 >
                     {isSim ? (
