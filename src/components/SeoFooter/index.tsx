@@ -130,7 +130,7 @@ export default function SeoFooter() {
                             Contact
                         </h3>
                         <ul className="mt-2 text-sm leading-7">
-                            <li>
+                            <li className="whitespace-nowrap">
                                 이메일:&nbsp;
                                 <a
                                     href="mailto:whird398@naver.com"
