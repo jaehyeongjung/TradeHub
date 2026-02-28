@@ -218,7 +218,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                             </div>
 
                             {/* 리스트 */}
-                            <div>
+                            <div className="overflow-y-auto max-h-[calc(100vh-550px)] lg:max-h-[calc(100vh-350px)] 2xl:max-h-[calc(100vh-450px)]">
                                 {list.slice(0, 15).map((item, i) => {
                                     const pct = Number(item.priceChangePercent);
                                     const isPos = pct >= 0;
