@@ -54,7 +54,7 @@ export default function LandingPage() {
                 </div>
             </nav>
 
-            <main className="relative mx-auto max-w-[1600px] px-6">
+            <main className="relative mx-auto max-w-[1600px] px-6 md:px-12">
                 {/* Section 1: Hero */}
                 <section className="relative flex min-h-screen flex-col items-start justify-center pt-20">
                     <div className="flex flex-col gap-0 select-none">
