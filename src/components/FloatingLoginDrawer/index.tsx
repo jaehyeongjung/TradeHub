@@ -184,8 +184,8 @@ export default function FloatingLoginSidebar() {
                     )}
                 </button>
 
-                {/* 로그인 버튼 */}
-                <button
+                {/* 로그인 버튼 - 랜딩 페이지 제외 */}
+                {pathname !== "/" && <button
                     type="button"
                     onClick={toggle}
                     aria-haspopup="dialog"
@@ -210,7 +210,7 @@ export default function FloatingLoginSidebar() {
                             d="M12 2a5 5 0 1 1 0 10a5 5 0 0 1 0-10m0 12c5.33 0 8 2.67 8 6v2H4v-2c0-3.33 2.67-6 8-6"
                         />
                     </svg>
-                </button>
+                </button>}
             </div>
 
             {/* 드로어 루트 */}
