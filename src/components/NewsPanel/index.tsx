@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabase-browser";
 import { useToast } from "@/components/Toast";
 
@@ -219,9 +220,9 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
             </div>
 
             {/* IFRAME MODAL */}
-            {viewer && (
+            {viewer && createPortal(
                 <div
-                    className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4"
+                    className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4"
                     onClick={closeViewer}
                 >
                     <div
@@ -283,7 +284,8 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                             />
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     );
