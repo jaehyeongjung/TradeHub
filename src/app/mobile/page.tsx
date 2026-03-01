@@ -14,7 +14,7 @@ const FEATURES = [
         ),
         label: "실시간 대시보드",
         desc: "청산 · 고래 · 김프 · 공포탐욕지수",
-        img: "/mobile-1.png",
+        img: "/dashboard.png",
         alt: "실시간 대시보드",
     },
     {
@@ -27,7 +27,7 @@ const FEATURES = [
         ),
         label: "거래량 트리맵",
         desc: "150개 코인 등락률 시각화",
-        img: "/tree.png",
+        img: "/treeview.png",
         alt: "거래량 트리맵",
     },
     {
@@ -40,7 +40,7 @@ const FEATURES = [
         ),
         label: "선물 모의투자",
         desc: "최대 125배 레버리지 · 롱/숏",
-        img: "/main-Image.png",
+        img: "/trading.png",
         alt: "선물 모의투자",
     },
 ];
