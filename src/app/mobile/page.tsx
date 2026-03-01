@@ -97,7 +97,7 @@ export default function MobilePage() {
                         보여요
                     </h1>
                     <p className={`text-[15px] leading-relaxed ${isLight ? "text-neutral-500" : "text-neutral-500"}`}>
-                        TradeHub는 PC 환경에 최적화되어 있어요.
+                        TradeHub는 PC 환경에 최적화되어 있어요.<br />
                         아래 주소를 복사해서 PC 브라우저에서 접속해보세요.
                     </p>
                 </section>
@@ -133,15 +133,16 @@ export default function MobilePage() {
                     <div className="space-y-3">
                         {FEATURES.map((f) => (
                             <div key={f.label} className={`border rounded-2xl overflow-hidden ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800/60"}`}>
-                                <div className="relative">
-                                    <Image
-                                        src={f.img}
-                                        alt={f.alt}
-                                        width={400}
-                                        height={200}
-                                        className="w-full h-44 object-cover object-top"
-                                    />
-                                    <div className={`absolute inset-0 bg-gradient-to-t ${isLight ? "from-white/50" : "from-neutral-900/60"} to-transparent`} />
+                                <div className="relative px-3 pt-3">
+                                    <div className="rounded-xl overflow-hidden">
+                                        <Image
+                                            src={f.img}
+                                            alt={f.alt}
+                                            width={400}
+                                            height={200}
+                                            className="w-full h-auto object-contain"
+                                        />
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-3.5 px-4 py-4">
                                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${f.color} ${f.iconColor}`}>

@@ -18,14 +18,14 @@ export const metadata: Metadata = {
             "바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수를 한 화면에서 무료로 확인하세요.",
         url: `${SITE}/dashboard`,
         type: "website",
-        images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "TradeHub 실시간 대시보드" }],
+        images: [{ url: "/trading.png", width: 1200, height: 630, alt: "TradeHub 실시간 대시보드" }],
     },
     twitter: {
         card: "summary_large_image",
         title: "실시간 코인 대시보드 — 청산 · 고래 · 트리맵 · 김프 | TradeHub",
         description:
             "바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수를 한 화면에서 무료로 확인하세요.",
-        images: ["/og-image.png"],
+        images: ["/trading.png"],
     },
 };
 
