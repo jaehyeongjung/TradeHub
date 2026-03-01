@@ -114,7 +114,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
         ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
         : "bg-neutral-800 text-neutral-600 cursor-not-allowed";
     const skeletonBg = isLight ? "bg-neutral-100" : "bg-neutral-800";
-    const skeletonItem = isLight ? "bg-neutral-50 border-neutral-100" : "bg-neutral-900 border-neutral-800";
 
     return (
         <>
