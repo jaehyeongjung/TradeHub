@@ -13,6 +13,7 @@ import SimOrders from "./SimOrders";
 import SimTradeHistory from "./SimTradeHistory";
 import SimOrderBook from "./SimOrderBook";
 import SimMarketData from "./SimMarketData";
+import SimLeaderboard from "./SimLeaderboard";
 
 const CoinChart = dynamic(() => import("@/components/CoinChart"), {
     ssr: false,
@@ -30,6 +31,7 @@ export default function SimTradingPage() {
     const simSymbol = useAtomValue(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);
     const [clickedPrice, setClickedPrice] = useState<number | null>(null);
+    const [bottomTab, setBottomTab] = useState<"positions" | "orders" | "history" | "ranking">("positions");
     const [priceChange, setPriceChange] = useState(0);
     const prevPriceRef = useRef(0);
     const startPriceRef = useRef(0);
@@ -136,9 +138,43 @@ export default function SimTradingPage() {
                         </div>
                     </div>
 
-                    <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} />
-                    <SimOrders orders={orders} onCancel={cancelOrder} />
-                    <SimTradeHistory trades={trades} />
+                    {/* 하단 탭 바 */}
+                    <div className="flex bg-neutral-950 rounded-xl border border-zinc-800 overflow-hidden">
+                        {(
+                            [
+                                { key: "positions", label: "포지션" },
+                                { key: "orders", label: "주문" },
+                                { key: "history", label: "거래내역" },
+                                { key: "ranking", label: "🏆 랭킹" },
+                            ] as const
+                        ).map(({ key, label }) => (
+                            <button
+                                key={key}
+                                onClick={() => setBottomTab(key)}
+                                className={`flex-1 py-2.5 text-[12px] font-medium transition-colors cursor-pointer ${
+                                    bottomTab === key
+                                        ? "text-amber-400 bg-amber-500/10"
+                                        : "text-neutral-500 hover:text-neutral-300"
+                                }`}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* 탭 콘텐츠 */}
+                    {bottomTab === "positions" && (
+                        <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} />
+                    )}
+                    {bottomTab === "orders" && (
+                        <SimOrders orders={orders} onCancel={cancelOrder} />
+                    )}
+                    {bottomTab === "history" && (
+                        <SimTradeHistory trades={trades} />
+                    )}
+                    {bottomTab === "ranking" && (
+                        <SimLeaderboard userId={userId} />
+                    )}
                 </div>
 
                 {/* 우측: 주문 패널 */}

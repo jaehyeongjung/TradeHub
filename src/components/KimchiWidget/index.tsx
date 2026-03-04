@@ -140,7 +140,7 @@ export default function KimchiWidget({
                 <div className={`mt-4 mb-3 border-t ${dividerColor}`} />
 
                 {/* 보조 데이터 — 3열 그리드 */}
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-8">
                     <div>
                         <div className={`text-[9px] 2xl:text-[10px] mb-0.5 ${labelColor}`}>업비트</div>
                         <div className="text-[11px] 2xl:text-xs font-mono font-semibold text-emerald-400 tabular-nums">
@@ -149,7 +149,7 @@ export default function KimchiWidget({
                                 : "—"}
                         </div>
                     </div>
-                    <div>
+                    <div className="ml-2">
                         <div className={`text-[9px] 2xl:text-[10px] mb-0.5 ${labelColor}`}>바이낸스</div>
                         <div className="text-[11px] 2xl:text-xs font-mono font-semibold text-amber-400 tabular-nums">
                             {data?.binanceUsdt != null
