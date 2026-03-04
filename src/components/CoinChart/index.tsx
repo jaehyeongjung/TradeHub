@@ -850,6 +850,12 @@ export default function CoinChart({
 
                     {/* 상단 컨트롤 바 */}
                     <div className="absolute top-2 left-2 flex items-center gap-1 z-20">
+                        {/* 심볼 표시 - 인터벌 버튼 왼쪽에 인라인 배치 (우측 price axis와 겹침 방지) */}
+                        {!hideControls && (
+                            <div className="px-2 py-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50">
+                                <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">{sym}</span>
+                            </div>
+                        )}
                         {/* 인터벌 버튼 */}
                         <div className="flex gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50">
                             {INTERVAL_OPTIONS.map((opt) => (
@@ -1055,13 +1061,6 @@ export default function CoinChart({
                             </AnimatePresence>
                         </div>}
                     </div>
-
-                    {/* 심볼 표시 */}
-                    {!hideControls && (
-                        <div className="absolute top-2 right-2 px-2 py-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50 z-20">
-                            <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">{sym}</span>
-                        </div>
-                    )}
 
                     {/* 코인 변경 버튼 */}
                     {!hideControls && (
