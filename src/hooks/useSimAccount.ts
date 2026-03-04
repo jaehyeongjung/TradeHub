@@ -254,6 +254,28 @@ export function useSimAccount() {
         await loadAll();
     }, [userId, loadAll]);
 
+    // 30초마다 unrealized_pnl DB 동기화 (랭킹 싱크용)
+    const latestPositionsPnlRef = useRef(positionsWithPnl);
+    latestPositionsPnlRef.current = positionsWithPnl;
+
+    useEffect(() => {
+        if (!userId || activePage !== "sim") return;
+        const sync = async () => {
+            const pos = latestPositionsPnlRef.current;
+            if (pos.length === 0) return;
+            await Promise.all(
+                pos.map((p) =>
+                    supabase
+                        .from("sim_positions")
+                        .update({ unrealized_pnl: p.unrealized_pnl })
+                        .eq("id", p.id)
+                )
+            );
+        };
+        const id = setInterval(sync, 30_000);
+        return () => clearInterval(id);
+    }, [userId, activePage]);
+
     // TP/SL 검증용 최신 가격 참조
     const latestPricesRef = useRef(prices);
     latestPricesRef.current = prices;
