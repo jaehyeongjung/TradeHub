@@ -129,6 +129,7 @@ export default function SimTradingPage() {
                                 interval="1m"
                                 className="h-full"
                                 hideControls
+                                enableIndicators
                                 positions={positions}
                                 onUpdateTpSl={updateTpSl}
                             />
