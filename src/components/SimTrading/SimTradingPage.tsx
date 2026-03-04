@@ -85,115 +85,99 @@ export default function SimTradingPage() {
 
     return (
         <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto mt-3">
-            {/* 메인: 차트 + 호가창 + 주문 */}
-            <div className="flex gap-3">
-                {/* 좌측: 차트 + 포지션 */}
-                <div className="flex-[3] flex flex-col gap-3 min-w-0">
-                    {/* 코인 정보 바 */}
-                    <div className="flex items-center gap-4 px-4 py-2.5 bg-neutral-950 rounded-xl border border-zinc-800">
-                        <Image
-                            src={getCoinLogoUrl(simSymbol)}
-                            alt={simSymbol}
-                            width={28}
-                            height={28}
-                            className="rounded-full"
-                            unoptimized
-                        />
-                        <div className="flex items-center gap-1.5">
-                            <span className="text-[15px] font-bold text-white">
-                                {simSymbol.replace("USDT", "")}
-                            </span>
-                            <span className="text-[11px] text-neutral-500">/ USDT</span>
-                            <span className="text-[9px] px-1.5 py-0.5 bg-amber-500/10 text-amber-400 rounded-md ml-1">
-                                선물
-                            </span>
-                        </div>
-                        <div className="flex items-baseline gap-2 ml-4">
-                            <span className={`text-[18px] font-bold font-mono tabular-nums ${priceChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                                {currentPrice > 0 ? currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
-                            </span>
-                            <span className={`text-xs font-semibold font-mono tabular-nums ${priceChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                                {priceChange >= 0 ? "+" : ""}{priceChange.toFixed(2)}%
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* 마켓 지표 */}
-                    <SimMarketData />
-
-                    <div className="flex gap-3 h-[calc(100vh-350px)]">
-                        <div className="flex-1 min-w-0">
-                            <CoinChart
-                                boxId="sim-chart"
-                                symbol={simSymbol}
-                                interval="1m"
-                                className="h-full"
-                                hideControls
-                                enableIndicators
-                                positions={positions}
-                                onUpdateTpSl={updateTpSl}
-                            />
-                        </div>
-                        <div className="w-[280px] flex-shrink-0">
-                            <SimOrderBook onPriceClick={handleOrderBookClick} />
-                        </div>
-                    </div>
-
-                    {/* 하단 탭 바 */}
-                    <div className="flex bg-neutral-950 rounded-xl border border-zinc-800 overflow-hidden">
-                        {(
-                            [
-                                { key: "positions", label: "포지션" },
-                                { key: "orders", label: "주문" },
-                                { key: "history", label: "거래내역" },
-                                { key: "ranking", label: "🏆 랭킹" },
-                            ] as const
-                        ).map(({ key, label }) => (
-                            <button
-                                key={key}
-                                onClick={() => setBottomTab(key)}
-                                className={`flex-1 py-2.5 text-[12px] font-medium transition-colors cursor-pointer ${
-                                    bottomTab === key
-                                        ? "text-amber-400 bg-amber-500/10"
-                                        : "text-neutral-500 hover:text-neutral-300"
-                                }`}
-                            >
-                                {label}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* 탭 콘텐츠 */}
-                    {bottomTab === "positions" && (
-                        <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} />
-                    )}
-                    {bottomTab === "orders" && (
-                        <SimOrders orders={orders} onCancel={cancelOrder} />
-                    )}
-                    {bottomTab === "history" && (
-                        <SimTradeHistory trades={trades} />
-                    )}
-                    {bottomTab === "ranking" && (
-                        <SimLeaderboard userId={userId} />
-                    )}
+            {/* 통합 헤더 바: 코인 정보 + 마켓 지표 */}
+            <div className="flex items-center gap-4 px-4 py-2.5 bg-neutral-950 rounded-xl border border-zinc-800 overflow-x-auto scrollbar-none">
+                <Image
+                    src={getCoinLogoUrl(simSymbol)}
+                    alt={simSymbol}
+                    width={28}
+                    height={28}
+                    className="rounded-full flex-shrink-0"
+                    unoptimized
+                />
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <span className="text-[15px] font-bold text-white">
+                        {simSymbol.replace("USDT", "")}
+                    </span>
+                    <span className="text-[11px] text-neutral-500">/ USDT</span>
+                    <span className="text-[9px] px-1.5 py-0.5 bg-amber-500/10 text-amber-400 rounded-md ml-1">
+                        선물
+                    </span>
                 </div>
+                <span className={`text-[18px] font-bold font-mono tabular-nums flex-shrink-0 ${priceChange >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                    {currentPrice > 0 ? currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
+                </span>
+                <SimMarketData />
+            </div>
 
-                {/* 우측: 주문 패널 */}
-                <div className="w-[300px] flex-shrink-0">
-                    <div className="sticky top-4">
-                        <SimOrderPanel
-                            account={account}
-                            totalUnrealizedPnl={totalUnrealizedPnl}
-                            totalPositionMargin={totalPositionMargin}
-                            loading={loading}
-                            onSubmit={async (input) => { await openPosition(input); }}
-                            onReset={resetAccount}
-                            clickedPrice={clickedPrice}
-                            lockedMarginMode={lockedMarginMode}
-                        />
-                    </div>
+            {/* 차트 + 호가창 + 주문패널 (동일 높이) */}
+            <div className="flex gap-3 h-[calc(100vh-220px)]">
+                <div className="flex-1 min-w-0">
+                    <CoinChart
+                        boxId="sim-chart"
+                        symbol={simSymbol}
+                        interval="1m"
+                        className="h-full"
+                        hideControls
+                        enableIndicators
+                        positions={positions}
+                        onUpdateTpSl={updateTpSl}
+                    />
+                </div>
+                <div className="w-[280px] flex-shrink-0">
+                    <SimOrderBook onPriceClick={handleOrderBookClick} />
+                </div>
+                <div className="w-[300px] flex-shrink-0 flex flex-col">
+                    <SimOrderPanel
+                        account={account}
+                        totalUnrealizedPnl={totalUnrealizedPnl}
+                        totalPositionMargin={totalPositionMargin}
+                        loading={loading}
+                        onSubmit={async (input) => { await openPosition(input); }}
+                        onReset={resetAccount}
+                        clickedPrice={clickedPrice}
+                        lockedMarginMode={lockedMarginMode}
+                    />
                 </div>
             </div>
+
+            {/* 하단 탭 바 */}
+            <div className="flex bg-neutral-950 rounded-xl border border-zinc-800 overflow-hidden">
+                {(
+                    [
+                        { key: "positions", label: "포지션" },
+                        { key: "orders", label: "주문" },
+                        { key: "history", label: "거래내역" },
+                        { key: "ranking", label: "🏆 랭킹" },
+                    ] as const
+                ).map(({ key, label }) => (
+                    <button
+                        key={key}
+                        onClick={() => setBottomTab(key)}
+                        className={`flex-1 py-2.5 text-[12px] font-medium transition-colors cursor-pointer ${
+                            bottomTab === key
+                                ? "text-amber-400 bg-amber-500/10"
+                                : "text-neutral-500 hover:text-neutral-300"
+                        }`}
+                    >
+                        {label}
+                    </button>
+                ))}
+            </div>
+
+            {/* 탭 콘텐츠 */}
+            {bottomTab === "positions" && (
+                <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} />
+            )}
+            {bottomTab === "orders" && (
+                <SimOrders orders={orders} onCancel={cancelOrder} />
+            )}
+            {bottomTab === "history" && (
+                <SimTradeHistory trades={trades} />
+            )}
+            {bottomTab === "ranking" && (
+                <SimLeaderboard userId={userId} />
+            )}
         </div>
     );
 }
