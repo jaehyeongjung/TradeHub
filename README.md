@@ -21,7 +21,10 @@
 
 ## 선물 모의투자
 
+<img width="1440" height="688" alt="스크린샷 2026-03-05 오전 12 02 48" src="https://github.com/user-attachments/assets/e79f2143-2bfe-4372-97d0-3c9b85a1e04b" />
+
 https://github.com/user-attachments/assets/a8d60177-9063-4fdf-bd52-90e0d4b04e31
+
 
 
 ### 트레이딩 기능
@@ -43,7 +46,8 @@ https://github.com/user-attachments/assets/a8d60177-9063-4fdf-bd52-90e0d4b04e31
 
 ## 대시보드
 
-<img width="1432" height="686" alt="TradeHub 대시보드" src="https://github.com/user-attachments/assets/7954aa1d-5710-4d74-bb29-04c9ebc837d5" />
+<img width="1440" height="688" alt="스크린샷 2026-03-05 오전 12 03 03" src="https://github.com/user-attachments/assets/0efd2409-ab35-404a-9adb-2e453cd6f6ce" />
+
 
 ### 주요 기능
 
