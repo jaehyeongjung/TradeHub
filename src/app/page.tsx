@@ -32,8 +32,8 @@ export default function LandingPage() {
             <div className="landing-noise fixed inset-0 z-[9999] pointer-events-none opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/asfalt-light.png')]" />
 
             {/* 내비게이션 */}
-            <nav className="landing-nav fixed top-0 z-[100] flex w-full items-center justify-between px-6 py-8 md:px-12 md:py-12 mix-blend-difference">
-                <div className="flex flex-col">
+            <nav className="landing-nav fixed top-0 z-[100] flex w-full items-center justify-between px-6 py-8 md:px-12 md:py-12 mix-blend-difference pointer-events-none">
+                <div className="flex flex-col pointer-events-none">
                     <span className="text-2xl font-[1000] tracking-[-0.12em] leading-none text-white">
                         TRADEHUB
                     </span>
@@ -41,7 +41,7 @@ export default function LandingPage() {
                         LIVE LAB
                     </span>
                 </div>
-                <div className="flex items-center gap-10">
+                <div className="flex items-center gap-10 pointer-events-auto">
                     <Link
                         href="/trading"
                         className="landing-launch group flex items-center gap-3 px-6 py-2 rounded-full border border-[#02C076]/30 hover:bg-[#02C076] hover:text-black transition-all"

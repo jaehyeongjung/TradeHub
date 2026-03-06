@@ -1,10 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAtomValue } from "jotai";
 import { simPricesAtom } from "@/store/atoms";
 import { calcRoe } from "@/lib/sim-trading";
 import type { SimPosition } from "@/types/sim-trading";
+
+function useTheme() {
+    const [isLight, setIsLight] = useState(false);
+    useEffect(() => {
+        const html = document.documentElement;
+        setIsLight(html.classList.contains("light"));
+        const observer = new MutationObserver(() => setIsLight(html.classList.contains("light")));
+        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+        return () => observer.disconnect();
+    }, []);
+    return isLight;
+}
 
 interface Props {
     positions: SimPosition[];
@@ -13,48 +25,51 @@ interface Props {
 }
 
 export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props) {
+    const isLight = useTheme();
     const prices = useAtomValue(simPricesAtom);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editTp, setEditTp] = useState("");
     const [editSl, setEditSl] = useState("");
     const [tpSlError, setTpSlError] = useState("");
 
+    const border = isLight ? "border-neutral-200" : "border-zinc-800/60";
+    const cardBg = isLight ? "bg-white" : "bg-neutral-950";
+    const subCardBg = isLight ? "bg-neutral-50" : "bg-neutral-900/60";
+    const inputBg = isLight ? "bg-neutral-100 border-neutral-200" : "bg-neutral-800 border-neutral-700/50";
+    const textPrimary = isLight ? "text-neutral-900" : "text-white";
+    const textSecondary = isLight ? "text-neutral-600" : "text-neutral-400";
+    const textTertiary = isLight ? "text-neutral-500" : "text-neutral-600";
+    const btnClose = isLight
+        ? "bg-neutral-50 border-neutral-200 text-neutral-500 hover:bg-red-50 hover:text-red-500 hover:border-red-200"
+        : "bg-neutral-900 border-zinc-800 text-neutral-500 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/30";
+    const btnTpSl = isLight
+        ? "bg-neutral-50 border-neutral-200 text-neutral-500 hover:text-amber-600 hover:bg-amber-50 hover:border-amber-200"
+        : "bg-neutral-900 border-zinc-800 text-neutral-500 hover:text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/30";
+
     if (positions.length === 0) {
         return (
-            <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5">
-                <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Positions</h3>
-                <div className="text-[11px] text-neutral-600 text-center py-6">
-                    활성 포지션이 없습니다
+            <div className={`${cardBg} rounded-2xl border ${border} p-8 text-center`}>
+                <div className={`w-12 h-12 rounded-2xl ${subCardBg} border ${border} flex items-center justify-center mx-auto mb-3`}>
+                    <svg className={`w-6 h-6 ${textTertiary}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
                 </div>
+                <p className={`text-[13px] font-medium ${textSecondary}`}>활성 포지션이 없습니다</p>
+                <p className={`text-[11px] ${textTertiary} mt-1`}>주문 패널에서 포지션을 열어보세요</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden">
-            {/* 헤더 */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
-                <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
-                    Positions
-                    <span className="inline-flex items-center justify-center w-5 h-5 ml-2 text-[10px] font-bold bg-amber-500/15 text-amber-400 rounded-full">
-                        {positions.length}
-                    </span>
-                </h3>
+        <div className="space-y-2">
+            <div className="flex items-center gap-2 px-1">
+                <span className={`text-[11px] font-semibold ${textTertiary} uppercase tracking-wider`}>포지션</span>
+                <span className="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold bg-amber-500/15 text-amber-500 rounded-full">
+                    {positions.length}
+                </span>
             </div>
 
-            {/* 테이블 헤더 */}
-            <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-2 px-5 py-2 text-[11px] text-neutral-500 border-b border-zinc-800/40">
-                <div>심볼</div>
-                <div className="text-right">규모</div>
-                <div className="text-right">진입가</div>
-                <div className="text-right">현재가</div>
-                <div className="text-right">청산가</div>
-                <div className="text-right">미실현 PnL</div>
-                <div className="text-right w-[52px]"></div>
-            </div>
-
-            {/* 포지션 리스트 */}
-            <div className="divide-y divide-zinc-800/30">
+            <div className="grid gap-2">
                 {positions.map((pos) => {
                     const cp = prices[pos.symbol] ?? pos.entry_price;
                     const pnl = pos.unrealized_pnl;
@@ -65,169 +80,177 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                     const liqDist = pos.entry_price > 0
                         ? Math.abs(cp - pos.liq_price) / cp * 100
                         : 0;
+                    const isEditing = editingId === pos.id;
 
                     return (
-                        <div key={pos.id} className="group">
-                            {/* 메인 행 */}
-                            <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-2 items-center px-5 py-3 hover:bg-white/[0.015] transition-colors">
-                                {/* 심볼 + 방향 */}
-                                <div className="flex items-center gap-2">
-                                    <div className={`w-1 h-8 rounded-full ${isLong ? "bg-emerald-500" : "bg-red-500"}`} />
-                                    <div>
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-[14px] font-bold text-white">
-                                                {pos.symbol.replace("USDT", "")}
-                                            </span>
-                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                                                isLong
-                                                    ? "bg-emerald-500/15 text-emerald-400"
-                                                    : "bg-red-500/15 text-red-400"
-                                            }`}>
-                                                {pos.side}
-                                            </span>
+                        <div key={pos.id} className={`${cardBg} rounded-2xl border ${border} overflow-hidden`}>
+                            {/* 상단 컬러 라인 */}
+                            <div className={`h-[2px] ${isLong ? "bg-emerald-500" : "bg-red-500"}`} />
+
+                            <div className="p-4">
+                                {/* 헤더 */}
+                                <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[11px] font-black ${
+                                            isLong ? "bg-emerald-500/15 text-emerald-500" : "bg-red-500/15 text-red-500"
+                                        }`}>
+                                            {isLong ? "L" : "S"}
                                         </div>
-                                        <div className="flex items-center gap-1.5 mt-0.5">
-                                            <span className="text-[11px] text-amber-400 font-mono font-medium">{Number(pos.leverage).toFixed(0)}x</span>
-                                            <span className={`text-[10px] px-1 py-px rounded ${
-                                                pos.margin_mode === "CROSS"
-                                                    ? "bg-amber-500/10 text-amber-400"
-                                                    : "bg-violet-500/10 text-violet-400"
-                                            }`}>
-                                                {pos.margin_mode === "CROSS" ? "Cross" : "Isolated"}
-                                            </span>
-                                            <span className="text-[11px] text-neutral-400 font-mono">
-                                                {pos.quantity.toFixed(pos.quantity >= 1 ? 4 : 6)} {pos.symbol.replace("USDT", "")}
-                                            </span>
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <span className={`text-[15px] font-bold ${textPrimary}`}>
+                                                    {pos.symbol.replace("USDT", "")}
+                                                </span>
+                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-lg ${
+                                                    isLong ? "bg-emerald-500/15 text-emerald-500" : "bg-red-500/15 text-red-500"
+                                                }`}>
+                                                    {pos.side}
+                                                </span>
+                                                <span className="text-[10px] font-bold text-amber-500 font-mono">{Number(pos.leverage).toFixed(0)}x</span>
+                                                <span className={`text-[9px] px-1.5 py-0.5 rounded-md ${
+                                                    isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-400"
+                                                }`}>
+                                                    {pos.margin_mode === "CROSS" ? "교차" : "격리"}
+                                                </span>
+                                            </div>
+                                            <div className={`text-[11px] ${textTertiary} mt-0.5 font-mono`}>
+                                                {pos.quantity.toFixed(pos.quantity >= 1 ? 4 : 6)} {pos.symbol.replace("USDT", "")} · ${notional.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                {/* 규모 */}
-                                <div className="text-right">
-                                    <div className="text-[13px] text-neutral-200 font-mono tabular-nums">
-                                        ${notional.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                    </div>
-                                    <div className="text-[11px] text-neutral-500 font-mono tabular-nums">
-                                        {pos.margin.toFixed(2)} 증거금
-                                    </div>
-                                </div>
-
-                                {/* 진입가 */}
-                                <div className="text-right">
-                                    <div className="text-[13px] text-neutral-300 font-mono tabular-nums">
-                                        {pos.entry_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                    </div>
-                                </div>
-
-                                {/* 현재가 */}
-                                <div className="text-right">
-                                    <div className={`text-[13px] font-mono tabular-nums font-medium ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
-                                        {cp.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                    </div>
-                                </div>
-
-                                {/* 청산가 */}
-                                <div className="text-right">
-                                    <div className="text-[13px] text-orange-400 font-mono tabular-nums">
-                                        {pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                    </div>
-                                    <div className={`text-[11px] font-mono tabular-nums ${liqDist < 5 ? "text-orange-400" : "text-neutral-500"}`}>
-                                        {liqDist.toFixed(1)}% 거리
-                                    </div>
-                                </div>
-
-                                {/* PnL */}
-                                <div className="text-right">
-                                    <div className={`text-[15px] font-bold font-mono tabular-nums ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
-                                        {isProfit ? "+" : ""}{pnl.toFixed(2)}
-                                    </div>
-                                    <div className={`text-[12px] font-mono tabular-nums ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
-                                        {isProfit ? "+" : ""}{roe.toFixed(2)}%
-                                    </div>
-                                </div>
-
-                                {/* 청산 버튼 */}
-                                <div className="text-right w-[52px]">
                                     <button
                                         onClick={() => onClose(pos.id, cp)}
-                                        className="text-[11px] px-3 py-1.5 bg-neutral-800 hover:bg-red-500/20 text-neutral-400 hover:text-red-400 rounded-lg border border-neutral-700/50 transition-all cursor-pointer"
+                                        className={`text-[11px] px-3 py-1.5 rounded-xl border transition-all cursor-pointer font-medium ${btnClose}`}
                                     >
                                         청산
                                     </button>
                                 </div>
-                            </div>
 
-                            {/* TP/SL 바 */}
-                            <div className="px-5 pb-2.5">
-                                {editingId === pos.id ? (
-                                    <div className="flex items-center gap-2 bg-neutral-900/50 rounded-lg px-3 py-2">
-                                        <div className="flex items-center gap-1.5 flex-1">
-                                            <span className="text-[10px] text-emerald-400 font-medium shrink-0">TP</span>
-                                            <input
-                                                type="number"
-                                                value={editTp}
-                                                onChange={(e) => setEditTp(e.target.value)}
-                                                placeholder="미설정"
-                                                className="w-full bg-neutral-800 text-emerald-400 text-[11px] font-mono rounded-md px-2 py-1.5 border border-neutral-700/50 outline-none placeholder:text-neutral-600 focus:border-emerald-500"
-                                            />
+                                {/* PnL 히어로 */}
+                                <div className={`rounded-xl px-4 py-3 mb-3 ${isProfit ? "bg-emerald-500/8" : "bg-red-500/8"}`}>
+                                    <div className="flex items-end justify-between">
+                                        <div>
+                                            <div className={`text-[24px] font-bold font-mono tabular-nums leading-none ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
+                                                {isProfit ? "+" : ""}{pnl.toFixed(2)}
+                                                <span className={`text-[13px] ml-1 font-medium ${isProfit ? "text-emerald-500/70" : "text-red-500/70"}`}>USDT</span>
+                                            </div>
+                                            <div className={`text-[10px] ${textTertiary} mt-1`}>미실현 손익</div>
                                         </div>
-                                        <div className="flex items-center gap-1.5 flex-1">
-                                            <span className="text-[10px] text-red-400 font-medium shrink-0">SL</span>
-                                            <input
-                                                type="number"
-                                                value={editSl}
-                                                onChange={(e) => setEditSl(e.target.value)}
-                                                placeholder="미설정"
-                                                className="w-full bg-neutral-800 text-red-400 text-[11px] font-mono rounded-md px-2 py-1.5 border border-neutral-700/50 outline-none placeholder:text-neutral-600 focus:border-red-500"
-                                            />
+                                        <div className="text-right">
+                                            <div className={`text-[18px] font-bold font-mono tabular-nums ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
+                                                {isProfit ? "+" : ""}{roe.toFixed(2)}%
+                                            </div>
+                                            <div className={`text-[10px] ${textTertiary} mt-1`}>수익률 (ROE)</div>
                                         </div>
-                                        <button
-                                            onClick={async () => {
-                                                setTpSlError("");
-                                                const tp = editTp ? parseFloat(editTp) : null;
-                                                const sl = editSl ? parseFloat(editSl) : null;
-                                                try {
-                                                    await onUpdateTpSl?.(pos.id, tp, sl);
-                                                    setEditingId(null);
-                                                } catch (e) {
-                                                    setTpSlError(e instanceof Error ? e.message : "TP/SL 설정 실패");
-                                                }
-                                            }}
-                                            className="text-[10px] px-3 py-1.5 bg-amber-500/20 text-amber-300 rounded-md border border-amber-500/30 hover:bg-amber-500/30 transition-colors cursor-pointer shrink-0 font-medium"
-                                        >
-                                            저장
-                                        </button>
-                                        <button
-                                            onClick={() => { setEditingId(null); setTpSlError(""); }}
-                                            className="text-[10px] px-2 py-1.5 text-neutral-500 hover:text-neutral-300 cursor-pointer shrink-0"
-                                        >
-                                            취소
-                                        </button>
-                                        {tpSlError && (
-                                            <span className="text-[10px] text-red-500 shrink-0">{tpSlError}</span>
-                                        )}
+                                    </div>
+                                </div>
+
+                                {/* 가격 3열 */}
+                                <div className="grid grid-cols-3 gap-2 mb-3">
+                                    {[
+                                        { label: "진입가", value: pos.entry_price.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: textSecondary },
+                                        { label: "현재가", value: cp.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: isProfit ? "text-emerald-500" : "text-red-500" },
+                                        { label: "청산가", value: pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: "text-orange-500" },
+                                    ].map(({ label, value, color }) => (
+                                        <div key={label} className={`${subCardBg} rounded-xl px-3 py-2 border ${border}`}>
+                                            <div className={`text-[9px] ${textTertiary} mb-0.5`}>{label}</div>
+                                            <div className={`text-[12px] font-mono tabular-nums font-bold ${color}`}>{value}</div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* 청산가 거리 바 */}
+                                <div className="mb-3">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <span className={`text-[9px] ${textTertiary}`}>청산가까지 거리</span>
+                                        <span className={`text-[10px] font-mono font-semibold ${
+                                            liqDist < 5 ? "text-red-500" : liqDist < 15 ? "text-orange-500" : textTertiary
+                                        }`}>
+                                            {liqDist.toFixed(1)}%
+                                        </span>
+                                    </div>
+                                    <div className={`h-1.5 rounded-full overflow-hidden ${isLight ? "bg-neutral-100" : "bg-neutral-800"}`}>
+                                        <div
+                                            className={`h-full rounded-full transition-all duration-500 ${
+                                                liqDist < 5 ? "bg-red-500" : liqDist < 15 ? "bg-orange-500" : "bg-emerald-500/60"
+                                            }`}
+                                            style={{ width: `${Math.max(2, Math.min(100, 100 - liqDist * 3))}%` }}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* TP/SL */}
+                                {isEditing ? (
+                                    <div className={`${subCardBg} rounded-xl p-3 border ${border} space-y-2`}>
+                                        <div className="flex gap-2">
+                                            <div className="flex-1">
+                                                <label className="text-[9px] text-emerald-500 font-medium mb-1 block">익절가 (TP)</label>
+                                                <input
+                                                    type="number" value={editTp}
+                                                    onChange={(e) => setEditTp(e.target.value)}
+                                                    placeholder="미설정"
+                                                    className={`w-full text-emerald-500 text-[12px] font-mono rounded-xl px-3 py-2 border outline-none focus:border-emerald-500/50 transition-colors placeholder:text-neutral-500 ${inputBg}`}
+                                                />
+                                            </div>
+                                            <div className="flex-1">
+                                                <label className="text-[9px] text-red-500 font-medium mb-1 block">손절가 (SL)</label>
+                                                <input
+                                                    type="number" value={editSl}
+                                                    onChange={(e) => setEditSl(e.target.value)}
+                                                    placeholder="미설정"
+                                                    className={`w-full text-red-500 text-[12px] font-mono rounded-xl px-3 py-2 border outline-none focus:border-red-500/50 transition-colors placeholder:text-neutral-500 ${inputBg}`}
+                                                />
+                                            </div>
+                                        </div>
+                                        {tpSlError && <p className="text-[10px] text-red-500">{tpSlError}</p>}
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={async () => {
+                                                    setTpSlError("");
+                                                    const tp = editTp ? parseFloat(editTp) : null;
+                                                    const sl = editSl ? parseFloat(editSl) : null;
+                                                    try {
+                                                        await onUpdateTpSl?.(pos.id, tp, sl);
+                                                        setEditingId(null);
+                                                    } catch (e) {
+                                                        setTpSlError(e instanceof Error ? e.message : "TP/SL 설정 실패");
+                                                    }
+                                                }}
+                                                className="flex-1 py-2 text-[11px] font-bold bg-amber-500/15 text-amber-500 rounded-xl border border-amber-500/25 hover:bg-amber-500/25 transition-colors cursor-pointer"
+                                            >
+                                                저장
+                                            </button>
+                                            <button
+                                                onClick={() => { setEditingId(null); setTpSlError(""); }}
+                                                className={`px-4 py-2 text-[11px] ${textTertiary} hover:${textSecondary} cursor-pointer transition-colors`}
+                                            >
+                                                취소
+                                            </button>
+                                        </div>
                                     </div>
                                 ) : (
-                                    <div className="flex items-center gap-4 text-[12px]">
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-neutral-500">TP</span>
-                                            {pos.tp_price ? (
-                                                <span className="text-emerald-400 font-mono font-medium">
-                                                    {pos.tp_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                                </span>
-                                            ) : (
-                                                <span className="text-neutral-600">---</span>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <span className="text-neutral-500">SL</span>
-                                            {pos.sl_price ? (
-                                                <span className="text-red-400 font-mono font-medium">
-                                                    {pos.sl_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                                </span>
-                                            ) : (
-                                                <span className="text-neutral-600">---</span>
-                                            )}
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-4 flex-1">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className={`text-[9px] ${textTertiary} font-medium`}>TP</span>
+                                                {pos.tp_price ? (
+                                                    <span className="text-[11px] text-emerald-500 font-mono font-semibold">
+                                                        {pos.tp_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                                    </span>
+                                                ) : (
+                                                    <span className={`text-[11px] ${textTertiary}`}>미설정</span>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <span className={`text-[9px] ${textTertiary} font-medium`}>SL</span>
+                                                {pos.sl_price ? (
+                                                    <span className="text-[11px] text-red-500 font-mono font-semibold">
+                                                        {pos.sl_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                                    </span>
+                                                ) : (
+                                                    <span className={`text-[11px] ${textTertiary}`}>미설정</span>
+                                                )}
+                                            </div>
                                         </div>
                                         <button
                                             onClick={() => {
@@ -236,7 +259,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                                 setEditSl(pos.sl_price ? String(pos.sl_price) : "");
                                                 setTpSlError("");
                                             }}
-                                            className="text-[10px] px-2.5 py-1 font-medium bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 rounded-md transition-colors cursor-pointer ml-auto"
+                                            className={`text-[10px] px-3 py-1.5 font-semibold border rounded-xl transition-all cursor-pointer ${btnTpSl}`}
                                         >
                                             TP/SL 설정
                                         </button>
