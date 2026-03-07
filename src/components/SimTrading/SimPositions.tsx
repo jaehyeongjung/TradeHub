@@ -173,8 +173,14 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                                     {pos.margin_mode === "CROSS" ? "교차" : "격리"}
                                                 </span>
                                             </div>
-                                            <div className={`text-[11px] ${textTertiary} mt-0.5 font-mono`}>
-                                                {pos.quantity.toFixed(pos.quantity >= 1 ? 4 : 6)} {pos.symbol.replace("USDT", "")} · ${notional.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                            <div className={`text-[11px] mt-0.5 font-mono flex items-center gap-1.5`}>
+                                                <span className={textSecondary}>
+                                                    {pos.quantity.toFixed(pos.quantity >= 1 ? 4 : 6)} {pos.symbol.replace("USDT", "")}
+                                                </span>
+                                                <span className={textTertiary}>·</span>
+                                                <span className={`${isLight ? "text-neutral-500" : "text-neutral-300"} font-semibold`}>
+                                                    ${notional.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -221,21 +227,37 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
 
                                 {/* 청산가 거리 바 */}
                                 <div className="mb-3">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <span className={`text-[9px] ${textTertiary}`}>청산가까지 거리</span>
-                                        <span className={`text-[10px] font-mono font-semibold ${
-                                            liqDist < 5 ? "text-red-500" : liqDist < 15 ? "text-orange-500" : textTertiary
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <div className="flex items-center gap-1.5">
+                                            <span className={`text-[9px] font-medium uppercase tracking-wide ${textTertiary}`}>청산까지 안전거리</span>
+                                            {liqDist < 5 && (
+                                                <span className="text-[9px] font-bold text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded-md">위험</span>
+                                            )}
+                                            {liqDist >= 5 && liqDist < 15 && (
+                                                <span className="text-[9px] font-bold text-orange-500 bg-orange-500/10 px-1.5 py-0.5 rounded-md">주의</span>
+                                            )}
+                                        </div>
+                                        <span className={`text-[12px] font-mono font-bold tabular-nums ${
+                                            liqDist < 5 ? "text-red-500" : liqDist < 15 ? "text-orange-500" : "text-emerald-500"
                                         }`}>
                                             {liqDist.toFixed(1)}%
                                         </span>
                                     </div>
-                                    <div className={`h-1.5 rounded-full overflow-hidden ${isLight ? "bg-neutral-100" : "bg-neutral-800"}`}>
+                                    <div className={`h-2 rounded-full overflow-hidden ${isLight ? "bg-neutral-100" : "bg-neutral-800/80"}`}>
                                         <div
                                             className={`h-full rounded-full transition-all duration-500 ${
-                                                liqDist < 5 ? "bg-red-500" : liqDist < 15 ? "bg-orange-500" : "bg-emerald-500/60"
+                                                liqDist < 5
+                                                    ? "bg-red-500"
+                                                    : liqDist < 15
+                                                    ? "bg-orange-500"
+                                                    : "bg-emerald-500"
                                             }`}
-                                            style={{ width: `${Math.max(2, Math.min(100, 100 - liqDist * 3))}%` }}
+                                            style={{ width: `${Math.max(2, Math.min(100, liqDist * 2))}%` }}
                                         />
+                                    </div>
+                                    <div className="flex justify-between mt-1">
+                                        <span className={`text-[9px] ${textTertiary}`}>청산가 ${pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                                        <span className={`text-[9px] ${textTertiary}`}>현재 ${cp.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                                     </div>
                                 </div>
 
