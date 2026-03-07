@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAtomValue } from "jotai";
 import { simPricesAtom } from "@/store/atoms";
 import { calcRoe } from "@/lib/sim-trading";
@@ -20,6 +20,22 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
     const [editTp, setEditTp] = useState("");
     const [editSl, setEditSl] = useState("");
     const [tpSlError, setTpSlError] = useState("");
+
+    // PnL 플래시
+    const prevPnlRef = useRef<Record<string, number>>({});
+    const [flashMap, setFlashMap] = useState<Record<string, "up" | "down" | null>>({});
+
+    useEffect(() => {
+        positions.forEach((pos) => {
+            const prev = prevPnlRef.current[pos.id];
+            if (prev !== undefined && Math.abs(pos.unrealized_pnl - prev) > 0.001) {
+                const dir = pos.unrealized_pnl > prev ? "up" : "down";
+                setFlashMap((f) => ({ ...f, [pos.id]: dir }));
+                setTimeout(() => setFlashMap((f) => ({ ...f, [pos.id]: null })), 500);
+            }
+            prevPnlRef.current[pos.id] = pos.unrealized_pnl;
+        });
+    }, [positions]);
 
     const border = isLight ? "border-neutral-200" : "border-zinc-800/60";
     const cardBg = isLight ? "bg-white" : "bg-neutral-950";
@@ -77,7 +93,6 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
 
         return (
             <div className="space-y-3">
-                {/* 헤더 */}
                 <div className={`${cardBg} rounded-2xl border ${border} p-5`}>
                     <div className="flex items-center gap-3 mb-1">
                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isLight ? "bg-amber-50" : "bg-amber-500/10"}`}>
@@ -92,7 +107,6 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                     </div>
                 </div>
 
-                {/* 3단계 */}
                 <div className="space-y-2">
                     {steps.map((step) => (
                         <div key={step.num} className={`${cardBg} rounded-2xl border ${border} p-4 flex items-start gap-3`}>
@@ -110,7 +124,6 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                     ))}
                 </div>
 
-                {/* 안내 */}
                 <div className={`rounded-xl px-4 py-3 border ${isLight ? "bg-neutral-50 border-neutral-200" : "bg-neutral-900/50 border-zinc-800/60"}`}>
                     <p className={`text-[11px] ${textTertiary} text-center`}>
                         💡 모든 거래는 가상 자산으로 진행되며 실제 손익이 발생하지 않습니다
@@ -141,6 +154,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                         ? Math.abs(cp - pos.liq_price) / cp * 100
                         : 0;
                     const isEditing = editingId === pos.id;
+                    const flash = flashMap[pos.id];
 
                     return (
                         <div key={pos.id} className={`${cardBg} rounded-2xl border ${border} overflow-hidden`}>
@@ -173,7 +187,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                                     {pos.margin_mode === "CROSS" ? "교차" : "격리"}
                                                 </span>
                                             </div>
-                                            <div className={`text-[11px] mt-0.5 font-mono flex items-center gap-1.5`}>
+                                            <div className="text-[11px] mt-0.5 font-mono flex items-center gap-1.5">
                                                 <span className={isLight ? "text-neutral-700" : textSecondary}>
                                                     {pos.quantity.toFixed(pos.quantity >= 1 ? 4 : 6)} {pos.symbol.replace("USDT", "")}
                                                 </span>
@@ -192,8 +206,14 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                     </button>
                                 </div>
 
-                                {/* PnL 히어로 */}
-                                <div className={`rounded-xl px-4 py-3 mb-3 ${isProfit ? "bg-emerald-500/8" : "bg-red-500/8"}`}>
+                                {/* PnL 히어로 — 플래시 */}
+                                <div className={`rounded-xl px-4 py-3 mb-3 transition-colors duration-300 ${
+                                    flash === "up"
+                                        ? "bg-emerald-500/25"
+                                        : flash === "down"
+                                        ? "bg-red-500/25"
+                                        : isProfit ? "bg-emerald-500/8" : "bg-red-500/8"
+                                }`}>
                                     <div className="flex items-end justify-between">
                                         <div>
                                             <div className={`text-[24px] font-bold font-mono tabular-nums leading-none ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
@@ -304,7 +324,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                             </button>
                                             <button
                                                 onClick={() => { setEditingId(null); setTpSlError(""); }}
-                                                className={`px-4 py-2 text-[11px] ${textTertiary} hover:${textSecondary} cursor-pointer transition-colors`}
+                                                className={`px-4 py-2 text-[11px] ${textTertiary} cursor-pointer transition-colors`}
                                             >
                                                 취소
                                             </button>
