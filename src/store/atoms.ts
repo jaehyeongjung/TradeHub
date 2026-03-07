@@ -21,5 +21,8 @@ export const simSymbolAtom = atom("BTCUSDT");
 /** 실시간 가격 캐시 { BTCUSDT: 98000.5, ... } */
 export const simPricesAtom = atom<Record<string, number>>({});
 
+/** 24h 가격 변동률 캐시 { BTCUSDT: 2.35, ... } */
+export const simChangesAtom = atom<Record<string, number>>({});
+
 /** 마진 모드 (Cross / Isolated) */
 export const simMarginModeAtom = atom<MarginMode>("CROSS");

@@ -2,11 +2,26 @@
 
 import { useEffect, useRef } from "react";
 import { useAtom, useAtomValue } from "jotai";
-import { activePageAtom, simPricesAtom, simSymbolAtom } from "@/store/atoms";
+import { activePageAtom, simPricesAtom, simChangesAtom, simSymbolAtom } from "@/store/atoms";
 
 const SUPPORTED_SYMBOLS = [
-    "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT",
-    "DOGEUSDT", "ADAUSDT", "AVAXUSDT", "DOTUSDT", "MATICUSDT",
+    // Tier 1 — 최상위 유동성
+    "BTCUSDT",  "ETHUSDT",  "BNBUSDT",  "SOLUSDT",  "XRPUSDT",
+    "DOGEUSDT", "ADAUSDT",  "AVAXUSDT", "LINKUSDT", "DOTUSDT",
+    // Tier 2 — 주요 알트
+    "MATICUSDT","LTCUSDT",  "ATOMUSDT", "UNIUSDT",  "NEARUSDT",
+    "APTUSDT",  "ARBUSDT",  "OPUSDT",   "INJUSDT",  "SUIUSDT",
+    // Tier 3 — 레이어1 / 인프라
+    "TRXUSDT",  "BCHUSDT",  "ETCUSDT",  "FILUSDT",  "ALGOUSDT",
+    "VETUSDT",  "EOSUSDT",  "HBARUSDT", "QTUMUSDT", "FLOWUSDT",
+    // Tier 4 — DeFi
+    "AAVEUSDT", "LDOUSDT",  "CRVUSDT",  "MKRUSDT",  "SNXUSDT",
+    "RUNEUSDT", "GRTUSDT",  "PENDLEUSDT","KAVAUSDT", "IMXUSDT",
+    // Tier 5 — 메타버스 / 게임
+    "SANDUSDT", "MANAUSDT", "GALAUSDT", "AXSUSDT",  "ENJUSDT",
+    // Tier 6 — 신규 / 트렌드
+    "TONUSDT",  "SEIUSDT",  "TIAUSDT",  "WLDUSDT",  "ORDIUSDT",
+    "JUPUSDT",  "FETUSDT",  "STXUSDT",  "FTMUSDT",  "WIFUSDT",
 ];
 
 /**
@@ -16,13 +31,13 @@ const SUPPORTED_SYMBOLS = [
 export function useSimPriceStream() {
     const activePage = useAtomValue(activePageAtom);
     const [prices, setPrices] = useAtom(simPricesAtom);
+    const [, setChanges] = useAtom(simChangesAtom);
     const simSymbol = useAtomValue(simSymbolAtom);
     const wsRef = useRef<WebSocket | null>(null);
     const reconnectRef = useRef<number | null>(null);
 
     useEffect(() => {
         if (activePage !== "sim") {
-            // 페이지 비활성 시 연결 종료
             if (wsRef.current) {
                 wsRef.current.close();
                 wsRef.current = null;
@@ -41,13 +56,18 @@ export function useSimPriceStream() {
             ws.onmessage = (ev: MessageEvent<string>) => {
                 try {
                     const msg = JSON.parse(ev.data);
-                    const data = msg.data as { s: string; c: string };
+                    const data = msg.data as { s: string; c: string; P: string };
                     if (data?.s && data?.c) {
                         const symbol = data.s;
                         const price = parseFloat(data.c);
+                        const change = parseFloat(data.P ?? "0");
                         setPrices((prev) => {
                             if (prev[symbol] === price) return prev;
                             return { ...prev, [symbol]: price };
+                        });
+                        setChanges((prev) => {
+                            if (prev[symbol] === change) return prev;
+                            return { ...prev, [symbol]: change };
                         });
                     }
                 } catch {}

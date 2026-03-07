@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { simSymbolAtom, simPricesAtom, simMarginModeAtom } from "@/store/atoms";
-import { SUPPORTED_SYMBOLS } from "@/hooks/useSimPriceStream";
 import { calcLiqPrice, calcLiqPriceCross } from "@/lib/sim-trading";
 import AnimatedNumber from "@/components/AnimatedNumber";
 import type { SimAccount, OpenPositionInput, PositionSide, OrderType, MarginMode } from "@/types/sim-trading";
@@ -35,7 +34,7 @@ const LEVERAGE_PRESETS = [1, 2, 5, 10, 20, 50, 75, 100, 125];
 
 export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode }: Props) {
     const isLight = useTheme();
-    const [simSymbol, setSimSymbol] = useAtom(simSymbolAtom);
+    const simSymbol = useAtomValue(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);
     const [marginMode, setMarginMode] = useAtom(simMarginModeAtom);
     const currentPrice = prices[simSymbol] ?? 0;
@@ -185,22 +184,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
 
             {/* ── 주문 폼 ── */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-none">
-
-                {/* 심볼 선택 */}
-                <div className="relative">
-                    <select
-                        value={simSymbol}
-                        onChange={(e) => setSimSymbol(e.target.value)}
-                        className={`w-full appearance-none text-[12px] font-medium rounded-xl px-3.5 py-2.5 border outline-none cursor-pointer pr-8 ${inputBg}`}
-                    >
-                        {SUPPORTED_SYMBOLS.map((s) => (
-                            <option key={s} value={s}>{s.replace("USDT", " / USDT")}</option>
-                        ))}
-                    </select>
-                    <svg className={`absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ${textTertiary} pointer-events-none`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
 
                 {/* Long / Short 슬라이딩 토글 */}
                 <div className={`relative grid grid-cols-2 ${pillBg} rounded-2xl p-1`}>

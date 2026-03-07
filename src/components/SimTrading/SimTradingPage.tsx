@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useAtomValue } from "jotai";
 import { simSymbolAtom, simPricesAtom } from "@/store/atoms";
 import { useSimPriceStream } from "@/hooks/useSimPriceStream";
@@ -14,6 +13,7 @@ import SimTradeHistory from "./SimTradeHistory";
 import SimOrderBook from "./SimOrderBook";
 import SimMarketData from "./SimMarketData";
 import SimLeaderboard from "./SimLeaderboard";
+import SimSymbolSelector from "./SimSymbolSelector";
 
 function useTheme() {
     const [isLight, setIsLight] = useState(false);
@@ -34,10 +34,6 @@ const CoinChart = dynamic(() => import("@/components/CoinChart"), {
     ),
 });
 
-function getCoinLogoUrl(symbol: string): string {
-    const base = symbol.toUpperCase().replace(/USDT$/, "").toLowerCase();
-    return `https://assets.coincap.io/assets/icons/${base}@2x.png`;
-}
 
 const TABS = [
     { key: "positions", label: "포지션" },
@@ -128,21 +124,7 @@ export default function SimTradingPage() {
 
             {/* ── 헤더 바 ── */}
             <div className={`flex items-center gap-4 px-4 py-2.5 rounded-xl border overflow-x-auto scrollbar-none ${headerBg}`}>
-                <Image
-                    src={getCoinLogoUrl(simSymbol)}
-                    alt={simSymbol}
-                    width={28}
-                    height={28}
-                    className="rounded-full flex-shrink-0"
-                    unoptimized
-                />
-                <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <span className={`text-[15px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>
-                        {simSymbol.replace("USDT", "")}
-                    </span>
-                    <span className="text-[11px] text-neutral-400">/ USDT</span>
-                    <span className="text-[9px] px-1.5 py-0.5 bg-amber-500/10 text-amber-500 rounded-md ml-1 font-medium">선물</span>
-                </div>
+                <SimSymbolSelector isLight={isLight} />
                 <div className="flex items-center gap-2 flex-shrink-0">
                     <span className={`text-[20px] font-bold font-mono tabular-nums ${isUp ? "text-emerald-500" : "text-red-500"}`}>
                         {currentPrice > 0 ? currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
