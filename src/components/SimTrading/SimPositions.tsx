@@ -47,15 +47,86 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
         : "bg-neutral-900 border-zinc-800 text-neutral-500 hover:text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/30";
 
     if (positions.length === 0) {
-        return (
-            <div className={`${cardBg} rounded-2xl border ${border} p-8 text-center`}>
-                <div className={`w-12 h-12 rounded-2xl ${subCardBg} border ${border} flex items-center justify-center mx-auto mb-3`}>
-                    <svg className={`w-6 h-6 ${textTertiary}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        const steps = [
+            {
+                num: "1",
+                color: "text-amber-500",
+                bg: isLight ? "bg-amber-50 border-amber-200/60" : "bg-amber-500/8 border-amber-500/20",
+                icon: (
+                    <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
+                ),
+                title: "코인 & 레버리지 선택",
+                desc: "상단 드롭다운에서 거래할 코인을 고르고, 레버리지를 설정하세요.",
+            },
+            {
+                num: "2",
+                color: "text-blue-500",
+                bg: isLight ? "bg-blue-50 border-blue-200/60" : "bg-blue-500/8 border-blue-500/20",
+                icon: (
+                    <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                ),
+                title: "수량 입력 & 방향 선택",
+                desc: "투자 금액과 수량을 입력한 후 롱(매수) 또는 숏(매도) 버튼을 누르세요.",
+            },
+            {
+                num: "3",
+                color: "text-emerald-500",
+                bg: isLight ? "bg-emerald-50 border-emerald-200/60" : "bg-emerald-500/8 border-emerald-500/20",
+                icon: (
+                    <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                ),
+                title: "포지션 관리",
+                desc: "여기서 실시간 손익(PnL)을 확인하고 TP/SL 설정 후 원하는 타이밍에 청산하세요.",
+            },
+        ];
+
+        return (
+            <div className="space-y-3">
+                {/* 헤더 */}
+                <div className={`${cardBg} rounded-2xl border ${border} p-5`}>
+                    <div className="flex items-center gap-3 mb-1">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isLight ? "bg-amber-50" : "bg-amber-500/10"}`}>
+                            <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p className={`text-[14px] font-bold ${textPrimary}`}>모의투자 시작하기</p>
+                            <p className={`text-[11px] ${textTertiary}`}>실제 돈 없이 선물 거래를 연습해보세요</p>
+                        </div>
+                    </div>
                 </div>
-                <p className={`text-[13px] font-medium ${textSecondary}`}>활성 포지션이 없습니다</p>
-                <p className={`text-[11px] ${textTertiary} mt-1`}>주문 패널에서 포지션을 열어보세요</p>
+
+                {/* 3단계 */}
+                <div className="space-y-2">
+                    {steps.map((step) => (
+                        <div key={step.num} className={`${cardBg} rounded-2xl border ${border} p-4 flex items-start gap-3`}>
+                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 border ${step.bg}`}>
+                                {step.icon}
+                            </div>
+                            <div className="min-w-0">
+                                <div className="flex items-center gap-1.5 mb-0.5">
+                                    <span className={`text-[9px] font-bold ${step.color} uppercase tracking-wider`}>Step {step.num}</span>
+                                </div>
+                                <p className={`text-[12px] font-semibold ${textPrimary} mb-0.5`}>{step.title}</p>
+                                <p className={`text-[11px] ${textTertiary} leading-relaxed`}>{step.desc}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* 안내 */}
+                <div className={`rounded-xl px-4 py-3 border ${isLight ? "bg-neutral-50 border-neutral-200" : "bg-neutral-900/50 border-zinc-800/60"}`}>
+                    <p className={`text-[11px] ${textTertiary} text-center`}>
+                        💡 모든 거래는 가상 자산으로 진행되며 실제 손익이 발생하지 않습니다
+                    </p>
+                </div>
             </div>
         );
     }
