@@ -169,7 +169,16 @@ export default function SymbolPickerModal({
 }: Props) {
     const [search, setSearch] = useState("");
     const [selected, setSelected] = useState(initialSymbol.toLowerCase());
+    const [isLight, setIsLight] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const check = () => setIsLight(document.documentElement.classList.contains("light"));
+        check();
+        const obs = new MutationObserver(check);
+        obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+        return () => obs.disconnect();
+    }, []);
 
     useEffect(() => {
         if (open) {
@@ -232,23 +241,31 @@ export default function SymbolPickerModal({
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.96, y: 16 }}
                         transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                        className="relative w-full max-w-[460px] h-[72vh] bg-neutral-950 border border-zinc-800 rounded-3xl overflow-hidden flex flex-col shadow-[0_32px_80px_rgba(0,0,0,0.9)]"
+                        className={`relative w-full max-w-[460px] h-[72vh] rounded-3xl overflow-hidden flex flex-col ${
+                            isLight
+                                ? "bg-white border border-neutral-200 shadow-[0_32px_80px_rgba(0,0,0,0.18)]"
+                                : "bg-neutral-950 border border-zinc-800 shadow-[0_32px_80px_rgba(0,0,0,0.9)]"
+                        }`}
                     >
                         {/* 핸들바 */}
                         <div className="flex justify-center pt-3 pb-0 flex-shrink-0">
-                            <div className="w-8 h-1 rounded-full bg-zinc-700" />
+                            <div className={`w-8 h-1 rounded-full ${isLight ? "bg-neutral-300" : "bg-zinc-700"}`} />
                         </div>
 
                         {/* 헤더 */}
                         <div className="flex-shrink-0 px-5 pt-4 pb-4">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <h2 className="text-[17px] font-bold text-white tracking-tight">코인 선택</h2>
+                                    <h2 className={`text-[17px] font-bold tracking-tight ${isLight ? "text-neutral-900" : "text-white"}`}>코인 선택</h2>
                                     <p className="text-[11px] text-neutral-500 mt-0.5">{symbols.length}개 코인 지원</p>
                                 </div>
                                 <button
                                     onClick={onClose}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors cursor-pointer"
+                                    className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors cursor-pointer ${
+                                        isLight
+                                            ? "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-800"
+                                            : "bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700"
+                                    }`}
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
@@ -257,7 +274,11 @@ export default function SymbolPickerModal({
                             </div>
 
                             {/* 검색창 */}
-                            <div className="flex items-center gap-3 px-4 py-2.5 bg-neutral-900 border border-zinc-800 rounded-2xl focus-within:border-zinc-600 transition-colors">
+                            <div className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl border transition-colors ${
+                                isLight
+                                    ? "bg-neutral-50 border-neutral-200 focus-within:border-neutral-400"
+                                    : "bg-neutral-900 border-zinc-800 focus-within:border-zinc-600"
+                            }`}>
                                 <svg className="w-4 h-4 text-neutral-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
@@ -267,7 +288,7 @@ export default function SymbolPickerModal({
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     placeholder="코인 이름 또는 심볼 검색"
-                                    className="flex-1 bg-transparent text-[13px] text-white placeholder-neutral-600 outline-none"
+                                    className={`flex-1 bg-transparent text-[13px] outline-none ${isLight ? "text-neutral-900 placeholder-neutral-400" : "text-white placeholder-neutral-600"}`}
                                 />
                                 {search && (
                                     <button
@@ -304,8 +325,10 @@ export default function SymbolPickerModal({
                                                     onClick={() => handleSelect(s)}
                                                     className={`flex-shrink-0 flex items-center gap-2 pl-2 pr-3.5 py-2 rounded-2xl border transition-all cursor-pointer ${
                                                         isActive
-                                                            ? "bg-amber-500/15 border-amber-500/40 text-amber-400"
-                                                            : "bg-neutral-900 border-zinc-800 text-neutral-300 hover:border-zinc-600 hover:bg-neutral-800/60"
+                                                            ? "bg-amber-500/15 border-amber-500/40 text-amber-500"
+                                                            : isLight
+                                                                ? "bg-neutral-50 border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-100"
+                                                                : "bg-neutral-900 border-zinc-800 text-neutral-300 hover:border-zinc-600 hover:bg-neutral-800/60"
                                                     }`}
                                                 >
                                                     <Image
@@ -332,20 +355,20 @@ export default function SymbolPickerModal({
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                                         </svg>
                                         <span className="text-[11px] font-semibold text-neutral-500 tracking-wider uppercase">전체</span>
-                                        <span className="text-[10px] text-neutral-700 font-mono">{otherSymbols.length}개</span>
+                                        <span className={`text-[10px] font-mono ${isLight ? "text-neutral-400" : "text-neutral-700"}`}>{otherSymbols.length}개</span>
                                     </div>
                                 )}
 
                                 {search.trim() && filteredSymbols.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-16 gap-4">
-                                        <div className="w-14 h-14 rounded-2xl bg-neutral-900 border border-zinc-800 flex items-center justify-center">
-                                            <svg className="w-6 h-6 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className={`w-14 h-14 rounded-2xl border flex items-center justify-center ${isLight ? "bg-neutral-100 border-neutral-200" : "bg-neutral-900 border-zinc-800"}`}>
+                                            <svg className="w-6 h-6 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                             </svg>
                                         </div>
                                         <div className="text-center">
-                                            <p className="text-[14px] font-semibold text-neutral-400">결과 없음</p>
-                                            <p className="text-[12px] text-neutral-600 mt-1">다른 검색어를 입력해보세요</p>
+                                            <p className={`text-[14px] font-semibold ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>결과 없음</p>
+                                            <p className="text-[12px] text-neutral-400 mt-1">다른 검색어를 입력해보세요</p>
                                         </div>
                                     </div>
                                 ) : (
@@ -361,7 +384,9 @@ export default function SymbolPickerModal({
                                                     className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all cursor-pointer ${
                                                         isActive
                                                             ? "bg-amber-500/8 border border-amber-500/20"
-                                                            : "border border-transparent hover:bg-neutral-900"
+                                                            : isLight
+                                                                ? "border border-transparent hover:bg-neutral-50"
+                                                                : "border border-transparent hover:bg-neutral-900"
                                                     }`}
                                                 >
                                                     <div className="relative w-9 h-9 flex-shrink-0">
@@ -375,7 +400,7 @@ export default function SymbolPickerModal({
                                                         />
                                                     </div>
                                                     <div className="flex-1 text-left min-w-0">
-                                                        <div className={`text-[14px] font-semibold leading-tight ${isActive ? "text-amber-400" : "text-white"}`}>
+                                                        <div className={`text-[14px] font-semibold leading-tight ${isActive ? "text-amber-500" : isLight ? "text-neutral-900" : "text-white"}`}>
                                                             {base}
                                                         </div>
                                                         <div className="text-[11px] text-neutral-500 mt-0.5 truncate">{name}</div>
@@ -387,7 +412,7 @@ export default function SymbolPickerModal({
                                                             </svg>
                                                         </div>
                                                     ) : (
-                                                        <svg className="w-4 h-4 text-neutral-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <svg className={`w-4 h-4 flex-shrink-0 ${isLight ? "text-neutral-300" : "text-neutral-700"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                                         </svg>
                                                     )}
@@ -400,7 +425,11 @@ export default function SymbolPickerModal({
                         </div>
 
                         {/* 하단 현재 선택 표시 */}
-                        <div className="flex-shrink-0 px-5 py-3 border-t border-zinc-800/60 bg-neutral-950/80 backdrop-blur-sm">
+                        <div className={`flex-shrink-0 px-5 py-3 border-t backdrop-blur-sm ${
+                            isLight
+                                ? "border-neutral-200 bg-white/90"
+                                : "border-zinc-800/60 bg-neutral-950/80"
+                        }`}>
                             <div className="flex items-center gap-2.5">
                                 <div className="relative w-5 h-5 flex-shrink-0">
                                     <Image
@@ -412,10 +441,10 @@ export default function SymbolPickerModal({
                                     />
                                 </div>
                                 <span className="text-[12px] text-neutral-500">현재 선택</span>
-                                <span className="text-[12px] font-semibold text-amber-400">
+                                <span className="text-[12px] font-semibold text-amber-500">
                                     {selected.replace("usdt", "").toUpperCase()}
                                 </span>
-                                <span className="text-[11px] text-neutral-600">
+                                <span className={`text-[11px] ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>
                                     · {SYMBOL_NAMES[selected] ?? ""}
                                 </span>
                             </div>

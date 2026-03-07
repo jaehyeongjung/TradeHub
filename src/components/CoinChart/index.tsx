@@ -445,7 +445,10 @@ export default function CoinChart({
             // ── Cursor hover feedback ──
             const tool = drawToolRef.current;
             if (tool === "cursor" && coords) {
-                const TOL = 0.003 * Math.abs(coords.price || 1);
+                const rect = el!.getBoundingClientRect();
+                const pa = candleSeriesRef.current?.coordinateToPrice(e.clientY - rect.top - 8);
+                const pb = candleSeriesRef.current?.coordinateToPrice(e.clientY - rect.top + 8);
+                const TOL = pa != null && pb != null ? Math.abs(pa - pb) / 2 : 0.01 * Math.abs(coords.price || 1);
                 const nearH = drawnHLinesRef.current.some(h => Math.abs(h.price - coords.price) <= TOL);
                 // 끝점 근처
                 const nearEp = drawnTLinesRef.current.some(t =>
@@ -497,7 +500,10 @@ export default function CoinChart({
             if (tool !== "cursor") return;
             const coords = getCoords(e);
             if (!coords) return;
-            const TOL = 0.003 * Math.abs(coords.price || 1);
+            const rect2 = el!.getBoundingClientRect();
+            const pa2 = candleSeriesRef.current?.coordinateToPrice(e.clientY - rect2.top - 8);
+            const pb2 = candleSeriesRef.current?.coordinateToPrice(e.clientY - rect2.top + 8);
+            const TOL = pa2 != null && pb2 != null ? Math.abs(pa2 - pb2) / 2 : 0.01 * Math.abs(coords.price || 1);
 
             const hlines = drawnHLinesRef.current;
             const hi = hlines.findIndex(h => Math.abs(h.price - coords.price) <= TOL);
@@ -578,7 +584,15 @@ export default function CoinChart({
                     setTlinePending(null);
                 }
             } else if (tool === "eraser") {
-                const TOL = 0.005 * Math.abs(price || 1);
+                // 픽셀 12px 에 해당하는 가격 범위를 tolerance로 사용
+                const rect = el!.getBoundingClientRect();
+                const pxTol = 12;
+                const priceAbove = series.coordinateToPrice(e.clientY - rect.top - pxTol);
+                const priceBelow = series.coordinateToPrice(e.clientY - rect.top + pxTol);
+                const TOL = priceAbove !== null && priceBelow !== null
+                    ? Math.abs(priceAbove - priceBelow) / 2
+                    : 0.01 * Math.abs(price || 1);
+
                 const hlines = drawnHLinesRef.current;
                 const hi = hlines.findIndex(h => Math.abs(h.price - price) <= TOL);
                 if (hi >= 0) {
@@ -590,9 +604,8 @@ export default function CoinChart({
                     const tlines = drawnTLinesRef.current;
                     const ti = tlines.findIndex(t => {
                         if (t.p1.time === t.p2.time) return false;
-                        // 클릭한 time 위치에서 선의 보간 가격 계산
                         const interp = t.p1.price + (t.p2.price - t.p1.price) * (time - t.p1.time) / (t.p2.time - t.p1.time);
-                        return Math.abs(price - interp) <= TOL * 8;
+                        return Math.abs(price - interp) <= TOL;
                     });
                     if (ti >= 0) {
                         const id = tlines[ti].id;
@@ -1253,7 +1266,7 @@ export default function CoinChart({
                         )}
                         {/* 인터벌 버튼 */}
                         <div className="flex gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50">
-                            {INTERVAL_OPTIONS.map((opt) => (
+                            {INTERVAL_OPTIONS.filter(opt => enableIndicators || (opt.value !== "1w" && opt.value !== "1M")).map((opt) => (
                                 <button
                                     key={opt.value}
                                     onClick={() => {
