@@ -174,7 +174,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                                 </span>
                                             </div>
                                             <div className={`text-[11px] mt-0.5 font-mono flex items-center gap-1.5`}>
-                                                <span className={textSecondary}>
+                                                <span className={isLight ? "text-neutral-700" : textSecondary}>
                                                     {pos.quantity.toFixed(pos.quantity >= 1 ? 4 : 6)} {pos.symbol.replace("USDT", "")}
                                                 </span>
                                                 <span className={textTertiary}>·</span>
