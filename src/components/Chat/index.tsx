@@ -33,6 +33,10 @@ type Msg = {
     user_id: string;
     room_id?: string;
 };
+type Reaction = { count: number; mine: boolean };
+type ReactionsState = Record<string, Record<string, Reaction>>; // msgId → emoji → {count, mine}
+
+const REACTION_EMOJIS = ["👍", "❤️", "🚀", "😂", "🔥"] as const;
 type Position = {
     user_id: string;
     choice: "long" | "short";
@@ -151,6 +155,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
             if (!error && data) {
                 setMsgs(data as Msg[]);
                 requestAnimationFrame(() => { listRef.current?.scrollTo({ top: listRef.current!.scrollHeight }); });
+                fetchReactions(data.map((m) => m.id), userIdRef.current);
             }
             setInitialLoading(false);
         })();
@@ -179,6 +184,54 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
             .subscribe();
         return () => { supabase.removeChannel(ch); };
     }, [roomId]);
+
+    const buildReactionsState = (
+        rows: { message_id: string; user_id: string; emoji: string }[],
+        uid: string | null,
+    ): ReactionsState => {
+        const state: ReactionsState = {};
+        for (const r of rows) {
+            if (!state[r.message_id]) state[r.message_id] = {};
+            if (!state[r.message_id][r.emoji]) state[r.message_id][r.emoji] = { count: 0, mine: false };
+            state[r.message_id][r.emoji].count++;
+            if (uid && r.user_id === uid) state[r.message_id][r.emoji].mine = true;
+        }
+        return state;
+    };
+
+    const fetchReactions = async (messageIds: string[], uid: string | null) => {
+        if (!messageIds.length) return;
+        const { data } = await supabase
+            .from("message_reactions")
+            .select("message_id, user_id, emoji")
+            .in("message_id", messageIds);
+        if (data) setReactions(buildReactionsState(data, uid));
+    };
+
+    const toggleReaction = async (messageId: string, emoji: string) => {
+        if (!userIdRef.current) return;
+        const uid = userIdRef.current;
+        const isMine = reactions[messageId]?.[emoji]?.mine ?? false;
+
+        // 낙관적 업데이트
+        setReactions((prev) => {
+            const curr = prev[messageId]?.[emoji] ?? { count: 0, mine: false };
+            const next = { count: Math.max(0, curr.count + (isMine ? -1 : 1)), mine: !isMine };
+            return { ...prev, [messageId]: { ...(prev[messageId] ?? {}), [emoji]: next } };
+        });
+        setPickerOpenId(null);
+
+        if (isMine) {
+            await supabase.from("message_reactions")
+                .delete()
+                .eq("message_id", messageId)
+                .eq("user_id", uid)
+                .eq("emoji", emoji);
+        } else {
+            await supabase.from("message_reactions")
+                .upsert([{ message_id: messageId, user_id: uid, emoji }], { onConflict: "message_id,user_id,emoji" });
+        }
+    };
 
     const send = async () => {
         if (sendingRef.current) return;
@@ -215,6 +268,16 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
         if (e.nativeEvent.isComposing) return;
         if (e.key === "Enter") { e.preventDefault(); void send(); }
     };
+
+    const [reactions, setReactions] = useState<ReactionsState>({});
+    const [pickerOpenId, setPickerOpenId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!pickerOpenId) return;
+        const close = () => setPickerOpenId(null);
+        document.addEventListener("click", close, { capture: true });
+        return () => document.removeEventListener("click", close, { capture: true });
+    }, [pickerOpenId]);
 
     const [myChoice, setMyChoice] = useState<"long" | "short" | null>(null);
     const [ratio, setRatio] = useState<Ratio>({ long_count: 0, short_count: 0, total: 0, long_ratio: 0 });
@@ -254,6 +317,30 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                 setPositionsMap(map);
             }
         })();
+    }, [roomId]);
+
+    useEffect(() => {
+        const ch = supabase.channel(`reactions:${roomId}`)
+            .on("postgres_changes", { event: "*", schema: "public", table: "message_reactions" },
+                async (payload) => {
+                    const row = (payload.new ?? payload.old) as { message_id?: string; user_id?: string; emoji?: string } | null;
+                    const messageId = row?.message_id;
+                    if (!messageId) return;
+                    const { data } = await supabase
+                        .from("message_reactions")
+                        .select("user_id, emoji")
+                        .eq("message_id", messageId);
+                    if (!data) return;
+                    const emojiMap: Record<string, Reaction> = {};
+                    for (const r of data) {
+                        if (!emojiMap[r.emoji]) emojiMap[r.emoji] = { count: 0, mine: false };
+                        emojiMap[r.emoji].count++;
+                        if (r.user_id === userIdRef.current) emojiMap[r.emoji].mine = true;
+                    }
+                    setReactions((prev) => ({ ...prev, [messageId]: emojiMap }));
+                })
+            .subscribe();
+        return () => { supabase.removeChannel(ch); };
     }, [roomId]);
 
     useEffect(() => {
@@ -397,6 +484,9 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                     ? isLight ? "text-teal-600" : "text-teal-400"
                                     : isLight ? "text-neutral-500" : "text-neutral-500";
                                 const contentColor = isLight ? "text-neutral-700" : "text-neutral-300";
+                                const msgReactions = reactions[m.id] ?? {};
+                                const hasReactions = Object.values(msgReactions).some((r) => r.count > 0);
+                                const isPickerOpen = pickerOpenId === m.id;
 
                                 return (
                                     <motion.div
@@ -404,30 +494,100 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                         initial={{ opacity: 0, y: 6 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.2 }}
-                                        className="flex items-baseline gap-1.5 py-[3px] min-w-0"
+                                        className="group relative py-[3px] min-w-0"
                                     >
-                                        {/* 포지션 pill */}
-                                        {userChoice ? (
-                                            <span className={`text-[8px] font-bold px-1 py-[1px] rounded shrink-0 leading-none ${
-                                                userChoice === "long"
-                                                    ? "bg-emerald-500/15 text-emerald-400"
-                                                    : "bg-red-500/15 text-red-400"
-                                            }`}>
-                                                {userChoice === "long" ? "L" : "S"}
+                                        {/* 메시지 행 */}
+                                        <div className="flex items-baseline gap-1.5">
+                                            {/* 포지션 pill */}
+                                            {userChoice ? (
+                                                <span className={`text-[8px] font-bold px-1 py-[1px] rounded shrink-0 leading-none ${
+                                                    userChoice === "long"
+                                                        ? "bg-emerald-500/15 text-emerald-400"
+                                                        : "bg-red-500/15 text-red-400"
+                                                }`}>
+                                                    {userChoice === "long" ? "L" : "S"}
+                                                </span>
+                                            ) : (
+                                                <span className="w-[14px] shrink-0" />
+                                            )}
+                                            {/* 이름 */}
+                                            <span className={`text-[11px] font-semibold shrink-0 ${nameColor}`}>
+                                                {isMe ? "나" : m.user_id.slice(0, 6)}
                                             </span>
-                                        ) : (
-                                            <span className="w-[14px] shrink-0" />
+                                            {/* 구분자 */}
+                                            <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-300" : "text-neutral-700"}`}>·</span>
+                                            {/* 내용 */}
+                                            <span className={`text-[12px] whitespace-pre-wrap break-anywhere flex-1 ${contentColor}`}>
+                                                {linkify(m.content)}
+                                            </span>
+                                            {/* 리액션 추가 버튼 (hover시) */}
+                                            <button
+                                                onClick={() => setPickerOpenId(isPickerOpen ? null : m.id)}
+                                                className={`shrink-0 text-[11px] w-5 h-5 flex items-center justify-center rounded-md transition-all cursor-pointer ${
+                                                    isPickerOpen
+                                                        ? "opacity-100 bg-neutral-700 text-neutral-200"
+                                                        : "opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800"
+                                                }`}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+
+                                        {/* 이모지 피커 (인라인 팝업) */}
+                                        <AnimatePresence>
+                                            {isPickerOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.9, y: -4 }}
+                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                    exit={{ opacity: 0, scale: 0.9, y: -4 }}
+                                                    transition={{ duration: 0.12 }}
+                                                    className={`absolute right-0 top-full mt-1 z-30 flex items-center gap-0.5 px-2 py-1.5 rounded-2xl border shadow-xl ${
+                                                        isLight
+                                                            ? "bg-white border-neutral-200"
+                                                            : "bg-neutral-900 border-zinc-700"
+                                                    }`}
+                                                >
+                                                    {REACTION_EMOJIS.map((emoji) => (
+                                                        <button
+                                                            key={emoji}
+                                                            onClick={() => toggleReaction(m.id, emoji)}
+                                                            className={`w-8 h-8 flex items-center justify-center rounded-xl text-[16px] transition-all cursor-pointer hover:scale-125 active:scale-110 ${
+                                                                msgReactions[emoji]?.mine
+                                                                    ? "bg-amber-500/20"
+                                                                    : "hover:bg-neutral-700/60"
+                                                            }`}
+                                                        >
+                                                            {emoji}
+                                                        </button>
+                                                    ))}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+
+                                        {/* 리액션 pills */}
+                                        {hasReactions && (
+                                            <div className="flex flex-wrap gap-1 mt-1 pl-[22px]">
+                                                {REACTION_EMOJIS.filter((e) => (msgReactions[e]?.count ?? 0) > 0).map((emoji) => {
+                                                    const r = msgReactions[emoji];
+                                                    return (
+                                                        <button
+                                                            key={emoji}
+                                                            onClick={() => toggleReaction(m.id, emoji)}
+                                                            className={`flex items-center gap-1 px-1.5 py-0.5 rounded-lg border text-[11px] transition-all cursor-pointer active:scale-95 ${
+                                                                r.mine
+                                                                    ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
+                                                                    : isLight
+                                                                        ? "bg-neutral-100 border-neutral-200 text-neutral-600 hover:border-neutral-300"
+                                                                        : "bg-neutral-800/60 border-zinc-700/60 text-neutral-400 hover:border-zinc-600"
+                                                            }`}
+                                                        >
+                                                            <span className="text-[12px]">{emoji}</span>
+                                                            <span className="font-semibold tabular-nums">{r.count}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
                                         )}
-                                        {/* 이름 */}
-                                        <span className={`text-[11px] font-semibold shrink-0 ${nameColor}`}>
-                                            {isMe ? "나" : m.user_id.slice(0, 6)}
-                                        </span>
-                                        {/* 구분자 */}
-                                        <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-300" : "text-neutral-700"}`}>·</span>
-                                        {/* 내용 */}
-                                        <span className={`text-[12px] whitespace-pre-wrap break-anywhere ${contentColor}`}>
-                                            {linkify(m.content)}
-                                        </span>
                                     </motion.div>
                                 );
                             })}
