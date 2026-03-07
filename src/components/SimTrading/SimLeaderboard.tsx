@@ -1,18 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-
-function useTheme() {
-    const [isLight, setIsLight] = useState(false);
-    useEffect(() => {
-        const html = document.documentElement;
-        setIsLight(html.classList.contains("light"));
-        const observer = new MutationObserver(() => setIsLight(html.classList.contains("light")));
-        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
-    return isLight;
-}
+import { useTheme } from "@/hooks/useTheme";
 
 interface LeaderboardEntry {
     user_id: string;

@@ -5,19 +5,9 @@ import { useAtom, useAtomValue } from "jotai";
 import { simSymbolAtom, simPricesAtom, simMarginModeAtom } from "@/store/atoms";
 import { calcLiqPrice, calcLiqPriceCross } from "@/lib/sim-trading";
 import AnimatedNumber from "@/components/AnimatedNumber";
+import { useTheme } from "@/hooks/useTheme";
+import { LEVERAGE_PRESETS } from "@/constants/sim-trading";
 import type { SimAccount, OpenPositionInput, PositionSide, OrderType, MarginMode } from "@/types/sim-trading";
-
-function useTheme() {
-    const [isLight, setIsLight] = useState(false);
-    useEffect(() => {
-        const html = document.documentElement;
-        setIsLight(html.classList.contains("light"));
-        const observer = new MutationObserver(() => setIsLight(html.classList.contains("light")));
-        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
-    return isLight;
-}
 
 interface Props {
     account: SimAccount | null;
@@ -29,8 +19,6 @@ interface Props {
     clickedPrice: number | null;
     lockedMarginMode: MarginMode | null;
 }
-
-const LEVERAGE_PRESETS = [1, 2, 5, 10, 20, 50, 75, 100, 125];
 
 export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode }: Props) {
     const isLight = useTheme();

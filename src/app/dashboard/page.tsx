@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { RealTimeSection } from "@/components/RealTimeSection";
-import { DashBoard } from "@/components/DashBorad";
-import MobileSuggestModal from "@/components/MobileSuggestModa";
+import { DashBoard } from "@/components/DashBoard";
+import MobileSuggestModal from "@/components/MobileSuggestModal";
 import Script from "next/script";
 import ForceTabReturnReload from "@/components/ForceTabReturnReload";
 

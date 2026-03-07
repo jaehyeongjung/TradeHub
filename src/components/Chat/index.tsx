@@ -2,21 +2,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { supabase } from "@/lib/supabase-browser";
+import type { PostgrestSingleResponse } from "@supabase/supabase-js";
 import { sanitizeText } from "@/lib/sanitize";
 import { AnimatePresence, motion } from "framer-motion";
 
-interface PostgrestError {
-    message: string;
-    details: string | null;
-    hint: string | null;
-    code: string;
-}
-type PostgrestSingleResponse<T> = {
-    data: T | null;
-    error: PostgrestError | null;
-    status: number;
-    statusText: string;
-};
 interface PayloadObject {
     id: string;
     content: string;

@@ -3,26 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { activePageAtom, simPricesAtom, simChangesAtom, simSymbolAtom } from "@/store/atoms";
-
-const SUPPORTED_SYMBOLS = [
-    // Tier 1 — 최상위 유동성
-    "BTCUSDT",  "ETHUSDT",  "BNBUSDT",  "SOLUSDT",  "XRPUSDT",
-    "DOGEUSDT", "ADAUSDT",  "AVAXUSDT", "LINKUSDT", "DOTUSDT",
-    // Tier 2 — 주요 알트
-    "MATICUSDT","LTCUSDT",  "ATOMUSDT", "UNIUSDT",  "NEARUSDT",
-    "APTUSDT",  "ARBUSDT",  "OPUSDT",   "INJUSDT",  "SUIUSDT",
-    // Tier 3 — 레이어1 / 인프라
-    "TRXUSDT",  "BCHUSDT",  "ETCUSDT",  "FILUSDT",  "ALGOUSDT",
-    "VETUSDT",  "EOSUSDT",  "HBARUSDT", "QTUMUSDT", "FLOWUSDT",
-    // Tier 4 — DeFi
-    "AAVEUSDT", "LDOUSDT",  "CRVUSDT",  "MKRUSDT",  "SNXUSDT",
-    "RUNEUSDT", "GRTUSDT",  "PENDLEUSDT","KAVAUSDT", "IMXUSDT",
-    // Tier 5 — 메타버스 / 게임
-    "SANDUSDT", "MANAUSDT", "GALAUSDT", "AXSUSDT",  "ENJUSDT",
-    // Tier 6 — 신규 / 트렌드
-    "TONUSDT",  "SEIUSDT",  "TIAUSDT",  "WLDUSDT",  "ORDIUSDT",
-    "JUPUSDT",  "FETUSDT",  "STXUSDT",  "FTMUSDT",  "WIFUSDT",
-];
+import { SUPPORTED_SYMBOLS } from "@/constants/sim-trading";
 
 /**
  * 모의투자 페이지 활성 시 Binance WebSocket으로 실시간 가격을 스트리밍.
@@ -106,4 +87,3 @@ export function useSimPriceStream() {
     return { prices, currentPrice: prices[simSymbol] ?? 0 };
 }
 
-export { SUPPORTED_SYMBOLS };

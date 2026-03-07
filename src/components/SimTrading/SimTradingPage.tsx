@@ -14,18 +14,7 @@ import SimOrderBook from "./SimOrderBook";
 import SimMarketData from "./SimMarketData";
 import SimLeaderboard from "./SimLeaderboard";
 import SimSymbolSelector from "./SimSymbolSelector";
-
-function useTheme() {
-    const [isLight, setIsLight] = useState(false);
-    useEffect(() => {
-        const html = document.documentElement;
-        setIsLight(html.classList.contains("light"));
-        const observer = new MutationObserver(() => setIsLight(html.classList.contains("light")));
-        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
-    return isLight;
-}
+import { useTheme } from "@/hooks/useTheme";
 
 const CoinChart = dynamic(() => import("@/components/CoinChart"), {
     ssr: false,

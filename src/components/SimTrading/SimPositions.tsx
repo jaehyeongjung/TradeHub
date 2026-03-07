@@ -1,22 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAtomValue } from "jotai";
 import { simPricesAtom } from "@/store/atoms";
 import { calcRoe } from "@/lib/sim-trading";
+import { useTheme } from "@/hooks/useTheme";
 import type { SimPosition } from "@/types/sim-trading";
-
-function useTheme() {
-    const [isLight, setIsLight] = useState(false);
-    useEffect(() => {
-        const html = document.documentElement;
-        setIsLight(html.classList.contains("light"));
-        const observer = new MutationObserver(() => setIsLight(html.classList.contains("light")));
-        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
-    return isLight;
-}
 
 interface Props {
     positions: SimPosition[];

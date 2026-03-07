@@ -5,29 +5,7 @@ import { createPortal } from "react-dom";
 import { useAtom, useAtomValue } from "jotai";
 import Image from "next/image";
 import { simSymbolAtom, simPricesAtom, simChangesAtom } from "@/store/atoms";
-import { SUPPORTED_SYMBOLS } from "@/hooks/useSimPriceStream";
-
-const SYMBOL_NAMES: Record<string, string> = {
-    BTCUSDT: "Bitcoin",      ETHUSDT: "Ethereum",     BNBUSDT: "BNB",
-    SOLUSDT: "Solana",       XRPUSDT: "XRP",          DOGEUSDT: "Dogecoin",
-    ADAUSDT: "Cardano",      AVAXUSDT: "Avalanche",   LINKUSDT: "Chainlink",
-    DOTUSDT: "Polkadot",     MATICUSDT: "Polygon",    LTCUSDT: "Litecoin",
-    ATOMUSDT: "Cosmos",      UNIUSDT: "Uniswap",      NEARUSDT: "NEAR",
-    APTUSDT: "Aptos",        ARBUSDT: "Arbitrum",     OPUSDT: "Optimism",
-    INJUSDT: "Injective",    SUIUSDT: "Sui",          TRXUSDT: "TRON",
-    BCHUSDT: "Bitcoin Cash", ETCUSDT: "Ethereum Classic", FILUSDT: "Filecoin",
-    ALGOUSDT: "Algorand",    VETUSDT: "VeChain",      EOSUSDT: "EOS",
-    HBARUSDT: "Hedera",      QTUMUSDT: "QTUM",        FLOWUSDT: "Flow",
-    AAVEUSDT: "Aave",        LDOUSDT: "Lido DAO",     CRVUSDT: "Curve",
-    MKRUSDT: "Maker",        SNXUSDT: "Synthetix",    RUNEUSDT: "THORChain",
-    GRTUSDT: "The Graph",    PENDLEUSDT: "Pendle",    KAVAUSDT: "Kava",
-    IMXUSDT: "Immutable X",  SANDUSDT: "Sandbox",     MANAUSDT: "Decentraland",
-    GALAUSDT: "Gala",        AXSUSDT: "Axie Infinity",ENJUSDT: "Enjin",
-    TONUSDT: "Toncoin",      SEIUSDT: "Sei",          TIAUSDT: "Celestia",
-    WLDUSDT: "Worldcoin",    ORDIUSDT: "ORDI",        JUPUSDT: "Jupiter",
-    FETUSDT: "Fetch.ai",     STXUSDT: "Stacks",       FTMUSDT: "Fantom",
-    WIFUSDT: "dogwifhat",
-};
+import { SUPPORTED_SYMBOLS, SYMBOL_NAMES } from "@/constants/sim-trading";
 
 function getCoinLogoUrl(symbol: string) {
     const base = symbol.toUpperCase().replace(/USDT$/, "").toLowerCase();
