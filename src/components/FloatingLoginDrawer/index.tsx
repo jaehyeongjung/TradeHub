@@ -29,9 +29,29 @@ export default function FloatingLoginSidebar() {
     // 다크모드 토글
     const toggleTheme = () => {
         const newDark = !isDark;
+
+        // 전역 color transition 주입
+        const style = document.createElement("style");
+        style.id = "__theme-transition__";
+        style.textContent = `*, *::before, *::after {
+            transition:
+                background-color 0.35s ease,
+                color 0.25s ease,
+                border-color 0.35s ease,
+                fill 0.25s ease,
+                stroke 0.25s ease,
+                box-shadow 0.35s ease !important;
+        }`;
+        document.head.appendChild(style);
+
         setIsDark(newDark);
         localStorage.setItem("theme", newDark ? "dark" : "light");
         document.documentElement.classList.toggle("light", !newDark);
+
+        // transition 제거 (완료 후)
+        setTimeout(() => {
+            document.getElementById("__theme-transition__")?.remove();
+        }, 400);
     };
 
     // 열기/닫기 토글
@@ -100,9 +120,9 @@ export default function FloatingLoginSidebar() {
                         ],
                     } : { scale: 1 }}
                     transition={{ duration: 7, ease: "easeOut", delay: 0.3 }}
-                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-105 focus:outline-none transition-colors ${
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-110 focus:outline-none transition-colors ${
                         isDark
-                            ? "bg-amber-500 text-white ring-1 ring-amber-400/60 shadow-amber-500/30 shadow-lg"
+                            ? "bg-emerald-500 text-white ring-1 ring-emerald-400/40 shadow-emerald-500/20 shadow-lg"
                             : "bg-emerald-500 text-white ring-1 ring-emerald-400/50 shadow-md"
                     }`}
                 >
@@ -124,10 +144,10 @@ export default function FloatingLoginSidebar() {
                     type="button"
                     onClick={() => setShowTreemap(true)}
                     aria-label="트리맵 보기"
-                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-105 focus:outline-none transition-colors ${
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-110 focus:outline-none transition-colors ${
                         isDark
-                            ? "bg-zinc-700 text-emerald-400 ring-1 ring-zinc-600/50"
-                            : "bg-white text-emerald-600 ring-1 ring-neutral-200 shadow-md"
+                            ? "bg-neutral-800 text-neutral-300 ring-1 ring-neutral-700/60"
+                            : "bg-white text-neutral-600 ring-1 ring-neutral-200 shadow-md"
                     }`}
                 >
                     {/* Grid 아이콘 */}
@@ -149,10 +169,10 @@ export default function FloatingLoginSidebar() {
                     type="button"
                     onClick={toggleTheme}
                     aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
-                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-105 focus:outline-none transition-colors ${
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-110 focus:outline-none transition-colors ${
                         isDark
-                            ? "bg-zinc-700 text-yellow-300 ring-1 ring-zinc-600/50"
-                            : "bg-white text-amber-500 ring-1 ring-neutral-200 shadow-md"
+                            ? "bg-neutral-800 text-neutral-400 ring-1 ring-neutral-700/60"
+                            : "bg-white text-neutral-500 ring-1 ring-neutral-200 shadow-md"
                     }`}
                 >
                     {isDark ? (
@@ -191,9 +211,9 @@ export default function FloatingLoginSidebar() {
                     aria-haspopup="dialog"
                     aria-expanded={open}
                     aria-controls="login-drawer"
-                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-105 focus:outline-none transition-colors ${
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-110 focus:outline-none transition-colors ${
                         isDark
-                            ? "bg-amber-400 text-black ring-1 ring-amber-300/50"
+                            ? "bg-neutral-800 text-neutral-300 ring-1 ring-neutral-700/60"
                             : "bg-white text-neutral-700 ring-1 ring-neutral-200 shadow-md"
                     }`}
                 >
@@ -291,6 +311,7 @@ export default function FloatingLoginSidebar() {
                     <CryptoTreemap onClose={() => setShowTreemap(false)} />
                 )}
             </AnimatePresence>
+
         </>
     );
 }

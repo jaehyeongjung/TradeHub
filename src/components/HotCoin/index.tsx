@@ -105,8 +105,8 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
     const current = list.length ? list[idx] : null;
 
     const badgeClass = isLight
-        ? "bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100"
-        : "bg-orange-500/15 text-orange-400 border border-orange-500/25 hover:bg-orange-500/20";
+        ? "bg-neutral-100 text-neutral-500 border border-neutral-200 hover:bg-neutral-200"
+        : "bg-neutral-800/80 text-neutral-400 border border-neutral-700/60 hover:bg-neutral-800";
     const tickerBaseColor = isLight ? "text-neutral-800" : "text-neutral-200";
     const tooltipBg = isLight
         ? "bg-white border-neutral-200 text-neutral-700 shadow-lg"
@@ -131,7 +131,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                 onMouseLeave={() => setShowTooltip(false)}
             >
                 <p className={`flex items-center gap-1.5 text-[11px] 2xl:text-xs font-bold px-3 py-1.5 rounded-full select-none cursor-pointer transition-colors whitespace-nowrap tracking-wide ${badgeClass}`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
                     HOT
                 </p>
 

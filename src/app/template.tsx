@@ -28,7 +28,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
                     filter: "blur(0px)",
                 }}
                 transition={{
-                    duration: 0.45,
+                    duration: 0.28,
                     ease: [0.16, 1, 0.3, 1],
                 }}
             >
