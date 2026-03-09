@@ -26,6 +26,29 @@ const nextConfig: NextConfig = {
     compress: true,
     // 프로덕션 소스맵 비활성화 (번들 크기 감소)
     productionBrowserSourceMaps: false,
+    // 리디렉트
+    async redirects() {
+        return [
+            // HTTP → HTTPS, 비-www → www
+            {
+                source: "/:path*",
+                has: [{ type: "host", value: "tradehub.kr" }],
+                destination: "https://www.tradehub.kr/:path*",
+                permanent: true,
+            },
+            // 잘못된 URL 정리
+            {
+                source: "/&",
+                destination: "/",
+                permanent: true,
+            },
+            {
+                source: "/$",
+                destination: "/",
+                permanent: true,
+            },
+        ];
+    },
     // 보안 헤더
     async headers() {
         return [

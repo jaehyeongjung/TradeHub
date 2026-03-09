@@ -6,24 +6,23 @@ export default function robots(): MetadataRoute.Robots {
             {
                 userAgent: "*",
                 allow: "/",
-                disallow: ["/api/", "/mobile"],
+                disallow: ["/api/", "/mobile", "/_next/"],
             },
             {
                 userAgent: "Googlebot",
                 allow: "/",
-                disallow: ["/api/", "/mobile"],
-                crawlDelay: 0,
+                disallow: ["/api/", "/mobile", "/_next/"],
             },
             {
                 userAgent: "Bingbot",
                 allow: "/",
-                disallow: ["/api/", "/mobile"],
+                disallow: ["/api/", "/mobile", "/_next/"],
                 crawlDelay: 1,
             },
             {
                 userAgent: "Yeti",
                 allow: "/",
-                disallow: ["/api/", "/mobile"],
+                disallow: ["/api/", "/mobile", "/_next/"],
                 crawlDelay: 1,
             },
         ],
