@@ -179,9 +179,8 @@ interface AddForm {
 }
 
 // ─── Drawing tool types ───────────────────────────────────────────────────────
-type DrawTool = "cursor" | "hline" | "tline" | "eraser";
+type DrawTool = "cursor" | "hline" | "eraser";
 interface DrawnHLine { id: string; price: number; }
-interface DrawnTLine { id: string; p1: { time: number; price: number }; p2: { time: number; price: number }; }
 
 function defaultAddForm(type: IndicatorType): AddForm {
     return {
@@ -195,36 +194,6 @@ function defaultAddForm(type: IndicatorType): AddForm {
     };
 }
 
-/** 추세선을 양 방향으로 크게 연장한 2-포인트 데이터 반환 (가격 >= 0 보장) */
-function extendTLine(
-    p1: { time: number; price: number },
-    p2: { time: number; price: number },
-): [{ time: UTCTimestamp; value: number }, { time: UTCTimestamp; value: number }] {
-    const dt = p2.time - p1.time;
-    if (dt === 0) return [
-        { time: p1.time as UTCTimestamp, value: p1.price },
-        { time: (p2.time + 1) as UTCTimestamp, value: p2.price },
-    ];
-    const slope = (p2.price - p1.price) / dt;
-    const EXTEND = 800;
-    let tStart = Math.min(p1.time, p2.time) - EXTEND * Math.abs(dt);
-    let tEnd   = Math.max(p1.time, p2.time) + EXTEND * Math.abs(dt);
-
-    // slope가 있을 때 가격이 0이 되는 시점 계산해서 클램프
-    if (slope !== 0) {
-        const tZero = p1.time - p1.price / slope; // v(t) = 0 인 t
-        if (slope < 0) tEnd   = Math.min(tEnd,   tZero - 1); // 오른쪽이 음수
-        else           tStart = Math.max(tStart, tZero + 1); // 왼쪽이 음수
-    }
-
-    const vStart = Math.max(0, p1.price + slope * (tStart - p1.time));
-    const vEnd   = Math.max(0, p1.price + slope * (tEnd   - p1.time));
-
-    return [
-        { time: tStart as UTCTimestamp, value: vStart },
-        { time: tEnd   as UTCTimestamp, value: vEnd   },
-    ];
-}
 
 export default function CoinChart({
     boxId = "chart-1",
@@ -257,16 +226,9 @@ export default function CoinChart({
 
     // Drawing refs
     const hlPriceLineRefs = useRef<Map<string, IPriceLine>>(new Map());
-    const tlSeriesRefs = useRef<Map<string, ISeriesApi<"Line">>>(new Map());
-    const tlinePendingRef = useRef<{ time: number; price: number } | null>(null);
     const drawToolRef = useRef<DrawTool>("cursor");
     const drawnHLinesRef = useRef<DrawnHLine[]>([]);
-    const drawnTLinesRef = useRef<DrawnTLine[]>([]);
-    const previewTlSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
-    const drawDragRef = useRef<
-        | { type: "hline"; id: string }
-        | { type: "tline"; id: string; endpoint: 0 | 1 | "body"; startCoords: { price: number; time: number }; startP1: { price: number; time: number }; startP2: { price: number; time: number } }
-        | null>(null);
+    const drawDragRef = useRef<{ type: "hline"; id: string } | null>(null);
 
     const [sym, setSym] = useState(symbol.toUpperCase());
     const [interval, setInterval] = useState<Interval>(defaultInterval);
@@ -287,20 +249,10 @@ export default function CoinChart({
             return Array.isArray(saved.hlines) ? saved.hlines : [];
         } catch { return []; }
     });
-    const [drawnTLines, setDrawnTLines] = useState<DrawnTLine[]>(() => {
-        if (typeof window === "undefined") return [];
-        try {
-            const saved = JSON.parse(localStorage.getItem(`chart:${boxId}:drawings`) ?? "{}");
-            return Array.isArray(saved.tlines) ? saved.tlines : [];
-        } catch { return []; }
-    });
-    const [tlinePending, setTlinePending] = useState<{ time: number; price: number } | null>(null);
 
     // Keep refs in sync with state (for click handler)
     drawToolRef.current = drawTool;
     drawnHLinesRef.current = drawnHLines;
-    drawnTLinesRef.current = drawnTLines;
-    tlinePendingRef.current = tlinePending;
 
     // Indicator state (enableIndicators=false이면 항상 빈 배열)
     const indicatorStorageKey = `chart:${boxId}:indicators`;
@@ -326,8 +278,8 @@ export default function CoinChart({
     // Persist drawings
     useEffect(() => {
         if (!enableIndicators) return;
-        localStorage.setItem(drawStorageKey, JSON.stringify({ hlines: drawnHLines, tlines: drawnTLines }));
-    }, [drawnHLines, drawnTLines, enableIndicators, drawStorageKey]);
+        localStorage.setItem(drawStorageKey, JSON.stringify({ hlines: drawnHLines }));
+    }, [drawnHLines, enableIndicators, drawStorageKey]);
 
     // Render horizontal price lines
     useEffect(() => {
@@ -344,22 +296,6 @@ export default function CoinChart({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [drawnHLines, candleDataVersion]);
 
-    // Render trend lines
-    useEffect(() => {
-        const chart = chartApiRef.current;
-        if (!chart) return;
-        tlSeriesRefs.current.forEach((s) => { try { chart.removeSeries(s); } catch {} });
-        tlSeriesRefs.current.clear();
-        drawnTLines.forEach((t) => {
-            try {
-                const tlSeries = chart.addSeries(LineSeries, { color: "#3b82f6", lineWidth: 1 as LineWidth, lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false });
-                tlSeries.setData(extendTLine(t.p1, t.p2));
-                tlSeriesRefs.current.set(t.id, tlSeries);
-            } catch {}
-        });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [drawnTLines, candleDataVersion]);
-
     // Drawing interactions: preview, drag, click
     useEffect(() => {
         const el = chartRef.current;
@@ -372,17 +308,33 @@ export default function CoinChart({
             const series = candleSeriesRef.current;
             if (!chart || !series) return null;
             const rect = el!.getBoundingClientRect();
-            const price = series.coordinateToPrice(e.clientY - rect.top);
-            const time = chart.timeScale().coordinateToTime(e.clientX - rect.left);
-            if (price === null || time === null) return null;
-            return { price, time: time as number };
-        }
-
-        function clearPreview() {
-            if (previewTlSeriesRef.current) {
-                try { chartApiRef.current?.removeSeries(previewTlSeriesRef.current); } catch {}
-                previewTlSeriesRef.current = null;
+            const x = e.clientX - rect.left;
+            const clampedY = Math.max(0, Math.min(rect.height - 1, e.clientY - rect.top));
+            const price = series.coordinateToPrice(clampedY) ?? series.coordinateToPrice(clampedY - 30);
+            if (price === null) return null;
+            let timeVal = chart.timeScale().coordinateToTime(x) as number | null;
+            if (timeVal === null) {
+                // 미래 영역: 마지막 두 바의 (logical, time) 쌍으로 외삽
+                const mouseLl = chart.timeScale().coordinateToLogical(x);
+                if (mouseLl === null) return null;
+                let t1: number | null = null, l1: number | null = null;
+                let t2: number | null = null, l2: number | null = null;
+                for (let sx = Math.min(Math.floor(x) - 1, rect.width - 1); sx >= 0; sx--) {
+                    const t = chart.timeScale().coordinateToTime(sx) as number | null;
+                    if (t !== null) {
+                        const ll = chart.timeScale().coordinateToLogical(sx);
+                        if (ll !== null) {
+                            const li = Math.round(ll);
+                            if (t1 === null) { t1 = t; l1 = li; }
+                            else if (li !== l1) { t2 = t; l2 = li; break; }
+                        }
+                    }
+                }
+                if (t1 === null || t2 === null || l1 === null || l2 === null || l1 === l2) return null;
+                const timePerLogical = (t1 - t2) / (l1 - l2);
+                timeVal = Math.round(t1 + timePerLogical * (mouseLl - l1));
             }
+            return { price, time: timeVal as number };
         }
 
         function onMouseMove(e: MouseEvent) {
@@ -392,106 +344,27 @@ export default function CoinChart({
             const drag = drawDragRef.current;
             if (drag) {
                 if (!coords) return;
-                if (drag.type === "hline") {
-                    const ln = hlPriceLineRefs.current.get(drag.id);
-                    if (ln) {
-                        try { ln.applyOptions({ price: coords.price }); } catch {}
-                        drawnHLinesRef.current = drawnHLinesRef.current.map(
-                            h => h.id === drag.id ? { ...h, price: coords.price } : h
-                        );
-                    }
-                } else {
-                    const tlS = tlSeriesRefs.current.get(drag.id);
-                    if (tlS) {
-                        let newP1: { time: UTCTimestamp; value: number };
-                        let newP2: { time: UTCTimestamp; value: number };
-
-                        if (drag.endpoint === "body") {
-                            // 각도 고정, 전체 이동
-                            const dprice = coords.price - drag.startCoords.price;
-                            const dtime  = coords.time  - drag.startCoords.time;
-                            newP1 = { time: (drag.startP1.time + dtime) as UTCTimestamp, value: drag.startP1.price + dprice };
-                            newP2 = { time: (drag.startP2.time + dtime) as UTCTimestamp, value: drag.startP2.price + dprice };
-                            drawnTLinesRef.current = drawnTLinesRef.current.map(tl => tl.id !== drag.id ? tl : {
-                                ...tl,
-                                p1: { ...tl.p1, price: drag.startP1.price + dprice, time: drag.startP1.time + dtime },
-                                p2: { ...tl.p2, price: drag.startP2.price + dprice, time: drag.startP2.time + dtime },
-                            });
-                        } else {
-                            // 끝점만 이동
-                            const t = drawnTLinesRef.current.find(tl => tl.id === drag.id);
-                            if (!t) return;
-                            newP1 = drag.endpoint === 0
-                                ? { time: coords.time as UTCTimestamp, value: coords.price }
-                                : { time: t.p1.time as UTCTimestamp, value: t.p1.price };
-                            newP2 = drag.endpoint === 1
-                                ? { time: coords.time as UTCTimestamp, value: coords.price }
-                                : { time: t.p2.time as UTCTimestamp, value: t.p2.price };
-                            drawnTLinesRef.current = drawnTLinesRef.current.map(tl => {
-                                if (tl.id !== drag.id) return tl;
-                                if (drag.endpoint === 0) return { ...tl, p1: { ...tl.p1, price: coords.price, time: coords.time } };
-                                return { ...tl, p2: { ...tl.p2, price: coords.price, time: coords.time } };
-                            });
-                        }
-
-                        if (newP1.time !== newP2.time) {
-                            try { tlS.setData(extendTLine({ time: newP1.time as number, price: newP1.value }, { time: newP2.time as number, price: newP2.value })); } catch {}
-                        }
-                    }
+                const ln = hlPriceLineRefs.current.get(drag.id);
+                if (ln) {
+                    try { ln.applyOptions({ price: coords.price }); } catch {}
+                    drawnHLinesRef.current = drawnHLinesRef.current.map(
+                        h => h.id === drag.id ? { ...h, price: coords.price } : h
+                    );
                 }
                 return;
             }
 
             // ── Cursor hover feedback ──
             const tool = drawToolRef.current;
-            if (tool === "cursor" && coords) {
-                const rect = el!.getBoundingClientRect();
-                const pa = candleSeriesRef.current?.coordinateToPrice(e.clientY - rect.top - 8);
-                const pb = candleSeriesRef.current?.coordinateToPrice(e.clientY - rect.top + 8);
-                const TOL = pa != null && pb != null ? Math.abs(pa - pb) / 2 : 0.01 * Math.abs(coords.price || 1);
-                const nearH = drawnHLinesRef.current.some(h => Math.abs(h.price - coords.price) <= TOL);
-                // 끝점 근처
-                const nearEp = drawnTLinesRef.current.some(t =>
-                    Math.min(Math.abs(t.p1.price - coords.price), Math.abs(t.p2.price - coords.price)) <= TOL * 6
-                );
-                // 선 본체 근처 (보간)
-                const nearBody = !nearEp && drawnTLinesRef.current.some(t => {
-                    if (t.p1.time === t.p2.time) return false;
-                    const tMin = Math.min(t.p1.time, t.p2.time);
-                    const tMax = Math.max(t.p1.time, t.p2.time);
-                    if (coords.time < tMin || coords.time > tMax) return false;
-                    const interp = t.p1.price + (t.p2.price - t.p1.price) * (coords.time - t.p1.time) / (t.p2.time - t.p1.time);
-                    return Math.abs(coords.price - interp) <= TOL * 5;
-                });
-                el!.style.cursor = nearH ? "ns-resize" : nearEp ? "crosshair" : nearBody ? "grab" : "";
+            if (tool === "cursor") {
+                const pa = candleSeriesRef.current?.coordinateToPrice(e.clientY - el!.getBoundingClientRect().top - 8);
+                const pb = candleSeriesRef.current?.coordinateToPrice(e.clientY - el!.getBoundingClientRect().top + 8);
+                const TOL = pa != null && pb != null ? Math.abs(pa - pb) / 2 : 0.01 * Math.abs(coords?.price || 1);
+                const nearH = coords ? drawnHLinesRef.current.some(h => Math.abs(h.price - coords.price) <= TOL) : false;
+                el!.style.cursor = nearH ? "ns-resize" : "";
             } else {
                 el!.style.cursor = "";
             }
-
-            // ── Preview tline ──
-            if (tool === "tline" && coords) {
-                const pending = tlinePendingRef.current;
-                if (pending) {
-                    const chart = chartApiRef.current;
-                    if (!chart) return;
-                    if (!previewTlSeriesRef.current) {
-                        try {
-                            previewTlSeriesRef.current = chart.addSeries(LineSeries, {
-                                color: "#3b82f660",
-                                lineWidth: 1 as LineWidth,
-                                lineStyle: 2,
-                                lastValueVisible: false,
-                                priceLineVisible: false,
-                                crosshairMarkerVisible: false,
-                            });
-                        } catch {}
-                    }
-                    if (pending.time === coords.time) return;
-                    try { previewTlSeriesRef.current?.setData(extendTLine(pending, { time: coords.time, price: coords.price })); } catch {}
-                    return;
-                }
-            }
-            clearPreview();
         }
 
         function onMouseDown(e: MouseEvent) {
@@ -512,42 +385,13 @@ export default function CoinChart({
                 e.stopPropagation();
                 return;
             }
-            const tlines = drawnTLinesRef.current;
-            for (const t of tlines) {
-                const d1 = Math.abs(t.p1.price - coords.price);
-                const d2 = Math.abs(t.p2.price - coords.price);
-                const base = { startCoords: coords, startP1: { price: t.p1.price, time: t.p1.time }, startP2: { price: t.p2.price, time: t.p2.time } };
-
-                // 끝점 우선 감지
-                if (Math.min(d1, d2) <= TOL * 6) {
-                    drawDragRef.current = { type: "tline", id: t.id, endpoint: d1 <= d2 ? 0 : 1, ...base };
-                    e.stopPropagation();
-                    return;
-                }
-
-                // 선 본체 감지 (보간)
-                if (t.p1.time !== t.p2.time) {
-                    const tMin = Math.min(t.p1.time, t.p2.time);
-                    const tMax = Math.max(t.p1.time, t.p2.time);
-                    if (coords.time >= tMin && coords.time <= tMax) {
-                        const interp = t.p1.price + (t.p2.price - t.p1.price) * (coords.time - t.p1.time) / (t.p2.time - t.p1.time);
-                        if (Math.abs(coords.price - interp) <= TOL * 5) {
-                            drawDragRef.current = { type: "tline", id: t.id, endpoint: "body", ...base };
-                            e.stopPropagation();
-                            return;
-                        }
-                    }
-                }
-            }
         }
 
         function onMouseUp(e: MouseEvent) {
             el!.style.cursor = "";
             const drag = drawDragRef.current;
             if (drag) {
-                // Save final position to state
-                if (drag.type === "hline") setDrawnHLines([...drawnHLinesRef.current]);
-                else setDrawnTLines([...drawnTLinesRef.current]);
+                setDrawnHLines([...drawnHLinesRef.current]);
                 drawDragRef.current = null;
                 mdPos = null;
                 return;
@@ -566,23 +410,10 @@ export default function CoinChart({
             if (!chart || !series) return;
             const coords = getCoords(e);
             if (!coords) return;
-            const { price, time } = coords;
+            const { price } = coords;
 
             if (tool === "hline") {
                 setDrawnHLines(prev => [...prev, { id: crypto.randomUUID(), price }]);
-            } else if (tool === "tline") {
-                const pending = tlinePendingRef.current;
-                if (!pending) {
-                    const p = { time, price };
-                    tlinePendingRef.current = p;
-                    setTlinePending(p);
-                } else {
-                    clearPreview();
-                    const newTLine: DrawnTLine = { id: crypto.randomUUID(), p1: pending, p2: { time, price } };
-                    setDrawnTLines(prev => [...prev, newTLine]);
-                    tlinePendingRef.current = null;
-                    setTlinePending(null);
-                }
             } else if (tool === "eraser") {
                 // 픽셀 12px 에 해당하는 가격 범위를 tolerance로 사용
                 const rect = el!.getBoundingClientRect();
@@ -600,47 +431,21 @@ export default function CoinChart({
                     const ln = hlPriceLineRefs.current.get(id);
                     if (ln) { try { series.removePriceLine(ln); } catch {} hlPriceLineRefs.current.delete(id); }
                     setDrawnHLines(prev => prev.filter(h => h.id !== id));
-                } else {
-                    const tlines = drawnTLinesRef.current;
-                    const ti = tlines.findIndex(t => {
-                        if (t.p1.time === t.p2.time) return false;
-                        const interp = t.p1.price + (t.p2.price - t.p1.price) * (time - t.p1.time) / (t.p2.time - t.p1.time);
-                        return Math.abs(price - interp) <= TOL;
-                    });
-                    if (ti >= 0) {
-                        const id = tlines[ti].id;
-                        const tlS = tlSeriesRefs.current.get(id);
-                        if (tlS) { try { chart.removeSeries(tlS); } catch {} tlSeriesRefs.current.delete(id); }
-                        setDrawnTLines(prev => prev.filter(t => t.id !== id));
-                    }
                 }
             }
         }
 
-        el.addEventListener("mousemove", onMouseMove);
+        window.addEventListener("mousemove", onMouseMove);
         el.addEventListener("mousedown", onMouseDown, { capture: true });
         window.addEventListener("mouseup", onMouseUp);
 
         return () => {
-            el.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("mousemove", onMouseMove);
             el.removeEventListener("mousedown", onMouseDown, { capture: true });
             window.removeEventListener("mouseup", onMouseUp);
-            clearPreview();
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    // Clear pending tline + preview when switching away from tline tool
-    useEffect(() => {
-        if (drawTool !== "tline") {
-            tlinePendingRef.current = null;
-            setTlinePending(null);
-            if (previewTlSeriesRef.current) {
-                try { chartApiRef.current?.removeSeries(previewTlSeriesRef.current); } catch {}
-                previewTlSeriesRef.current = null;
-            }
-        }
-    }, [drawTool]);
 
     const decimalsFromTickSize = (tick: string) => {
         const i = tick.indexOf(".");
@@ -736,7 +541,7 @@ export default function CoinChart({
         chart.timeScale().applyOptions({
             timeVisible: true,
             secondsVisible: false,
-            rightOffset: 0,
+            rightOffset: 20,
             lockVisibleTimeRangeOnResize: true,
             shiftVisibleRangeOnNewBar: true,
         });
@@ -1221,13 +1026,7 @@ export default function CoinChart({
         const series = candleSeriesRef.current;
         hlPriceLineRefs.current.forEach((line) => { try { series?.removePriceLine(line); } catch {} });
         hlPriceLineRefs.current.clear();
-        const chart = chartApiRef.current;
-        tlSeriesRefs.current.forEach((s) => { try { chart?.removeSeries(s); } catch {} });
-        tlSeriesRefs.current.clear();
         setDrawnHLines([]);
-        setDrawnTLines([]);
-        tlinePendingRef.current = null;
-        setTlinePending(null);
     };
 
     const indicatorLabel = (ind: IndicatorConfig) => {
@@ -1303,19 +1102,6 @@ export default function CoinChart({
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16" />
                                     </svg>
                                 </button>
-                                {/* 추세선 */}
-                                <button
-                                    title="추세선"
-                                    onClick={() => setDrawTool("tline")}
-                                    className={`p-1 rounded-md transition-all cursor-pointer relative ${drawTool === "tline" ? "bg-amber-500/20 text-amber-300" : "text-neutral-500 hover:text-neutral-200 hover:bg-neutral-700/50"}`}
-                                >
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19L19 5" />
-                                    </svg>
-                                    {tlinePending && (
-                                        <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                                    )}
-                                </button>
                                 {/* 지우개 */}
                                 <button
                                     title="지우개"
@@ -1327,7 +1113,7 @@ export default function CoinChart({
                                     </svg>
                                 </button>
                                 {/* 전체 삭제 */}
-                                {(drawnHLines.length > 0 || drawnTLines.length > 0) && (
+                                {drawnHLines.length > 0 && (
                                     <button
                                         title="전체 삭제"
                                         onClick={clearAllDrawings}
