@@ -881,7 +881,7 @@ export default function CoinChart({
             const entryLine = series.createPriceLine({
                 price: pos.entry_price, color: isLong ? "#26a69a" : "#ef5350",
                 lineWidth: 1 as LineWidth, lineStyle: 1, axisLabelVisible: true,
-                title: `${pos.side} 진입 $${pos.entry_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+                title: isLong ? "▲ 진입" : "▼ 진입",
             });
             priceLinesRef.current.push(entryLine);
 
@@ -889,7 +889,7 @@ export default function CoinChart({
                 const liqLine = series.createPriceLine({
                     price: pos.liq_price, color: "#f97316",
                     lineWidth: 1 as LineWidth, lineStyle: 2, axisLabelVisible: true,
-                    title: `${pos.side} 청산 $${pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+                    title: "청산",
                 });
                 priceLinesRef.current.push(liqLine);
             }
@@ -897,7 +897,7 @@ export default function CoinChart({
                 const tpLine = series.createPriceLine({
                     price: pos.tp_price, color: "#22c55e",
                     lineWidth: 1 as LineWidth, lineStyle: 2, axisLabelVisible: true,
-                    title: `TP $${pos.tp_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+                    title: "TP",
                 });
                 priceLinesRef.current.push(tpLine);
                 tpSlLinesRef.current.push({ posId: pos.id, type: "tp", line: tpLine });
@@ -906,7 +906,7 @@ export default function CoinChart({
                 const slLine = series.createPriceLine({
                     price: pos.sl_price, color: "#ef4444",
                     lineWidth: 1 as LineWidth, lineStyle: 2, axisLabelVisible: true,
-                    title: `SL $${pos.sl_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+                    title: "SL",
                 });
                 priceLinesRef.current.push(slLine);
                 tpSlLinesRef.current.push({ posId: pos.id, type: "sl", line: slLine });
