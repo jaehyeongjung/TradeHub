@@ -17,12 +17,19 @@ export default function Template({ children }: { children: React.ReactNode }) {
             <motion.div
                 initial={{
                     opacity: 0,
-                    x: isTrading ? "100%" : "-100%",
+                    x: isTrading ? "6%" : "-6%",
+                    scale: 0.97,
+                    filter: "blur(6px)",
                 }}
-                animate={{ opacity: 1, x: 0 }}
+                animate={{
+                    opacity: 1,
+                    x: 0,
+                    scale: 1,
+                    filter: "blur(0px)",
+                }}
                 transition={{
-                    x: { type: "tween", duration: 0.3, ease: "easeInOut" },
-                    opacity: { duration: 0.2 },
+                    duration: 0.45,
+                    ease: [0.16, 1, 0.3, 1],
                 }}
             >
                 {children}

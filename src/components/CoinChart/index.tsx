@@ -405,9 +405,8 @@ export default function CoinChart({
 
             const tool = drawToolRef.current;
             if (tool === "cursor") return;
-            const chart = chartApiRef.current;
             const series = candleSeriesRef.current;
-            if (!chart || !series) return;
+            if (!series) return;
             const coords = getCoords(e);
             if (!coords) return;
             const { price } = coords;
