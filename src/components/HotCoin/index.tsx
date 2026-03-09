@@ -164,10 +164,10 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                         {current && (
                             <motion.div
                                 key={current.symbol + idx}
-                                initial={{ y: 14, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: -14, opacity: 0 }}
-                                transition={{ duration: 0.22 }}
+                                initial={{ y: 16, opacity: 0, filter: "blur(4px)" }}
+                                animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                                exit={{ y: -16, opacity: 0, filter: "blur(4px)" }}
+                                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                                 className={`flex items-center gap-2 whitespace-nowrap ${tickerBaseColor}`}
                             >
                                 <span className={`text-[10px] tabular-nums w-6 text-right shrink-0 ${rankColor}`}>
@@ -218,14 +218,23 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                             </div>
 
                             {/* 리스트 */}
-                            <div className="overflow-y-auto max-h-[calc(100vh-550px)] lg:max-h-[calc(100vh-350px)] 2xl:max-h-[calc(100vh-450px)]">
+                            <div
+                                className="overflow-y-auto scrollbar-hide max-h-[calc(100vh-550px)] lg:max-h-[calc(100vh-350px)] 2xl:max-h-[calc(100vh-450px)]"
+                                style={{
+                                    maskImage: "linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 32px), transparent 100%)",
+                                    WebkitMaskImage: "linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 32px), transparent 100%)",
+                                }}
+                            >
                                 {list.slice(0, 15).map((item, i) => {
                                     const pct = Number(item.priceChangePercent);
                                     const isPos = pct >= 0;
                                     const isActive = i === idx;
                                     return (
-                                        <div
+                                        <motion.div
                                             key={item.symbol}
+                                            initial={{ opacity: 0, x: -8 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.2, delay: i * 0.03, ease: [0.16, 1, 0.3, 1] }}
                                             className={`relative flex items-center px-4 py-[6px] transition-colors ${
                                                 isActive
                                                     ? isLight ? "bg-amber-50" : "bg-amber-500/5"
@@ -253,7 +262,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                                             }`}>
                                                 {isPos ? "▲" : "▼"} {Math.abs(pct).toFixed(2)}%
                                             </span>
-                                        </div>
+                                        </motion.div>
                                     );
                                 })}
                             </div>

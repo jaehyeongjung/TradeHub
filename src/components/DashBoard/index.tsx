@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import SeoFooter from "../SeoFooter";
 import Chat from "../Chat";
 import PostBoard, { PostBoardHandle } from "../PostBoard";
@@ -40,9 +41,15 @@ export const DashBoard = () => {
     const raw = paramsForRead.get("tab");
     const activeTab: TabKey = raw === "board" ? "board" : "news";
 
+    const tabOrder: Record<TabKey, number> = { news: 0, board: 1 };
+    const [direction, setDirection] = useState(0);
+    const prevTabRef = useRef(activeTab);
+
     const switchTab = (next: TabKey) => {
+        if (next === activeTab) return;
+        setDirection(tabOrder[next] > tabOrder[prevTabRef.current] ? 1 : -1);
+        prevTabRef.current = next;
         if (next === "news") {
-            // 기본 탭이면 파라미터 제거해서 URL 깔끔히
             paramsForWrite.delete("tab");
         } else {
             paramsForWrite.set("tab", "board");
@@ -122,12 +129,29 @@ export const DashBoard = () => {
                         </div>
                     </div>
 
-                    <div className="relative z-10 flex-1 min-h-0">
-                        {activeTab === "board" ? (
-                            <PostBoard ref={postRef} fadeDelay={100} />
-                        ) : (
-                            <NewsPanel roomId="lobby" fadeDelay={100} />
-                        )}
+                    <div className="relative z-10 flex-1 min-h-0 overflow-hidden">
+                        <AnimatePresence initial={false} custom={direction} mode="wait">
+                            <motion.div
+                                key={activeTab}
+                                custom={direction}
+                                variants={{
+                                    enter: (d: number) => ({ x: d > 0 ? "40%" : "-40%", opacity: 0 }),
+                                    center: { x: 0, opacity: 1 },
+                                    exit: (d: number) => ({ x: d > 0 ? "-40%" : "40%", opacity: 0 }),
+                                }}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                                className="h-full"
+                            >
+                                {activeTab === "board" ? (
+                                    <PostBoard ref={postRef} fadeDelay={0} />
+                                ) : (
+                                    <NewsPanel roomId="lobby" fadeDelay={0} />
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
                     </div>
                 </article>
 

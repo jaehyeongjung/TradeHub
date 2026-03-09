@@ -224,7 +224,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                     // 가격 변동 플래시 효과
                     if (prevPriceRef.current !== null && last !== prevPriceRef.current) {
                         setPriceFlash(last > prevPriceRef.current ? "up" : "down");
-                        setTimeout(() => setPriceFlash(null), 300);
+                        setTimeout(() => setPriceFlash(null), 600);
                     }
                     prevPriceRef.current = last;
                     setPrice(last);
@@ -308,7 +308,13 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                         <h2 className="text-sm 2xl:text-base font-bold text-white">
                             {symbol.toUpperCase()}
                         </h2>
-                        <p className={`text-lg 2xl:text-2xl font-mono tabular-nums transition-colors duration-150 rounded px-1 ${pctColor} ${priceFlash === "up" ? "bg-emerald-500/20" : priceFlash === "down" ? "bg-red-500/20" : ""}`}>
+                        <p className={`text-lg 2xl:text-2xl font-mono tabular-nums rounded-md px-2 py-0.5 transition-all duration-300 ${
+                            priceFlash === "up"
+                                ? "bg-emerald-500/30 text-emerald-400 scale-105"
+                                : priceFlash === "down"
+                                ? "bg-red-500/30 text-red-400 scale-105"
+                                : `${pctColor} scale-100`
+                        }`}>
                             {getDisplayPrice()}
                         </p>
                         <div className={`text-xs 2xl:text-sm font-semibold ${pctColor}`}>

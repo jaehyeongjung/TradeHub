@@ -345,9 +345,13 @@ html.light .bg-zinc-900\/60 {
     background-color: rgba(255, 255, 255, 0.95) !important;
 }
 
-/* 스크롤바 스타일 */
-html.light .scrollbar-hide::-webkit-scrollbar-track {
-    background: #F7F8FA;
+/* 스크롤바 완전 숨김 */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
 }
 
 /* 스켈레톤 애니메이션 */

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { SlotNumber } from "@/components/AnimatedNumber";
 
 type Props = {
     value: number;
@@ -21,6 +22,11 @@ export default function FearGreedGauge({
     const v = Math.max(0, Math.min(100, value));
     const [isHovered, setIsHovered] = useState(false);
     const [isLight, setIsLight] = useState(false);
+    const [slotValue, setSlotValue] = useState(0);
+
+    useEffect(() => {
+        if (!isLoading && v > 0) setSlotValue(v);
+    }, [isLoading, v]);
 
     useEffect(() => {
         const check = () => setIsLight(document.documentElement.classList.contains("light"));
@@ -77,7 +83,9 @@ export default function FearGreedGauge({
 
                 {/* 메인 숫자 */}
                 <div className="flex items-baseline gap-2 mb-4">
-                    <span className={heroNumClass}>{v}</span>
+                    <span className={heroNumClass}>
+                        <SlotNumber value={slotValue} />
+                    </span>
                     <span className={subNumClass}>/100</span>
                 </div>
 

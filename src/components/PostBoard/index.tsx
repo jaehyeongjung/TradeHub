@@ -218,7 +218,13 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
             >
                 {/* 목록 */}
                 {mode === "list" && (
-                    <div className="flex-1 overflow-auto scrollbar-hide">
+                    <div
+                        className="flex-1 overflow-auto scrollbar-hide"
+                        style={{
+                            maskImage: "linear-gradient(to bottom, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%)",
+                            WebkitMaskImage: "linear-gradient(to bottom, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%)",
+                        }}
+                    >
                         {showInternalWriteButton && (
                             <button
                                 onClick={() => setMode("write")}

@@ -5,7 +5,7 @@ import { useAtomValue } from "jotai";
 import { supabase } from "@/lib/supabase-browser";
 import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
 import { treemapOpenAtom } from "@/store/atoms";
-import AnimatedNumber from "@/components/AnimatedNumber";
+import { SlotNumber } from "@/components/AnimatedNumber";
 
 function getDeviceId() {
     if (typeof window === "undefined") return "server";
@@ -75,8 +75,8 @@ export default function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } =
                     지금 함께 보는 중
                 </div>
                 <div className="flex items-baseline gap-1">
-                    <span className={`text-2xl 2xl:text-3xl font-bold tabular-nums leading-none ${numColor}`}>
-                        <AnimatedNumber value={onlineNow} />
+                    <span className={`text-2xl 2xl:text-3xl font-bold leading-none ${numColor}`}>
+                        <SlotNumber value={onlineNow} />
                     </span>
                     <span className={`text-xs 2xl:text-sm font-medium ${unitColor}`}>명</span>
                 </div>

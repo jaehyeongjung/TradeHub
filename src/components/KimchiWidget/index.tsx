@@ -50,6 +50,8 @@ export default function KimchiWidget({
     const [data, setData] = useState<Data | null>(null);
     const [isHovered, setIsHovered] = useState(false);
     const [isLight, setIsLight] = useState(false);
+    const [flash, setFlash] = useState<"up" | "down" | null>(null);
+    const prevPctRef = useRef<number | null>(null);
     const abortRef = useRef<AbortController | null>(null);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
@@ -68,6 +70,12 @@ export default function KimchiWidget({
             abortRef.current = ctrl;
             const d = await fetchKimchiWithRetry(symbol, ctrl.signal);
             if (ctrl.signal.aborted) return;
+            const newPct = d.premium != null ? d.premium * 100 : null;
+            if (newPct != null && prevPctRef.current != null && Math.abs(newPct - prevPctRef.current) > 0.001) {
+                setFlash(newPct > prevPctRef.current ? "up" : "down");
+                setTimeout(() => setFlash(null), 600);
+            }
+            if (newPct != null) prevPctRef.current = newPct;
             setData(d);
         } catch {
             // 에러 시 기존 데이터 유지
@@ -129,7 +137,9 @@ export default function KimchiWidget({
                 </div>
 
                 {/* 히어로 */}
-                <div className={`text-3xl 2xl:text-4xl font-bold tabular-nums leading-none ${heroColor}`}>
+                <div className={`inline-block text-3xl 2xl:text-4xl font-bold tabular-nums leading-none rounded-lg px-1 transition-all duration-300 ${heroColor} ${
+                    flash === "up" ? "bg-emerald-500/20 scale-105" : flash === "down" ? "bg-rose-500/20 scale-105" : "scale-100"
+                }`}>
                     {pct != null ? `${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%` : "—"}
                 </div>
                 <div className={`mt-1.5 text-[11px] 2xl:text-xs font-medium ${heroColor} opacity-80`}>
