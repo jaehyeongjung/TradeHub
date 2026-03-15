@@ -2,6 +2,7 @@
 
 import React, {
     useEffect,
+    useRef,
     useState,
     forwardRef,
     useImperativeHandle,
@@ -93,6 +94,8 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
         isConfirm: boolean;
         onConfirm?: () => void;
     } | null>(null);
+    const [listScrolled, setListScrolled] = useState(false);
+    const listRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const check = () => setIsLight(document.documentElement.classList.contains("light"));
@@ -219,10 +222,16 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                 {/* 목록 */}
                 {mode === "list" && (
                     <div
+                        ref={listRef}
                         className="flex-1 overflow-auto scrollbar-hide"
+                        onScroll={(e) => setListScrolled((e.currentTarget as HTMLDivElement).scrollTop > 0)}
                         style={{
-                            maskImage: "linear-gradient(to bottom, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%)",
-                            WebkitMaskImage: "linear-gradient(to bottom, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%)",
+                            maskImage: listScrolled
+                                ? "linear-gradient(to bottom, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%)"
+                                : "linear-gradient(to bottom, black calc(100% - 40px), transparent 100%)",
+                            WebkitMaskImage: listScrolled
+                                ? "linear-gradient(to bottom, transparent 0px, black 40px, black calc(100% - 40px), transparent 100%)"
+                                : "linear-gradient(to bottom, black calc(100% - 40px), transparent 100%)",
                         }}
                     >
                         {showInternalWriteButton && (

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useAtomValue } from "jotai";
-import { simSymbolAtom, simPricesAtom } from "@/store/atoms";
+import { simSymbolAtom, simPricesAtom, simChangesAtom } from "@/store/atoms";
 import { useSimPriceStream } from "@/hooks/useSimPriceStream";
 import { useSimAccount } from "@/hooks/useSimAccount";
 import SimOrderPanel from "./SimOrderPanel";
@@ -41,32 +41,16 @@ export default function SimTradingPage() {
     const isLight = useTheme();
     const simSymbol = useAtomValue(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);
+    const changes = useAtomValue(simChangesAtom);
     const [clickedPrice, setClickedPrice] = useState<number | null>(null);
     const [bottomTab, setBottomTab] = useState<TabKey>("positions");
-    const [priceChange, setPriceChange] = useState(0);
-    const prevPriceRef = useRef(0);
-    const startPriceRef = useRef(0);
     const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
     const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
     useSimPriceStream();
 
     const currentPrice = prices[simSymbol] ?? 0;
-
-    useEffect(() => {
-        if (currentPrice > 0 && startPriceRef.current === 0) {
-            startPriceRef.current = currentPrice;
-        }
-        if (startPriceRef.current > 0 && currentPrice > 0) {
-            setPriceChange(((currentPrice - startPriceRef.current) / startPriceRef.current) * 100);
-        }
-        prevPriceRef.current = currentPrice;
-    }, [currentPrice]);
-
-    useEffect(() => {
-        startPriceRef.current = 0;
-        setPriceChange(0);
-    }, [simSymbol]);
+    const priceChange = changes[simSymbol] ?? null;
 
     // 탭 인디케이터 위치
     useEffect(() => {
@@ -97,7 +81,7 @@ export default function SimTradingPage() {
         setTimeout(() => setClickedPrice(null), 50);
     };
 
-    const isUp = priceChange >= 0;
+    const isUp = (priceChange ?? 0) >= 0;
 
     const headerBg = isLight ? "bg-white border-neutral-200" : "bg-neutral-950 border-zinc-800/60";
     const tabBg = isLight ? "bg-white border-neutral-200" : "bg-neutral-950 border-zinc-800/60";
@@ -118,16 +102,22 @@ export default function SimTradingPage() {
                     <span className={`text-[20px] font-bold font-mono tabular-nums ${isUp ? "text-emerald-500" : "text-red-500"}`}>
                         {currentPrice > 0 ? currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
                     </span>
-                    {priceChange !== 0 && (
-                        <div className={`flex items-center gap-0.5 px-2 py-0.5 rounded-lg text-[11px] font-bold font-mono ${
-                            isUp ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
-                        }`}>
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path d={isUp ? "M7 14l5-5 5 5H7z" : "M7 10l5 5 5-5H7z"} />
-                            </svg>
-                            {Math.abs(priceChange).toFixed(2)}%
-                        </div>
-                    )}
+                    <div className={`flex items-center gap-0.5 px-2 py-0.5 rounded-lg text-[11px] font-bold font-mono min-w-[60px] ${
+                        priceChange === null
+                            ? "bg-neutral-800/40 text-neutral-600"
+                            : isUp ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
+                    }`}>
+                        {priceChange === null ? (
+                            <span className="w-full text-center">—</span>
+                        ) : (
+                            <>
+                                <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d={isUp ? "M7 14l5-5 5 5H7z" : "M7 10l5 5 5-5H7z"} />
+                                </svg>
+                                {Math.abs(priceChange).toFixed(2)}%
+                            </>
+                        )}
+                    </div>
                 </div>
                 <SimMarketData />
             </div>
