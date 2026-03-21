@@ -1,7 +1,2 @@
-import { createClient } from "@supabase/supabase-js";
-
-export const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } }
-);
+// re-export stub — 실제 구현은 @/shared/lib/supabase-admin 로 이동
+export * from "@/shared/lib/supabase-admin";

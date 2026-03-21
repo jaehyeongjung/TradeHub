@@ -1,7 +1,2 @@
-import type { UTCTimestamp } from "lightweight-charts";
-
-const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
-
-export function toKstUtcTimestamp(ms: number): UTCTimestamp {
-    return Math.floor((ms + KST_OFFSET_MS) / 1000) as UTCTimestamp;
-}
+// re-export stub — 실제 구현은 @/shared/lib/time 로 이동
+export * from "@/shared/lib/time";

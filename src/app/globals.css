@@ -2,12 +2,43 @@
 
 html {
     color-scheme: dark;
-    background: #0a0a0a;
+    background: #060C14;
 }
 
 :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #060C14;
+    --foreground: #EEF2F7;
+
+    /* ============================================
+       디자인 시스템 시맨틱 토큰 (다크모드 기본값)
+       ============================================ */
+
+    /* Surface - 배경 레이어 */
+    --surface-page:     #060C14;   /* 페이지 배경 */
+    --surface-card:     #0C1422;   /* 카드 (neutral-950) */
+    --surface-elevated: #111C2D;   /* 모달/상위 카드 (neutral-900) */
+    --surface-input:    #172133;   /* 입력/버튼 (neutral-800) */
+    --surface-hover:    #1F2D40;   /* 호버 (neutral-700) */
+    --surface-active:   #263345;   /* 선택/활성 (neutral-600) */
+
+    /* Text - 텍스트 계층 */
+    --text-primary:     #EEF2F7;   /* 제목, 강조 */
+    --text-secondary:   #A8B4C8;   /* 본문 */
+    --text-tertiary:    #7A8BA0;   /* 보조 설명 */
+    --text-muted:       #566475;   /* 힌트, 플레이스홀더 */
+    --text-disabled:    #3A4A5A;   /* 비활성 */
+
+    /* Border - 구분선 */
+    --border-subtle:    #17243A;   /* 가장 연한 구분선 */
+    --border-default:   #1F2D40;   /* 기본 구분선 */
+    --border-strong:    #263345;   /* 강조 구분선 */
+
+    /* Semantic - 의미 색상 */
+    --color-up:         #02C076;   /* 상승 */
+    --color-up-muted:   rgba(2, 192, 118, 0.12);
+    --color-down:       #F75467;   /* 하락 */
+    --color-down-muted: rgba(247, 84, 103, 0.10);
+    --color-accent:     #02C076;   /* 브랜드 포인트 */
 }
 
 /* ============================================
@@ -18,6 +49,33 @@ html.light {
     background: #F7F8FA;
     --background: #F7F8FA;
     --foreground: #191F28;
+
+    /* Surface */
+    --surface-page:     #F7F8FA;
+    --surface-card:     #FFFFFF;
+    --surface-elevated: #FFFFFF;
+    --surface-input:    #F2F4F6;
+    --surface-hover:    #E5E8EB;
+    --surface-active:   #D1D6DB;
+
+    /* Text */
+    --text-primary:     #191F28;
+    --text-secondary:   #4E5968;
+    --text-tertiary:    #6B7684;
+    --text-muted:       #8B95A1;
+    --text-disabled:    #B0B8C1;
+
+    /* Border */
+    --border-subtle:    #E5E8EB;
+    --border-default:   #D1D6DB;
+    --border-strong:    #B0B8C1;
+
+    /* Semantic */
+    --color-up:         #00A676;
+    --color-up-muted:   rgba(0, 166, 118, 0.10);
+    --color-down:       #E0294A;
+    --color-down-muted: rgba(224, 41, 74, 0.08);
+    --color-accent:     #00A676;
 }
 
 html.light body {
@@ -166,28 +224,28 @@ html.light .bg-green-700 {
 /* 하락 - 빨강 */
 html.light .text-red-400,
 html.light .text-red-500 {
-    color: #E53935 !important;
+    color: #E0294A !important;
 }
 
 html.light .text-rose-500 {
-    color: #E53935 !important;
+    color: #E0294A !important;
 }
 
 html.light .bg-red-600,
 html.light .bg-red-700 {
-    background-color: #E53935 !important;
+    background-color: #E0294A !important;
 }
 
 html.light .hover\:bg-red-500:hover {
-    background-color: #EF5350 !important;
+    background-color: #F75467 !important;
 }
 
 html.light .bg-red-500\/10 {
-    background-color: rgba(229, 57, 53, 0.08) !important;
+    background-color: rgba(247, 84, 103, 0.08) !important;
 }
 
 html.light .hover\:bg-red-500\/20:hover {
-    background-color: rgba(229, 57, 53, 0.12) !important;
+    background-color: rgba(247, 84, 103, 0.12) !important;
 }
 
 /* 강조 - 앰버/골드 */
@@ -380,7 +438,7 @@ html.light .active\:bg-emerald-700:active {
 }
 
 html.light .active\:bg-red-700:active {
-    background-color: #C62828 !important;
+    background-color: #C42D40 !important;
 }
 
 html.light .active\:bg-neutral-800:active {
@@ -579,6 +637,60 @@ html.light .landing-freedom:hover h3 {
     --color-foreground: var(--foreground);
     --font-sans: var(--font-geist-sans);
     --font-mono: var(--font-geist-mono);
+
+    /* ============================================
+       시맨틱 Tailwind 유틸리티 토큰
+       사용: bg-surface-card, text-text-secondary,
+             border-border-default, bg-color-up-muted
+       ============================================ */
+    --color-surface-page:     var(--surface-page);
+    --color-surface-card:     var(--surface-card);
+    --color-surface-elevated: var(--surface-elevated);
+    --color-surface-input:    var(--surface-input);
+    --color-surface-hover:    var(--surface-hover);
+    --color-surface-active:   var(--surface-active);
+
+    --color-text-primary:   var(--text-primary);
+    --color-text-secondary: var(--text-secondary);
+    --color-text-tertiary:  var(--text-tertiary);
+    --color-text-muted:     var(--text-muted);
+    --color-text-disabled:  var(--text-disabled);
+
+    --color-border-subtle:  var(--border-subtle);
+    --color-border-default: var(--border-default);
+    --color-border-strong:  var(--border-strong);
+
+    --color-up:         var(--color-up);
+    --color-up-muted:   var(--color-up-muted);
+    --color-down:       var(--color-down);
+    --color-down-muted: var(--color-down-muted);
+    --color-accent:     var(--color-accent);
+
+    /* ============================================
+       다크모드 색조 회색 (네이비 틴트 - 토스 철학)
+       순수 neutral 대신 블루-그린 온도가 섞인 palette
+       ============================================ */
+    --color-neutral-950: #0C1422;
+    --color-neutral-900: #111C2D;
+    --color-neutral-800: #172133;
+    --color-neutral-700: #1F2D40;
+    --color-neutral-600: #263345;
+    --color-zinc-900:    #0E1928;
+    --color-zinc-800:    #17243A;
+    --color-zinc-700:    #1D2E44;
+
+    /* ============================================
+       하락 색상 - 토스 스타일 핑크-레드
+       원색 빨강(#ef4444) → 따뜻한 핑크빨강으로 교체
+       더 세련되고 덜 경고스러운 톤
+       ============================================ */
+    --color-red-300: #FF8FA3;
+    --color-red-400: #FF6B7A;
+    --color-red-500: #F75467;
+    --color-red-600: #E03A4F;
+    --color-red-700: #C42D40;
+    --color-rose-400: #FF6B7A;
+    --color-rose-500: #F75467;
 }
 
 body {

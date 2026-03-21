@@ -1,0 +1,317 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import { useAtom } from "jotai";
+import AuthBox from "@/features/auth/Login";
+import CryptoTreemap from "@/components/CryptoTreemap";
+import { treemapOpenAtom } from "@/shared/store/atoms";
+
+export default function FloatingLoginSidebar() {
+    const [open, setOpen] = useState(false);
+    const [isDark, setIsDark] = useState(false);
+    const [showTreemap, setShowTreemap] = useAtom(treemapOpenAtom);
+    const router = useRouter();
+    const pathname = usePathname();
+    const isSim = pathname === "/trading";
+    const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+    const lastFocusRef = useRef<HTMLElement | null>(null);
+
+    // 다크모드 초기화 (기본값: 라이트모드)
+    useEffect(() => {
+        const saved = localStorage.getItem("theme");
+        const dark = saved === "dark"; // 저장된 값이 "dark"일 때만 다크모드
+        setIsDark(dark);
+        document.documentElement.classList.toggle("light", !dark);
+    }, []);
+
+    // 다크모드 토글
+    const toggleTheme = () => {
+        const newDark = !isDark;
+
+        // 전역 color transition 주입
+        const style = document.createElement("style");
+        style.id = "__theme-transition__";
+        style.textContent = `*, *::before, *::after {
+            transition:
+                background-color 0.35s ease,
+                color 0.25s ease,
+                border-color 0.35s ease,
+                fill 0.25s ease,
+                stroke 0.25s ease,
+                box-shadow 0.35s ease !important;
+        }`;
+        document.head.appendChild(style);
+
+        setIsDark(newDark);
+        localStorage.setItem("theme", newDark ? "dark" : "light");
+        document.documentElement.classList.toggle("light", !newDark);
+
+        // transition 제거 (완료 후)
+        setTimeout(() => {
+            document.getElementById("__theme-transition__")?.remove();
+        }, 400);
+    };
+
+    // 열기/닫기 토글
+    const toggle = () => setOpen((v) => !v);
+    const close = () => setOpen(false);
+
+    // ESC로 닫기, 포커스/스크롤 관리
+    useEffect(() => {
+        if (open) {
+            lastFocusRef.current = document.activeElement as HTMLElement | null;
+            // 스크롤 잠금
+            document.body.classList.add("overflow-hidden");
+            // 약간 딜레이 후 닫기 버튼에 포커스
+            const t = setTimeout(() => closeBtnRef.current?.focus(), 0);
+
+            const onKey = (e: KeyboardEvent) => {
+                if (e.key === "Escape") close();
+            };
+            window.addEventListener("keydown", onKey);
+
+            return () => {
+                clearTimeout(t);
+                window.removeEventListener("keydown", onKey);
+            };
+        } else {
+            document.body.classList.remove("overflow-hidden");
+            // 포커스 복원
+            lastFocusRef.current?.focus?.();
+        }
+    }, [open]);
+
+    // 라우트 변경 시 자동 닫기
+    useEffect(() => {
+        close();
+    }, [pathname]);
+
+    // 모바일 페이지에서는 플로팅 버튼 숨김
+    if (pathname === "/mobile") return null;
+
+    return (
+        <>
+            {/* FAB: 우하단 떠있는 버튼들 */}
+            <div className="fixed bottom-5 right-5 z-[60] flex items-center gap-3">
+                {/* 모의투자 버튼 */}
+                <motion.button
+                    type="button"
+                    onClick={() => router.push(isSim ? "/dashboard" : "/trading")}
+                    aria-label={isSim ? "대시보드로 이동" : "모의투자로 이동"}
+                    initial={{ scale: 1 }}
+                    animate={isSim ? {
+                        scale: [1, 1.12, 0.97, 1.1, 0.98, 1.08, 0.99, 1.06, 1, 1.04, 1, 1.03, 1],
+                        boxShadow: [
+                            "0 0 0px rgba(16,185,129,0)",
+                            "0 0 18px rgba(16,185,129,0.7)",
+                            "0 0 4px rgba(16,185,129,0.2)",
+                            "0 0 16px rgba(16,185,129,0.6)",
+                            "0 0 4px rgba(16,185,129,0.2)",
+                            "0 0 14px rgba(16,185,129,0.5)",
+                            "0 0 3px rgba(16,185,129,0.15)",
+                            "0 0 12px rgba(16,185,129,0.4)",
+                            "0 0 2px rgba(16,185,129,0.1)",
+                            "0 0 10px rgba(16,185,129,0.3)",
+                            "0 0 2px rgba(16,185,129,0.1)",
+                            "0 0 6px rgba(16,185,129,0.2)",
+                            "0 0 0px rgba(16,185,129,0)",
+                        ],
+                    } : { scale: 1 }}
+                    transition={{ duration: 7, ease: "easeOut", delay: 0.3 }}
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-110 focus:outline-none transition-colors ${
+                        isDark
+                            ? "bg-emerald-500 text-white ring-1 ring-emerald-400/40 shadow-emerald-500/20 shadow-lg"
+                            : "bg-emerald-500 text-white ring-1 ring-emerald-400/50 shadow-md"
+                    }`}
+                >
+                    {isSim ? (
+                        /* 홈 아이콘 */
+                        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3L2 12h3v8z" />
+                        </svg>
+                    ) : (
+                        /* 차트 아이콘 */
+                        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M3 13h2v8H3v-8zm4-6h2v14H7V7zm4-4h2v18h-2V3zm4 8h2v10h-2V11zm4-3h2v13h-2V8z" />
+                        </svg>
+                    )}
+                </motion.button>
+
+                {/* 트리맵 버튼 */}
+                <button
+                    type="button"
+                    onClick={() => setShowTreemap(true)}
+                    aria-label="트리맵 보기"
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-110 focus:outline-none transition-colors ${
+                        isDark
+                            ? "bg-neutral-800 text-neutral-300 ring-1 ring-neutral-700/60"
+                            : "bg-white text-neutral-600 ring-1 ring-neutral-200 shadow-md"
+                    }`}
+                >
+                    {/* Grid 아이콘 */}
+                    <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            fill="currentColor"
+                            d="M3 3h8v8H3V3zm0 10h8v8H3v-8zm10-10h8v8h-8V3zm0 10h8v8h-8v-8z"
+                        />
+                    </svg>
+                </button>
+
+                {/* 다크모드 토글 */}
+                <button
+                    type="button"
+                    onClick={toggleTheme}
+                    aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-110 focus:outline-none transition-colors ${
+                        isDark
+                            ? "bg-neutral-800 text-neutral-400 ring-1 ring-neutral-700/60"
+                            : "bg-white text-neutral-500 ring-1 ring-neutral-200 shadow-md"
+                    }`}
+                >
+                    {isDark ? (
+                        /* 달 아이콘 (다크모드) */
+                        <svg
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                fill="currentColor"
+                                d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26a5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"
+                            />
+                        </svg>
+                    ) : (
+                        /* 해 아이콘 (라이트모드) */
+                        <svg
+                            width="22"
+                            height="22"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                fill="currentColor"
+                                d="M12 7a5 5 0 1 0 0 10a5 5 0 0 0 0-10zm0-5a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm0 18a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1zM4.22 4.22a1 1 0 0 1 1.42 0l1.41 1.42a1 1 0 1 1-1.41 1.41L4.22 5.64a1 1 0 0 1 0-1.42zm14.14 14.14a1 1 0 0 1 1.42 0l1.41 1.42a1 1 0 1 1-1.41 1.41l-1.42-1.41a1 1 0 0 1 0-1.42zM2 12a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1zm18 0a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2h-2a1 1 0 0 1-1-1zM5.64 18.36a1 1 0 0 1 0 1.42l-1.42 1.41a1 1 0 1 1-1.41-1.41l1.41-1.42a1 1 0 0 1 1.42 0zm12.72-12.72a1 1 0 0 1 0 1.42l-1.42 1.41a1 1 0 1 1-1.41-1.41l1.41-1.42a1 1 0 0 1 1.42 0z"
+                            />
+                        </svg>
+                    )}
+                </button>
+
+                {/* 로그인 버튼 - 랜딩 페이지 제외 */}
+                {pathname !== "/" && <button
+                    type="button"
+                    onClick={toggle}
+                    aria-haspopup="dialog"
+                    aria-expanded={open}
+                    aria-controls="login-drawer"
+                    className={`flex h-12 w-12 items-center cursor-pointer justify-center rounded-full shadow-lg hover:brightness-110 focus:outline-none transition-colors ${
+                        isDark
+                            ? "bg-neutral-800 text-neutral-300 ring-1 ring-neutral-700/60"
+                            : "bg-white text-neutral-700 ring-1 ring-neutral-200 shadow-md"
+                    }`}
+                >
+                    <span className="sr-only">로그인 사이드바 열기</span>
+                    {/* user 아이콘 (inlined) */}
+                    <svg
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            fill="currentColor"
+                            d="M12 2a5 5 0 1 1 0 10a5 5 0 0 1 0-10m0 12c5.33 0 8 2.67 8 6v2H4v-2c0-3.33 2.67-6 8-6"
+                        />
+                    </svg>
+                </button>}
+            </div>
+
+            {/* 드로어 루트 */}
+            <div
+                className={`fixed inset-0 z-[59] ${
+                    open ? "pointer-events-auto" : "pointer-events-none"
+                }`}
+                aria-hidden={!open}
+            >
+                {/* 오버레이 */}
+                <div
+                    onClick={close}
+                    className={`absolute inset-0 bg-black/50 transition-opacity duration-200 ${
+                        open ? "opacity-100" : "opacity-0"
+                    }`}
+                />
+
+                {/* 패널 */}
+                <aside
+                    id="login-drawer"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="login-drawer-title"
+                    className={`absolute right-0 top-0 h-full w-[360px] max-w-[92vw] border-l shadow-2xl transition-transform duration-300 ${
+                        open ? "translate-x-0" : "translate-x-full"
+                    } ${
+                        isDark
+                            ? "border-neutral-700/50 bg-neutral-950"
+                            : "border-neutral-200 bg-white"
+                    }`}
+                >
+                    {/* 헤더 */}
+                    <div className={`flex items-center justify-between border-b px-4 py-3 ${
+                        isDark ? "border-neutral-700/50" : "border-neutral-200"
+                    }`}>
+                        <h2
+                            id="login-drawer-title"
+                            className={`text-sm font-semibold ${isDark ? "text-white" : "text-neutral-800"}`}
+                        >
+                            로그인
+                        </h2>
+                        <button
+                            ref={closeBtnRef}
+                            type="button"
+                            onClick={close}
+                            className={`rounded-md p-2 cursor-pointer focus:outline-none focus:ring-2 ${
+                                isDark
+                                    ? "text-zinc-300 hover:bg-zinc-800 hover:text-white focus:ring-zinc-500"
+                                    : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 focus:ring-neutral-300"
+                            }`}
+                        >
+                            <span className="sr-only">닫기</span>
+                            {/* close 아이콘 */}
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    fill="currentColor"
+                                    d="M18.3 5.71L12 12.01l-6.29-6.3L4.3 7.12l6.3 6.3l-6.3 6.29l1.41 1.41l6.29-6.29l6.29 6.29l1.41-1.41l-6.29-6.29l6.29-6.3z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {/* 본문 */}
+                    <div className="h-[calc(100%-49px)] overflow-y-auto p-4">
+                        <AuthBox isDark={isDark} />
+                    </div>
+                </aside>
+            </div>
+
+            {/* 트리맵 */}
+            <AnimatePresence>
+                {showTreemap && (
+                    <CryptoTreemap onClose={() => setShowTreemap(false)} />
+                )}
+            </AnimatePresence>
+
+        </>
+    );
+}
