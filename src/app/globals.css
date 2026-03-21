@@ -1059,6 +1059,30 @@ body {
 }
 
 /* ============================================
+   랜딩페이지 전용 스타일
+   ============================================ */
+.landing-nav-btn {
+    color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.05);
+}
+.landing-nav-btn:hover {
+    color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.1);
+}
+html.light .landing-nav-btn {
+    color: rgba(0,0,0,0.55) !important;
+    background: rgba(0,0,0,0.06) !important;
+}
+html.light .landing-nav-btn:hover {
+    color: rgba(0,0,0,0.85) !important;
+    background: rgba(0,0,0,0.1) !important;
+}
+html.light .hero-no-text {
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+}
+
+/* ============================================
    BGM 플레이어 사운드웨이브 애니메이션
    ============================================ */
 @keyframes soundwave {

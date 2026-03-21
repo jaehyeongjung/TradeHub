@@ -1,5 +1,7 @@
+"use client";
 import Link from "next/link";
 import LiveMarketStats from "@/components/Landing/LiveMarketStats";
+import { useRef, useCallback } from "react";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -22,7 +24,7 @@ const MAIN_JSONLD = {
 
 export default function LandingPage() {
     return (
-        <div className="min-h-screen bg-neutral-950 text-white selection:bg-[#02C076] selection:text-black font-sans tracking-tight antialiased">
+        <div className="min-h-screen bg-neutral-950 text-white selection:bg-[#00C896] selection:text-black font-sans tracking-tight antialiased">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(MAIN_JSONLD) }}
@@ -37,10 +39,9 @@ export default function LandingPage() {
                 </div>
                 <Link
                     href="/trading"
-                    className="group flex items-center gap-2 text-sm font-semibold text-neutral-400 hover:text-white transition-colors duration-200"
+                    className="landing-nav-btn text-sm font-semibold transition-colors duration-200 px-4 py-1.5 rounded-full"
                 >
                     시작하기
-                    <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
                 </Link>
             </nav>
 
@@ -56,9 +57,7 @@ export default function LandingPage() {
                         <div className="overflow-hidden mt-[-1vw]">
                             <h1 className="text-[clamp(3rem,min(18vw,25vh),15rem)] font-[1000] leading-[0.75] tracking-[-0.11em] italic text-white animate-in fade-in slide-in-from-bottom-40 duration-1000 delay-200 fill-mode-both">
                                 JUST{" "}
-                                <span className="text-[#02C076] not-italic">
-                                    EDGE.
-                                </span>
+                                <GlowText className="not-italic" />
                             </h1>
                         </div>
                     </div>
@@ -78,7 +77,7 @@ export default function LandingPage() {
                     <div className="mt-[min(6rem,9vh)] w-full flex flex-col md:flex-row items-start md:items-end justify-between gap-10">
                         <Link
                             href="/trading"
-                            className="landing-cta group relative inline-flex items-center justify-center h-16 px-12 bg-[#02C076] text-black text-base font-bold tracking-tight rounded-2xl overflow-hidden transition-all duration-300 hover:bg-[#02b36d] hover:scale-[1.02] active:scale-[0.98]"
+                            className="landing-cta group relative inline-flex items-center justify-center h-16 px-12 bg-gradient-to-br from-[#00D4A0] to-[#00A878] text-black text-base font-bold tracking-tight rounded-2xl overflow-hidden transition-all duration-300 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]"
                         >
                             <span className="relative z-10">
                                 무료로 시작하기
@@ -92,7 +91,7 @@ export default function LandingPage() {
                 {/* Section 2: Grid */}
                 <section className="py-[min(8rem,11vh)] grid grid-cols-1 md:grid-cols-12 gap-2 h-screen content-center" style={{ scrollSnapAlign: "start" }}>
                     <div className="col-span-1 md:col-span-7 bg-neutral-900 p-[clamp(2rem,min(3vw,5vh),5rem)] flex flex-col justify-between min-h-[min(560px,62vh)] rounded-3xl">
-                        <span className="text-xs font-semibold tracking-[0.3em] text-[#02C076] uppercase">
+                        <span className="text-xs font-semibold tracking-[0.3em] text-[#00C896] uppercase">
                             01 / Precision
                         </span>
                         <h2 className="text-[clamp(2.5rem,min(6vw,8vh),4.5rem)] font-black tracking-[-0.06em] leading-none mt-[min(2.5rem,4vh)]">
@@ -112,7 +111,7 @@ export default function LandingPage() {
                                 02 / Leverage
                             </span>
                             <div>
-                                <h3 className="text-6xl font-black tracking-tighter text-[#02C076]">
+                                <h3 className="text-6xl font-black tracking-tighter text-[#00C896]">
                                     125X
                                 </h3>
                                 <p className="mt-3 text-neutral-500 font-medium tracking-tight text-sm">
@@ -141,7 +140,7 @@ export default function LandingPage() {
                     <div className="md:w-1/3">
                         <h2 className="text-[clamp(2rem,3.5vh,2.5rem)] font-black tracking-[-0.06em] leading-tight">
                             실전과 동일한 <br />
-                            <span className="text-[#02C076]">매매 로직</span>
+                            <span className="text-[#00C896]">매매 로직</span>
                         </h2>
                     </div>
                     <div className="md:w-2/3 space-y-[min(6rem,9vh)]">
@@ -181,33 +180,74 @@ export default function LandingPage() {
                     __html: `
                 .hero-no-text {
                     padding-right: 0.06em;
+                    -webkit-text-fill-color: transparent !important;
                     background: linear-gradient(
                         90deg,
-                        #02C076 0%,
-                        #02C076 42%,
-                        #34d399 45%,
-                        rgba(255,255,255,0.85) 48%,
-                        #ffffff 50%,
-                        rgba(255,255,255,0.85) 52%,
-                        #34d399 55%,
-                        #02C076 58%,
-                        #02C076 100%
+                        #00C896 0%,
+                        #00C896 42%,
+                        #7FFFD4 45%,
+                        #C8FFF0 48%,
+                        #DFFFEF 50%,
+                        #C8FFF0 52%,
+                        #7FFFD4 55%,
+                        #00C896 58%,
+                        #00C896 100%
                     );
                     background-size: 300% 100%;
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
-                    filter: drop-shadow(0 0 24px rgba(2,192,118,0.18));
+                    filter: drop-shadow(0 0 24px rgba(0,200,150,0.18));
                     animation: hero-no-shine 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
                 }
                 @keyframes hero-no-shine {
                     0%, 20% { background-position: 100% center; }
                     50%, 100% { background-position: 0% center; }
                 }
+                .edge-breathe {
+                    display: inline-block;
             `,
                 }}
             />
         </div>
+    );
+}
+
+
+function GlowText({ className }: { className?: string }) {
+    const ref = useRef<HTMLSpanElement>(null);
+
+    const handleMouseMove = useCallback((e: React.MouseEvent) => {
+        const el = ref.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        el.style.backgroundImage = `radial-gradient(circle at ${x}% 50%, #AFFFDF 0%, #00C896 40%, #00875A 100%)`;
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+        const el = ref.current;
+        if (!el) return;
+        el.style.backgroundImage = `linear-gradient(135deg, #00C896 0%, #00A878 100%)`;
+    }, []);
+
+    return (
+        <span
+            ref={ref}
+            className={className}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            style={{
+                backgroundImage: "linear-gradient(135deg, #00C896 0%, #00A878 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                transition: "background-image 0.1s ease",
+                cursor: "default",
+            }}
+        >
+            EDGE.
+        </span>
     );
 }
 
@@ -218,7 +258,7 @@ function HeroNO() {
 function FeatureRow({ title, desc }: { title: string; desc: React.ReactNode }) {
     return (
         <div className="group border-b border-neutral-800 pb-[min(2.5rem,4vh)] transition-colors duration-300 hover:border-neutral-700">
-            <h3 className="text-[clamp(1.25rem,2.5vh,1.5rem)] font-black tracking-tight group-hover:text-[#02C076] transition-colors duration-300">
+            <h3 className="text-[clamp(1.25rem,2.5vh,1.5rem)] font-black tracking-tight group-hover:text-[#00C896] transition-colors duration-300">
                 {title}
             </h3>
             <p className="mt-[min(1rem,1.5vh)] text-base font-medium text-neutral-500 leading-relaxed max-w-xl group-hover:text-neutral-400 transition-colors duration-300">

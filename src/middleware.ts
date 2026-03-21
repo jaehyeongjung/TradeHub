@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const MOBILE_UA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+const BOT_UA = /Googlebot|bingbot|Baiduspider|YandexBot|DuckDuckBot|Slurp|facebookexternalhit|Twitterbot|LinkedInBot|WhatsApp|Applebot/i;
 
 export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
@@ -16,6 +17,12 @@ export function middleware(req: NextRequest) {
     }
 
     const ua = req.headers.get("user-agent") ?? "";
+
+    // 크롤러/봇은 리디렉트 제외 — Googlebot(iPhone)이 /mobile로 막히는 문제 방지
+    if (BOT_UA.test(ua)) {
+        return NextResponse.next();
+    }
+
     if (MOBILE_UA.test(ua)) {
         return NextResponse.redirect(new URL("/mobile", req.url));
     }
