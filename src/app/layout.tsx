@@ -5,6 +5,7 @@ import AuthGate from "@/components/AuthGate";
 import Script from "next/script";
 import FloatingLoginSidebar from "@/components/FloatingLoginDrawer";
 import HeaderNav from "@/widgets/shared-modals/HeaderNav";
+import JotaiProvider from "@/shared/ui/JotaiProvider";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -98,6 +99,7 @@ export default function RootLayout({
     return (
         <html lang="ko" className={`bg-black ${inter.variable}`} suppressHydrationWarning>
             <body>
+                <JotaiProvider>
                 <HeaderNav />
                 <AuthGate>{children}</AuthGate>
                 <Script
@@ -114,6 +116,7 @@ export default function RootLayout({
     `}
                 </Script>
                 <FloatingLoginSidebar />
+                </JotaiProvider>
             </body>
         </html>
     );

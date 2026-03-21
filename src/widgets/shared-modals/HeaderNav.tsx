@@ -15,7 +15,7 @@ function HeaderNavInner() {
 
     useEffect(() => {
         const saved = localStorage.getItem("theme");
-        const dark = saved === "dark";
+        const dark = saved !== "light"; // 저장값 없으면 다크 디폴트
         setIsDark(dark);
         document.documentElement.classList.toggle("light", !dark);
     }, []);

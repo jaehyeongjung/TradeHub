@@ -37,10 +37,7 @@ export default function LandingPage() {
                         TRADEHUB
                     </span>
                 </div>
-                <Link
-                    href="/trading"
-                    className="landing-nav-btn text-sm font-semibold transition-colors duration-200 px-4 py-1.5 rounded-full"
-                >
+                <Link href="/trading" className="landing-nav-link">
                     시작하기
                 </Link>
             </nav>
@@ -75,13 +72,11 @@ export default function LandingPage() {
                     </div>
 
                     <div className="mt-[min(6rem,9vh)] w-full flex flex-col md:flex-row items-start md:items-end justify-between gap-10">
-                        <Link
-                            href="/trading"
-                            className="landing-cta group relative inline-flex items-center justify-center h-16 px-12 bg-gradient-to-br from-[#00D4A0] to-[#00A878] text-black text-base font-bold tracking-tight rounded-2xl overflow-hidden transition-all duration-300 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                            <span className="relative z-10">
-                                무료로 시작하기
-                            </span>
+                        <Link href="/trading" className="landing-cta-btn">
+                            <span>무료로 시작하기</span>
+                            <svg className="landing-cta-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
                         </Link>
 
                         <LiveMarketStats />
