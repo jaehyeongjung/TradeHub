@@ -365,14 +365,14 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
     const shortPct = 100 - longPct;
 
     // 스타일 변수
-    const headerBg = isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800";
-    const labelColor = isLight ? "text-neutral-500" : "text-neutral-500";
-    const pillBg = isLight ? "bg-neutral-100 text-neutral-600" : "bg-neutral-800 text-neutral-400";
+    const headerBg = isLight ? "bg-white border-neutral-200" : "bg-surface-elevated border-border-subtle";
+    const labelColor = isLight ? "text-neutral-500" : "text-text-muted";
+    const pillBg = isLight ? "bg-neutral-100 text-neutral-600" : "bg-surface-input text-text-tertiary";
     const inputBg = isLight
         ? "border-neutral-200 bg-neutral-50 text-neutral-800 placeholder-neutral-400 focus:border-emerald-400"
-        : "border-neutral-700 bg-neutral-900 text-neutral-100 placeholder-neutral-600 focus:border-emerald-500";
+        : "border-border-default bg-surface-elevated text-text-primary placeholder-neutral-600 focus:border-emerald-500";
     const msgAreaBg = isLight ? "bg-neutral-50" : "";
-    const emptyTextColor = isLight ? "text-neutral-400" : "text-neutral-600";
+    const emptyTextColor = isLight ? "text-neutral-400" : "text-text-muted";
 
     return (
         <div
@@ -434,7 +434,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                             className={`flex-1 py-2 rounded-xl text-white text-xs font-bold transition-all ${
                                 userId
                                     ? "bg-emerald-600 hover:bg-emerald-500 cursor-pointer"
-                                    : "bg-neutral-700 cursor-not-allowed opacity-50"
+                                    : "bg-surface-hover cursor-not-allowed opacity-50"
                             }`}
                             onClick={() => choose("long")}
                         >
@@ -447,7 +447,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                             className={`flex-1 py-2 rounded-xl text-white text-xs font-bold transition-all ${
                                 userId
                                     ? "bg-red-600 hover:bg-red-500 cursor-pointer"
-                                    : "bg-neutral-700 cursor-not-allowed opacity-50"
+                                    : "bg-surface-hover cursor-not-allowed opacity-50"
                             }`}
                             onClick={() => choose("short")}
                         >
@@ -472,7 +472,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                 const nameColor = isMe
                                     ? isLight ? "text-teal-600" : "text-teal-400"
                                     : isLight ? "text-neutral-500" : "text-neutral-500";
-                                const contentColor = isLight ? "text-neutral-700" : "text-neutral-300";
+                                const contentColor = isLight ? "text-neutral-700" : "text-text-secondary";
                                 const msgReactions = reactions[m.id] ?? {};
                                 const hasReactions = Object.values(msgReactions).some((r) => r.count > 0);
                                 const isPickerOpen = pickerOpenId === m.id;
@@ -504,7 +504,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                                 {isMe ? "나" : m.user_id.slice(0, 6)}
                                             </span>
                                             {/* 구분자 */}
-                                            <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-300" : "text-neutral-700"}`}>·</span>
+                                            <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-300" : "text-text-muted"}`}>·</span>
                                             {/* 내용 */}
                                             <span className={`text-[12px] whitespace-pre-wrap break-anywhere flex-1 ${contentColor}`}>
                                                 {linkify(m.content)}
@@ -514,8 +514,8 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                                 onClick={() => setPickerOpenId(isPickerOpen ? null : m.id)}
                                                 className={`shrink-0 text-[11px] w-5 h-5 flex items-center justify-center rounded-md transition-all cursor-pointer ${
                                                     isPickerOpen
-                                                        ? "opacity-100 bg-neutral-700 text-neutral-200"
-                                                        : "opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800"
+                                                        ? "opacity-100 bg-surface-hover text-text-primary"
+                                                        : "opacity-0 group-hover:opacity-100 text-text-muted hover:text-text-secondary hover:bg-surface-input"
                                                 }`}
                                             >
                                                 +
@@ -533,7 +533,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                                     className={`absolute right-0 top-full mt-1 z-30 flex items-center gap-0.5 px-2 py-1.5 rounded-2xl border shadow-xl ${
                                                         isLight
                                                             ? "bg-white border-neutral-200"
-                                                            : "bg-neutral-900 border-zinc-700"
+                                                            : "bg-surface-elevated border-border-default"
                                                     }`}
                                                 >
                                                     {REACTION_EMOJIS.map((emoji) => (
@@ -567,7 +567,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                                                     ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
                                                                     : isLight
                                                                         ? "bg-neutral-100 border-neutral-200 text-neutral-600 hover:border-neutral-300"
-                                                                        : "bg-neutral-800/60 border-zinc-700/60 text-neutral-400 hover:border-zinc-600"
+                                                                        : "bg-surface-input/60 border-border-default/60 text-text-tertiary hover:border-border-default"
                                                             }`}
                                                         >
                                                             <span className="text-[12px]">{emoji}</span>
@@ -599,7 +599,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                             exit={{ opacity: 0, y: 8, scale: 0.92 }}
                             transition={{ duration: 0.18 }}
                             onClick={handleScrollBtnClick}
-                            className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-800/95 border border-neutral-700 text-neutral-200 text-[11px] font-medium shadow-lg backdrop-blur-sm hover:bg-neutral-700 transition-colors cursor-pointer z-20"
+                            className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-800/95 border border-border-default text-text-primary text-[11px] font-medium shadow-lg backdrop-blur-sm hover:bg-surface-hover transition-colors cursor-pointer z-20"
                         >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -611,7 +611,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
             </div>
 
             {/* 입력바 */}
-            <div className={`pt-3 pb-1 px-1 border-t mt-3 ${isLight ? "border-neutral-200" : "border-neutral-800"}`}>
+            <div className={`pt-3 pb-1 px-1 border-t mt-3 ${isLight ? "border-neutral-200" : "border-border-subtle"}`}>
                 <div className="flex gap-2">
                     <input
                         ref={inputRef}
@@ -631,7 +631,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                         className={`px-4 py-2 rounded-xl text-[12px] font-semibold transition-all ${
                             userId
                                 ? "bg-emerald-600 text-white hover:bg-emerald-500 cursor-pointer"
-                                : "bg-neutral-700 text-neutral-500 cursor-not-allowed"
+                                : "bg-surface-hover text-text-muted cursor-not-allowed"
                         }`}
                         disabled={!userId}
                     >

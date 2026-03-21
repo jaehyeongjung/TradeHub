@@ -49,19 +49,19 @@ export default function FearGreedGauge({
 
     const cardClass = isLight
         ? "rounded-2xl border border-neutral-200 bg-white p-4 2xl:p-5"
-        : "rounded-2xl border border-neutral-800 bg-neutral-900 p-4 2xl:p-5";
+        : "rounded-2xl border border-border-subtle bg-surface-elevated p-4 2xl:p-5";
 
     const heroNumClass = isLight
         ? `text-4xl 2xl:text-5xl font-bold tabular-nums ${state.color}`
         : `text-4xl 2xl:text-5xl font-bold tabular-nums ${state.color}`;
 
-    const subNumClass = isLight ? "text-neutral-400 text-sm" : "text-neutral-500 text-sm";
-    const headerLabelClass = isLight ? "text-xs 2xl:text-sm text-neutral-500 font-medium" : "text-xs 2xl:text-sm text-neutral-400 font-medium";
-    const trackClass = isLight ? "bg-neutral-200" : "bg-neutral-800";
-    const edgeLabelClass = isLight ? "text-[10px] 2xl:text-xs text-neutral-400" : "text-[10px] 2xl:text-xs text-neutral-500";
+    const subNumClass = isLight ? "text-neutral-400 text-sm" : "text-text-muted text-sm";
+    const headerLabelClass = isLight ? "text-xs 2xl:text-sm text-neutral-500 font-medium" : "text-xs 2xl:text-sm text-text-tertiary font-medium";
+    const trackClass = isLight ? "bg-neutral-200" : "bg-surface-input";
+    const edgeLabelClass = isLight ? "text-[10px] 2xl:text-xs text-neutral-400" : "text-[10px] 2xl:text-xs text-text-muted";
     const tooltipClass = isLight
         ? "absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-[240px] text-[11px] bg-white border border-neutral-200 text-neutral-600 rounded-xl py-3 px-4 shadow-lg z-50 pointer-events-none"
-        : "absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-[240px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-xl py-3 px-4 shadow-xl z-50 pointer-events-none";
+        : "absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-[240px] text-[11px] bg-surface-elevated border border-border-default text-text-secondary rounded-xl py-3 px-4 shadow-xl z-50 pointer-events-none";
 
     return (
         <div
@@ -107,7 +107,7 @@ export default function FearGreedGauge({
                         />
                         {/* 인디케이터 dot */}
                         <motion.div
-                            className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full shadow-md ${isLight ? "bg-white border-2 border-neutral-300" : "bg-white border-2 border-neutral-900"}`}
+                            className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full shadow-md ${isLight ? "bg-white border-2 border-neutral-300" : "bg-white border-2 border-surface-card"}`}
                             initial={{ left: 0 }}
                             animate={{ left: `calc(${v}% - 5px)` }}
                             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -135,8 +135,8 @@ export default function FearGreedGauge({
                         <p className="leading-relaxed">
                             가격 변동성, 거래량, 소셜 트렌드 등을 종합해 시장 심리를 0~100으로 표현합니다.
                         </p>
-                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[6px] w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent ${isLight ? "border-b-neutral-200" : "border-b-neutral-700"}`} />
-                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[4px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent ${isLight ? "border-b-white" : "border-b-neutral-900"}`} />
+                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[6px] w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent ${isLight ? "border-b-neutral-200" : "border-b-border-default"}`} />
+                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[4px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent ${isLight ? "border-b-white" : "border-b-surface-elevated"}`} />
                     </motion.div>
                 )}
             </AnimatePresence>

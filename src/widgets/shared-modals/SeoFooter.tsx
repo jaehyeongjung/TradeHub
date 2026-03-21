@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function SeoFooter() {
-    const [isLight, setIsLight] = useState(true);
+    const [isLight, setIsLight] = useState(false);
 
     useEffect(() => {
         const html = document.documentElement;

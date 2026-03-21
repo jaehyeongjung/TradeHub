@@ -97,13 +97,13 @@ export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number 
             onMouseLeave={() => setIsHovered(false)}
         >
             <div
-                className={`absolute inset-0 border border-neutral-800 rounded-2xl p-2.5 2xl:p-3.5 bg-neutral-900 flex flex-col overflow-hidden transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                className={`absolute inset-0 border border-border-subtle rounded-2xl p-2.5 2xl:p-3.5 bg-surface-elevated flex flex-col overflow-hidden transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                 style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
             >
                 {/* 헤더 */}
                 <div className="flex items-center justify-between mb-2 flex-shrink-0">
                     <div className="flex items-center gap-2">
-                        <span className="text-[11px] 2xl:text-xs font-medium text-neutral-400 tracking-wide">
+                        <span className="text-[11px] 2xl:text-xs font-medium text-text-tertiary tracking-wide">
                             실시간 청산
                         </span>
                         {isConnected && (
@@ -113,7 +113,7 @@ export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number 
                             </span>
                         )}
                     </div>
-                    <span className="text-[9px] 2xl:text-[10px] font-medium px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-500">
+                    <span className="text-[9px] 2xl:text-[10px] font-medium px-2 py-0.5 rounded-full bg-surface-input text-text-muted">
                         $5K+
                     </span>
                 </div>
@@ -148,7 +148,7 @@ export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number 
                                                 {isLong ? "LONG" : "SHORT"}
                                             </span>
                                             {/* 심볼 */}
-                                            <span className="text-[11px] 2xl:text-xs text-neutral-200 font-medium flex-1 truncate">
+                                            <span className="text-[11px] 2xl:text-xs text-text-primary font-medium flex-1 truncate">
                                                 {liq.symbol}
                                             </span>
                                             {/* 금액 히어로 */}
@@ -156,7 +156,7 @@ export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number 
                                                 {formatValue(liq.usdValue)}
                                             </span>
                                             {/* 시간 */}
-                                            <span className="text-[9px] text-neutral-600 w-7 text-right shrink-0">
+                                            <span className="text-[9px] text-text-muted w-7 text-right shrink-0">
                                                 {formatTime(liq.timestamp)}
                                             </span>
                                         </motion.div>
@@ -176,7 +176,7 @@ export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number 
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 6 }}
                         transition={{ duration: 0.18 }}
-                        className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[235px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-xl py-4 px-5 shadow-xl z-50 pointer-events-none"
+                        className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[235px] text-[11px] bg-surface-elevated border border-border-default text-text-secondary rounded-xl py-4 px-5 shadow-xl z-50 pointer-events-none"
                     >
                         <div className="font-semibold text-amber-400 mb-1.5">지표 설명</div>
                         <p className="leading-relaxed">
@@ -185,8 +185,8 @@ export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number 
                             <span className="text-emerald-400 font-medium">• SHORT</span>: 숏 포지션 청산<br /><br />
                             대규모 청산은 급격한 가격 변동의 신호가 될 수 있습니다.
                         </p>
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-border-default" />
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-surface-elevated" />
                     </motion.div>
                 )}
             </AnimatePresence>

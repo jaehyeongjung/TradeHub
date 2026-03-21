@@ -92,28 +92,28 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
 
     const cardBg = isLight
         ? "border-neutral-200 bg-white"
-        : "border-neutral-800 bg-neutral-900";
-    const dividerColor = isLight ? "border-neutral-100" : "border-neutral-800";
+        : "border-border-subtle bg-surface-elevated";
+    const dividerColor = isLight ? "border-neutral-100" : "border-border-subtle";
     const titleColor = isLight
         ? "text-neutral-800 hover:text-teal-600"
-        : "text-neutral-100 hover:text-teal-400";
+        : "text-text-primary hover:text-teal-400";
     const sourcePill = isLight
         ? "bg-neutral-100 text-neutral-500"
-        : "bg-neutral-800 text-neutral-400";
+        : "bg-surface-input text-text-tertiary";
     const symPill = isLight
         ? "bg-teal-50 text-teal-600"
         : "bg-teal-500/10 text-teal-400";
-    const timeColor = isLight ? "text-neutral-400" : "text-neutral-600";
+    const timeColor = isLight ? "text-neutral-400" : "text-text-muted";
     const openBtn = isLight
         ? "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-        : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700";
+        : "bg-surface-input text-text-secondary hover:bg-surface-hover";
     const shareBtn = isLight
         ? "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer"
         : "bg-emerald-600 text-white hover:bg-emerald-500 cursor-pointer";
     const shareBtnDisabled = isLight
         ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
-        : "bg-neutral-800 text-neutral-600 cursor-not-allowed";
-    const skeletonBg = isLight ? "bg-neutral-100" : "bg-neutral-800";
+        : "bg-surface-input text-text-muted cursor-not-allowed";
+    const skeletonBg = isLight ? "bg-neutral-100" : "bg-surface-input";
 
     return (
         <>
@@ -229,12 +229,12 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                     onClick={closeViewer}
                 >
                     <div
-                        className="relative w-[90vw] max-w-5xl h-[80vh] rounded-2xl overflow-hidden border border-neutral-700 bg-neutral-900"
+                        className="relative w-[90vw] max-w-5xl h-[80vh] rounded-2xl overflow-hidden border border-border-default bg-surface-elevated"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* 상단 바 */}
-                        <div className="absolute top-0 left-0 right-0 h-11 bg-neutral-900/95 border-b border-neutral-800 flex items-center gap-2 px-4">
-                            <div className="truncate text-xs text-neutral-300 flex-1" title={viewer.title}>
+                        <div className="absolute top-0 left-0 right-0 h-11 bg-surface-elevated/95 border-b border-border-subtle flex items-center gap-2 px-4">
+                            <div className="truncate text-xs text-text-secondary flex-1" title={viewer.title}>
                                 {viewer.title}
                             </div>
                             <div className="flex items-center gap-1.5 shrink-0">
@@ -242,13 +242,13 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                                     href={viewer.url}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-neutral-800 text-neutral-200 hover:bg-neutral-700 whitespace-nowrap transition-colors"
+                                    className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-surface-input text-text-primary hover:bg-surface-hover whitespace-nowrap transition-colors"
                                 >
                                     새 탭
                                 </a>
                                 <button
                                     onClick={closeViewer}
-                                    className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-neutral-800 text-neutral-300 hover:bg-neutral-700 whitespace-nowrap cursor-pointer transition-colors"
+                                    className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-surface-input text-text-secondary hover:bg-surface-hover whitespace-nowrap cursor-pointer transition-colors"
                                 >
                                     닫기
                                 </button>
@@ -258,10 +258,10 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                         {/* iframe */}
                         <div className="absolute inset-x-0 top-11 bottom-0">
                             {!iframeReady && (
-                                <div className="absolute inset-0 flex items-center justify-center text-sm text-neutral-400">
+                                <div className="absolute inset-0 flex items-center justify-center text-sm text-text-tertiary">
                                     {iframeBlocked ? (
                                         <div className="text-center space-y-3">
-                                            <p className="text-sm text-neutral-300">이 사이트는 보안 정책으로 임베드가 차단되어 있어요.</p>
+                                            <p className="text-sm text-text-secondary">이 사이트는 보안 정책으로 임베드가 차단되어 있어요.</p>
                                             <a
                                                 href={viewer.url}
                                                 target="_blank"
@@ -272,7 +272,7 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                                             </a>
                                         </div>
                                     ) : (
-                                        <div className="w-full h-full bg-neutral-800 animate-pulse" />
+                                        <div className="w-full h-full bg-surface-input animate-pulse" />
                                     )}
                                 </div>
                             )}

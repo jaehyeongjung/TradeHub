@@ -199,7 +199,7 @@ export default function Home() {
                 {JSON.stringify(SOFTWARE_JSONLD)}
             </Script>
 
-            <main className="flex flex-col px-5 bg-black min-w-310">
+            <main className="flex flex-col px-5 bg-black min-w-310 pt-12">
                 <RealTimeSection />
                 <DashBoard />
             </main>

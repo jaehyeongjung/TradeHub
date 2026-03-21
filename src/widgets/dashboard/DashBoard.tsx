@@ -62,24 +62,24 @@ export const DashBoard = () => {
         <>
             <section
                 aria-label="커뮤니티 게시판 및 채팅"
-                className="flex gap-5 mt-5 min-h-120 h-[calc(100vh-400px)] lg:h-[calc(100vh-200px)] 2xl:h-[calc(100vh-300px)] border-neutral-800"
+                className="flex gap-5 mt-5 min-h-120 h-[calc(100vh-448px)] lg:h-[calc(100vh-248px)] 2xl:h-[calc(100vh-348px)] overflow-hidden"
             >
                 {/* 왼쪽: 게시판/뉴스 카드 */}
-                <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-neutral-950 border border-zinc-800">
+                <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-surface-card border border-border-subtle">
                     {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
                     <div className={`relative z-20 flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14 transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: "50ms", transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                         {/* 탭 버튼 */}
-                        <div className={`inline-flex items-center rounded-xl p-1 shrink-0 ${isLight ? "bg-neutral-100 border border-neutral-200" : "bg-neutral-800/60 border border-neutral-800"}`}>
+                        <div className={`inline-flex items-center rounded-xl p-1 shrink-0 ${isLight ? "bg-neutral-100 border border-neutral-200" : "bg-surface-input/60 border border-border-subtle"}`}>
                             <button
                                 onClick={() => switchTab("board")}
                                 className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg cursor-pointer transition-all ${
                                     activeTab === "board"
                                         ? isLight
                                             ? "bg-white text-neutral-800 shadow-sm border border-neutral-200"
-                                            : "bg-neutral-700 text-white shadow-sm"
+                                            : "bg-surface-hover text-white shadow-sm"
                                         : isLight
                                             ? "text-neutral-500 hover:text-neutral-700"
-                                            : "text-neutral-500 hover:text-neutral-300"
+                                            : "text-text-muted hover:text-text-secondary"
                                 }`}
                             >
                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,10 +93,10 @@ export const DashBoard = () => {
                                     activeTab === "news"
                                         ? isLight
                                             ? "bg-white text-neutral-800 shadow-sm border border-neutral-200"
-                                            : "bg-neutral-700 text-white shadow-sm"
+                                            : "bg-surface-hover text-white shadow-sm"
                                         : isLight
                                             ? "text-neutral-500 hover:text-neutral-700"
-                                            : "text-neutral-500 hover:text-neutral-300"
+                                            : "text-text-muted hover:text-text-secondary"
                                 }`}
                             >
                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,7 +169,7 @@ export const DashBoard = () => {
                     <MarketIndicesWidget fadeDelay={280} />
                     <aside
                         aria-label="실시간 채팅"
-                        className="border border-zinc-800 rounded-2xl flex-1 bg-neutral-950 overflow-hidden flex flex-col"
+                        className="border border-border-subtle rounded-2xl flex-1 bg-surface-card overflow-hidden flex flex-col"
                     >
                         <div className="flex-1 min-h-0">
                             <Chat fadeDelay={350} />

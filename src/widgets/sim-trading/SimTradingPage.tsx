@@ -93,7 +93,7 @@ export default function SimTradingPage() {
     const contentBg = isLight ? "bg-neutral-50" : "";
 
     return (
-        <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto mt-3">
+        <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto h-[calc(100vh-60px)] overflow-hidden">
 
             {/* ── 헤더 바 ── */}
             <div className={`flex items-center gap-4 px-4 py-2.5 rounded-xl border overflow-x-auto scrollbar-none ${headerBg}`}>
@@ -122,16 +122,8 @@ export default function SimTradingPage() {
                 <SimMarketData />
             </div>
 
-            {/* ── 차트 + 호가창 + 주문패널
-                  오더북 자연 높이(770px)를 기준으로 max-h 설정
-                  뷰포트가 작으면 그보다 작아질 수 있도록 min-h도 지정 ── */}
-            <div
-                className="flex gap-3"
-                style={{
-                    height: `min(calc(100vh - 220px), ${ORDER_BOOK_NATURAL_H}px)`,
-                    minHeight: "480px",
-                }}
-            >
+            {/* ── 차트 + 호가창 + 주문패널 (flex-1로 남은 공간 채움) ── */}
+            <div className="flex gap-3 flex-1 min-h-0">
                 <div className="flex-1 min-w-0">
                     <CoinChart
                         boxId="sim-chart"
@@ -161,8 +153,8 @@ export default function SimTradingPage() {
                 </div>
             </div>
 
-            {/* ── 하단 탭 (슬라이딩 인디케이터) ── */}
-            <div className={`rounded-2xl border overflow-hidden ${tabBg}`}>
+            {/* ── 하단 탭 (슬라이딩 인디케이터, 고정 높이) ── */}
+            <div className={`rounded-2xl border overflow-hidden flex-shrink-0 ${tabBg}`}>
                 <div className={`relative flex border-b ${tabBorder}`}>
                     {/* 슬라이딩 언더라인 */}
                     <div
@@ -198,7 +190,7 @@ export default function SimTradingPage() {
                     })}
                 </div>
 
-                <div className={`p-4 ${contentBg}`}>
+                <div className={`p-4 max-h-[200px] overflow-y-auto scrollbar-hide ${contentBg}`}>
                     {bottomTab === "positions" && (
                         <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} />
                     )}

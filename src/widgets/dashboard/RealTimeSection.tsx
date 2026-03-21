@@ -8,7 +8,7 @@ import WhaleTrades from "@/entities/whale/WhaleTrades";
 const CoinChart = dynamic(() => import("@/entities/coin/CoinChart"), {
     ssr: false,
     loading: () => (
-        <div className="w-full h-full min-h-35 2xl:min-h-50 bg-neutral-900 rounded-xl animate-pulse" />
+        <div className="w-full h-full min-h-35 2xl:min-h-50 bg-surface-elevated rounded-xl animate-pulse" />
     ),
 });
 
@@ -16,7 +16,7 @@ export const RealTimeSection = () => {
     return (
         <section
             aria-label="실시간 코인 가격 및 차트"
-            className="realtime-section font-sans flex gap-3 2xl:gap-5 min-h-35 2xl:min-h-50 mt-4 mx-auto bg-neutral-950 items-center w-full min-w-[1320px] border border-zinc-800 rounded-2xl px-4 2xl:px-6"
+            className="realtime-section font-sans flex gap-3 2xl:gap-5 min-h-35 2xl:min-h-50 mt-4 mx-auto bg-surface-card items-center w-full min-w-[1320px] border border-border-subtle rounded-2xl px-4 2xl:px-6"
         >
             {/* 코인 가격 박스들 - 비율 3 */}
             <div className="flex gap-2 2xl:gap-3 flex-[3] min-w-0">

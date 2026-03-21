@@ -18,7 +18,7 @@ import {
     calcUnrealizedPnl,
     calcLiqPriceCross,
     updatePositionTpSl,
-} from "@/shared/lib/sim-trading";
+} from "@/shared/lib/sim-trading.service";
 import {
     playOrderFilledSound,
     playPositionClosedSound,

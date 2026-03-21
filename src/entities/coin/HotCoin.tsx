@@ -106,18 +106,18 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
 
     const badgeClass = isLight
         ? "bg-neutral-100 text-neutral-500 border border-neutral-200 hover:bg-neutral-200"
-        : "bg-neutral-800/80 text-neutral-400 border border-neutral-700/60 hover:bg-neutral-800";
-    const tickerBaseColor = isLight ? "text-neutral-800" : "text-neutral-200";
+        : "bg-surface-input/80 text-text-tertiary border border-border-default/60 hover:bg-surface-input";
+    const tickerBaseColor = isLight ? "text-neutral-800" : "text-text-primary";
     const tooltipBg = isLight
         ? "bg-white border-neutral-200 text-neutral-700 shadow-lg"
-        : "bg-neutral-900 border-neutral-700 text-neutral-300 shadow-xl";
-    const dividerColor = isLight ? "border-neutral-200" : "border-neutral-800";
+        : "bg-surface-elevated border-border-default text-text-secondary shadow-xl";
+    const dividerColor = isLight ? "border-neutral-200" : "border-border-subtle";
     const colLabelColor = isLight ? "text-neutral-500" : "text-neutral-600";
     const rankColor = isLight ? "text-neutral-500" : "text-neutral-600";
-    const symColor = isLight ? "text-neutral-800" : "text-neutral-200";
-    const priceColor = isLight ? "text-neutral-600" : "text-neutral-400";
-    const arrowBorder = isLight ? "border-b-neutral-200" : "border-b-neutral-700";
-    const arrowFill = isLight ? "border-b-white" : "border-b-neutral-900";
+    const symColor = isLight ? "text-neutral-800" : "text-text-primary";
+    const priceColor = isLight ? "text-neutral-600" : "text-text-tertiary";
+    const arrowBorder = isLight ? "border-b-neutral-200" : "border-b-border-default";
+    const arrowFill = isLight ? "border-b-white" : "border-b-surface-elevated";
 
     return (
         <div
@@ -176,7 +176,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                                 <span className={`font-semibold font-mono text-[13px] 2xl:text-sm ${symColor}`}>
                                     {prettySym(current.symbol)}
                                 </span>
-                                <span className={`text-[10px] ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>/USDT</span>
+                                <span className={`text-[10px] ${isLight ? "text-neutral-400" : "text-text-muted"}`}>/USDT</span>
                                 <span className={`text-[10px] 2xl:text-[11px] font-bold px-1.5 py-[2px] rounded font-mono tabular-nums ${
                                     Number(current.priceChangePercent) >= 0
                                         ? "text-emerald-400 bg-emerald-500/10"
@@ -203,8 +203,8 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                             {/* 패널 헤더 */}
                             <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: isLight ? "#f0f0f0" : "#262626" }}>
                                 <div className="flex items-center gap-1.5">
-                                    <span className={`font-bold text-xs tracking-wide ${isLight ? "text-neutral-700" : "text-neutral-200"}`}>HOT</span>
-                                    <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-500"}`}>TOP 15</span>
+                                    <span className={`font-bold text-xs tracking-wide ${isLight ? "text-neutral-700" : "text-text-primary"}`}>HOT</span>
+                                    <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${isLight ? "bg-neutral-100 text-neutral-500" : "bg-surface-input text-text-muted"}`}>TOP 15</span>
                                 </div>
                                 <span className={`text-[9px] ${colLabelColor}`}>30초 갱신</span>
                             </div>

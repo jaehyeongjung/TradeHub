@@ -131,14 +131,14 @@ export default function LongShortRatioBox({
   const accentBg = longPct === null ? (isLight ? "bg-neutral-300" : "bg-neutral-600")
     : isLongDominant ? "bg-emerald-500" : "bg-red-500";
 
-  const cardBg = isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800";
-  const labelColor = isLight ? "text-neutral-400" : "text-neutral-500";
-  const pillBg = isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-400";
+  const cardBg = isLight ? "bg-white border-neutral-200" : "bg-surface-elevated border-border-subtle";
+  const labelColor = isLight ? "text-neutral-400" : "text-text-muted";
+  const pillBg = isLight ? "bg-neutral-100 text-neutral-500" : "bg-surface-input text-text-tertiary";
   const tooltipBg = isLight
     ? "bg-white border-neutral-200 text-neutral-600 shadow-lg"
-    : "bg-neutral-900 border-neutral-700 text-neutral-300 shadow-xl";
-  const arrowBorder = isLight ? "border-b-neutral-200" : "border-b-neutral-700";
-  const arrowFill = isLight ? "border-b-white" : "border-b-neutral-900";
+    : "bg-surface-elevated border-border-default text-text-secondary shadow-xl";
+  const arrowBorder = isLight ? "border-b-neutral-200" : "border-b-border-default";
+  const arrowFill = isLight ? "border-b-white" : "border-b-surface-elevated";
 
   return (
     <div
@@ -165,7 +165,7 @@ export default function LongShortRatioBox({
         </div>
 
         {loading ? (
-          <div className={`flex-1 rounded-xl animate-pulse ${isLight ? "bg-neutral-100" : "bg-neutral-800"}`} />
+          <div className={`flex-1 rounded-xl animate-pulse ${isLight ? "bg-neutral-100" : "bg-surface-input"}`} />
         ) : err ? (
           <div className="text-xs text-amber-500 flex-1 flex items-center">데이터 없음</div>
         ) : (

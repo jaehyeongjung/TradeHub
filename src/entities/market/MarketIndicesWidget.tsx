@@ -47,8 +47,8 @@ function IndexItem({ index, isLight }: { index: MarketIndex; isLight: boolean })
         ? "bg-white border-neutral-200/80 hover:bg-neutral-50 shadow-sm"
         : "bg-neutral-800/40 border-neutral-700/20 hover:bg-neutral-800/60";
 
-    const labelColor = isLight ? "text-neutral-500" : "text-neutral-400";
-    const priceColor = isLight ? "text-neutral-700" : "text-neutral-200";
+    const labelColor = isLight ? "text-neutral-500" : "text-text-tertiary";
+    const priceColor = isLight ? "text-neutral-700" : "text-text-primary";
 
     return (
         <div className={`flex-1 min-w-0 flex flex-col gap-1 py-2.5 2xl:py-3 pl-3 2xl:pl-3.5 pr-2.5 rounded-xl 2xl:rounded-2xl border border-l-2 ${accentColor} ${cardBg} transition-colors`}>

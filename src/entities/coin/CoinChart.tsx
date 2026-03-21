@@ -525,15 +525,15 @@ export default function CoinChart({
             width: el.clientWidth,
             height: el.clientHeight,
             layout: {
-                background: { color: isLight ? "#ffffff" : "#171717" },
-                textColor: isLight ? "#333333" : "#E5E5E5",
+                background: { color: isLight ? "#ffffff" : "#111C2D" },
+                textColor: isLight ? "#333333" : "#A8B4C8" ,
             },
             grid: {
-                vertLines: { color: isLight ? "#e0e0e0" : "#1F1F1F" },
-                horzLines: { color: isLight ? "#e0e0e0" : "#1F1F1F" },
+                vertLines: { color: isLight ? "#e0e0e0" : "#17243A" },
+                horzLines: { color: isLight ? "#e0e0e0" : "#17243A" },
             },
-            rightPriceScale: { borderColor: isLight ? "#d0d0d0" : "#2A2A2A" },
-            timeScale: { borderColor: isLight ? "#d0d0d0" : "#2A2A2A" },
+            rightPriceScale: { borderColor: isLight ? "#d0d0d0" : "#1F2D40" },
+            timeScale: { borderColor: isLight ? "#d0d0d0" : "#1F2D40" },
         });
         chartApiRef.current = chart;
 
@@ -546,10 +546,10 @@ export default function CoinChart({
         });
 
         const candleSeries = chart.addSeries(CandlestickSeries, {
-            upColor: "#26a69a",
-            downColor: "#ef5350",
-            wickUpColor: "#26a69a",
-            wickDownColor: "#ef5350",
+            upColor: "#02C076",
+            downColor: "#F75467",
+            wickUpColor: "#02C076",
+            wickDownColor: "#F75467",
             borderVisible: false,
         });
         candleSeriesRef.current = candleSeries;

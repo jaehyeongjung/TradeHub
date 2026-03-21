@@ -670,14 +670,13 @@ html.light .landing-freedom:hover h3 {
        다크모드 색조 회색 (네이비 틴트 - 토스 철학)
        순수 neutral 대신 블루-그린 온도가 섞인 palette
        ============================================ */
+    /* 배경 전용 오버라이드 (neutral-950~800만 재매핑)
+       neutral-700 이하는 텍스트로도 쓰이므로 기본값 유지 */
     --color-neutral-950: #0C1422;
     --color-neutral-900: #111C2D;
     --color-neutral-800: #172133;
-    --color-neutral-700: #1F2D40;
-    --color-neutral-600: #263345;
     --color-zinc-900:    #0E1928;
     --color-zinc-800:    #17243A;
-    --color-zinc-700:    #1D2E44;
 
     /* ============================================
        하락 색상 - 토스 스타일 핑크-레드

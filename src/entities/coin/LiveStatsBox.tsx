@@ -60,10 +60,10 @@ export default function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } =
         return () => { void supabase.removeChannel(channel); };
     }, [fetchOnline]);
 
-    const cardBg = isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800";
-    const labelColor = isLight ? "text-neutral-400" : "text-neutral-500";
-    const numColor = isLight ? "text-neutral-700" : "text-neutral-100";
-    const unitColor = isLight ? "text-neutral-400" : "text-neutral-400";
+    const cardBg = isLight ? "bg-white border-neutral-200" : "bg-surface-elevated border-border-subtle";
+    const labelColor = isLight ? "text-neutral-400" : "text-text-muted";
+    const numColor = isLight ? "text-neutral-700" : "text-text-primary";
+    const unitColor = isLight ? "text-neutral-400" : "text-text-tertiary";
 
     return (
         <div
@@ -88,7 +88,7 @@ export default function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } =
                     LIVE
                 </span>
             ) : (
-                <span className={`text-[9px] font-medium px-2 py-1 rounded-full ${isLight ? "bg-neutral-100 text-neutral-400" : "bg-neutral-800 text-neutral-500"}`}>
+                <span className={`text-[9px] font-medium px-2 py-1 rounded-full ${isLight ? "bg-neutral-100 text-neutral-400" : "bg-surface-input text-text-muted"}`}>
                     연결 중
                 </span>
             )}

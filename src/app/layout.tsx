@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import AuthGate from "@/components/AuthGate";
 import Script from "next/script";
 import FloatingLoginSidebar from "@/components/FloatingLoginDrawer";
+import HeaderNav from "@/widgets/shared-modals/HeaderNav";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -97,6 +98,7 @@ export default function RootLayout({
     return (
         <html lang="ko" className={`bg-black ${inter.variable}`} suppressHydrationWarning>
             <body>
+                <HeaderNav />
                 <AuthGate>{children}</AuthGate>
                 <Script
                     async

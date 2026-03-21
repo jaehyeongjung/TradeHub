@@ -290,7 +290,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
             >
                 <button
                     onClick={() => setOpen(true)}
-                    className="flex-1 min-w-0 w-full min-h-26 2xl:min-h-40 cursor-pointer rounded-lg border border-neutral-800 bg-neutral-900 p-2 2xl:p-4 shadow-md transition hover:border-neutral-700 flex flex-col items-center justify-center overflow-hidden"
+                    className="flex-1 min-w-0 w-full min-h-26 2xl:min-h-40 cursor-pointer rounded-lg border border-border-subtle bg-surface-elevated p-2 2xl:p-4 shadow-md transition hover:border-border-default flex flex-col items-center justify-center overflow-hidden"
                 >
                     <div className={`flex flex-col items-center gap-1 2xl:gap-2 transition-[opacity,transform] duration-700 ${price != null ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
                         <div className="relative w-8 h-8 2xl:w-10 2xl:h-10 flex-shrink-0">
@@ -305,7 +305,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                                 }}
                             />
                         </div>
-                        <h2 className="text-sm 2xl:text-base font-bold text-white">
+                        <h2 className="text-sm 2xl:text-base font-bold text-text-primary">
                             {symbol.toUpperCase()}
                         </h2>
                         <p className={`text-lg 2xl:text-2xl font-mono tabular-nums rounded-md px-2 py-0.5 transition-all duration-300 ${
@@ -330,12 +330,12 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.18 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] z-50 w-[200px] rounded-lg bg-neutral-900 border border-neutral-700 py-2 px-3 text-[11px] text-neutral-200 shadow-lg pointer-events-none"
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] z-50 w-[200px] rounded-lg bg-surface-elevated border border-border-default py-2 px-3 text-[11px] text-text-primary shadow-lg pointer-events-none"
                         >
                             클릭 시 코인 심볼을 변경할 수 있습니다.
                             {/* 테두리가 있는 삼각형 화살표 */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-border-default" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-surface-elevated" />
                         </motion.div>
                     )}
                 </AnimatePresence>

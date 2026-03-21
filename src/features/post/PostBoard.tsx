@@ -42,15 +42,15 @@ const CustomModal: React.FC<{
             tabIndex={-1}
             ref={(el) => el?.focus()}
         >
-            <div className={`rounded-2xl p-6 shadow-2xl max-w-sm w-full outline-none ${isLight ? "bg-white border border-neutral-200" : "bg-neutral-900 border border-neutral-800"}`}>
-                <p className={`mb-6 text-sm leading-relaxed ${isLight ? "text-neutral-700" : "text-neutral-200"}`}>
+            <div className={`rounded-2xl p-6 shadow-2xl max-w-sm w-full outline-none ${isLight ? "bg-white border border-neutral-200" : "bg-surface-elevated border border-border-subtle"}`}>
+                <p className={`mb-6 text-sm leading-relaxed ${isLight ? "text-neutral-700" : "text-text-primary"}`}>
                     {message}
                 </p>
                 <div className={`flex ${isConfirm ? "justify-between" : "justify-center"} gap-3`}>
                     {isConfirm && (
                         <button
                             onClick={onCancel}
-                            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${isLight ? "bg-neutral-100 text-neutral-600 hover:bg-neutral-200" : "bg-neutral-800 text-neutral-300 hover:bg-neutral-700"}`}
+                            className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${isLight ? "bg-neutral-100 text-neutral-600 hover:bg-neutral-200" : "bg-surface-input text-text-secondary hover:bg-surface-hover"}`}
                         >
                             취소
                         </button>
@@ -187,28 +187,28 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
     };
 
     // 스타일 변수
-    const dividerColor = isLight ? "border-neutral-100" : "border-neutral-800";
-    const titleColor = isLight ? "text-neutral-800 group-hover:text-teal-600" : "text-neutral-100 group-hover:text-white";
-    const bodyColor = isLight ? "text-neutral-500" : "text-neutral-400";
-    const metaColor = isLight ? "text-neutral-400" : "text-neutral-500";
+    const dividerColor = isLight ? "border-neutral-100" : "border-border-subtle";
+    const titleColor = isLight ? "text-neutral-800 group-hover:text-teal-600" : "text-text-primary group-hover:text-white";
+    const bodyColor = isLight ? "text-neutral-500" : "text-text-tertiary";
+    const metaColor = isLight ? "text-neutral-400" : "text-text-muted";
     const articleBg = isLight ? "bg-neutral-50 border border-neutral-100" : "bg-neutral-800/30 border border-neutral-800/50";
     const backBtnClass = isLight
         ? "flex items-center gap-1 text-sm text-neutral-500 px-3 py-1.5 rounded-xl cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-all"
-        : "flex items-center gap-1 text-sm text-neutral-400 px-3 py-1.5 rounded-xl cursor-pointer hover:bg-neutral-800 hover:text-neutral-200 transition-all";
+        : "flex items-center gap-1 text-sm text-text-tertiary px-3 py-1.5 rounded-xl cursor-pointer hover:bg-surface-input hover:text-text-primary transition-all";
     const editBtnClass = isLight
         ? "flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl text-neutral-600 bg-neutral-100 cursor-pointer hover:bg-neutral-200 transition-all"
-        : "flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl text-neutral-300 bg-neutral-800 cursor-pointer hover:bg-neutral-700 transition-all";
+        : "flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl text-text-secondary bg-surface-input cursor-pointer hover:bg-surface-hover transition-all";
 
     const Thumb = ({ url }: { url?: string | null }) =>
         url ? (
-            <div className={`w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 ${isLight ? "bg-neutral-100" : "bg-neutral-800"}`}>
+            <div className={`w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 ${isLight ? "bg-neutral-100" : "bg-surface-input"}`}>
                 <Image src={url} alt="thumb" width={56} height={56} className="object-cover w-full h-full" unoptimized />
             </div>
         ) : null;
 
     const DetailImage = ({ url }: { url?: string | null }) =>
         url ? (
-            <div className={`mt-4 rounded-2xl overflow-hidden ${isLight ? "bg-neutral-100" : "bg-neutral-900/50"}`}>
+            <div className={`mt-4 rounded-2xl overflow-hidden ${isLight ? "bg-neutral-100" : "bg-surface-elevated/50"}`}>
                 <Image src={url} alt="이미지" width={600} height={400} className="max-h-96 w-full object-contain" unoptimized />
             </div>
         ) : null;
@@ -249,11 +249,11 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                                 {[...Array(5)].map((_, i) => (
                                     <div key={i} className={`flex items-start gap-3 py-3 border-b ${dividerColor} animate-pulse`}>
                                         <div className="flex-1 space-y-2">
-                                            <div className={`h-3.5 w-3/4 rounded ${isLight ? "bg-neutral-200" : "bg-neutral-800"}`} />
-                                            <div className={`h-3 w-full rounded ${isLight ? "bg-neutral-200" : "bg-neutral-800"}`} />
-                                            <div className={`h-2.5 w-24 rounded ${isLight ? "bg-neutral-200" : "bg-neutral-800"}`} />
+                                            <div className={`h-3.5 w-3/4 rounded ${isLight ? "bg-neutral-200" : "bg-surface-input"}`} />
+                                            <div className={`h-3 w-full rounded ${isLight ? "bg-neutral-200" : "bg-surface-input"}`} />
+                                            <div className={`h-2.5 w-24 rounded ${isLight ? "bg-neutral-200" : "bg-surface-input"}`} />
                                         </div>
-                                        <div className={`w-14 h-14 rounded-xl ${isLight ? "bg-neutral-200" : "bg-neutral-800"}`} />
+                                        <div className={`w-14 h-14 rounded-xl ${isLight ? "bg-neutral-200" : "bg-surface-input"}`} />
                                     </div>
                                 ))}
                             </div>
@@ -289,7 +289,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                                                 {p.body}
                                             </p>
                                             <div className={`flex items-center gap-1.5 mt-1.5 text-[10px] ${metaColor}`}>
-                                                <span className={`font-mono px-1.5 py-[1px] rounded text-[9px] ${isLight ? "bg-neutral-100" : "bg-neutral-800"}`}>
+                                                <span className={`font-mono px-1.5 py-[1px] rounded text-[9px] ${isLight ? "bg-neutral-100" : "bg-surface-input"}`}>
                                                     {p.user_id.slice(0, 6)}
                                                 </span>
                                                 <span>·</span>
@@ -338,19 +338,19 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
 
                         {/* 본문 카드 */}
                         <article className={`rounded-2xl p-4 2xl:p-5 ${articleBg}`}>
-                            <h2 className={`text-lg 2xl:text-xl font-bold mb-3 leading-snug ${isLight ? "text-neutral-800" : "text-white"}`}>
+                            <h2 className={`text-lg 2xl:text-xl font-bold mb-3 leading-snug ${isLight ? "text-neutral-800" : "text-text-primary"}`}>
                                 {selected.title}
                             </h2>
 
                             <div className={`flex items-center gap-2 pb-3 mb-4 border-b text-[10px] ${dividerColor} ${metaColor}`}>
-                                <span className={`font-mono px-1.5 py-[2px] rounded ${isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-400"}`}>
+                                <span className={`font-mono px-1.5 py-[2px] rounded ${isLight ? "bg-neutral-100 text-neutral-500" : "bg-surface-input text-text-tertiary"}`}>
                                     {selected.user_id.slice(0, 8)}
                                 </span>
                                 <span>·</span>
                                 <span>{formatRelativeTime(selected.created_at)}</span>
                             </div>
 
-                            <p className={`whitespace-pre-wrap text-sm leading-relaxed ${isLight ? "text-neutral-600" : "text-neutral-300"}`}>
+                            <p className={`whitespace-pre-wrap text-sm leading-relaxed ${isLight ? "text-neutral-600" : "text-text-secondary"}`}>
                                 {selected.body}
                             </p>
                             <DetailImage url={selected.image_url} />
