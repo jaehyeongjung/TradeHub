@@ -203,7 +203,7 @@ export default function SeoFooter() {
                         </Link>
                         를 한 화면에서 제공하는 코인 트레이더 대시보드입니다.
                     </p>
-                    <span className={`text-[11px] shrink-0 md:ml-4 ${taglineColor}`}>© 2025 TradeHub</span>
+                    <span className={`text-[11px] shrink-0 md:ml-4 ${taglineColor}`}>© 2026 TradeHub</span>
                 </div>
 
             </div>

@@ -10,6 +10,9 @@ import type { MarginMode } from "@/shared/types/sim-trading.types";
  */
 export const treemapOpenAtom = atom(false);
 
+/** 로그인 드로어 열림 상태 */
+export const loginDrawerOpenAtom = atom(false);
+
 /* ── 모의투자 관련 atoms ── */
 
 /** 현재 활성 페이지: 메인 대시보드 vs 모의투자 */

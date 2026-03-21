@@ -149,17 +149,17 @@ export default function SimOrderBook({ onPriceClick }: Props) {
             className={`rounded-xl border flex flex-col h-full overflow-hidden select-none ${
                 isLight
                     ? "bg-white border-neutral-200"
-                    : "bg-[#0b0e11] border-neutral-800"
+                    : "bg-surface-card border-border-subtle"
             }`}
         >
             {/* 헤더 */}
             <div
                 className={`flex items-center justify-between px-3 py-2 border-b ${
-                    isLight ? "border-neutral-200" : "border-neutral-800/80"
+                    isLight ? "border-neutral-200" : "border-border-subtle"
                 }`}
             >
                 <span
-                    className={`text-[11px] font-bold tracking-wide ${isLight ? "text-neutral-900" : "text-white"}`}
+                    className={`text-[11px] font-bold tracking-wide ${isLight ? "text-neutral-900" : "text-text-primary"}`}
                 >
                     Order Book
                 </span>
@@ -167,8 +167,8 @@ export default function SimOrderBook({ onPriceClick }: Props) {
 
             {/* 컬럼 헤더 */}
             <div
-                className={`flex items-center px-3 py-1.5 text-[10px] text-neutral-500 border-b ${
-                    isLight ? "border-neutral-200/60" : "border-neutral-800/40"
+                className={`flex items-center px-3 py-1.5 text-[10px] border-b ${
+                    isLight ? "border-neutral-200/60 text-neutral-500" : "border-border-subtle text-text-muted"
                 }`}
             >
                 <span className="flex-[2]">Price({coinName})</span>
@@ -211,18 +211,14 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                             </span>
                             <span
                                 className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
-                                    isLight
-                                        ? "text-neutral-700"
-                                        : "text-neutral-300"
+                                    isLight ? "text-neutral-700" : "text-text-secondary"
                                 }`}
                             >
                                 {formatQty(qty)}
                             </span>
                             <span
                                 className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
-                                    isLight
-                                        ? "text-neutral-500"
-                                        : "text-neutral-400"
+                                    isLight ? "text-neutral-500" : "text-text-tertiary"
                                 }`}
                             >
                                 {formatQty(cum)}
@@ -237,7 +233,7 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                 className={`flex items-center px-3 py-2 border-y ${
                     isLight
                         ? "border-neutral-200 bg-neutral-50"
-                        : "border-neutral-700/60 bg-neutral-900/80"
+                        : "border-border-subtle bg-surface-elevated"
                 }`}
             >
                 <div className="flex items-center gap-1.5">
@@ -327,18 +323,14 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                             </span>
                             <span
                                 className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
-                                    isLight
-                                        ? "text-neutral-700"
-                                        : "text-neutral-300"
+                                    isLight ? "text-neutral-700" : "text-text-secondary"
                                 }`}
                             >
                                 {formatQty(qty)}
                             </span>
                             <span
                                 className={`flex-[2] text-right text-[11px] font-mono relative z-10 tabular-nums ${
-                                    isLight
-                                        ? "text-neutral-500"
-                                        : "text-neutral-400"
+                                    isLight ? "text-neutral-500" : "text-text-tertiary"
                                 }`}
                             >
                                 {formatQty(cum)}
@@ -350,7 +342,7 @@ export default function SimOrderBook({ onPriceClick }: Props) {
 
             {/* 매수/매도 비율 바 */}
             <div
-                className={`px-3 py-2 border-t ${isLight ? "border-neutral-200/60" : "border-neutral-800/60"}`}
+                className={`px-3 py-2 border-t ${isLight ? "border-neutral-200/60" : "border-border-subtle"}`}
             >
                 <div className="flex items-center justify-between text-[10px] mb-1">
                     <span className="text-neutral-500">B</span>

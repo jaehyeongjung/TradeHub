@@ -93,7 +93,7 @@ export default function SimTradingPage() {
     const contentBg = isLight ? "bg-neutral-50" : "";
 
     return (
-        <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto h-[calc(100vh-60px)] overflow-hidden">
+        <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto">
 
             {/* ── 헤더 바 ── */}
             <div className={`flex items-center gap-4 px-4 py-2.5 rounded-xl border overflow-x-auto scrollbar-none ${headerBg}`}>
@@ -122,8 +122,8 @@ export default function SimTradingPage() {
                 <SimMarketData />
             </div>
 
-            {/* ── 차트 + 호가창 + 주문패널 (flex-1로 남은 공간 채움) ── */}
-            <div className="flex gap-3 flex-1 min-h-0">
+            {/* ── 차트 + 호가창 + 주문패널 ── */}
+            <div className="flex gap-3 h-[calc(100vh-200px)] min-h-[480px]">
                 <div className="flex-1 min-w-0">
                     <CoinChart
                         boxId="sim-chart"
@@ -190,7 +190,7 @@ export default function SimTradingPage() {
                     })}
                 </div>
 
-                <div className={`p-4 max-h-[200px] overflow-y-auto scrollbar-hide ${contentBg}`}>
+                <div className={`p-4 ${contentBg}`}>
                     {bottomTab === "positions" && (
                         <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} />
                     )}

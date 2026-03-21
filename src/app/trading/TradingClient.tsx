@@ -8,7 +8,7 @@ import ForceTabReturnReload from "@/components/ForceTabReturnReload";
 
 function SimTradingSkeleton() {
     return (
-        <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto h-[calc(100vh-60px)] overflow-hidden animate-pulse">
+        <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto animate-pulse">
             {/* 헤더 바 */}
             <div className="flex items-center gap-4 px-4 py-2.5 bg-neutral-950 rounded-xl h-[52px]">
                 <div className="w-7 h-7 rounded-full bg-neutral-800 flex-shrink-0" />
@@ -25,7 +25,7 @@ function SimTradingSkeleton() {
             </div>
 
             {/* 메인 영역 */}
-            <div className="flex gap-3" style={{ height: "min(calc(100vh - 220px), 770px)", minHeight: "480px" }}>
+            <div className="flex gap-3 h-[calc(100vh-200px)] min-h-[480px]">
                 {/* 차트 */}
                 <div className="flex-1 min-w-0 bg-neutral-950 rounded-xl" />
 
@@ -115,7 +115,7 @@ export default function TradingClient() {
 
     return (
         <>
-            <div className="px-5 bg-black min-w-[310px] pb-8 pt-12">
+            <div className="pt-12 pb-5 px-5 bg-black min-w-[310px]">
                 <SimTradingPage />
             </div>
             <ForceTabReturnReload />

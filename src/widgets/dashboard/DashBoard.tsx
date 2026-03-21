@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import SeoFooter from "@/widgets/shared-modals/SeoFooter";
 import Chat from "@/features/chat/Chat";
 import PostBoard, { PostBoardHandle } from "@/features/post/PostBoard";
 import LiveStatsBox from "@/entities/coin/LiveStatsBox";
@@ -59,11 +58,10 @@ export const DashBoard = () => {
     };
 
     return (
-        <>
-            <section
-                aria-label="커뮤니티 게시판 및 채팅"
-                className="flex gap-5 mt-5 min-h-120 h-[calc(100vh-448px)] lg:h-[calc(100vh-248px)] 2xl:h-[calc(100vh-348px)] overflow-hidden"
-            >
+        <section
+            aria-label="커뮤니티 게시판 및 채팅"
+            className="flex gap-3 2xl:gap-5 mt-3 2xl:mt-5 flex-1 min-h-0 overflow-hidden"
+        >
                 {/* 왼쪽: 게시판/뉴스 카드 */}
                 <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-surface-card border border-border-subtle">
                     {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
@@ -157,7 +155,7 @@ export const DashBoard = () => {
 
                 <aside
                     aria-label="거래 정보 위젯"
-                    className="flex flex-col gap-5 min-w-57 2xl:min-w-80"
+                    className="flex flex-col gap-2 2xl:gap-5 min-w-57 2xl:min-w-80"
                 >
                     <KimchiWidget fadeDelay={200} />
                     <LiveStatsBox fadeDelay={280} />
@@ -165,7 +163,7 @@ export const DashBoard = () => {
                     <YouTubeSeamlessPlayer videoId="j23SO29LNWE" />
                 </aside>
 
-                <div className="flex flex-col gap-5 min-w-115 2xl:min-w-140">
+                <div className="flex flex-col gap-2 2xl:gap-5 min-w-115 2xl:min-w-140">
                     <MarketIndicesWidget fadeDelay={280} />
                     <aside
                         aria-label="실시간 채팅"
@@ -176,9 +174,7 @@ export const DashBoard = () => {
                         </div>
                     </aside>
                 </div>
-            </section>
-            <SeoFooter />
-        </>
+        </section>
     );
 };
 

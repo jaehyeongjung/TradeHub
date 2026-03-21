@@ -48,8 +48,8 @@ export default function FearGreedGauge({
     const displayLabel = subLabel ?? state.text;
 
     const cardClass = isLight
-        ? "rounded-2xl border border-neutral-200 bg-white p-4 2xl:p-5"
-        : "rounded-2xl border border-border-subtle bg-surface-elevated p-4 2xl:p-5";
+        ? "rounded-2xl border border-neutral-200 bg-white p-3 2xl:p-5"
+        : "rounded-2xl border border-border-subtle bg-surface-elevated p-3 2xl:p-5";
 
     const heroNumClass = isLight
         ? `text-4xl 2xl:text-5xl font-bold tabular-nums ${state.color}`
@@ -74,7 +74,7 @@ export default function FearGreedGauge({
                 style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
             >
                 {/* 헤더 */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-2 2xl:mb-4">
                     <h3 className={headerLabelClass}>{title}</h3>
                     <div className={`px-2 py-0.5 rounded-full text-[10px] 2xl:text-xs font-medium ${state.bgLight}`}>
                         {displayLabel}
@@ -82,7 +82,7 @@ export default function FearGreedGauge({
                 </div>
 
                 {/* 메인 숫자 */}
-                <div className="flex items-baseline gap-2 mb-4">
+                <div className="flex items-baseline gap-2 mb-2 2xl:mb-4">
                     <span className={heroNumClass}>
                         <SlotNumber value={slotValue} />
                     </span>

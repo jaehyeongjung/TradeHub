@@ -4,6 +4,7 @@ import { DashBoard } from "@/components/DashBoard";
 import MobileSuggestModal from "@/components/MobileSuggestModal";
 import Script from "next/script";
 import ForceTabReturnReload from "@/components/ForceTabReturnReload";
+import SeoFooter from "@/widgets/shared-modals/SeoFooter";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -199,10 +200,11 @@ export default function Home() {
                 {JSON.stringify(SOFTWARE_JSONLD)}
             </Script>
 
-            <main className="flex flex-col px-5 bg-black min-w-310 pt-12">
+            <main className="h-screen overflow-hidden flex flex-col px-5 bg-black min-w-310 pt-12 pb-3 2xl:pb-4">
                 <RealTimeSection />
                 <DashBoard />
             </main>
+            <SeoFooter />
             <MobileSuggestModal />
             <ForceTabReturnReload />
         </>

@@ -121,7 +121,7 @@ export default function KimchiWidget({
             <div className={`absolute left-0 inset-y-0 w-[3px] rounded-l-2xl transition-colors duration-500 ${accentBg}`} />
 
             <div
-                className={`pl-5 pr-5 pt-4 pb-4 2xl:pl-6 2xl:pr-6 2xl:pt-5 2xl:pb-5 transition-[opacity,transform] duration-700 ${
+                className={`pl-4 pr-4 pt-3 pb-3 2xl:pl-6 2xl:pr-6 2xl:pt-5 2xl:pb-5 transition-[opacity,transform] duration-700 ${
                     data == null ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
                 }`}
                 style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
@@ -147,7 +147,7 @@ export default function KimchiWidget({
                 </div>
 
                 {/* 구분선 */}
-                <div className={`mt-4 mb-3 border-t ${dividerColor}`} />
+                <div className={`mt-3 mb-2 2xl:mt-4 2xl:mb-3 border-t ${dividerColor}`} />
 
                 {/* 보조 데이터 — 3열 그리드 */}
                 <div className="grid grid-cols-3 gap-8">
