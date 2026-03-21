@@ -36,7 +36,7 @@ function HeaderNavInner() {
         setTimeout(() => document.getElementById("__theme-transition__")?.remove(), 400);
     };
 
-    if (pathname === "/") return null;
+    if (pathname === "/" || pathname.startsWith("/mobile")) return null;
 
     const isDashboard = pathname === "/dashboard";
     const isSim = pathname === "/trading";
