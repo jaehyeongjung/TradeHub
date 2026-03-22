@@ -55,10 +55,10 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
         const steps = [
             {
                 num: "1",
-                color: "text-amber-500",
+                color: isLight ? "text-amber-600" : "text-amber-400",
                 bg: isLight ? "bg-amber-50 border-amber-200/60" : "bg-amber-500/8 border-amber-500/20",
                 icon: (
-                    <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 ${isLight ? "text-amber-600" : "text-amber-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 ),
@@ -96,7 +96,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                 <div className={`${cardBg} rounded-2xl border ${border} p-5`}>
                     <div className="flex items-center gap-3 mb-1">
                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isLight ? "bg-amber-50" : "bg-amber-500/10"}`}>
-                            <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className={`w-4 h-4 ${isLight ? "text-amber-600" : "text-amber-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
                         </div>
@@ -137,7 +137,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
         <div className="space-y-2">
             <div className="flex items-center gap-2 px-1">
                 <span className={`text-[11px] font-semibold ${textTertiary} uppercase tracking-wider`}>포지션</span>
-                <span className="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold bg-amber-500/15 text-amber-500 rounded-full">
+                <span className={`inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold bg-amber-500/10 rounded-full ${isLight ? "text-amber-600" : "text-amber-400"}`}>
                     {positions.length}
                 </span>
             </div>
@@ -180,7 +180,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                                 }`}>
                                                     {pos.side}
                                                 </span>
-                                                <span className="text-[10px] font-bold text-amber-500 font-mono">{Number(pos.leverage).toFixed(0)}x</span>
+                                                <span className={`text-[10px] font-bold font-mono ${isLight ? "text-amber-600" : "text-amber-400"}`}>{Number(pos.leverage).toFixed(0)}x</span>
                                                 <span className={`text-[9px] px-1.5 py-0.5 rounded-md ${
                                                     isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-400"
                                                 }`}>
@@ -318,7 +318,7 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                                         setTpSlError(e instanceof Error ? e.message : "TP/SL 설정 실패");
                                                     }
                                                 }}
-                                                className="flex-1 py-2 text-[11px] font-bold bg-amber-500/15 text-amber-500 rounded-xl border border-amber-500/25 hover:bg-amber-500/25 transition-colors cursor-pointer"
+                                                className={`flex-1 py-2 text-[11px] font-bold bg-amber-500/10 rounded-xl border border-amber-500/20 hover:bg-amber-500/20 transition-colors cursor-pointer ${isLight ? "text-amber-600" : "text-amber-400"}`}
                                             >
                                                 저장
                                             </button>

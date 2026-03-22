@@ -91,8 +91,8 @@ export default function KimchiWidget({
     const heroColor = isNeutral
         ? "text-neutral-400"
         : isPositive
-        ? "text-emerald-400"
-        : "text-rose-500";
+        ? isLight ? "text-emerald-600" : "text-emerald-400"
+        : isLight ? "text-rose-600" : "text-rose-500";
 
     const accentBg = isNeutral
         ? isLight ? "bg-neutral-300" : "bg-neutral-600"
@@ -153,7 +153,7 @@ export default function KimchiWidget({
                 <div className="grid grid-cols-3 gap-8">
                     <div>
                         <div className={`text-[9px] 2xl:text-[10px] mb-0.5 ${labelColor}`}>업비트</div>
-                        <div className="text-[11px] 2xl:text-xs font-mono font-semibold text-emerald-400 tabular-nums">
+                        <div className={`text-[11px] 2xl:text-xs font-mono font-semibold tabular-nums ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>
                             {data?.upbitKrw != null
                                 ? `${Math.round(data.upbitKrw).toLocaleString()}`
                                 : "—"}

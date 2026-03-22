@@ -115,9 +115,7 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
     const openBtn = isLight
         ? "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
         : "bg-surface-input text-text-secondary hover:bg-surface-hover";
-    const shareBtn = isLight
-        ? "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer"
-        : "bg-emerald-600 text-white hover:bg-emerald-500 cursor-pointer";
+    const shareBtn = "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer";
     const shareBtnDisabled = isLight
         ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"
         : "bg-surface-input text-text-muted cursor-not-allowed";

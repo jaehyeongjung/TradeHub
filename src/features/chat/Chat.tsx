@@ -67,7 +67,7 @@ function linkify(text: string): ReactNode[] {
         const href = stripped.startsWith("http") ? stripped : `https://${stripped}`;
         parts.push(
             <a key={`${start}-${href}`} href={href} target="_blank" rel="noreferrer"
-                className="underline hover:text-emerald-300 break-anywhere">
+                className="underline hover:text-emerald-400 break-anywhere">
                 {stripped}
             </a>
         );
@@ -369,7 +369,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
     const labelColor = isLight ? "text-neutral-500" : "text-text-muted";
     const pillBg = isLight ? "bg-neutral-100 text-neutral-600" : "bg-surface-input text-text-tertiary";
     const inputBg = isLight
-        ? "border-neutral-200 bg-neutral-50 text-neutral-800 placeholder-neutral-400 focus:border-emerald-400"
+        ? "border-neutral-200 bg-neutral-50 text-neutral-800 placeholder-neutral-400 focus:border-emerald-500"
         : "border-border-default bg-surface-elevated text-text-primary placeholder-neutral-600 focus:border-emerald-500";
     const msgAreaBg = isLight ? "bg-neutral-50" : "";
     const emptyTextColor = isLight ? "text-neutral-400" : "text-text-muted";
@@ -433,7 +433,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                             disabled={!userId}
                             className={`flex-1 py-2 rounded-xl text-white text-xs font-bold transition-all ${
                                 userId
-                                    ? "bg-emerald-600 hover:bg-emerald-500 cursor-pointer"
+                                    ? "bg-emerald-500 hover:bg-emerald-600 cursor-pointer"
                                     : "bg-surface-hover cursor-not-allowed opacity-50"
                             }`}
                             onClick={() => choose("long")}
@@ -630,7 +630,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                         onClick={send}
                         className={`px-4 py-2 rounded-xl text-[12px] font-semibold transition-all ${
                             userId
-                                ? "bg-emerald-600 text-white hover:bg-emerald-500 cursor-pointer"
+                                ? "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer"
                                 : "bg-surface-hover text-text-muted cursor-not-allowed"
                         }`}
                         disabled={!userId}

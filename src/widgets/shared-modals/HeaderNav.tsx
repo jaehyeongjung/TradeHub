@@ -43,7 +43,7 @@ function HeaderNavInner() {
 
     const activeClass = "text-text-primary font-semibold";
     const inactiveClass = "text-text-muted hover:text-text-secondary transition-colors";
-    const iconBtnClass = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-text-muted hover:text-text-secondary transition-colors cursor-pointer";
+    const iconBtnClass = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-text-secondary hover:text-text-primary transition-colors cursor-pointer";
 
     return (
         <header suppressHydrationWarning className="fixed top-0 left-0 right-0 z-50 h-12 w-full bg-[var(--surface-card)] border-b border-[var(--border-subtle)] flex items-center px-4">

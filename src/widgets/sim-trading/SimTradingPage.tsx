@@ -88,7 +88,7 @@ export default function SimTradingPage() {
     const tabBorder = isLight ? "border-neutral-100" : "border-zinc-800/60";
     const tabActive = isLight ? "text-amber-600" : "text-amber-400";
     const tabInactive = isLight ? "text-neutral-500 hover:text-neutral-700" : "text-neutral-500 hover:text-neutral-300";
-    const badgeActive = isLight ? "bg-amber-500/15 text-amber-600" : "bg-amber-500/20 text-amber-400";
+    const badgeActive = isLight ? "bg-amber-500/10 text-amber-600" : "bg-amber-500/10 text-amber-400";
     const badgeInactive = isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-500";
     const contentBg = isLight ? "bg-neutral-50" : "";
 

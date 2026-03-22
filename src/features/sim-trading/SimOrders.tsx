@@ -27,7 +27,7 @@ export default function SimOrders({ orders, onCancel }: Props) {
             <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
                 <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
                     Open Orders
-                    <span className="inline-flex items-center justify-center w-5 h-5 ml-2 text-[10px] font-bold bg-amber-500/15 text-amber-400 rounded-full">
+                    <span className="inline-flex items-center justify-center w-5 h-5 ml-2 text-[10px] font-bold bg-amber-500/10 text-amber-400 rounded-full">
                         {orders.length}
                     </span>
                 </h3>

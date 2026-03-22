@@ -247,14 +247,14 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
                 {/* 오른쪽: ESC 힌트 + 닫기 버튼 */}
                 <div className="flex items-center gap-2">
                     <span className={`text-[11px] font-mono px-1.5 py-0.5 rounded border select-none ${
-                        isLight ? "text-neutral-400 border-neutral-300 bg-neutral-100" : "text-neutral-500 border-neutral-700 bg-neutral-800"
+                        isLight ? "text-neutral-600 border-neutral-400 bg-neutral-100" : "text-neutral-300 border-neutral-600 bg-neutral-800"
                     }`}>ESC</span>
                     <button
                         onClick={onClose}
                         className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all cursor-pointer active:scale-95 ${
                             isLight
-                                ? "text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100"
-                                : "text-neutral-500 hover:text-white hover:bg-neutral-800"
+                                ? "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+                                : "text-neutral-300 hover:text-white hover:bg-neutral-800"
                         }`}
                     >
                         <svg width="18" height="18" viewBox="0 0 24 24">
