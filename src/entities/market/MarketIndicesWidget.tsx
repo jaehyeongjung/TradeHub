@@ -45,7 +45,7 @@ function IndexItem({ index, isLight }: { index: MarketIndex; isLight: boolean })
 
     const cardBg = isLight
         ? "bg-white border-neutral-200/80 hover:bg-neutral-50 shadow-sm"
-        : "bg-neutral-800/40 border-neutral-700/20 hover:bg-neutral-800/60";
+        : "bg-surface-elevated border-border-subtle hover:bg-surface-hover";
 
     const labelColor = isLight ? "text-neutral-500" : "text-text-tertiary";
     const priceColor = isLight ? "text-neutral-700" : "text-text-primary";
@@ -108,7 +108,7 @@ export default function MarketIndicesWidget({ pollMs = 30000, fadeDelay = 0 }: {
         enabled: !isTreemapOpen,
     });
 
-    const skeletonAccent = isLight ? "border-l-neutral-300 bg-neutral-100" : "border-l-neutral-600 bg-neutral-800/40";
+    const skeletonAccent = isLight ? "border-l-neutral-300 bg-neutral-100" : "border-l-neutral-600 bg-surface-elevated";
 
     return (
         <div
