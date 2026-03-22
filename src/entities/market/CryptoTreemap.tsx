@@ -174,7 +174,8 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
     }, []);
 
     useEffect(() => {
-        const update = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });
+        const HEADER_H = 48;
+        const update = () => setDimensions({ width: window.innerWidth, height: window.innerHeight - HEADER_H });
         update();
         window.addEventListener("resize", update);
         return () => window.removeEventListener("resize", update);
@@ -215,6 +216,12 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
         return squarify(data, 0, 0, dimensions.width, dimensions.height);
     }, [data, dimensions]);
 
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+        window.addEventListener("keydown", handleKey);
+        return () => window.removeEventListener("keydown", handleKey);
+    }, [onClose]);
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -223,31 +230,42 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
             transition={{ duration: 0.25 }}
             className={`fixed inset-0 z-[100] overflow-hidden transition-colors duration-500 ${isLight ? "bg-neutral-100" : "bg-neutral-950"}`}
         >
-            {/* Header */}
-            <div className="absolute bottom-4 right-4 z-10 flex items-center gap-3">
-                <div className={`flex items-center gap-3 backdrop-blur-md rounded-xl px-4 py-2.5 border shadow-lg transition-all duration-500 ${
-                    isLight ? "bg-white/90 border-neutral-300/50" : "bg-neutral-900/90 border-neutral-700/50"
-                }`}>
-                    <h1 className={`text-sm 2xl:text-base font-semibold transition-colors duration-500 ${isLight ? "text-neutral-900" : "text-white"}`}>Treemap</h1>
-                    <div className={`w-px h-4 transition-colors duration-500 ${isLight ? "bg-neutral-300" : "bg-neutral-700"}`} />
-                    <span className={`text-[11px] 2xl:text-xs transition-colors duration-500 ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>24h 거래대금</span>
-                </div>
-                <button
-                    onClick={onClose}
-                    className={`w-12 h-12 flex items-center justify-center rounded-xl backdrop-blur-md border-2 transition-all cursor-pointer shadow-xl group ${
-                        isLight
-                            ? "bg-white border-red-300/60 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-red-200/50"
-                            : "bg-neutral-900/95 border-red-500/40 text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 hover:shadow-red-500/30"
-                    } hover:shadow-2xl hover:scale-105 active:scale-95`}
-                >
-                    <svg width="22" height="22" viewBox="0 0 24 24" className="transition-transform group-hover:rotate-90 duration-200">
-                        <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            {/* Top Header Bar */}
+            <div className={`absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-5 h-12 backdrop-blur-md border-b transition-colors duration-500 ${
+                isLight ? "bg-white/80 border-neutral-200/60" : "bg-neutral-950/80 border-neutral-800/60"
+            }`}>
+                {/* 왼쪽: 아이콘 + 제목 + 설명 */}
+                <div className="flex items-center gap-2.5">
+                    <svg width="15" height="15" viewBox="0 0 24 24" className={isLight ? "text-neutral-500" : "text-neutral-400"}>
+                        <path fill="currentColor" d="M3 3h8v8H3zm10 0h8v5h-8zm0 7h8v11h-8zM3 13h8v8H3z"/>
                     </svg>
-                </button>
+                    <span className={`text-sm font-semibold ${isLight ? "text-neutral-900" : "text-white"}`}>코인 트리맵</span>
+                    <div className={`w-px h-3.5 ${isLight ? "bg-neutral-300" : "bg-neutral-700"}`} />
+                    <span className={`text-xs ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>24h 거래대금 기준</span>
+                </div>
+
+                {/* 오른쪽: ESC 힌트 + 닫기 버튼 */}
+                <div className="flex items-center gap-2">
+                    <span className={`text-[11px] font-mono px-1.5 py-0.5 rounded border select-none ${
+                        isLight ? "text-neutral-400 border-neutral-300 bg-neutral-100" : "text-neutral-500 border-neutral-700 bg-neutral-800"
+                    }`}>ESC</span>
+                    <button
+                        onClick={onClose}
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all cursor-pointer active:scale-95 ${
+                            isLight
+                                ? "text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100"
+                                : "text-neutral-500 hover:text-white hover:bg-neutral-800"
+                        }`}
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             {/* Content */}
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 top-12">
                 <AnimatePresence mode="wait">
                     {loading ? (
                         /* ── 스켈레톤 ── */
