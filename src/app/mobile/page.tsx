@@ -5,6 +5,19 @@ import Image from "next/image";
 
 const FEATURES = [
     {
+        color: "bg-amber-500/10",
+        iconColor: "text-amber-400",
+        icon: (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        ),
+        label: "선물 모의투자",
+        desc: "최대 125배 레버리지 · 롱/숏",
+        img: "/mobile-trade.png",
+        alt: "선물 모의투자",
+    },
+    {
         color: "bg-emerald-500/10",
         iconColor: "text-emerald-400",
         icon: (
@@ -29,19 +42,6 @@ const FEATURES = [
         desc: "150개 코인 등락률 시각화",
         img: "/mobile-tree.png",
         alt: "거래량 트리맵",
-    },
-    {
-        color: "bg-amber-500/10",
-        iconColor: "text-amber-400",
-        icon: (
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        ),
-        label: "선물 모의투자",
-        desc: "최대 125배 레버리지 · 롱/숏",
-        img: "/mobile-trade.png",
-        alt: "선물 모의투자",
     },
 ];
 

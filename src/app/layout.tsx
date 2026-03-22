@@ -18,11 +18,10 @@ const SITE = "https://www.tradehub.kr";
 export const metadata: Metadata = {
     metadataBase: new URL(SITE),
     title: {
-        default: "TradeHub — 비트코인 모의투자 · 실시간 시장 대시보드",
+        default: "TradeHub",
         template: "%s | TradeHub",
     },
-    description:
-        "비트코인 모의투자와 실시간 시장 분석을 한 화면에서. 바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수, 코인 선물 모의투자를 무료로 제공합니다.",
+    description: "더 큰 화면으로, 더 자세하게 즐겨보세요.",
     keywords: [
         "비트코인 모의투자",
         "코인 모의투자",
@@ -56,17 +55,15 @@ export const metadata: Metadata = {
     openGraph: {
         type: "website",
         url: SITE,
-        title: "TradeHub — 비트코인 모의투자 · 실시간 시장 대시보드",
+        title: "TradeHub",
         siteName: "TradeHub",
-        description: "비트코인 모의투자와 실시간 시장 분석을 한 화면에서. 바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수, 코인 선물 모의투자 무료 제공.",
-        images: [{ url: "/trading.png", width: 1200, height: 630, alt: "TradeHub 비트코인 모의투자 대시보드" }],
+        description: "더 큰 화면으로, 더 자세하게 즐겨보세요.",
         locale: "ko_KR",
     },
     twitter: {
         card: "summary_large_image",
-        title: "TradeHub — 비트코인 모의투자 · 실시간 시장 대시보드",
-        description: "비트코인 모의투자와 실시간 시장 분석을 한 화면에서. 바이낸스 실시간 청산, 고래 거래, 150개 코인 트리맵, 김치프리미엄, 공포탐욕지수, 코인 선물 모의투자 무료 제공.",
-        images: ["/trading.png"],
+        title: "TradeHub",
+        description: "더 큰 화면으로, 더 자세하게 즐겨보세요.",
     },
     icons: { icon: "/favicon.png", apple: "/favicon-512.png" },
     manifest: "/manifest.json",

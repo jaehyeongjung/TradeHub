@@ -15,14 +15,6 @@ export const metadata: Metadata = {
         siteName: "TradeHub",
         description:
             "바이낸스 실시간 가격 기반 비트코인 모의투자. 가상 자금 10,000 USDT로 코인 선물 모의거래, 최대 125배 레버리지, 롱/숏 포지션을 무료로 연습하세요.",
-        images: [
-            {
-                url: "/trading.png",
-                width: 1200,
-                height: 630,
-                alt: "TradeHub 비트코인 모의투자",
-            },
-        ],
         locale: "ko_KR",
     },
     twitter: {
@@ -30,7 +22,6 @@ export const metadata: Metadata = {
         title: "코인 선물 모의투자 - 실시간 비트코인 모의거래 | TradeHub",
         description:
             "바이낸스 실시간 가격 기반 비트코인 모의투자. 가상 자금 10,000 USDT로 코인 선물 모의거래, 최대 125배 레버리지, 롱/숏 포지션을 무료로 연습하세요.",
-        images: ["/trading.png"],
     },
 };
 
