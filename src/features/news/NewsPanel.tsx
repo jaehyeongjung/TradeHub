@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { useToast } from "@/shared/ui/Toast";
@@ -30,6 +30,10 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
     const [loading, setLoading] = useState(true);
     const [isLight, setIsLight] = useState(false);
 
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [canScrollUp, setCanScrollUp] = useState(false);
+    const [canScrollDown, setCanScrollDown] = useState(false);
+
     const [viewer, setViewer] = useState<{ url: string; title: string } | null>(null);
     const [iframeReady, setIframeReady] = useState(false);
     const [iframeBlocked, setIframeBlocked] = useState(false);
@@ -53,6 +57,10 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                 .limit(30);
             if (!error && data) setNews(data as NewsItem[]);
             setLoading(false);
+            setTimeout(() => {
+                const el = scrollRef.current;
+                if (el) setCanScrollDown(el.scrollHeight > el.clientHeight + 4);
+            }, 100);
         })();
     }, []);
 
@@ -120,11 +128,17 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
             {/* 카드 */}
             <div className={`h-full min-h-0 flex flex-col rounded-2xl border overflow-hidden ${cardBg}`}>
                 <div
+                    ref={scrollRef}
                     className="flex-1 min-h-0 overflow-y-auto scrollbar-hide"
                     style={{
                         transitionDelay: `${fadeDelay}ms`,
-                        maskImage: "linear-gradient(to bottom, transparent 0px, black 48px, black calc(100% - 48px), transparent 100%)",
-                        WebkitMaskImage: "linear-gradient(to bottom, transparent 0px, black 48px, black calc(100% - 48px), transparent 100%)",
+                        maskImage: `linear-gradient(to bottom, ${canScrollUp ? "transparent 0px, black 48px" : "black 0px"}, black calc(100% - ${canScrollDown ? "48px" : "0px"}), ${canScrollDown ? "transparent 100%" : "black 100%"})`,
+                        WebkitMaskImage: `linear-gradient(to bottom, ${canScrollUp ? "transparent 0px, black 48px" : "black 0px"}, black calc(100% - ${canScrollDown ? "48px" : "0px"}), ${canScrollDown ? "transparent 100%" : "black 100%"})`,
+                    }}
+                    onScroll={(e) => {
+                        const el = e.currentTarget;
+                        setCanScrollUp(el.scrollTop > 4);
+                        setCanScrollDown(el.scrollTop + el.clientHeight < el.scrollHeight - 4);
                     }}
                 >
                     {/* 스켈레톤 */}

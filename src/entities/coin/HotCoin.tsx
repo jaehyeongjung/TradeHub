@@ -48,6 +48,9 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
     const [isLight, setIsLight] = useState(false);
     const timerRef = useRef<number | null>(null);
     const listTooltipRef = useRef<HTMLDivElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [canScrollUp, setCanScrollUp] = useState(false);
+    const [canScrollDown, setCanScrollDown] = useState(false);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
     useEffect(() => {
@@ -66,6 +69,11 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
             }
         };
         document.addEventListener("click", handleClick);
+        // 열릴 때 초기 스크롤 상태 체크
+        setTimeout(() => {
+            const el = scrollRef.current;
+            if (el) setCanScrollDown(el.scrollHeight > el.clientHeight + 4);
+        }, 50);
         return () => document.removeEventListener("click", handleClick);
     }, [showListTooltip]);
 
@@ -144,7 +152,7 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                             transition={{ duration: 0.2 }}
                             className={`absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[200px] text-[11px] rounded-xl px-4 py-3 z-[100] border pointer-events-none ${tooltipBg}`}
                         >
-                            <div className="font-semibold text-amber-500 mb-1">기준 설명</div>
+                            <div className={`font-semibold mb-1 ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>기준 설명</div>
                             <p className="leading-relaxed text-[10px]">24h 거래대금(USDT) + 등락률 가중 점수</p>
                             <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent ${arrowBorder}`} />
                             <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent ${arrowFill}`} />
@@ -219,10 +227,16 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
 
                             {/* 리스트 */}
                             <div
+                                ref={scrollRef}
                                 className="overflow-y-auto scrollbar-hide max-h-[calc(100vh-550px)] lg:max-h-[calc(100vh-350px)] 2xl:max-h-[calc(100vh-450px)]"
                                 style={{
-                                    maskImage: "linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 32px), transparent 100%)",
-                                    WebkitMaskImage: "linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 32px), transparent 100%)",
+                                    maskImage: `linear-gradient(to bottom, ${canScrollUp ? "transparent 0px, black 32px" : "black 0px"}, black calc(100% - ${canScrollDown ? "32px" : "0px"}), ${canScrollDown ? "transparent 100%" : "black 100%"})`,
+                                    WebkitMaskImage: `linear-gradient(to bottom, ${canScrollUp ? "transparent 0px, black 32px" : "black 0px"}, black calc(100% - ${canScrollDown ? "32px" : "0px"}), ${canScrollDown ? "transparent 100%" : "black 100%"})`,
+                                }}
+                                onScroll={(e) => {
+                                    const el = e.currentTarget;
+                                    setCanScrollUp(el.scrollTop > 4);
+                                    setCanScrollDown(el.scrollTop + el.clientHeight < el.scrollHeight - 4);
                                 }}
                             >
                                 {list.slice(0, 15).map((item, i) => {
@@ -237,19 +251,19 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                                             transition={{ duration: 0.2, delay: i * 0.03, ease: [0.16, 1, 0.3, 1] }}
                                             className={`relative flex items-center px-4 py-[6px] transition-colors ${
                                                 isActive
-                                                    ? isLight ? "bg-amber-50" : "bg-amber-500/5"
+                                                    ? isLight ? "bg-emerald-50" : "bg-emerald-500/8"
                                                     : isLight ? "hover:bg-neutral-50" : "hover:bg-neutral-800/50"
                                             }`}
                                         >
-                                            {isActive && <div className="absolute left-0 inset-y-0 w-[2px] bg-amber-500 rounded-r" />}
+                                            {isActive && <div className="absolute left-0 inset-y-0 w-[2px] bg-emerald-500 rounded-r" />}
                                             <span className={`text-[10px] tabular-nums w-5 mr-3 shrink-0 font-medium text-right ${
-                                                isActive ? "text-amber-500" : rankColor
+                                                isActive ? (isLight ? "text-emerald-600" : "text-emerald-400") : rankColor
                                             }`}>
                                                 {i + 1}
                                             </span>
                                             <span className={`flex-1 font-mono font-semibold text-[11px] 2xl:text-xs ${
                                                 isActive
-                                                    ? isLight ? "text-amber-700" : "text-amber-300"
+                                                    ? isLight ? "text-emerald-700" : "text-emerald-300"
                                                     : symColor
                                             }`}>
                                                 {prettySym(item.symbol)}
