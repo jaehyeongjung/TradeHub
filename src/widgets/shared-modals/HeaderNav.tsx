@@ -40,6 +40,7 @@ function HeaderNavInner() {
 
     const isDashboard = pathname === "/dashboard";
     const isSim = pathname === "/trading";
+    const isRanking = pathname === "/ranking";
 
     const activeClass = "text-text-primary font-semibold";
     const inactiveClass = "text-text-muted hover:text-text-secondary transition-colors";
@@ -66,6 +67,12 @@ function HeaderNavInner() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     <span className="hidden sm:inline whitespace-nowrap">모의투자</span>
+                </Link>
+                <Link href="/ranking" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isRanking ? activeClass : inactiveClass}`} aria-current={isRanking ? "page" : undefined}>
+                    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                    </svg>
+                    <span className="hidden sm:inline whitespace-nowrap">랭킹</span>
                 </Link>
             </nav>
 
