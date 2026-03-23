@@ -84,8 +84,8 @@ function HeaderNavInner() {
                     <path d="M4 20h10l4 5H4v-5z" fill="currentColor" opacity="0.4" />
                     <path d="M20 8l8 4-8 4V8z" fill="currentColor" />
                 </svg>
-                <span className="hidden sm:inline whitespace-nowrap">Bybit 수수료 할인</span>
-                <span className="sm:hidden">Bybit</span>
+                <span className="hidden sm:inline whitespace-nowrap">Bybit 가입 시 $20 지급</span>
+                <span className="sm:hidden">Bybit $20</span>
             </a>
 
             {/* 우측 액션 */}
