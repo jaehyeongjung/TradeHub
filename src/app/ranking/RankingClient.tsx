@@ -105,9 +105,9 @@ function SkeletonRow({ isLight }: { isLight: boolean }) {
 }
 
 /* ─── Main ─── */
-export default function RankingClient() {
-    const [coins, setCoins] = useState<RankingCoin[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function RankingClient({ initialData }: { initialData?: RankingCoin[] }) {
+    const [coins, setCoins] = useState<RankingCoin[]>(initialData ?? []);
+    const [loading, setLoading] = useState(!initialData || initialData.length === 0);
     const [sortMode, setSortMode] = useState<SortMode>("market_cap");
     const [isLight, setIsLight] = useState(false);
     const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
@@ -121,15 +121,16 @@ export default function RankingClient() {
     }, []);
 
     useEffect(() => {
+        if (initialData && initialData.length > 0) {
+            setUpdatedAt(new Date());
+            return; // SSR 데이터 있으면 클라이언트 재요청 생략
+        }
         fetch("/api/ranking")
             .then((r) => r.json())
-            .then((data: RankingCoin[]) => {
-                setCoins(data);
-                setUpdatedAt(new Date());
-            })
+            .then((data: RankingCoin[]) => { setCoins(data); setUpdatedAt(new Date()); })
             .catch(() => {})
             .finally(() => setLoading(false));
-    }, []);
+    }, [initialData]);
 
     const sorted = useMemo(() => {
         const list = [...coins];
