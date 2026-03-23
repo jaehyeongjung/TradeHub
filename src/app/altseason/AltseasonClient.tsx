@@ -26,10 +26,10 @@ function getZoneConfig(zone: AltseasonData["zone"]) {
         };
         default: return {
             label: "중립 구간",
-            hex: "#818cf8",
-            textClass: "text-indigo-400",
-            badgeDark: "bg-indigo-500/10 border-indigo-500/20 text-indigo-400",
-            badgeLight: "bg-indigo-50 border-indigo-200 text-indigo-600",
+            hex: "#94A3B8",
+            textClass: "text-slate-400",
+            badgeDark: "bg-slate-500/10 border-slate-500/20 text-slate-400",
+            badgeLight: "bg-slate-100 border-slate-200 text-slate-500",
         };
     }
 }

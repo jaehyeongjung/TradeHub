@@ -3,7 +3,9 @@
 import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import type { RankingCoin } from "@/app/api/ranking/route";
+import { useVirtualList } from "@/hooks/useVirtualList";
 
 type SortMode = "market_cap" | "volume" | "gainers" | "losers" | "ath_drop";
 
@@ -15,13 +17,13 @@ const TABS: { key: SortMode; label: string; desc: string }[] = [
     { key: "ath_drop",   label: "고점낙폭",  desc: "역대 고점에서 가장 많이 내려온 코인" },
 ];
 
+/* ─── 포맷 ─── */
 function fmtPrice(n: number): string {
     if (n >= 10000) return `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
     if (n >= 1)     return `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     if (n >= 0.01)  return `$${n.toFixed(4)}`;
     return `$${n.toFixed(6)}`;
 }
-
 function fmtLarge(n: number): string {
     if (n >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
     if (n >= 1e9)  return `$${(n / 1e9).toFixed(1)}B`;
@@ -29,6 +31,7 @@ function fmtLarge(n: number): string {
     return `$${n.toFixed(0)}`;
 }
 
+/* ─── 스파크라인 ─── */
 function Sparkline({ prices, isUp }: { prices: number[]; isUp: boolean }) {
     if (!prices || prices.length < 2) return <div className="w-16 h-8" />;
     const step = Math.max(1, Math.floor(prices.length / 30));
@@ -58,7 +61,7 @@ function Sparkline({ prices, isUp }: { prices: number[]; isUp: boolean }) {
     );
 }
 
-// 고점낙폭 바 — 설명 없이 데이터가 스스로 말하게
+/* ─── 고점낙폭 바 ─── */
 function AthBar({ pct, isLight }: { pct: number; isLight: boolean }) {
     const drop = Math.abs(pct);
     const color =
@@ -81,6 +84,7 @@ function AthBar({ pct, isLight }: { pct: number; isLight: boolean }) {
     );
 }
 
+/* ─── 스켈레톤 ─── */
 function SkeletonRow({ isLight }: { isLight: boolean }) {
     const pulse = isLight ? "bg-neutral-200" : "bg-surface-elevated";
     return (
@@ -100,6 +104,7 @@ function SkeletonRow({ isLight }: { isLight: boolean }) {
     );
 }
 
+/* ─── Main ─── */
 export default function RankingClient() {
     const [coins, setCoins] = useState<RankingCoin[]>([]);
     const [loading, setLoading] = useState(true);
@@ -137,8 +142,10 @@ export default function RankingClient() {
         }
     }, [coins, sortMode]);
 
-    const activeTab = TABS.find((t) => t.key === sortMode)!;
+    /* ─── 가상화 ─── */
+    const { visibleItems, sentinelRef, hasMore, newBatchStart } = useVirtualList(sorted, 20);
 
+    /* ─── theme ─── */
     const bg       = isLight ? "bg-neutral-50"    : "bg-black";
     const cardBg   = isLight ? "bg-white border-neutral-200"  : "bg-surface-card border-border-subtle";
     const hoverRow = isLight ? "hover:bg-neutral-50"          : "hover:bg-surface-hover/20";
@@ -156,6 +163,7 @@ export default function RankingClient() {
         ? "text-neutral-400 border-neutral-100 bg-neutral-50/80"
         : "text-text-muted border-border-subtle bg-surface-elevated/30";
 
+    const activeTab = TABS.find((t) => t.key === sortMode)!;
     const secondaryLabel =
         sortMode === "volume"   ? "거래대금" :
         sortMode === "ath_drop" ? "고점 대비" :
@@ -219,11 +227,14 @@ export default function RankingClient() {
                         <SkeletonRow key={i} isLight={isLight} />
                     ))}
 
-                    {/* 코인 리스트 */}
-                    {!loading && sorted.map((coin, idx) => {
-                        const pct   = coin.price_change_percentage_24h ?? 0;
-                        const isUp  = pct >= 0;
+                    {/* 코인 리스트 — 가상화 적용 */}
+                    {!loading && visibleItems.map((coin, idx) => {
+                        const pct    = coin.price_change_percentage_24h ?? 0;
+                        const isUp   = pct >= 0;
                         const pctColor = isUp ? "text-emerald-500" : "text-red-500";
+
+                        // 이 배치에서 새로 마운트된 아이템의 상대 인덱스 → 스태거 딜레이
+                        const batchIdx = Math.max(0, idx - newBatchStart);
 
                         const secondaryNode = sortMode === "ath_drop"
                             ? <AthBar pct={coin.ath_change_percentage ?? 0} isLight={isLight} />
@@ -236,8 +247,15 @@ export default function RankingClient() {
                             );
 
                         return (
-                            <div
-                                key={coin.id}
+                            <motion.div
+                                key={`${sortMode}-${coin.id}`}
+                                initial={{ opacity: 0, y: 14 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{
+                                    delay: batchIdx * 0.032,
+                                    duration: 0.32,
+                                    ease: [0.16, 1, 0.3, 1],
+                                }}
                                 className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 transition-colors ${divider} ${hoverRow}`}
                             >
                                 {/* 순위 */}
@@ -285,13 +303,29 @@ export default function RankingClient() {
                                 <div className="hidden xl:flex w-16 justify-end shrink-0">
                                     <Sparkline prices={coin.sparkline_in_7d?.price ?? []} isUp={isUp} />
                                 </div>
-                            </div>
+                            </motion.div>
                         );
                     })}
+
+                    {/* 센티넬 — IntersectionObserver 감지 지점 */}
+                    {!loading && hasMore && (
+                        <div ref={sentinelRef} className="h-px" aria-hidden />
+                    )}
                 </div>
 
+                {/* 더 로드 중 표시 */}
+                {!loading && hasMore && (
+                    <div className={`flex justify-center py-4 text-xs ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
+                        <span className="flex items-center gap-1.5">
+                            <span className="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:0ms]" />
+                            <span className="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:150ms]" />
+                            <span className="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:300ms]" />
+                        </span>
+                    </div>
+                )}
+
                 {/* CTA */}
-                {!loading && sorted.length > 0 && (
+                {!loading && !hasMore && sorted.length > 0 && (
                     <Link
                         href="/trading?tab=sim"
                         className={`mt-5 flex items-center justify-between px-5 py-4 rounded-2xl border transition-all hover:scale-[1.004] active:scale-[0.998] group ${
