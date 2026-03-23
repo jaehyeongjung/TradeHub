@@ -87,7 +87,7 @@ export default function SeoFooter() {
                         </p>
                         {/* Feature 배지 */}
                         <div className="flex flex-wrap gap-1.5">
-                            {["실시간 청산", "고래 거래", "트리맵", "김치프리미엄", "모의투자", "무료"].map((tag) => (
+                            {["실시간 청산", "고래 거래", "트리맵", "김치프리미엄", "모의투자", "펀딩비", "알트시즌", "코인랭킹", "무료"].map((tag) => (
                                 <span
                                     key={tag}
                                     className={`text-[9px] font-medium px-2 py-[3px] rounded-full ${pillBg}`}
@@ -124,6 +124,11 @@ export default function SeoFooter() {
                         <p className={`text-[11px] leading-relaxed ${bodyColor}`}>
                             150개 코인 거래량 트리맵, 김치프리미엄, 공포탐욕지수로 시장 심리를 한눈에 확인하세요.
                         </p>
+                        <div className={`mt-3 pt-3 border-t flex flex-col gap-0.5 ${isLight ? "divide-neutral-100 border-neutral-100" : "divide-neutral-800 border-neutral-800"}`}>
+                            <GuideLink href="/ranking">코인 시가총액 순위</GuideLink>
+                            <GuideLink href="/funding">코인 펀딩비 순위</GuideLink>
+                            <GuideLink href="/altseason">알트코인 시즌 지수</GuideLink>
+                        </div>
                     </article>
 
                     <article className={`rounded-2xl p-5 transition-all duration-200 ${cardBg} ${cardHover}`}>
