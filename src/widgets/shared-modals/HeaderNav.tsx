@@ -69,8 +69,27 @@ function HeaderNavInner() {
                 </Link>
             </nav>
 
+            {/* 바이비트 레퍼럴 */}
+            <a
+                href="https://www.bybit.com/invite?ref=ADYNPO"
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-90 active:scale-[0.97] cursor-pointer flex-shrink-0"
+                style={{ background: "linear-gradient(90deg, #f7a600 0%, #e09500 100%)", color: "#000" }}
+                aria-label="Bybit 파트너 링크"
+            >
+                <svg width="12" height="12" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                    <path d="M4 8h14l-4 5H4V8z" fill="currentColor" />
+                    <path d="M4 14h12l4 5H4v-5z" fill="currentColor" opacity="0.7" />
+                    <path d="M4 20h10l4 5H4v-5z" fill="currentColor" opacity="0.4" />
+                    <path d="M20 8l8 4-8 4V8z" fill="currentColor" />
+                </svg>
+                <span className="hidden sm:inline whitespace-nowrap">Bybit 수수료 할인</span>
+                <span className="sm:hidden">Bybit</span>
+            </a>
+
             {/* 우측 액션 */}
-            <div className="ml-auto flex items-center gap-1">
+            <div className="flex items-center gap-1 ml-3">
                 {/* 트리맵 */}
                 <button type="button" onClick={() => setTreemapOpen(true)} aria-label="트리맵 보기" className={iconBtnClass}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
