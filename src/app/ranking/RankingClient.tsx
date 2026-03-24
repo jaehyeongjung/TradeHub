@@ -144,7 +144,7 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
     }, [coins, sortMode]);
 
     /* ─── 가상화 ─── */
-    const { visibleItems, sentinelRef, hasMore, newBatchStart } = useVirtualList(sorted, 20);
+    const { visibleItems, sentinelRef, hasMore, newBatchStart } = useVirtualList(sorted, 15);
 
     /* ─── theme ─── */
     const bg       = isLight ? "bg-neutral-50"    : "bg-black";
@@ -251,10 +251,11 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                             <motion.div
                                 key={`${sortMode}-${coin.id}`}
                                 initial={{ opacity: 0, y: 14 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: false, amount: 0.1 }}
                                 transition={{
-                                    delay: batchIdx * 0.032,
-                                    duration: 0.32,
+                                    delay: batchIdx * 0.04,
+                                    duration: 0.35,
                                     ease: [0.16, 1, 0.3, 1],
                                 }}
                                 className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 transition-colors ${divider} ${hoverRow}`}

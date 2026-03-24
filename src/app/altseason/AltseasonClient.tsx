@@ -151,7 +151,7 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
     }, [data, filter]);
 
     /* 가상화 — 필터 변경 시 자동 리셋 */
-    const { visibleItems, sentinelRef, hasMore, newBatchStart } = useVirtualList(filteredAlts, 20);
+    const { visibleItems, sentinelRef, hasMore, newBatchStart } = useVirtualList(filteredAlts, 15);
 
     /* 점수 카운트업 */
     const animatedScore = useCountUp(data?.score ?? 0, !loading && !!data);
@@ -320,7 +320,8 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
                             <motion.div
                                 key={`${filter}-${coin.id}`}
                                 initial={{ opacity: 0, y: 12 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: false, amount: 0.1 }}
                                 transition={{
                                     delay: batchIdx * 0.032,
                                     duration: 0.3,
