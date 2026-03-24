@@ -1,22 +1,62 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import Link from "next/link";
 import { guides } from "@/lib/guides";
 
+const SITE = "https://www.tradehub.kr";
+
 export const metadata: Metadata = {
-  title: "투자 가이드 — 코인 용어 · 지표 · 전략 쉽게 배우기",
+  title: "코인 투자 가이드 — 선물거래·지표·용어 쉽게 배우기",
   description:
-    "김치프리미엄, 공포탐욕지수, 청산, 레버리지, 모의투자 등 코인 투자에 필요한 핵심 개념과 전략을 쉽게 설명합니다.",
+    "코인 선물거래 방법, 레버리지 뜻, 청산이란, 김치프리미엄 계산, 공포탐욕지수 활용까지. 암호화폐 투자 초보도 이해하는 핵심 개념 가이드.",
+  keywords: [
+    "코인 선물거래 방법", "레버리지 뜻 코인", "청산이란 코인",
+    "김치프리미엄 뜻", "공포탐욕지수 활용", "코인 고래 거래란",
+    "코인 트리맵이란", "알트코인 시즌 뜻", "코인 투자 용어 정리",
+    "코인 초보 가이드", "암호화폐 투자 공부", "선물거래 용어",
+    "롱 숏 뜻", "격리마진 뜻", "모의투자란",
+  ],
   alternates: { canonical: "/guide" },
   openGraph: {
-    title: "투자 가이드 — 코인 용어 · 지표 · 전략 쉽게 배우기 | TradeHub",
+    title: "코인 투자 가이드 — 선물거래·지표·용어 쉽게 배우기 | TradeHub",
     description:
-      "김치프리미엄, 공포탐욕지수, 청산, 레버리지, 모의투자 등 코인 투자에 필요한 핵심 개념과 전략을 쉽게 설명합니다.",
-    url: "https://www.tradehub.kr/guide",
+      "코인 선물거래 방법, 레버리지 뜻, 청산이란, 김치프리미엄 계산, 공포탐욕지수 활용까지. 암호화폐 투자 초보도 이해하는 핵심 개념 가이드.",
+    url: `${SITE}/guide`,
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "코인 투자 가이드 — 선물거래·지표·용어 쉽게 배우기 | TradeHub",
+    description:
+      "코인 선물거래 방법, 레버리지, 청산, 김치프리미엄, 공포탐욕지수 등 핵심 개념을 쉽게 설명합니다.",
   },
 };
 
 const categoryOrder = ["시장 지표", "선물 거래", "투자 도구"] as const;
+
+const GUIDE_LIST_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "코인 투자 가이드 목록",
+  description: "암호화폐 선물거래, 시장 지표, 투자 도구에 관한 핵심 개념 가이드",
+  numberOfItems: guides.length,
+  itemListElement: guides.map((g, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: g.title,
+    description: g.description,
+    url: `${SITE}/guide/${g.slug}`,
+  })),
+};
+
+const BREADCRUMB_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "TradeHub", item: SITE },
+    { "@type": "ListItem", position: 2, name: "투자 가이드", item: `${SITE}/guide` },
+  ],
+};
 
 export default function GuidesIndex() {
   const grouped = categoryOrder.map((cat) => ({
@@ -25,6 +65,13 @@ export default function GuidesIndex() {
   }));
 
   return (
+    <>
+      <Script id="ld-guide-list" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify(GUIDE_LIST_JSONLD)}
+      </Script>
+      <Script id="ld-guide-bc" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify(BREADCRUMB_JSONLD)}
+      </Script>
     <main className="mx-auto max-w-3xl px-5 py-16 text-white">
       <h1 className="text-3xl font-extrabold tracking-tight">투자 가이드</h1>
       <p className="mt-3 text-zinc-400">
@@ -62,5 +109,6 @@ export default function GuidesIndex() {
         </section>
       ))}
     </main>
+    </>
   );
 }
