@@ -85,6 +85,12 @@ export default function RootLayout({
                 <AuthGate>{children}</AuthGate>
                 <Script
                     async
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4322318127284357"
+                    crossOrigin="anonymous"
+                    strategy="afterInteractive"
+                />
+                <Script
+                    async
                     src="https://www.googletagmanager.com/gtag/js?id=G-PHXWQJSM4Z"
                     strategy="afterInteractive"
                 />
