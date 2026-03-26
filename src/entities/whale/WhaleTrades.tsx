@@ -71,7 +71,7 @@ export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                 });
                 all.sort((a, b) => b.timestamp - a.timestamp);
                 setTrades((prev) => prev.length === 0 ? all.slice(0, MAX_ITEMS) : prev);
-            } catch {}
+            } catch (e) { console.error("[WhaleTrades] initial fetch error:", e); }
         })();
     }, [isTreemapOpen]);
 
@@ -95,7 +95,7 @@ export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                     const usdValue = price * quantity;
                     if (usdValue < MIN_USD_VALUE) return;
                     setTrades((prev) => [{ id: `${d.s}-${d.a}-${Date.now()}`, symbol: d.s.replace("USDT", ""), side: (d.m ? "SELL" : "BUY") as "BUY" | "SELL", price, quantity, usdValue, timestamp: d.T }, ...prev].slice(0, MAX_ITEMS));
-                } catch {}
+                } catch (e) { console.error("[WhaleTrades] ws message parse error:", e); }
             };
             ws.onclose = () => { if (!destroyed) { setIsConnected(false); reconnectTimerRef.current = window.setTimeout(connect, 3000); } };
             ws.onerror = () => { try { ws.close(); } catch {} };

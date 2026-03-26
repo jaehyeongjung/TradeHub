@@ -139,7 +139,7 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
         fetch("/api/altseason")
             .then((r) => r.json())
             .then((d: AltseasonData) => setData(d))
-            .catch(() => {})
+            .catch((e) => console.error("[AltseasonClient] fetch error:", e))
             .finally(() => setLoading(false));
     }, [initialData]);
 

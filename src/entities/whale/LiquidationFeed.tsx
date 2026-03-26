@@ -67,7 +67,7 @@ export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number 
                         side: (o.S === "SELL" ? "LONG" : "SHORT") as "LONG" | "SHORT",
                         quantity, price, usdValue, timestamp: o.T,
                     }, ...prev].slice(0, MAX_ITEMS));
-                } catch {}
+                } catch (e) { console.error("[LiquidationFeed] ws message parse error:", e); }
             };
             ws.onclose = () => { if (!destroyed) { setIsConnected(false); reconnectTimerRef.current = window.setTimeout(connect, 3000); } };
             ws.onerror = () => { try { ws.close(); } catch {} };

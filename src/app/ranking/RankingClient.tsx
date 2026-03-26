@@ -128,7 +128,7 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
         fetch("/api/ranking")
             .then((r) => r.json())
             .then((data: RankingCoin[]) => { setCoins(data); setUpdatedAt(new Date()); })
-            .catch(() => {})
+            .catch((e) => console.error("[RankingClient] fetch error:", e))
             .finally(() => setLoading(false));
     }, [initialData]);
 

@@ -53,7 +53,7 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                     const data = JSON.parse(ev.data) as DepthSnapshot;
                     if (data.b) setBids(data.b.slice(0, ROWS));
                     if (data.a) setAsks(data.a.slice(0, ROWS));
-                } catch {}
+                } catch (e) { console.error("[SimOrderBook] ws message parse error:", e); }
             };
 
             ws.onclose = () => {

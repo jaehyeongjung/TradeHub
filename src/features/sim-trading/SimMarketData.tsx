@@ -77,7 +77,7 @@ export default function SimMarketData() {
             if (Array.isArray(lsData) && lsData[0]) {
                 setLsRatio({ longAccount: parseFloat(lsData[0].longAccount), shortAccount: parseFloat(lsData[0].shortAccount) });
             }
-        } catch {}
+        } catch (e) { console.error("[SimMarketData] fetchAll error:", e); }
     }, [simSymbol, activePage]);
 
     useEffect(() => {

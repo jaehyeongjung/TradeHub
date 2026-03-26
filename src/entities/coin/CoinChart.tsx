@@ -720,13 +720,13 @@ export default function CoinChart({
                         }
                         setCandleDataVersion((v) => v + 1);
                     }
-                } catch {}
+                } catch (e) { console.error("[CoinChart] ws kline parse error:", e); }
             };
             ws.onclose = () => { if (!destroyed) reconnectTimer = window.setTimeout(openWs, 1000); };
             ws.onerror = () => { try { ws?.close(); } catch {} };
         }
 
-        loadHistory().then(openWs).catch(() => {});
+        loadHistory().then(openWs).catch((e) => console.error("[CoinChart] loadHistory error:", e));
 
         ro = new ResizeObserver(() => {
             if (destroyed) return;
