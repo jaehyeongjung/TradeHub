@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { RankingCoin } from "@/app/api/ranking/route";
 import { useVirtualList } from "@/hooks/useVirtualList";
+import { fmtPrice, fmtLarge } from "@/shared/lib/formatting";
 
 type SortMode = "market_cap" | "volume" | "gainers" | "losers" | "ath_drop";
 
@@ -18,18 +19,6 @@ const TABS: { key: SortMode; label: string; desc: string }[] = [
 ];
 
 /* ─── 포맷 ─── */
-function fmtPrice(n: number): string {
-    if (n >= 10000) return `$${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
-    if (n >= 1)     return `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    if (n >= 0.01)  return `$${n.toFixed(4)}`;
-    return `$${n.toFixed(6)}`;
-}
-function fmtLarge(n: number): string {
-    if (n >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
-    if (n >= 1e9)  return `$${(n / 1e9).toFixed(1)}B`;
-    if (n >= 1e6)  return `$${(n / 1e6).toFixed(1)}M`;
-    return `$${n.toFixed(0)}`;
-}
 
 /* ─── 스파크라인 ─── */
 function Sparkline({ prices, isUp }: { prices: number[]; isUp: boolean }) {

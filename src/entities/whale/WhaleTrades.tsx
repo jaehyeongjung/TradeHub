@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtomValue } from "jotai";
 import { treemapOpenAtom } from "@/shared/store/atoms";
+import { fmtUsdCompact, fmtRelativeTime } from "@/shared/lib/formatting";
 
 type WhaleTrade = {
     id: string;
@@ -108,15 +109,6 @@ export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
         };
     }, [isTreemapOpen]);
 
-    const formatValue = (v: number) =>
-        v >= 1_000_000 ? `$${(v / 1_000_000).toFixed(2)}M` : `$${(v / 1_000).toFixed(0)}K`;
-
-    const formatTime = (ts: number) => {
-        const s = Math.floor((Date.now() - ts) / 1000);
-        if (s < 60) return "방금";
-        const m = Math.floor(s / 60);
-        return m < 60 ? `${m}분` : `${Math.floor(m / 60)}시간`;
-    };
 
     return (
         <div
@@ -181,11 +173,11 @@ export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                                             </span>
                                             {/* 금액 히어로 */}
                                             <span className={`text-[11px] 2xl:text-xs font-mono font-bold ${isBuy ? "text-emerald-400" : "text-red-400"}`}>
-                                                {formatValue(trade.usdValue)}
+                                                {fmtUsdCompact(trade.usdValue)}
                                             </span>
                                             {/* 시간 */}
                                             <span className="text-[9px] text-text-muted w-7 text-right shrink-0">
-                                                {formatTime(trade.timestamp)}
+                                                {fmtRelativeTime(trade.timestamp)}
                                             </span>
                                         </motion.div>
                                     );
