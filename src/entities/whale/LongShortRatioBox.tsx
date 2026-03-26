@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtomValue } from "jotai";
 import { treemapOpenAtom } from "@/shared/store/atoms";
@@ -67,16 +68,8 @@ export default function LongShortRatioBox({
   const [shortPct, setShortPct] = useState<number | null>(null);
   const [ts, setTs] = useState<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const [isLight, setIsLight] = useState(false);
+  const isLight = useTheme();
   const isTreemapOpen = useAtomValue(treemapOpenAtom);
-
-  useEffect(() => {
-    const check = () => setIsLight(document.documentElement.classList.contains("light"));
-    check();
-    const observer = new MutationObserver(check);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
 
   const endpoint = useMemo(() => {
     switch (source) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { useAtomValue } from "jotai";
 import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
 import { treemapOpenAtom } from "@/shared/store/atoms";
@@ -74,17 +75,9 @@ function IndexItem({ index, isLight }: { index: MarketIndex; isLight: boolean })
 
 export default function MarketIndicesWidget({ pollMs = 30000, fadeDelay = 0 }: { pollMs?: number; fadeDelay?: number }) {
     const [data, setData] = useState<MarketIndicesResponse | null>(null);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const abortRef = useRef<AbortController | null>(null);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     const load = useCallback(async () => {
         try {

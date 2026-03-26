@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { AnimatePresence, motion } from "framer-motion";
 import { SlotNumber } from "@/shared/ui/AnimatedNumber";
 
@@ -21,20 +22,12 @@ export default function FearGreedGauge({
 }: Props) {
     const v = Math.max(0, Math.min(100, value));
     const [isHovered, setIsHovered] = useState(false);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const [slotValue, setSlotValue] = useState(0);
 
     useEffect(() => {
         if (!isLoading && v > 0) setSlotValue(v);
     }, [isLoading, v]);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     const getStateInfo = (val: number) => {
         if (val < 25) return { text: "극도의 공포", color: "text-red-400", barColor: "bg-red-500", bgLight: isLight ? "bg-red-50 text-red-600" : "bg-red-500/10 text-red-400" };

@@ -2,20 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 
 export default function SeoFooter() {
-    const [isLight, setIsLight] = useState(false);
-
-    useEffect(() => {
-        const html = document.documentElement;
-        setIsLight(html.classList.contains("light"));
-        const observer = new MutationObserver(() => {
-            setIsLight(html.classList.contains("light"));
-        });
-        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
+    const isLight = useTheme();
 
     const borderColor = isLight ? "border-neutral-200" : "border-neutral-800";
     const cardBg = isLight

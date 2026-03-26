@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { createPortal } from "react-dom";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { useToast } from "@/shared/ui/Toast";
@@ -28,7 +29,7 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
     const [news, setNews] = useState<NewsItem[]>([]);
     const [userId, setUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
 
     const scrollRef = useRef<HTMLDivElement>(null);
     const [canScrollUp, setCanScrollUp] = useState(false);
@@ -37,14 +38,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
     const [viewer, setViewer] = useState<{ url: string; title: string } | null>(null);
     const [iframeReady, setIframeReady] = useState(false);
     const [iframeBlocked, setIframeBlocked] = useState(false);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     useEffect(() => {
         (async () => {

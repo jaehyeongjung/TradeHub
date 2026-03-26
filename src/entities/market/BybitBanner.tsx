@@ -1,20 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 
 export default function BybitBanner({ fadeDelay = 0 }: { fadeDelay?: number }) {
     const [mounted, setMounted] = useState(false);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
 
     useEffect(() => { setMounted(true); }, []);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     return (
         <a

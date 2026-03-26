@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import Chat from "@/features/chat/Chat";
@@ -18,17 +19,9 @@ type TabKey = "board" | "news";
 export const DashBoard = () => {
     const postRef = useRef<PostBoardHandle>(null);
     const [mounted, setMounted] = useState(false);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
 
     useEffect(() => { setMounted(true); }, []);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     const router = useRouter();
 

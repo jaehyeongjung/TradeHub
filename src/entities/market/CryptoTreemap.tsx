@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Ticker = {
@@ -163,15 +164,7 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
     const [data, setData] = useState<TreemapItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-    const [isLight, setIsLight] = useState(false);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
+    const isLight = useTheme();
 
     useEffect(() => {
         const HEADER_H = 48;

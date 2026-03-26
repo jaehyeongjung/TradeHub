@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtomValue } from "jotai";
 import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
@@ -49,19 +50,11 @@ export default function KimchiWidget({
 }) {
     const [data, setData] = useState<Data | null>(null);
     const [isHovered, setIsHovered] = useState(false);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const [flash, setFlash] = useState<"up" | "down" | null>(null);
     const prevPctRef = useRef<number | null>(null);
     const abortRef = useRef<AbortController | null>(null);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     const load = useCallback(async () => {
         try {

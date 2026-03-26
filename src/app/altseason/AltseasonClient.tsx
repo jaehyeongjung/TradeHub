@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import type { AltseasonData } from "@/app/api/altseason/route";
 import { useVirtualList } from "@/hooks/useVirtualList";
+import { useTheme } from "@/shared/hooks/useTheme";
 
 type FilterMode = "all" | "outperform" | "underperform";
 
@@ -123,16 +124,8 @@ function Sk({ w = "w-20", h = "h-4", isLight }: { w?: string; h?: string; isLigh
 export default function AltseasonClient({ initialData }: { initialData?: AltseasonData }) {
     const [data, setData] = useState<AltseasonData | null>(initialData ?? null);
     const [loading, setLoading] = useState(!initialData);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const [filter, setFilter] = useState<FilterMode>("all");
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const obs = new MutationObserver(check);
-        obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => obs.disconnect();
-    }, []);
 
     useEffect(() => {
         if (initialData) return; // SSR 데이터 있으면 생략

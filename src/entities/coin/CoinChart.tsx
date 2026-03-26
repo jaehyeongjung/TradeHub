@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import {
     createChart,
     CandlestickSeries,
@@ -235,7 +236,7 @@ export default function CoinChart({
     const [open, setOpen] = useState(false);
     const [hovered, setHovered] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
-    const [theme, setTheme] = useState<"dark" | "light">("light");
+    const isLight = useTheme();
     const [chartLoading, setChartLoading] = useState(true);
     const [candleDataVersion, setCandleDataVersion] = useState(0);
 
@@ -458,17 +459,6 @@ export default function CoinChart({
         return Number.isFinite(n) ? n : 0.01;
     };
 
-    // Theme detection
-    useEffect(() => {
-        const html = document.documentElement;
-        setTheme(html.classList.contains("light") ? "light" : "dark");
-        const observer = new MutationObserver(() => {
-            setTheme(html.classList.contains("light") ? "light" : "dark");
-        });
-        observer.observe(html, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
-
     // User session + symbol load
     useEffect(() => {
         const savedInterval = localStorage.getItem(`chart:${boxId}:interval`);
@@ -519,7 +509,7 @@ export default function CoinChart({
         let ro: ResizeObserver | null = null;
 
         setChartLoading(true);
-        const isLight = theme === "light";
+
 
         const chart: IChartApi = createChart(el, {
             width: el.clientWidth,
@@ -750,7 +740,7 @@ export default function CoinChart({
             }
             try { chart.remove(); } catch {}
         };
-    }, [sym, interval, historyLimit, theme]);
+    }, [sym, interval, historyLimit, isLight]);
 
     // ─── Indicator rendering effect ───────────────────────────────────────────
     useEffect(() => {

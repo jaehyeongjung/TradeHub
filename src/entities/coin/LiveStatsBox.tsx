@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { useAtomValue } from "jotai";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
@@ -20,18 +21,10 @@ export default function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } =
     const [onlineNow, setOnlineNow] = useState<number>(0);
     const [ready, setReady] = useState(false);
     const [connected, setConnected] = useState<boolean>(false);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
 
     const today = new Date().toISOString().slice(0, 10);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     useEffect(() => {
         void supabase.from("visits").upsert([{ day: today, device_id: deviceIdRef.current }], { onConflict: "day,device_id" });

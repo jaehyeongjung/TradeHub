@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import Image from "next/image";
 
 const FEATURES = [
@@ -47,15 +48,7 @@ const FEATURES = [
 
 export default function MobilePage() {
     const [copied, setCopied] = useState(false);
-    const [isLight, setIsLight] = useState(false);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
+    const isLight = useTheme();
 
     const handleCopy = () => {
         navigator.clipboard.writeText("https://www.tradehub.kr");

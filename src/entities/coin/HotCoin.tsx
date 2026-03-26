@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAtomValue } from "jotai";
 import { treemapOpenAtom } from "@/shared/store/atoms";
@@ -45,21 +46,13 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
     const [idx, setIdx] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);
     const [showListTooltip, setShowListTooltip] = useState(false);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const timerRef = useRef<number | null>(null);
     const listTooltipRef = useRef<HTMLDivElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
     const [canScrollUp, setCanScrollUp] = useState(false);
     const [canScrollDown, setCanScrollDown] = useState(false);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     useEffect(() => {
         if (!showListTooltip) return;

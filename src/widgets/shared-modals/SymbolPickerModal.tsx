@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useMemo } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
+
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
@@ -169,16 +171,8 @@ export default function SymbolPickerModal({
 }: Props) {
     const [search, setSearch] = useState("");
     const [selected, setSelected] = useState(initialSymbol.toLowerCase());
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const inputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const obs = new MutationObserver(check);
-        obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => obs.disconnect();
-    }, []);
 
     useEffect(() => {
         if (open) {

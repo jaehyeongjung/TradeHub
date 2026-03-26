@@ -7,6 +7,7 @@ import React, {
     forwardRef,
     useImperativeHandle,
 } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { sanitizeText } from "@/shared/lib/sanitize";
 import WriteForm from "@/features/post/WriteForm";
@@ -88,7 +89,7 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
     const [mode, setMode] = useState<"list" | "write" | "detail" | "edit">("list");
     const [selected, setSelected] = useState<Post | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const [modal, setModal] = useState<{
         message: string;
         isConfirm: boolean;
@@ -96,14 +97,6 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
     } | null>(null);
     const [listScrolled, setListScrolled] = useState(false);
     const listRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     useImperativeHandle(ref, () => ({
         openWrite: () => setMode("write"),

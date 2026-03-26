@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import type { RankingCoin } from "@/app/api/ranking/route";
 import { useVirtualList } from "@/hooks/useVirtualList";
 import { fmtPrice, fmtLarge } from "@/shared/lib/formatting";
+import { useTheme } from "@/shared/hooks/useTheme";
 
 type SortMode = "market_cap" | "volume" | "gainers" | "losers" | "ath_drop";
 
@@ -98,16 +99,8 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
     const [coins, setCoins] = useState<RankingCoin[]>(initialData ?? []);
     const [loading, setLoading] = useState(!initialData || initialData.length === 0);
     const [sortMode, setSortMode] = useState<SortMode>("market_cap");
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     useEffect(() => {
         if (initialData && initialData.length > 0) {

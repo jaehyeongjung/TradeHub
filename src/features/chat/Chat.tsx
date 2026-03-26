@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 import type { ReactNode } from "react";
 import { supabase } from "@/shared/lib/supabase-browser";
 import type { PostgrestSingleResponse } from "@supabase/supabase-js";
@@ -84,18 +85,10 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
     const [_isAnonymous, setIsAnonymous] = useState(false);
     const [msgs, setMsgs] = useState<Msg[]>([]);
     const [initialLoading, setInitialLoading] = useState(true);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const inputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
     const userIdRef = useRef<string | null>(null);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     useEffect(() => { userIdRef.current = userId; }, [userId]);
 

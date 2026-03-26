@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useTheme } from "@/shared/hooks/useTheme";
 
 interface YTPlayer {
     playVideo: () => void;
@@ -47,16 +48,8 @@ export default function YouTubeBGMPlayer({
 }: Props) {
     const [isMuted, setIsMuted] = useState(true);
     const [isReady, setIsReady] = useState(false);
-    const [isLight, setIsLight] = useState(false);
+    const isLight = useTheme();
     const playerRef = useRef<YTPlayer | null>(null);
-
-    useEffect(() => {
-        const check = () => setIsLight(document.documentElement.classList.contains("light"));
-        check();
-        const observer = new MutationObserver(check);
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-        return () => observer.disconnect();
-    }, []);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
