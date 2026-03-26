@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useSetAtom } from "jotai";
-import { activePageAtom } from "@/store/atoms";
+import { activePageAtom } from "@/shared/store/atoms";
 import dynamic from "next/dynamic";
 import ForceTabReturnReload from "@/components/ForceTabReturnReload";
 
