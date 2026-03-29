@@ -63,13 +63,12 @@ export interface SimTrade {
     created_at: string;
 }
 
-/** 주문 생성 시 사용하는 input */
 export interface OpenPositionInput {
     symbol: string;
     side: PositionSide;
     orderType: OrderType;
-    price: number; // 시장가일 경우 현재가
-    quantityUsdt: number; // USDT 기준 주문량
+    price: number;
+    quantityUsdt: number;
     leverage: number;
     tpPrice?: number;
     slPrice?: number;

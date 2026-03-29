@@ -88,7 +88,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
             if (!iframeReady) setIframeBlocked(true);
         }, 3500);
         return () => clearTimeout(t);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [viewer?.url]);
 
     const cardBg = isLight
@@ -116,7 +115,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
 
     return (
         <>
-            {/* 카드 */}
             <div className={`h-full min-h-0 flex flex-col rounded-2xl border overflow-hidden ${cardBg}`}>
                 <div
                     ref={scrollRef}
@@ -132,7 +130,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                         setCanScrollDown(el.scrollTop + el.clientHeight < el.scrollHeight - 4);
                     }}
                 >
-                    {/* 스켈레톤 */}
                     {loading && (
                         <div className="p-3 space-y-0">
                             {[...Array(6)].map((_, i) => (
@@ -154,7 +151,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                         </div>
                     )}
 
-                    {/* 콘텐츠 */}
                     {!loading && (
                         <div
                             className={`transition-[opacity,transform] duration-700 opacity-100 translate-y-0`}
@@ -174,9 +170,7 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                                             key={n.id}
                                             className={`flex items-start gap-3 py-3 border-b last:border-b-0 ${dividerColor}`}
                                         >
-                                            {/* 콘텐츠 */}
                                             <div className="flex-1 min-w-0">
-                                                {/* 소스 pill + 심볼 */}
                                                 <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
                                                     <span className={`text-[9px] font-semibold px-1.5 py-[2px] rounded-md ${sourcePill}`}>
                                                         {n.source}
@@ -187,7 +181,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                                                         </span>
                                                     ))}
                                                 </div>
-                                                {/* 제목 */}
                                                 <button
                                                     className={`block w-full text-left text-xs font-medium line-clamp-2 md:line-clamp-1 cursor-pointer transition-colors ${titleColor}`}
                                                     title={n.title}
@@ -197,7 +190,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                                                 </button>
                                             </div>
 
-                                            {/* 시간 + 버튼 */}
                                             <div className="flex flex-col items-end gap-1.5 shrink-0">
                                                 <span className={`text-[9px] tabular-nums ${timeColor}`}>
                                                     {formatRelativeTime(n.published_at)}
@@ -227,7 +219,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                 </div>
             </div>
 
-            {/* IFRAME MODAL */}
             {viewer && createPortal(
                 <div
                     className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-4"
@@ -237,7 +228,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                         className="relative w-[90vw] max-w-5xl h-[80vh] rounded-2xl overflow-hidden border border-border-default bg-surface-elevated"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* 상단 바 */}
                         <div className="absolute top-0 left-0 right-0 h-11 bg-surface-elevated/95 border-b border-border-subtle flex items-center gap-2 px-4">
                             <div className="truncate text-xs text-text-secondary flex-1" title={viewer.title}>
                                 {viewer.title}
@@ -260,7 +250,6 @@ export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; f
                             </div>
                         </div>
 
-                        {/* iframe */}
                         <div className="absolute inset-x-0 top-11 bottom-0">
                             {!iframeReady && (
                                 <div className="absolute inset-0 flex items-center justify-center text-sm text-text-tertiary">

@@ -3,21 +3,12 @@
 import { useEffect, useRef, useCallback } from "react";
 
 interface UseVisibilityPollingOptions {
-    /** 폴링 간격 (ms) */
     interval: number;
-    /** 폴링 함수 */
     onPoll: () => Promise<void> | void;
-    /** 즉시 실행 여부 (기본: true) */
     immediate?: boolean;
-    /** 활성화 여부 (기본: true) */
     enabled?: boolean;
 }
 
-/**
- * 탭이 활성화되었을 때만 폴링을 실행하는 훅
- * - 탭 비활성화 시 폴링 중단 → 네트워크 요청 절약
- * - 탭 활성화 시 즉시 1회 실행 후 폴링 재개
- */
 export function useVisibilityPolling({
     interval,
     onPoll,
@@ -28,7 +19,7 @@ export function useVisibilityPolling({
     const isPollingRef = useRef(false);
 
     const poll = useCallback(async () => {
-        if (isPollingRef.current) return; // 중복 실행 방지
+        if (isPollingRef.current) return;
         isPollingRef.current = true;
         try {
             await onPoll();
@@ -59,18 +50,15 @@ export function useVisibilityPolling({
             if (document.hidden) {
                 stopPolling();
             } else {
-                // 탭 활성화 시 즉시 1회 실행
                 void poll();
                 startPolling();
             }
         };
 
-        // 초기 실행
         if (immediate && !document.hidden) {
             void poll();
         }
 
-        // 탭이 보이면 폴링 시작
         if (!document.hidden) {
             startPolling();
         }

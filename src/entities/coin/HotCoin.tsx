@@ -62,7 +62,6 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
             }
         };
         document.addEventListener("click", handleClick);
-        // 열릴 때 초기 스크롤 상태 체크
         setTimeout(() => {
             const el = scrollRef.current;
             if (el) setCanScrollDown(el.scrollHeight > el.clientHeight + 4);
@@ -125,7 +124,6 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
             className={`relative flex items-center gap-3 2xl:gap-4 ml-10 transition-[opacity,transform] duration-700 ${current ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
             style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
         >
-            {/* Hot Coin 배지 */}
             <div
                 className="relative"
                 onMouseEnter={() => setShowTooltip(true)}
@@ -154,7 +152,6 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                 </AnimatePresence>
             </div>
 
-            {/* 실시간 회전 코인 */}
             <div
                 ref={listTooltipRef}
                 className="relative w-[280px] 2xl:w-[360px] cursor-pointer"
@@ -191,7 +188,6 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                     </AnimatePresence>
                 </div>
 
-                {/* Top 15 전체 리스트 패널 */}
                 <AnimatePresence>
                     {showListTooltip && list.length > 0 && (
                         <motion.div
@@ -201,7 +197,6 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                             transition={{ duration: 0.18 }}
                             className={`absolute left-0 top-[calc(100%+16px)] w-[320px] 2xl:w-[380px] text-[11px] rounded-2xl overflow-hidden z-[100] border ${tooltipBg}`}
                         >
-                            {/* 패널 헤더 */}
                             <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: isLight ? "#f0f0f0" : "#262626" }}>
                                 <div className="flex items-center gap-1.5">
                                     <span className={`font-bold text-xs tracking-wide ${isLight ? "text-neutral-700" : "text-text-primary"}`}>HOT</span>
@@ -210,7 +205,6 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                                 <span className={`text-[9px] ${colLabelColor}`}>30초 갱신</span>
                             </div>
 
-                            {/* 컬럼 헤더 */}
                             <div className={`flex items-center px-4 py-2 border-b ${dividerColor}`}>
                                 <span className={`text-[9px] font-medium w-5 mr-3 shrink-0 text-right ${colLabelColor}`}>#</span>
                                 <span className={`text-[9px] font-medium flex-1 ${colLabelColor}`}>코인</span>
@@ -218,7 +212,6 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                                 <span className={`text-[9px] font-medium w-16 text-right ${colLabelColor}`}>24h</span>
                             </div>
 
-                            {/* 리스트 */}
                             <div
                                 ref={scrollRef}
                                 className="overflow-y-auto scrollbar-hide max-h-[calc(100vh-550px)] lg:max-h-[calc(100vh-350px)] 2xl:max-h-[calc(100vh-450px)]"
@@ -274,7 +267,6 @@ export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number
                                 })}
                             </div>
 
-                            {/* 화살표 */}
                             <div className={`absolute top-0 left-8 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent ${arrowBorder}`} />
                             <div className={`absolute top-0 left-8 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent ${arrowFill}`} />
                         </motion.div>

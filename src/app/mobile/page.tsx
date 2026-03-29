@@ -59,7 +59,6 @@ export default function MobilePage() {
     return (
         <div className={`min-h-screen flex flex-col selection:bg-emerald-500/30 ${isLight ? "bg-neutral-50 text-neutral-950" : "bg-[#0A0A0A] text-white"}`}>
 
-            {/* 헤더 */}
             <header className="px-6 pt-14 pb-0 flex items-center justify-between">
                 <div className="flex flex-col">
                     <span className={`text-[22px] font-[900] tracking-[-0.08em] leading-none ${isLight ? "text-neutral-900" : "text-white"}`}>
@@ -77,7 +76,6 @@ export default function MobilePage() {
 
             <main className="flex-1 px-6 pb-36">
 
-                {/* 히어로 */}
                 <section className="pt-12 pb-10">
                     <div className={`w-14 h-14 rounded-[18px] border flex items-center justify-center mb-7 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
                         <svg className={`w-7 h-7 ${isLight ? "text-neutral-400" : "text-neutral-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -95,7 +93,6 @@ export default function MobilePage() {
                     </p>
                 </section>
 
-                {/* URL 카드 */}
                 <div className={`border rounded-2xl p-5 mb-3 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
                     <p className={`text-[11px] mb-3 font-medium tracking-wide uppercase ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>접속 주소</p>
                     <div className="flex items-center justify-between gap-3">
@@ -120,7 +117,6 @@ export default function MobilePage() {
                     </div>
                 </div>
 
-                {/* 기능 목록 */}
                 <section className="mt-10">
                     <p className={`text-[11px] font-bold uppercase tracking-widest mb-4 ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>주요 기능</p>
                     <div className="space-y-3">
@@ -152,7 +148,6 @@ export default function MobilePage() {
                 </section>
             </main>
 
-            {/* 하단 고정 CTA */}
             <div className={`fixed bottom-0 left-0 right-0 px-5 pb-10 pt-6 pointer-events-none bg-gradient-to-t ${isLight ? "from-neutral-50 via-neutral-50/95" : "from-[#0A0A0A] via-[#0A0A0A]/95"} to-transparent`}>
                 <button
                     onClick={handleCopy}

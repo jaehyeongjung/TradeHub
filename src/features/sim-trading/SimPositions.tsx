@@ -21,7 +21,6 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
     const [editSl, setEditSl] = useState("");
     const [tpSlError, setTpSlError] = useState("");
 
-    // PnL 플래시
     const prevPnlRef = useRef<Record<string, number>>({});
     const [flashMap, setFlashMap] = useState<Record<string, "up" | "down" | null>>({});
 
@@ -158,11 +157,9 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
 
                     return (
                         <div key={pos.id} className={`${cardBg} rounded-2xl border ${border} overflow-hidden`}>
-                            {/* 상단 컬러 라인 */}
                             <div className={`h-[2px] ${isLong ? "bg-emerald-500" : "bg-red-500"}`} />
 
                             <div className="p-4">
-                                {/* 헤더 */}
                                 <div className="flex items-start justify-between mb-3">
                                     <div className="flex items-center gap-2.5">
                                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[11px] font-black ${
@@ -206,7 +203,6 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                     </button>
                                 </div>
 
-                                {/* PnL 히어로 — 플래시 */}
                                 <div className={`rounded-xl px-4 py-3 mb-3 transition-colors duration-300 ${
                                     flash === "up"
                                         ? "bg-emerald-500/25"
@@ -231,7 +227,6 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                     </div>
                                 </div>
 
-                                {/* 가격 3열 */}
                                 <div className="grid grid-cols-3 gap-2 mb-3">
                                     {[
                                         { label: "진입가", value: pos.entry_price.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: textSecondary },
@@ -245,7 +240,6 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                     ))}
                                 </div>
 
-                                {/* 청산가 거리 바 */}
                                 <div className="mb-3">
                                     <div className="flex items-center justify-between mb-1.5">
                                         <div className="flex items-center gap-1.5">
@@ -281,7 +275,6 @@ export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props
                                     </div>
                                 </div>
 
-                                {/* TP/SL */}
                                 {isEditing ? (
                                     <div className={`${subCardBg} rounded-xl p-3 border ${border} space-y-2`}>
                                         <div className="flex gap-2">

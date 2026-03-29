@@ -21,7 +21,6 @@ import SymbolPickerModal from "@/components/SymbolPickerModal";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { AnimatePresence, motion } from "framer-motion";
 
-// ─── Indicator types ──────────────────────────────────────────────────────────
 type IndicatorType = "MA" | "EMA" | "BB" | "RSI" | "MACD";
 
 interface IndicatorConfig {
@@ -52,7 +51,6 @@ const DEFAULT_PERIODS: Record<IndicatorType, number> = {
     MACD: 12,
 };
 
-// ─── Indicator calculations ───────────────────────────────────────────────────
 function calcMA(data: number[], period: number): (number | null)[] {
     return data.map((_, i) => {
         if (i < period - 1) return null;
@@ -118,7 +116,6 @@ function calcMACD(data: number[], fast: number, slow: number, signal: number) {
         const s = emaSlow[i];
         return f !== null && s !== null ? f - s : null;
     });
-    // Signal line from valid MACD values
     const validMacd = macdLine.filter((v): v is number => v !== null);
     const signalValues = calcEMA(validMacd, signal);
     const signalLine: (number | null)[] = [];
@@ -134,7 +131,6 @@ function calcMACD(data: number[], fast: number, slow: number, signal: number) {
     return { macdLine, signalLine, histogram };
 }
 
-// ─── Chart component ──────────────────────────────────────────────────────────
 interface BinanceExchangeInfo {
     symbols: Array<{
         symbol: string;
@@ -179,7 +175,6 @@ interface AddForm {
     signalPeriod: number;
 }
 
-// ─── Drawing tool types ───────────────────────────────────────────────────────
 type DrawTool = "cursor" | "hline" | "eraser";
 interface DrawnHLine { id: string; price: number; }
 
@@ -220,12 +215,9 @@ export default function CoinChart({
     const positionsRef = useRef(positions);
     positionsRef.current = positions;
 
-    // Indicator refs
     const candleDataRef = useRef<CandlestickData<UTCTimestamp>[]>([]);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicatorSeriesMapRef = useRef<Map<string, ISeriesApi<any>[]>>(new Map());
 
-    // Drawing refs
     const hlPriceLineRefs = useRef<Map<string, IPriceLine>>(new Map());
     const drawToolRef = useRef<DrawTool>("cursor");
     const drawnHLinesRef = useRef<DrawnHLine[]>([]);
@@ -240,7 +232,6 @@ export default function CoinChart({
     const [chartLoading, setChartLoading] = useState(true);
     const [candleDataVersion, setCandleDataVersion] = useState(0);
 
-    // Drawing state
     const drawStorageKey = `chart:${boxId}:drawings`;
     const [drawTool, setDrawTool] = useState<DrawTool>("cursor");
     const [drawnHLines, setDrawnHLines] = useState<DrawnHLine[]>(() => {
@@ -251,11 +242,9 @@ export default function CoinChart({
         } catch { return []; }
     });
 
-    // Keep refs in sync with state (for click handler)
     drawToolRef.current = drawTool;
     drawnHLinesRef.current = drawnHLines;
 
-    // Indicator state (enableIndicators=false이면 항상 빈 배열)
     const indicatorStorageKey = `chart:${boxId}:indicators`;
     const [activeIndicators, setActiveIndicators] = useState<IndicatorConfig[]>(() => {
         if (!enableIndicators) return [];
@@ -270,19 +259,16 @@ export default function CoinChart({
 
     useEffect(() => { setSym(symbol.toUpperCase()); }, [symbol]);
 
-    // Persist indicators (enableIndicators가 true일 때만)
     useEffect(() => {
         if (!enableIndicators) return;
         localStorage.setItem(indicatorStorageKey, JSON.stringify(activeIndicators));
     }, [activeIndicators, enableIndicators, indicatorStorageKey]);
 
-    // Persist drawings
     useEffect(() => {
         if (!enableIndicators) return;
         localStorage.setItem(drawStorageKey, JSON.stringify({ hlines: drawnHLines }));
     }, [drawnHLines, enableIndicators, drawStorageKey]);
 
-    // Render horizontal price lines
     useEffect(() => {
         const series = candleSeriesRef.current;
         if (!series) return;
@@ -294,10 +280,8 @@ export default function CoinChart({
                 hlPriceLineRefs.current.set(h.id, line);
             } catch {}
         });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [drawnHLines, candleDataVersion]);
 
-    // Drawing interactions: preview, drag, click
     useEffect(() => {
         const el = chartRef.current;
         if (!el) return;
@@ -315,7 +299,6 @@ export default function CoinChart({
             if (price === null) return null;
             let timeVal = chart.timeScale().coordinateToTime(x) as number | null;
             if (timeVal === null) {
-                // 미래 영역: 마지막 두 바의 (logical, time) 쌍으로 외삽
                 const mouseLl = chart.timeScale().coordinateToLogical(x);
                 if (mouseLl === null) return null;
                 let t1: number | null = null, l1: number | null = null;
@@ -341,7 +324,6 @@ export default function CoinChart({
         function onMouseMove(e: MouseEvent) {
             const coords = getCoords(e);
 
-            // ── Drag ──
             const drag = drawDragRef.current;
             if (drag) {
                 if (!coords) return;
@@ -355,7 +337,6 @@ export default function CoinChart({
                 return;
             }
 
-            // ── Cursor hover feedback ──
             const tool = drawToolRef.current;
             if (tool === "cursor") {
                 const pa = candleSeriesRef.current?.coordinateToPrice(e.clientY - el!.getBoundingClientRect().top - 8);
@@ -398,7 +379,6 @@ export default function CoinChart({
                 return;
             }
 
-            // Click detection (skip if mouse moved > 5px)
             if (!mdPos) return;
             const dist = Math.hypot(e.clientX - mdPos.x, e.clientY - mdPos.y);
             mdPos = null;
@@ -415,7 +395,6 @@ export default function CoinChart({
             if (tool === "hline") {
                 setDrawnHLines(prev => [...prev, { id: crypto.randomUUID(), price }]);
             } else if (tool === "eraser") {
-                // 픽셀 12px 에 해당하는 가격 범위를 tolerance로 사용
                 const rect = el!.getBoundingClientRect();
                 const pxTol = 12;
                 const priceAbove = series.coordinateToPrice(e.clientY - rect.top - pxTol);
@@ -444,7 +423,6 @@ export default function CoinChart({
             el.removeEventListener("mousedown", onMouseDown, { capture: true });
             window.removeEventListener("mouseup", onMouseUp);
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const decimalsFromTickSize = (tick: string) => {
@@ -459,7 +437,6 @@ export default function CoinChart({
         return Number.isFinite(n) ? n : 0.01;
     };
 
-    // User session + symbol load
     useEffect(() => {
         const savedInterval = localStorage.getItem(`chart:${boxId}:interval`);
         if (savedInterval && INTERVAL_OPTIONS.some((o) => o.value === savedInterval)) {
@@ -498,7 +475,6 @@ export default function CoinChart({
         return () => { unsub?.subscription.unsubscribe(); };
     }, [boxId, hideControls]);
 
-    // Chart creation + data load
     useEffect(() => {
         const el = chartRef.current;
         if (!el) return;
@@ -555,7 +531,6 @@ export default function CoinChart({
             visible: false,
         });
 
-        // Price format from tickSize
         (async () => {
             try {
                 const key = sym.toUpperCase();
@@ -632,7 +607,6 @@ export default function CoinChart({
                     dataLength = mergedData.length;
                     oldestTime = rows[0][0] as number;
 
-                    // Update candle data ref & trigger indicator update
                     candleDataRef.current = mergedData;
                     setCandleDataVersion((v) => v + 1);
 
@@ -669,7 +643,6 @@ export default function CoinChart({
                     return { time: toKstUtcTimestamp(d[0]), value: parseFloat(d[5]), color: c >= o ? "rgba(38,166,154,0.3)" : "rgba(239,83,80,0.3)" };
                 }));
 
-                // Store candle data for indicators
                 candleDataRef.current = candles;
                 setCandleDataVersion((v) => v + 1);
                 setChartLoading(false);
@@ -700,7 +673,6 @@ export default function CoinChart({
 
                     if (k.x) {
                         dataLength++;
-                        // Update candle data ref
                         const existing = candleDataRef.current;
                         const idx = existing.findIndex((d) => d.time === newCandle.time);
                         if (idx >= 0) {
@@ -742,14 +714,12 @@ export default function CoinChart({
         };
     }, [sym, interval, historyLimit, isLight]);
 
-    // ─── Indicator rendering effect ───────────────────────────────────────────
     useEffect(() => {
         const chart = chartApiRef.current;
         const candles = candleDataRef.current;
         const seriesMap = indicatorSeriesMapRef.current;
         if (!chart || candles.length === 0) return;
 
-        // Remove old indicator series
         for (const seriesList of seriesMap.values()) {
             for (const s of seriesList) {
                 try { chart.removeSeries(s); } catch {}
@@ -757,7 +727,6 @@ export default function CoinChart({
         }
         seriesMap.clear();
 
-        // Remove sub-panes (pane index > 0)
         while (chart.panes().length > 1) {
             try { chart.removePane(chart.panes().length - 1); } catch { break; }
         }
@@ -773,7 +742,6 @@ export default function CoinChart({
                 .filter(Boolean) as { time: UTCTimestamp; value: number }[];
 
         for (const ind of activeIndicators.filter((i) => i.enabled)) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const seriesList: ISeriesApi<any>[] = [];
 
             try {
@@ -853,7 +821,6 @@ export default function CoinChart({
         }
     }, [candleDataVersion, activeIndicators]);
 
-    // ─── Position price lines ─────────────────────────────────────────────────
     useEffect(() => {
         const series = candleSeriesRef.current;
         if (!series || !positions) return;
@@ -904,7 +871,6 @@ export default function CoinChart({
         }
     }, [positions, sym]);
 
-    // ─── TP/SL drag ───────────────────────────────────────────────────────────
     useEffect(() => {
         const el = chartRef.current;
         if (!el || !onUpdateTpSl) return;
@@ -985,7 +951,6 @@ export default function CoinChart({
         }
     };
 
-    // ─── Indicator helpers ────────────────────────────────────────────────────
     const addIndicator = () => {
         if (!addForm) return;
         const newInd: IndicatorConfig = {
@@ -1028,7 +993,6 @@ export default function CoinChart({
         }
     };
 
-    // ─── Render ───────────────────────────────────────────────────────────────
     return (
         <>
             <div
@@ -1044,15 +1008,12 @@ export default function CoinChart({
                         style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
                     />
 
-                    {/* 상단 컨트롤 바 */}
                     <div className="absolute top-2 left-2 flex items-center gap-1 z-20">
-                        {/* 심볼 표시 - 인터벌 버튼 왼쪽에 인라인 배치 (우측 price axis와 겹침 방지) */}
                         {!hideControls && (
                             <div className="px-2 py-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50">
                                 <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">{sym}</span>
                             </div>
                         )}
-                        {/* 인터벌 버튼 */}
                         <div className="flex gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50">
                             {INTERVAL_OPTIONS.filter(opt => enableIndicators || (opt.value !== "1w" && opt.value !== "1M")).map((opt) => (
                                 <button
@@ -1068,10 +1029,8 @@ export default function CoinChart({
                             ))}
                         </div>
 
-                        {/* 드로잉 툴 (enableIndicators일 때만) */}
                         {enableIndicators && (
                             <div className="flex items-center gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50">
-                                {/* 커서 */}
                                 <button
                                     title="커서"
                                     onClick={() => setDrawTool("cursor")}
@@ -1081,7 +1040,6 @@ export default function CoinChart({
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
                                     </svg>
                                 </button>
-                                {/* 수평선 */}
                                 <button
                                     title="수평선 (지지/저항)"
                                     onClick={() => setDrawTool("hline")}
@@ -1091,7 +1049,6 @@ export default function CoinChart({
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16" />
                                     </svg>
                                 </button>
-                                {/* 지우개 */}
                                 <button
                                     title="지우개"
                                     onClick={() => setDrawTool("eraser")}
@@ -1101,7 +1058,6 @@ export default function CoinChart({
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                 </button>
-                                {/* 전체 삭제 */}
                                 {drawnHLines.length > 0 && (
                                     <button
                                         title="전체 삭제"
@@ -1116,7 +1072,6 @@ export default function CoinChart({
                             </div>
                         )}
 
-                        {/* 지표 버튼 (enableIndicators일 때만) */}
                         {enableIndicators && <div className="relative">
                             <button
                                 onClick={() => { setIndicatorPanelOpen((v) => !v); setAddForm(null); }}
@@ -1133,7 +1088,6 @@ export default function CoinChart({
                                 )}
                             </button>
 
-                            {/* 지표 패널 */}
                             <AnimatePresence>
                                 {indicatorPanelOpen && (
                                     <motion.div
@@ -1143,7 +1097,6 @@ export default function CoinChart({
                                         transition={{ duration: 0.15 }}
                                         className="absolute top-[calc(100%+6px)] left-0 z-50 w-64 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden"
                                     >
-                                        {/* 헤더 */}
                                         <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-800">
                                             <span className="text-[11px] font-semibold text-neutral-200">기술적 지표</span>
                                             <button onClick={() => { setIndicatorPanelOpen(false); setAddForm(null); }} className="text-neutral-500 hover:text-neutral-300 transition-colors cursor-pointer">
@@ -1153,7 +1106,6 @@ export default function CoinChart({
                                             </button>
                                         </div>
 
-                                        {/* 지표 목록 */}
                                         <div className="py-1 max-h-[200px] overflow-y-auto">
                                             {activeIndicators.length === 0 && !addForm && (
                                                 <div className="px-3 py-4 text-center text-[11px] text-neutral-500">
@@ -1162,18 +1114,14 @@ export default function CoinChart({
                                             )}
                                             {activeIndicators.map((ind) => (
                                                 <div key={ind.id} className="flex items-center gap-2 px-3 py-1.5 hover:bg-neutral-800/50 group">
-                                                    {/* 색상 점 */}
                                                     <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: ind.color }} />
-                                                    {/* 이름 */}
                                                     <span className="flex-1 text-[11px] text-neutral-300">{indicatorLabel(ind)}</span>
-                                                    {/* 토글 */}
                                                     <button
                                                         onClick={() => toggleIndicator(ind.id)}
                                                         className={`w-7 h-4 rounded-full transition-colors cursor-pointer flex-shrink-0 relative ${ind.enabled ? "bg-amber-500" : "bg-neutral-700"}`}
                                                     >
                                                         <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${ind.enabled ? "left-3.5" : "left-0.5"}`} />
                                                     </button>
-                                                    {/* 삭제 */}
                                                     <button
                                                         onClick={() => removeIndicator(ind.id)}
                                                         className="text-neutral-600 hover:text-red-400 transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
@@ -1186,10 +1134,8 @@ export default function CoinChart({
                                             ))}
                                         </div>
 
-                                        {/* 지표 추가 폼 */}
                                         {addForm ? (
                                             <div className="border-t border-neutral-800 px-3 py-2.5 space-y-2">
-                                                {/* 종류 */}
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">종류</span>
                                                     <select
@@ -1205,7 +1151,6 @@ export default function CoinChart({
                                                     </select>
                                                 </div>
 
-                                                {/* 기간 (MACD 제외) */}
                                                 {addForm.type !== "MACD" && (
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">기간</span>
@@ -1219,7 +1164,6 @@ export default function CoinChart({
                                                     </div>
                                                 )}
 
-                                                {/* BB 전용: 표준편차 */}
                                                 {addForm.type === "BB" && (
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">표준편차</span>
@@ -1233,7 +1177,6 @@ export default function CoinChart({
                                                     </div>
                                                 )}
 
-                                                {/* MACD 전용 */}
                                                 {addForm.type === "MACD" && (
                                                     <>
                                                         <div className="flex items-center gap-2">
@@ -1257,7 +1200,6 @@ export default function CoinChart({
                                                     </>
                                                 )}
 
-                                                {/* 색상 */}
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">색상</span>
                                                     <div className="flex items-center gap-2">
@@ -1271,7 +1213,6 @@ export default function CoinChart({
                                                     </div>
                                                 </div>
 
-                                                {/* 버튼 */}
                                                 <div className="flex gap-2 pt-1">
                                                     <button
                                                         onClick={addIndicator}
@@ -1306,7 +1247,6 @@ export default function CoinChart({
                         </div>}
                     </div>
 
-                    {/* 코인 변경 버튼 */}
                     {!hideControls && (
                         <button
                             onClick={() => setOpen(true)}
@@ -1320,7 +1260,6 @@ export default function CoinChart({
                     )}
                 </div>
 
-                {/* 툴팁 */}
                 <AnimatePresence>
                     {hovered && !hideControls && (
                         <motion.div

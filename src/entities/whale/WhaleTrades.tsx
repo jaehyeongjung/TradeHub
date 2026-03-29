@@ -120,7 +120,6 @@ export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                 className={`absolute inset-0 border border-border-subtle rounded-2xl p-2.5 2xl:p-3.5 bg-surface-elevated flex flex-col overflow-hidden transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                 style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
             >
-                {/* 헤더 */}
                 <div className="flex items-center justify-between mb-2 flex-shrink-0">
                     <div className="flex items-center gap-2">
                         <span className="text-[11px] 2xl:text-xs font-medium text-text-tertiary tracking-wide">
@@ -138,7 +137,6 @@ export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                     </span>
                 </div>
 
-                {/* 리스트 */}
                 <div className="flex-1 overflow-hidden">
                     {trades.length === 0 ? (
                         <div className="flex items-center justify-center h-full gap-1.5">
@@ -161,21 +159,16 @@ export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                                             transition={{ duration: 0.18 }}
                                             className="relative flex items-center gap-2 py-[5px] pl-3 pr-1.5 rounded-lg overflow-hidden"
                                         >
-                                            {/* accent 바 */}
                                             <div className={`absolute left-0 inset-y-0 w-[2px] ${isBuy ? "bg-emerald-500" : "bg-red-500"}`} />
-                                            {/* BUY/SELL pill */}
                                             <span className={`text-[9px] font-bold px-1.5 py-[2px] rounded-md ${isBuy ? "text-emerald-400 bg-emerald-500/10" : "text-red-400 bg-red-500/10"}`}>
                                                 {isBuy ? "BUY" : "SELL"}
                                             </span>
-                                            {/* 심볼 */}
                                             <span className="text-[11px] 2xl:text-xs text-text-primary font-medium flex-1 truncate">
                                                 {trade.symbol}
                                             </span>
-                                            {/* 금액 히어로 */}
                                             <span className={`text-[11px] 2xl:text-xs font-mono font-bold ${isBuy ? "text-emerald-400" : "text-red-400"}`}>
                                                 {fmtUsdCompact(trade.usdValue)}
                                             </span>
-                                            {/* 시간 */}
                                             <span className="text-[9px] text-text-muted w-7 text-right shrink-0">
                                                 {fmtRelativeTime(trade.timestamp)}
                                             </span>
@@ -188,7 +181,6 @@ export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                 </div>
             </div>
 
-            {/* 툴팁 */}
             <AnimatePresence>
                 {isHovered && (
                     <motion.div

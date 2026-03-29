@@ -108,13 +108,11 @@ export default function YouTubeBGMPlayer({
 
     return (
         <div className="w-full">
-            {/* 히든 플레이어 */}
             <div
                 id="youtube-player-container"
                 style={{ position: "fixed", top: "-1000px", left: "-1000px", width: "1px", height: "1px", zIndex: 0 }}
             />
 
-            {/* BGM 컨트롤 */}
             <button
                 onClick={toggleMute}
                 disabled={!isReady}
@@ -129,7 +127,6 @@ export default function YouTubeBGMPlayer({
                     }
                 `}
             >
-                {/* 아이콘 */}
                 <div className={`relative flex items-center justify-center w-7 h-7 rounded-xl transition-colors ${
                     isMuted
                         ? isLight ? "bg-neutral-100" : "bg-neutral-800"
@@ -145,7 +142,6 @@ export default function YouTubeBGMPlayer({
                             <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                             </svg>
-                            {/* 사운드웨이브 */}
                             <div className="absolute -right-1 flex items-center gap-[2px]">
                                 <span className="w-[2px] h-2 bg-emerald-500 rounded-full animate-[soundwave_0.5s_ease-in-out_infinite]" style={{ animationDelay: "0ms" }} />
                                 <span className="w-[2px] h-3 bg-emerald-500 rounded-full animate-[soundwave_0.5s_ease-in-out_infinite]" style={{ animationDelay: "150ms" }} />
@@ -155,7 +151,6 @@ export default function YouTubeBGMPlayer({
                     )}
                 </div>
 
-                {/* 텍스트 */}
                 <div className="flex-1 text-left">
                     <p className={`text-xs font-medium ${isLight ? "text-neutral-700" : "text-neutral-200"}`}>
                         Lo-fi BGM
@@ -168,7 +163,6 @@ export default function YouTubeBGMPlayer({
                     </p>
                 </div>
 
-                {/* 토글 스위치 */}
                 <div className={`w-8 h-5 rounded-full p-0.5 transition-colors ${
                     isMuted
                         ? isLight ? "bg-neutral-200" : "bg-neutral-700"

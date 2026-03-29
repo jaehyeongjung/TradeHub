@@ -19,9 +19,6 @@ const TABS: { key: SortMode; label: string; desc: string }[] = [
     { key: "ath_drop",   label: "고점낙폭",  desc: "역대 고점에서 가장 많이 내려온 코인" },
 ];
 
-/* ─── 포맷 ─── */
-
-/* ─── 스파크라인 ─── */
 function Sparkline({ prices, isUp }: { prices: number[]; isUp: boolean }) {
     if (!prices || prices.length < 2) return <div className="w-16 h-8" />;
     const step = Math.max(1, Math.floor(prices.length / 30));
@@ -51,7 +48,6 @@ function Sparkline({ prices, isUp }: { prices: number[]; isUp: boolean }) {
     );
 }
 
-/* ─── 고점낙폭 바 ─── */
 function AthBar({ pct, isLight }: { pct: number; isLight: boolean }) {
     const drop = Math.abs(pct);
     const color =
@@ -74,7 +70,6 @@ function AthBar({ pct, isLight }: { pct: number; isLight: boolean }) {
     );
 }
 
-/* ─── 스켈레톤 ─── */
 function SkeletonRow({ isLight }: { isLight: boolean }) {
     const pulse = isLight ? "bg-neutral-200" : "bg-surface-elevated";
     return (
@@ -94,7 +89,6 @@ function SkeletonRow({ isLight }: { isLight: boolean }) {
     );
 }
 
-/* ─── Main ─── */
 export default function RankingClient({ initialData }: { initialData?: RankingCoin[] }) {
     const [coins, setCoins] = useState<RankingCoin[]>(initialData ?? []);
     const [loading, setLoading] = useState(!initialData || initialData.length === 0);
@@ -105,7 +99,7 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
     useEffect(() => {
         if (initialData && initialData.length > 0) {
             setUpdatedAt(new Date());
-            return; // SSR 데이터 있으면 클라이언트 재요청 생략
+            return;
         }
         fetch("/api/ranking")
             .then((r) => r.json())
@@ -125,10 +119,8 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
         }
     }, [coins, sortMode]);
 
-    /* ─── 가상화 ─── */
     const { visibleItems, sentinelRef, hasMore, newBatchStart } = useVirtualList(sorted, 15);
 
-    /* ─── theme ─── */
     const bg       = isLight ? "bg-neutral-50"    : "bg-black";
     const cardBg   = isLight ? "bg-white border-neutral-200"  : "bg-surface-card border-border-subtle";
     const hoverRow = isLight ? "hover:bg-neutral-50"          : "hover:bg-surface-hover/20";
@@ -156,7 +148,6 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
         <div className={`min-h-screen ${bg}`}>
             <div className="max-w-5xl mx-auto px-4 pb-24 pt-6">
 
-                {/* 헤더 */}
                 <div className="mb-5 flex items-end justify-between">
                     <div>
                         <h1 className={`text-xl font-bold tracking-tight ${isLight ? "text-neutral-900" : "text-text-primary"}`}>
@@ -173,7 +164,6 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                     )}
                 </div>
 
-                {/* 탭 */}
                 <div className="mb-4 overflow-x-auto pb-0.5">
                     <div className={`inline-flex items-center rounded-xl p-1 gap-0.5 ${tabWrap}`}>
                         {TABS.map((tab) => (
@@ -190,10 +180,8 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                     </div>
                 </div>
 
-                {/* 리스트 카드 */}
                 <div className={`rounded-2xl border overflow-hidden ${cardBg}`}>
 
-                    {/* 컬럼 헤더 */}
                     <div className={`hidden md:flex items-center gap-3 px-4 py-2 text-[11px] font-medium border-b ${colHead}`}>
                         <span className="w-5 text-right shrink-0">#</span>
                         <span className="flex-1">코인</span>
@@ -205,18 +193,15 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                         <span className="w-16 text-right shrink-0 hidden xl:block">7일</span>
                     </div>
 
-                    {/* 스켈레톤 */}
                     {loading && Array.from({ length: 12 }).map((_, i) => (
                         <SkeletonRow key={i} isLight={isLight} />
                     ))}
 
-                    {/* 코인 리스트 — 가상화 적용 */}
                     {!loading && visibleItems.map((coin, idx) => {
                         const pct    = coin.price_change_percentage_24h ?? 0;
                         const isUp   = pct >= 0;
                         const pctColor = isUp ? "text-emerald-500" : "text-red-500";
 
-                        // 이 배치에서 새로 마운트된 아이템의 상대 인덱스 → 스태거 딜레이
                         const batchIdx = Math.max(0, idx - newBatchStart);
 
                         const secondaryNode = sortMode === "ath_drop"
@@ -242,12 +227,10 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                                 }}
                                 className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 transition-colors ${divider} ${hoverRow}`}
                             >
-                                {/* 순위 */}
                                 <span className={`w-5 text-[11px] text-right shrink-0 tabular-nums ${isLight ? "text-neutral-300" : "text-text-muted/50"}`}>
                                     {idx + 1}
                                 </span>
 
-                                {/* 로고 + 이름 */}
                                 <div className="flex items-center gap-2.5 flex-1 min-w-0">
                                     <div className="relative w-8 h-8 shrink-0">
                                         <Image
@@ -268,22 +251,18 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                                     </div>
                                 </div>
 
-                                {/* 현재가 */}
                                 <div className={`w-28 text-sm font-mono tabular-nums text-right shrink-0 ${isLight ? "text-neutral-800" : "text-text-primary"}`}>
                                     {fmtPrice(coin.current_price)}
                                 </div>
 
-                                {/* 24h */}
                                 <div className={`w-16 text-sm font-semibold text-right shrink-0 tabular-nums ${pctColor}`}>
                                     {isUp ? "+" : ""}{pct.toFixed(2)}%
                                 </div>
 
-                                {/* 보조 지표 */}
                                 <div className={`text-right shrink-0 hidden lg:flex lg:justify-end ${sortMode === "ath_drop" ? "w-28" : "w-24"}`}>
                                     {secondaryNode}
                                 </div>
 
-                                {/* 스파크라인 */}
                                 <div className="hidden xl:flex w-16 justify-end shrink-0">
                                     <Sparkline prices={coin.sparkline_in_7d?.price ?? []} isUp={isUp} />
                                 </div>
@@ -291,13 +270,11 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                         );
                     })}
 
-                    {/* 센티넬 — IntersectionObserver 감지 지점 */}
                     {!loading && hasMore && (
                         <div ref={sentinelRef} className="h-px" aria-hidden />
                     )}
                 </div>
 
-                {/* 더 로드 중 표시 */}
                 {!loading && hasMore && (
                     <div className={`flex justify-center py-4 text-xs ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
                         <span className="flex items-center gap-1.5">
@@ -308,7 +285,6 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                     </div>
                 )}
 
-                {/* CTA */}
                 {!loading && !hasMore && sorted.length > 0 && (
                     <Link
                         href="/trading?tab=sim"

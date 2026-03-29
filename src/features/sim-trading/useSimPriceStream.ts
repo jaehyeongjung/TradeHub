@@ -5,10 +5,6 @@ import { useAtom, useAtomValue } from "jotai";
 import { activePageAtom, simPricesAtom, simChangesAtom, simSymbolAtom } from "@/shared/store/atoms";
 import { SUPPORTED_SYMBOLS } from "@/shared/constants/sim-trading.constants";
 
-/**
- * 모의투자 페이지 활성 시 Binance WebSocket으로 실시간 가격을 스트리밍.
- * simPricesAtom에 가격 캐시를 업데이트.
- */
 export function useSimPriceStream() {
     const activePage = useAtomValue(activePageAtom);
     const [prices, setPrices] = useAtom(simPricesAtom);

@@ -92,7 +92,6 @@ export default function SimSymbolSelector({ isLight = false }: Props) {
             style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 9999, width: 300 }}
             className={`border rounded-2xl overflow-hidden ${dropdownBg}`}
         >
-            {/* 검색창 */}
             <div className={`p-3 border-b ${isLight ? "border-neutral-100" : "border-zinc-800/60"}`}>
                 <div className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border ${searchBg}`}>
                     <svg className="w-3.5 h-3.5 text-neutral-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +114,6 @@ export default function SimSymbolSelector({ isLight = false }: Props) {
                 </div>
             </div>
 
-            {/* 심볼 리스트 */}
             <div className="max-h-[340px] overflow-y-auto py-1.5 scrollbar-hide">
                 {filtered.length === 0 ? (
                     <div className="text-center text-[11px] text-neutral-600 py-8">검색 결과가 없습니다</div>

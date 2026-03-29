@@ -7,7 +7,6 @@ type Props = {
     params: Promise<{ id: string }>;
 };
 
-// 동적 메타데이터 생성
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { id } = await params;
     const news = await getNewsById(id);
@@ -63,7 +62,6 @@ export default async function NewsDetailPage({ params }: Props) {
         notFound();
     }
 
-    // Article JSON-LD 구조화 데이터
     const articleJsonLd = {
         "@context": "https://schema.org",
         "@type": "NewsArticle",

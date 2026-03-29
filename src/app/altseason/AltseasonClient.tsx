@@ -9,7 +9,6 @@ import { useTheme } from "@/shared/hooks/useTheme";
 
 type FilterMode = "all" | "outperform" | "underperform";
 
-/* ─── Zone config ─── */
 function getZoneConfig(zone: AltseasonData["zone"]) {
     switch (zone) {
         case "altcoin": return {
@@ -36,7 +35,6 @@ function getZoneConfig(zone: AltseasonData["zone"]) {
     }
 }
 
-/* ─── 인사이트 — 헤드라인 + 서브 2줄 ─── */
 function getInsight(zone: AltseasonData["zone"], outperformedCount: number, total: number) {
     const under = total - outperformedCount;
     if (zone === "altcoin") return {
@@ -53,7 +51,6 @@ function getInsight(zone: AltseasonData["zone"], outperformedCount: number, tota
     };
 }
 
-/* ─── 점수 카운트업 ─── */
 function useCountUp(target: number, enabled: boolean) {
     const [val, setVal] = useState(0);
     useEffect(() => {
@@ -63,7 +60,7 @@ function useCountUp(target: number, enabled: boolean) {
         let raf: number;
         const tick = (now: number) => {
             const t = Math.min((now - startTime) / duration, 1);
-            const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+            const eased = 1 - Math.pow(1 - t, 3);
             setVal(Math.round(eased * target));
             if (t < 1) raf = requestAnimationFrame(tick);
         };
@@ -73,7 +70,6 @@ function useCountUp(target: number, enabled: boolean) {
     return val;
 }
 
-/* ─── Arc Gauge ─── */
 function ArcGauge({ score, zone, isLight }: { score: number; zone: AltseasonData["zone"]; isLight: boolean }) {
     const { hex } = getZoneConfig(zone);
     const r = 72, cx = 100, cy = 86, sw = 10;
@@ -113,14 +109,12 @@ function ArcGauge({ score, zone, isLight }: { score: number; zone: AltseasonData
     );
 }
 
-/* ─── Skeleton ─── */
 function Sk({ w = "w-20", h = "h-4", isLight }: { w?: string; h?: string; isLight: boolean }) {
     return (
         <div className={`${w} ${h} rounded-lg ${isLight ? "bg-neutral-200" : "bg-surface-elevated"} animate-pulse`} />
     );
 }
 
-/* ─── Main ─── */
 export default function AltseasonClient({ initialData }: { initialData?: AltseasonData }) {
     const [data, setData] = useState<AltseasonData | null>(initialData ?? null);
     const [loading, setLoading] = useState(!initialData);
@@ -128,7 +122,7 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
     const [filter, setFilter] = useState<FilterMode>("all");
 
     useEffect(() => {
-        if (initialData) return; // SSR 데이터 있으면 생략
+        if (initialData) return;
         fetch("/api/altseason")
             .then((r) => r.json())
             .then((d: AltseasonData) => setData(d))
@@ -143,13 +137,10 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
         return data.alts;
     }, [data, filter]);
 
-    /* 가상화 — 필터 변경 시 자동 리셋 */
     const { visibleItems, sentinelRef, hasMore, newBatchStart } = useVirtualList(filteredAlts, 15);
 
-    /* 점수 카운트업 */
     const animatedScore = useCountUp(data?.score ?? 0, !loading && !!data);
 
-    /* ─── 다크모드 토큰 (ranking 페이지와 동일한 시스템) ─── */
     const bg       = isLight ? "bg-neutral-50"                    : "bg-black";
     const cardBg   = isLight ? "bg-white border-neutral-200"      : "bg-surface-card border-border-subtle";
     const hoverRow = isLight ? "hover:bg-neutral-50"              : "hover:bg-surface-hover/20";
@@ -170,13 +161,11 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
         <div className={`min-h-screen ${bg}`}>
             <div className="max-w-lg mx-auto px-4 pb-24 pt-6 space-y-3">
 
-                {/* ── 헤더 ── */}
                 <div className="px-1 mb-1">
                     <h1 className={`text-lg font-bold tracking-tight ${primary}`}>알트코인 시즌 지수</h1>
                     <p className={`text-xs mt-0.5 ${muted}`}>상위 50개 알트코인의 BTC 대비 30일 수익률 기준</p>
                 </div>
 
-                {/* ── Hero 카드 ── */}
                 <div className={`rounded-2xl border p-6 ${cardBg}`}>
                     {loading ? (
                         <div className="flex flex-col items-center gap-5 py-2">
@@ -192,14 +181,12 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.3 }}
                         >
-                            {/* 존 배지 */}
                             <div className="flex justify-center mb-4">
                                 <span className={`text-xs font-semibold px-3.5 py-1.5 rounded-full border ${isLight ? zone.badgeLight : zone.badgeDark}`}>
                                     {zone.label}
                                 </span>
                             </div>
 
-                            {/* 점수 카운트업 */}
                             <div className="flex flex-col items-center mb-1">
                                 <span className={`text-[76px] font-bold tabular-nums leading-none ${zone.textClass}`}>
                                     {animatedScore}
@@ -207,12 +194,10 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
                                 <span className={`text-sm mt-1 ${muted}`}>/ 100점</span>
                             </div>
 
-                            {/* 아크 게이지 */}
                             <div className="mt-1 mb-4">
                                 <ArcGauge score={data.score} zone={data.zone} isLight={isLight} />
                             </div>
 
-                            {/* 인사이트 — 헤드라인 + 서브 */}
                             <div className="text-center space-y-1">
                                 <p className={`text-sm font-semibold leading-snug ${primary}`}>
                                     {insight.headline}
@@ -225,7 +210,6 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
                     )}
                 </div>
 
-                {/* ── 통계 카드 ── */}
                 <div className={`rounded-2xl border px-5 py-4 ${cardBg}`}>
                     {loading ? (
                         <div className="grid grid-cols-3 gap-3">
@@ -262,10 +246,8 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
                     )}
                 </div>
 
-                {/* ── 코인 리스트 카드 ── */}
                 <div className={`rounded-2xl border overflow-hidden ${cardBg}`}>
 
-                    {/* 필터 탭 */}
                     {!loading && data && (
                         <div className={`flex gap-1 p-2 border-b ${divider}`}>
                             {([
@@ -286,7 +268,6 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
                         </div>
                     )}
 
-                    {/* 로딩 스켈레톤 */}
                     {loading && Array.from({ length: 8 }).map((_, i) => (
                         <div key={i} className={`flex items-center gap-3 px-4 py-3.5 border-b ${divider}`}>
                             <Sk w="w-4" h="h-2.5" isLight={isLight} />
@@ -299,7 +280,6 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
                         </div>
                     ))}
 
-                    {/* 코인 행 — 가상화 + stagger 애니메이션 */}
                     {!loading && visibleItems.map((coin, idx) => {
                         const isUp = coin.change30d >= 0;
                         const pctColor = coin.outperformedBtc
@@ -349,13 +329,11 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
                         );
                     })}
 
-                    {/* 센티넬 */}
                     {!loading && hasMore && (
                         <div ref={sentinelRef} className="h-px" aria-hidden />
                     )}
                 </div>
 
-                {/* 더 로드 중 */}
                 {!loading && hasMore && (
                     <div className={`flex justify-center py-3 gap-1`}>
                         {[0, 150, 300].map((delay) => (
@@ -368,7 +346,6 @@ export default function AltseasonClient({ initialData }: { initialData?: Altseas
                     </div>
                 )}
 
-                {/* 푸터 */}
                 {!loading && !hasMore && (
                     <p className={`text-center text-xs ${muted}`}>
                         75점 이상 알트시즌 · 25점 이하 비트코인 시즌 · 30분마다 업데이트

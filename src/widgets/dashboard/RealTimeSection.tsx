@@ -18,7 +18,6 @@ export const RealTimeSection = () => {
             aria-label="실시간 코인 가격 및 차트"
             className="realtime-section font-sans flex gap-3 2xl:gap-5 min-h-35 2xl:min-h-50 mt-3 2xl:mt-4 mx-auto bg-surface-card items-center w-full min-w-[1320px] border border-border-subtle rounded-2xl px-4 2xl:px-6"
         >
-            {/* 코인 가격 박스들 - 비율 3 */}
             <div className="flex gap-2 2xl:gap-3 flex-[3] min-w-0">
                 <CoinPriceBox boxId="tile-1" defaultSymbol="btcusdt" fadeDelay={0} />
                 <CoinPriceBox boxId="tile-2" defaultSymbol="ethusdt" fadeDelay={80} />
@@ -26,12 +25,10 @@ export const RealTimeSection = () => {
                 <CoinPriceBox boxId="tile-4" defaultSymbol="solusdt" fadeDelay={240} />
             </div>
 
-            {/* 차트 - 비율 2 */}
             <div className="flex-[2] min-w-0">
                 <CoinChart fadeDelay={300} />
             </div>
 
-            {/* 고래 거래 + 청산 피드 - 비율 2 */}
             <div className="flex gap-2 2xl:gap-4 flex-[2] min-w-0">
                 <WhaleTrades fadeDelay={380} />
                 <LiquidationFeed fadeDelay={460} />

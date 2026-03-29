@@ -33,8 +33,6 @@ const TABS = [
 
 type TabKey = typeof TABS[number]["key"];
 
-// 오더북 14 asks + 14 bids 기준 자연 높이 계산
-// Header(36) + ColumnHeader(30) + 14×22(asks, 308) + PriceBar(44) + 14×22(bids, 308) + RatioBar(44) ≈ 770
 const ORDER_BOOK_NATURAL_H = 770;
 
 export default function SimTradingPage() {
@@ -52,7 +50,6 @@ export default function SimTradingPage() {
     const currentPrice = prices[simSymbol] ?? 0;
     const priceChange = changes[simSymbol] ?? null;
 
-    // 탭 인디케이터 위치
     useEffect(() => {
         const el = tabRefs.current[bottomTab];
         if (el) setIndicatorStyle({ left: el.offsetLeft, width: el.offsetWidth });
@@ -95,7 +92,6 @@ export default function SimTradingPage() {
     return (
         <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto">
 
-            {/* ── 헤더 바 ── */}
             <div className={`flex items-center gap-4 px-4 py-2.5 rounded-xl border overflow-x-auto scrollbar-none ${headerBg}`}>
                 <SimSymbolSelector isLight={isLight} />
                 <div className="flex items-center gap-2 flex-shrink-0">
@@ -122,7 +118,6 @@ export default function SimTradingPage() {
                 <SimMarketData />
             </div>
 
-            {/* ── 차트 + 호가창 + 주문패널 ── */}
             <div className="flex gap-3 h-[calc(100vh-200px)] min-h-[480px]">
                 <div className="flex-1 min-w-0">
                     <CoinChart
@@ -153,10 +148,8 @@ export default function SimTradingPage() {
                 </div>
             </div>
 
-            {/* ── 하단 탭 (슬라이딩 인디케이터, 고정 높이) ── */}
             <div className={`rounded-2xl border overflow-hidden flex-shrink-0 ${tabBg}`}>
                 <div className={`relative flex border-b ${tabBorder}`}>
-                    {/* 슬라이딩 언더라인 */}
                     <div
                         className="absolute bottom-0 h-[2px] bg-amber-500 rounded-full transition-all duration-200 ease-out"
                         style={{ left: indicatorStyle.left, width: indicatorStyle.width }}

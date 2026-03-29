@@ -71,7 +71,6 @@ export default function KimchiWidget({
             if (newPct != null) prevPctRef.current = newPct;
             setData(d);
         } catch {
-            // 에러 시 기존 데이터 유지
         }
     }, [symbol]);
 
@@ -110,7 +109,6 @@ export default function KimchiWidget({
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            {/* 방향 accent 바 */}
             <div className={`absolute left-0 inset-y-0 w-[3px] rounded-l-2xl transition-colors duration-500 ${accentBg}`} />
 
             <div
@@ -119,7 +117,6 @@ export default function KimchiWidget({
                 }`}
                 style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
             >
-                {/* 헤더 */}
                 <div className="flex items-center justify-between mb-3">
                     <span className={`text-[11px] 2xl:text-xs font-medium tracking-wide ${subLabelColor}`}>
                         김치프리미엄
@@ -129,7 +126,6 @@ export default function KimchiWidget({
                     </span>
                 </div>
 
-                {/* 히어로 */}
                 <div className={`inline-block text-3xl 2xl:text-4xl font-bold tabular-nums leading-none rounded-lg px-1 transition-all duration-300 ${heroColor} ${
                     flash === "up" ? "bg-emerald-500/20 scale-105" : flash === "down" ? "bg-rose-500/20 scale-105" : "scale-100"
                 }`}>
@@ -139,10 +135,8 @@ export default function KimchiWidget({
                     {isNeutral ? "데이터 로딩 중" : isPositive ? "▲ 한국이 해외보다 비쌈" : "▼ 해외가 한국보다 비쌈"}
                 </div>
 
-                {/* 구분선 */}
                 <div className={`mt-3 mb-2 2xl:mt-4 2xl:mb-3 border-t ${dividerColor}`} />
 
-                {/* 보조 데이터 — 3열 그리드 */}
                 <div className="grid grid-cols-3 gap-8">
                     <div>
                         <div className={`text-[9px] 2xl:text-[10px] mb-0.5 ${labelColor}`}>업비트</div>
@@ -171,7 +165,6 @@ export default function KimchiWidget({
                 </div>
             </div>
 
-            {/* 툴팁 */}
             <AnimatePresence>
                 {isHovered && (
                     <motion.div

@@ -30,7 +30,6 @@ export default function LandingPage() {
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(MAIN_JSONLD) }}
             />
 
-            {/* 내비게이션 */}
             <nav className="fixed top-0 z-[100] flex w-full items-center justify-between px-6 py-8 md:px-12 md:py-10">
                 <div className="flex items-baseline gap-3">
                     <span className="text-xl font-black tracking-[-0.08em] leading-none text-white">
@@ -43,7 +42,6 @@ export default function LandingPage() {
             </nav>
 
             <main className="relative mx-auto max-w-[1600px] px-6 md:px-12 h-screen overflow-y-scroll scrollbar-hide" style={{ scrollSnapType: "y mandatory" }}>
-                {/* Section 1: Hero */}
                 <section className="relative flex h-screen flex-col items-start justify-center pt-20" style={{ scrollSnapAlign: "start" }}>
                     <div className="flex flex-col gap-0 select-none">
                         <div className="overflow-hidden">
@@ -83,7 +81,6 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* Section 2: Grid */}
                 <section className="py-[min(8rem,11vh)] grid grid-cols-1 md:grid-cols-12 gap-2 h-screen content-center" style={{ scrollSnapAlign: "start" }}>
                     <div className="col-span-1 md:col-span-7 bg-neutral-900 p-[clamp(2rem,min(3vw,5vh),5rem)] flex flex-col justify-between min-h-[min(560px,62vh)] rounded-3xl">
                         <span className="text-xs font-semibold tracking-[0.3em] text-[#00C896] uppercase">
@@ -130,7 +127,6 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* Section 3: Features */}
                 <section className="flex flex-col md:flex-row gap-[min(5rem,8vw)] items-start h-screen py-[min(8rem,11vh)]" style={{ scrollSnapAlign: "start", paddingTop: "min(22vh,12rem)" }}>
                     <div className="md:w-1/3">
                         <h2 className="text-[clamp(2rem,3.5vh,2.5rem)] font-black tracking-[-0.06em] leading-tight">

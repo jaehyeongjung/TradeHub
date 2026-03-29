@@ -32,7 +32,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         const id = crypto.randomUUID();
         setToasts((prev) => [...prev, { id, message, type }]);
 
-        // 3초 후 자동 제거
         setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== id));
         }, 3000);
@@ -46,7 +45,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         <ToastContext.Provider value={{ showToast }}>
             {children}
 
-            {/* 토스트 컨테이너 */}
             <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2 pointer-events-none">
                 <AnimatePresence mode="popLayout">
                     {toasts.map((toast) => (
@@ -69,7 +67,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                                 }
                             `}
                         >
-                            {/* 아이콘 */}
                             {toast.type === "success" && (
                                 <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

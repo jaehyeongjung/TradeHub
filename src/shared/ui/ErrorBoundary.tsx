@@ -45,7 +45,6 @@ export class ErrorBoundary extends Component<Props, State> {
     }
 }
 
-/** 위젯용 간단한 에러 폴백 */
 export function WidgetErrorFallback({ message = "로딩 실패" }: { message?: string }) {
     return (
         <div className="flex items-center justify-center p-4 rounded-lg border border-zinc-800 bg-neutral-900 text-neutral-500 text-xs">

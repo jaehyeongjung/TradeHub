@@ -219,7 +219,6 @@ export default function SymbolPickerModal({
         <AnimatePresence>
             {open && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-                    {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -229,7 +228,6 @@ export default function SymbolPickerModal({
                         onClick={onClose}
                     />
 
-                    {/* Panel */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.96, y: 16 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -241,12 +239,10 @@ export default function SymbolPickerModal({
                                 : "bg-neutral-950 border border-zinc-800 shadow-[0_32px_80px_rgba(0,0,0,0.9)]"
                         }`}
                     >
-                        {/* 핸들바 */}
                         <div className="flex justify-center pt-3 pb-0 flex-shrink-0">
                             <div className={`w-8 h-1 rounded-full ${isLight ? "bg-neutral-300" : "bg-zinc-700"}`} />
                         </div>
 
-                        {/* 헤더 */}
                         <div className="flex-shrink-0 px-5 pt-4 pb-4">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
@@ -267,7 +263,6 @@ export default function SymbolPickerModal({
                                 </button>
                             </div>
 
-                            {/* 검색창 */}
                             <div className={`flex items-center gap-3 px-4 py-2.5 rounded-2xl border transition-colors ${
                                 isLight
                                     ? "bg-neutral-50 border-neutral-200 focus-within:border-neutral-400"
@@ -297,10 +292,8 @@ export default function SymbolPickerModal({
                             </div>
                         </div>
 
-                        {/* 바디 */}
                         <div className="flex-1 overflow-y-auto px-5 pb-5 scrollbar-hide">
 
-                            {/* 인기 섹션 */}
                             {popularFiltered.length > 0 && (
                                 <div className="mb-5">
                                     <div className="flex items-center gap-2 mb-3">
@@ -341,7 +334,6 @@ export default function SymbolPickerModal({
                                 </div>
                             )}
 
-                            {/* 전체 / 검색결과 */}
                             <div>
                                 {!search.trim() && (
                                     <div className="flex items-center gap-2 mb-3">
@@ -418,7 +410,6 @@ export default function SymbolPickerModal({
                             </div>
                         </div>
 
-                        {/* 하단 현재 선택 표시 */}
                         <div className={`flex-shrink-0 px-5 py-3 border-t backdrop-blur-sm ${
                             isLight
                                 ? "border-neutral-200 bg-white/90"

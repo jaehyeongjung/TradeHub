@@ -4,13 +4,9 @@ import { notFound } from "next/navigation";
 import { guides, getGuideBySlug, getAllGuideSlugs } from "@/lib/guides";
 import type { Guide } from "@/lib/guides";
 
-/* ---------- Static generation ---------- */
-
 export function generateStaticParams() {
   return getAllGuideSlugs().map((slug) => ({ slug }));
 }
-
-/* ---------- Metadata ---------- */
 
 export async function generateMetadata({
   params,
@@ -41,8 +37,6 @@ export async function generateMetadata({
     },
   };
 }
-
-/* ---------- JSON-LD helpers ---------- */
 
 const SITE = "https://www.tradehub.kr";
 
@@ -103,8 +97,6 @@ function buildJsonLd(guide: Guide) {
   return [article, faq, breadcrumb];
 }
 
-/* ---------- Page component ---------- */
-
 export default async function GuidePage({
   params,
 }: {
@@ -121,7 +113,6 @@ export default async function GuidePage({
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-16 text-white">
-      {/* JSON-LD */}
       {jsonLdItems.map((item, i) => (
         <script
           key={i}
@@ -130,7 +121,6 @@ export default async function GuidePage({
         />
       ))}
 
-      {/* Breadcrumb */}
       <nav aria-label="breadcrumb" className="mb-8 text-sm text-zinc-500">
         <ol className="flex items-center gap-1">
           <li>
@@ -151,7 +141,6 @@ export default async function GuidePage({
         </ol>
       </nav>
 
-      {/* Header */}
       <header>
         <span className="text-xs font-bold text-[#02C076] tracking-wide">
           {guide.category}
@@ -168,7 +157,6 @@ export default async function GuidePage({
         </div>
       </header>
 
-      {/* TOC */}
       <nav
         aria-label="목차"
         className="mt-10 rounded-xl bg-zinc-900/60 p-5 ring-1 ring-zinc-800"
@@ -188,7 +176,6 @@ export default async function GuidePage({
         </ol>
       </nav>
 
-      {/* Sections */}
       <article className="mt-12 space-y-12">
         {guide.sections.map((section) => (
           <section key={section.id} id={section.id}>
@@ -246,7 +233,6 @@ export default async function GuidePage({
         ))}
       </article>
 
-      {/* FAQ */}
       {guide.faqs.length > 0 && (
         <section className="mt-16">
           <h2 className="text-xl font-bold tracking-tight">자주 묻는 질문</h2>
@@ -271,7 +257,6 @@ export default async function GuidePage({
         </section>
       )}
 
-      {/* CTA */}
       <div className="mt-16 rounded-xl bg-gradient-to-r from-[#02C076]/20 to-transparent p-8 ring-1 ring-[#02C076]/30">
         <h2 className="text-lg font-bold">직접 확인해보세요</h2>
         <p className="mt-2 text-sm text-zinc-400">
@@ -286,7 +271,6 @@ export default async function GuidePage({
         </Link>
       </div>
 
-      {/* Related guides */}
       {relatedGuides.length > 0 && (
         <section className="mt-16">
           <h2 className="text-lg font-bold">관련 가이드</h2>

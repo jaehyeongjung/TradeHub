@@ -30,7 +30,6 @@ function isValidSymbol(sym: string) {
     );
 }
 
-// Treemap 레이아웃 계산 (Squarified)
 function squarify(
     items: TreemapItem[],
     x: number,
@@ -139,7 +138,6 @@ function getColor(pct: number): string {
     return "rgb(220, 38, 38)";
 }
 
-// 스켈레톤 블록 레이아웃 (화면 비율 기반)
 const SKELETON_BLOCKS = [
     { x: 0,    y: 0,    w: 35,  h: 55 },
     { x: 35,   y: 0,    w: 22,  h: 55 },
@@ -223,11 +221,9 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
             transition={{ duration: 0.25 }}
             className={`fixed inset-0 z-[100] overflow-hidden transition-colors duration-500 ${isLight ? "bg-neutral-100" : "bg-neutral-950"}`}
         >
-            {/* Top Header Bar */}
             <div className={`absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-5 h-12 backdrop-blur-md border-b transition-colors duration-500 ${
                 isLight ? "bg-white/80 border-neutral-200/60" : "bg-neutral-950/80 border-neutral-800/60"
             }`}>
-                {/* 왼쪽: 아이콘 + 제목 + 설명 */}
                 <div className="flex items-center gap-2.5">
                     <svg width="15" height="15" viewBox="0 0 24 24" className={isLight ? "text-neutral-500" : "text-neutral-400"}>
                         <path fill="currentColor" d="M3 3h8v8H3zm10 0h8v5h-8zm0 7h8v11h-8zM3 13h8v8H3z"/>
@@ -237,7 +233,6 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
                     <span className={`text-xs ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>24h 거래대금 기준</span>
                 </div>
 
-                {/* 오른쪽: ESC 힌트 + 닫기 버튼 */}
                 <div className="flex items-center gap-2">
                     <span className={`text-[11px] font-mono px-1.5 py-0.5 rounded border select-none ${
                         isLight ? "text-neutral-600 border-neutral-400 bg-neutral-100" : "text-neutral-300 border-neutral-600 bg-neutral-800"
@@ -257,11 +252,9 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
                 </div>
             </div>
 
-            {/* Content */}
             <div className="absolute inset-0 top-12">
                 <AnimatePresence mode="wait">
                     {loading ? (
-                        /* ── 스켈레톤 ── */
                         <motion.div
                             key="skeleton"
                             initial={{ opacity: 0 }}
@@ -289,7 +282,6 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
                                         height: `calc(${b.h}% - 4px)`,
                                     }}
                                 >
-                                    {/* 다크 shimmer */}
                                     <div className="absolute inset-0 transition-opacity duration-500"
                                         style={{
                                             opacity: isLight ? 0 : 1,
@@ -298,7 +290,6 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
                                             animation: `treemap-shimmer 1.8s ease-in-out ${i * 0.06}s infinite`,
                                         }}
                                     />
-                                    {/* 라이트 shimmer */}
                                     <div className="absolute inset-0 transition-opacity duration-500"
                                         style={{
                                             opacity: isLight ? 1 : 0,
@@ -311,7 +302,6 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
                             ))}
                         </motion.div>
                     ) : (
-                        /* ── 실제 트리맵 ── */
                         <motion.div
                             key="treemap"
                             initial={{ opacity: 0 }}
@@ -347,7 +337,6 @@ export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
                                     const pctFontSize = Math.max(6, Math.min(fontSize * 0.7, 32));
                                     const priceFontSize = Math.max(5, Math.min(fontSize * 0.55, 24));
 
-                                    // 스태거: 오른쪽 아래일수록 먼저, 왼쪽 위일수록 나중
                                     const cx = (x + w / 2) / dimensions.width;
                                     const cy = (y + h / 2) / dimensions.height;
                                     const staggerDelay = ((1 - cx) + (1 - cy)) / 2 * 0.6;

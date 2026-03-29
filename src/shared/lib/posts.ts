@@ -45,7 +45,6 @@ export async function deletePost(id: string) {
     return await supabase.from("posts").delete().eq("id", id);
 }
 
-// 서버 컴포넌트용: 단일 게시글 조회
 export async function getPostById(id: string): Promise<Post | null> {
     const { data, error } = await supabaseAdmin
         .from("posts")
@@ -57,7 +56,6 @@ export async function getPostById(id: string): Promise<Post | null> {
     return data as Post;
 }
 
-// Sitemap 생성용: 전체 게시글 ID 목록
 export async function getAllPostIds(limit = 1000) {
     const { data, error } = await supabaseAdmin
         .from("posts")

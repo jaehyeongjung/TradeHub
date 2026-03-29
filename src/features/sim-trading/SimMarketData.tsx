@@ -116,7 +116,6 @@ export default function SimMarketData() {
     const isPosPct = pct >= 0;
     const isFundPos = (funding?.fundingRate ?? 0) >= 0;
 
-    // 공통 stat 아이템 — flex-1로 공간 균등 분배
     const Item = ({ label, children }: { label: React.ReactNode; children: React.ReactNode }) => (
         <div className="flex-1 min-w-0 group cursor-default px-2 py-0.5">
             <div className="text-[10px] text-neutral-600 mb-[3px] whitespace-nowrap">{label}</div>
@@ -130,32 +129,26 @@ export default function SimMarketData() {
 
     return (
         <div className="flex flex-1 items-center min-w-0">
-            {/* 코인 정보와의 구분선 (첫번째만) */}
             <div className="w-px h-6 bg-gradient-to-b from-transparent via-zinc-600/70 to-transparent flex-shrink-0 mx-3" />
 
-            {/* 24h 변동 */}
             <Item label="24h 변동">
                 <span className={`text-[12.5px] font-bold font-mono tabular-nums ${isPosPct ? "text-emerald-400" : "text-red-400"}`}>
                     {ticker ? `${isPosPct ? "+" : ""}${pct.toFixed(2)}%` : "—"}
                 </span>
             </Item>
 
-            {/* 24h 고가 */}
             <Item label="24h 고가">
                 {val(ticker ? ticker.high.toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—")}
             </Item>
 
-            {/* 24h 저가 */}
             <Item label="24h 저가">
                 {val(ticker ? ticker.low.toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—")}
             </Item>
 
-            {/* 24h 거래대금 */}
             <Item label="24h 거래대금">
                 {val(ticker ? formatVolume(ticker.quoteVolume) : "—")}
             </Item>
 
-            {/* 펀딩비 */}
             <Item label={
                 <span className="flex items-center gap-1">
                     펀딩비
@@ -167,12 +160,10 @@ export default function SimMarketData() {
                 </span>
             </Item>
 
-            {/* 미결제약정 */}
             <Item label="미결제약정">
                 {val(oi ? formatVolume(oi.openInterest * currentPrice) : "—")}
             </Item>
 
-            {/* 롱/숏 */}
             <Item label="롱/숏 비율">
                 <div className="flex items-center gap-1.5">
                     <span className="text-[11.5px] font-mono font-semibold text-emerald-400">{longPct}%</span>

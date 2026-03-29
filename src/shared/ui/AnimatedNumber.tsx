@@ -34,7 +34,6 @@ export default function AnimatedNumber({
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
 
-            // easeOutExpo 이징
             const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
 
             const current = startValue + (endValue - startValue) * eased;
@@ -67,7 +66,6 @@ export default function AnimatedNumber({
     );
 }
 
-// 가격 변동 하이라이트가 포함된 버전
 interface AnimatedPriceProps {
     value: number;
     decimals?: number;
@@ -152,7 +150,6 @@ export function AnimatedPrice({
     );
 }
 
-// 토스 스타일 digit slot roller
 interface SlotNumberProps {
     value: number;
     className?: string;
@@ -164,7 +161,6 @@ function Digit({ char, prevChar }: { char: string; prevChar: string }) {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // 마운트 후 transition 활성화
         const t = requestAnimationFrame(() => setMounted(true));
         return () => cancelAnimationFrame(t);
     }, []);
@@ -209,7 +205,6 @@ export function SlotNumber({ value, className = "" }: SlotNumberProps) {
         }
     }, [value]);
 
-    // 자릿수 맞추기 (앞에 공백 패딩)
     const maxLen = Math.max(curr.length, prev.length);
     const paddedCurr = curr.padStart(maxLen, " ");
     const paddedPrev = prev.padStart(maxLen, " ");

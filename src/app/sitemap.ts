@@ -6,7 +6,6 @@ import { guides } from "@/lib/guides";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const base = "https://www.tradehub.kr";
 
-    // 뉴스 항목 (최근 500개)
     const newsItems = await getAllNewsIds(500);
     const newsSitemap: MetadataRoute.Sitemap = newsItems.map((news) => ({
         url: `${base}/news/${news.id}`,
@@ -15,7 +14,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
     }));
 
-    // 게시글 항목 (최근 1000개)
     const postItems = await getAllPostIds(1000);
     const postsSitemap: MetadataRoute.Sitemap = postItems.map((post) => ({
         url: `${base}/posts/${post.id}`,
@@ -24,7 +22,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.6,
     }));
 
-    // 가이드 페이지
     const guideSitemap: MetadataRoute.Sitemap = guides.map((guide) => ({
         url: `${base}/guide/${guide.slug}`,
         lastModified: new Date(guide.updatedAt),
@@ -75,5 +72,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
 }
 
-// ISR: 1시간마다 재생성
 export const revalidate = 3600;

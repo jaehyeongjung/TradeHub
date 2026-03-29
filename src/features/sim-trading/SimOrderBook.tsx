@@ -5,7 +5,7 @@ import { useAtomValue } from "jotai";
 import { simSymbolAtom, simPricesAtom, activePageAtom } from "@/shared/store/atoms";
 import { useTheme } from "@/shared/hooks/useTheme";
 
-type OrderBookEntry = [string, string]; // [price, quantity]
+type OrderBookEntry = [string, string];
 
 interface DepthSnapshot {
     b: OrderBookEntry[];
@@ -152,7 +152,6 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                     : "bg-surface-card border-border-subtle"
             }`}
         >
-            {/* 헤더 */}
             <div
                 className={`flex items-center justify-between px-3 py-2 border-b ${
                     isLight ? "border-neutral-200" : "border-border-subtle"
@@ -165,7 +164,6 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                 </span>
             </div>
 
-            {/* 컬럼 헤더 */}
             <div
                 className={`flex items-center px-3 py-1.5 text-[10px] border-b ${
                     isLight ? "border-neutral-200/60 text-neutral-500" : "border-border-subtle text-text-muted"
@@ -176,7 +174,6 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                 <span className="flex-[2] text-right">Total({coinName})</span>
             </div>
 
-            {/* 매도 호가 (asks) */}
             <div className="flex-1 overflow-hidden flex flex-col justify-end min-h-0">
                 {sortedAsks.map((entry, i) => {
                     const price = parseFloat(entry[0]);
@@ -228,7 +225,6 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                 })}
             </div>
 
-            {/* 현재가 */}
             <div
                 className={`flex items-center px-3 py-2 border-y ${
                     isLight
@@ -286,7 +282,6 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                 </span>
             </div>
 
-            {/* 매수 호가 (bids) */}
             <div className="flex-1 overflow-hidden min-h-0">
                 {bids.map((entry, i) => {
                     const price = parseFloat(entry[0]);
@@ -340,7 +335,6 @@ export default function SimOrderBook({ onPriceClick }: Props) {
                 })}
             </div>
 
-            {/* 매수/매도 비율 바 */}
             <div
                 className={`px-3 py-2 border-t ${isLight ? "border-neutral-200/60" : "border-border-subtle"}`}
             >

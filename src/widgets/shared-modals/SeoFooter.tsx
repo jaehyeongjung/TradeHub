@@ -56,7 +56,6 @@ export default function SeoFooter() {
         >
             <div className="mx-auto w-full max-w-screen-xl px-5 py-10">
 
-                {/* 상단: 브랜드 */}
                 <div className="flex items-start gap-4 mb-8">
                     <Image
                         src={isLight ? "/favicon-light.png" : "/favicon.png"}
@@ -75,7 +74,6 @@ export default function SeoFooter() {
                         <p className={`text-xs leading-relaxed mb-3 ${bodyColor}`}>
                             코인 트레이더를 위한 올인원 대시보드
                         </p>
-                        {/* Feature 배지 */}
                         <div className="flex flex-wrap gap-1.5">
                             {["실시간 청산", "고래 거래", "트리맵", "김치프리미엄", "모의투자", "펀딩비", "알트시즌", "코인랭킹", "무료"].map((tag) => (
                                 <span
@@ -89,7 +87,6 @@ export default function SeoFooter() {
                     </div>
                 </div>
 
-                {/* 5열 카드 그리드 */}
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
 
                     <article className={`rounded-2xl p-5 transition-all duration-200 ${cardBg} ${cardHover}`}>
@@ -189,7 +186,6 @@ export default function SeoFooter() {
 
                 </div>
 
-                {/* 하단 */}
                 <div className={`mt-8 pt-5 border-t ${borderColor} flex flex-col gap-1 md:flex-row md:items-center md:justify-between`}>
                     <p className={`text-[11px] leading-relaxed ${taglineColor}`}>
                         TradeHub는 실시간 청산·고래 거래·트리맵·김프·공포탐욕지수·뉴스·채팅·{" "}

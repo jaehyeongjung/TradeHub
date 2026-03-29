@@ -43,7 +43,6 @@ export default function FloatingLoginSidebar() {
 
     return (
         <>
-            {/* 드로어 */}
             <div
                 className={`fixed inset-0 z-[59] ${open ? "pointer-events-auto" : "pointer-events-none"}`}
                 aria-hidden={!open}
@@ -88,7 +87,6 @@ export default function FloatingLoginSidebar() {
                 </aside>
             </div>
 
-            {/* 트리맵 */}
             <AnimatePresence>
                 {showTreemap && <CryptoTreemap onClose={() => setShowTreemap(false)} />}
             </AnimatePresence>

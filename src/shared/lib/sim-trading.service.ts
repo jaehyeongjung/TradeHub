@@ -9,11 +9,9 @@ import type {
     MarginMode,
 } from "@/shared/types/sim-trading.types";
 
-const TAKER_FEE = 0.0004; // 0.04%
-const MAINTENANCE_MARGIN_RATE = 0.004; // 0.4%
+const TAKER_FEE = 0.0004;
+const MAINTENANCE_MARGIN_RATE = 0.004;
 const DEFAULT_BALANCE = 10000;
-
-/* ── 계좌 ── */
 
 export async function getOrCreateAccount(
     userId: string
@@ -41,21 +39,18 @@ export async function getOrCreateAccount(
 }
 
 export async function resetAccount(userId: string): Promise<SimAccount> {
-    // 모든 오픈 포지션 강제 종료
     await supabase
         .from("sim_positions")
         .update({ status: "CLOSED", closed_at: new Date().toISOString() })
         .eq("user_id", userId)
         .eq("status", "OPEN");
 
-    // 미체결 주문 취소
     await supabase
         .from("sim_orders")
         .update({ status: "CANCELLED" })
         .eq("user_id", userId)
         .eq("status", "PENDING");
 
-    // 잔고 리셋
     const { data, error } = await supabase
         .from("sim_accounts")
         .update({
@@ -70,8 +65,6 @@ export async function resetAccount(userId: string): Promise<SimAccount> {
     if (error) throw error;
     return data as SimAccount;
 }
-
-/* ── 계산 유틸 ── */
 
 export function calcLiqPrice(
     side: PositionSide,
@@ -104,7 +97,6 @@ export function calcRoe(
     return (pnl / margin) * 100;
 }
 
-/** Cross 모드 청산가 계산: 잔고(available balance)를 effective margin에 포함 */
 export function calcLiqPriceCross(
     side: PositionSide,
     entryPrice: number,
@@ -122,8 +114,6 @@ export function calcLiqPriceCross(
     return entryPrice * (1 + 1 / effectiveLev - MAINTENANCE_MARGIN_RATE);
 }
 
-/* ── 포지션 오픈 ── */
-
 export async function openPosition(
     userId: string,
     input: OpenPositionInput
@@ -132,20 +122,15 @@ export async function openPosition(
 
     const { symbol, side, orderType, price, quantityUsdt, leverage, tpPrice, slPrice, marginMode = "CROSS" } = input;
 
-    // 코인 수량
     const quantity = quantityUsdt / price;
-    // 필요 증거금
     const margin = quantityUsdt / leverage;
-    // 수수료
     const fee = quantityUsdt * TAKER_FEE;
-    // 총 비용
     const totalCost = margin + fee;
 
     if (account.balance < totalCost) {
         throw new Error("잔고가 부족합니다");
     }
 
-    // TP/SL 유효성 검증
     if (tpPrice !== undefined && tpPrice !== null) {
         if (side === "LONG" && tpPrice <= price) throw new Error("롱 포지션의 TP는 진입가보다 높아야 합니다");
         if (side === "SHORT" && tpPrice >= price) throw new Error("숏 포지션의 TP는 진입가보다 낮아야 합니다");
@@ -155,7 +140,6 @@ export async function openPosition(
         if (side === "SHORT" && slPrice <= price) throw new Error("숏 포지션의 SL은 진입가보다 높아야 합니다");
     }
 
-    // 지정가 주문은 바로 체결하지 않고 주문으로 등록
     if (orderType === "LIMIT" || orderType === "STOP_MARKET") {
         const { error } = await supabase.from("sim_orders").insert({
             user_id: userId,
@@ -171,7 +155,6 @@ export async function openPosition(
         });
         if (error) throw error;
 
-        // 증거금 선차감
         const newBalance = account.balance - totalCost;
         const { data: updatedAccount } = await supabase
             .from("sim_accounts")
@@ -186,7 +169,6 @@ export async function openPosition(
         };
     }
 
-    // 같은 심볼에 다른 마진 모드 포지션이 있는지 확인
     const { data: conflictPos } = await supabase
         .from("sim_positions")
         .select("margin_mode")
@@ -202,7 +184,6 @@ export async function openPosition(
         throw new Error(`이미 ${existing} 모드 포지션이 있습니다. 마진 모드를 변경하려면 기존 포지션을 먼저 청산하세요.`);
     }
 
-    // 시장가 즉시 체결 — 기존 같은 심볼+방향+마진모드 포지션 확인 (병합)
     const { data: existingPos } = await supabase
         .from("sim_positions")
         .select("*")
@@ -216,13 +197,12 @@ export async function openPosition(
     let position: SimPosition;
 
     if (existingPos) {
-        // 기존 포지션에 병합
         const old = existingPos as SimPosition;
         const newQty = old.quantity + quantity;
         const newEntryPrice = (old.quantity * old.entry_price + quantity * price) / newQty;
         const newMargin = old.margin + margin;
         const newLeverage = (old.margin * old.leverage + margin * leverage) / (old.margin + margin);
-        const mergedMarginMode = marginMode; // 새 주문의 마진 모드 사용
+        const mergedMarginMode = marginMode;
 
         let newLiqPrice: number;
         const remainingBalance = account.balance - totalCost;
@@ -232,7 +212,6 @@ export async function openPosition(
             newLiqPrice = calcLiqPrice(side, newEntryPrice, newLeverage);
         }
 
-        // TP/SL: 새 주문에 있으면 덮어쓰기, 없으면 기존 유지
         const mergedTp = tpPrice ?? old.tp_price;
         const mergedSl = slPrice ?? old.sl_price;
 
@@ -255,7 +234,6 @@ export async function openPosition(
         if (upErr) throw upErr;
         position = updated as SimPosition;
     } else {
-        // 새 포지션 생성
         const remainingBalance = account.balance - totalCost;
         let liqPrice: number;
         if (marginMode === "CROSS") {
@@ -286,7 +264,6 @@ export async function openPosition(
         position = created as SimPosition;
     }
 
-    // 거래 기록 (추가 매수 이력 추적용 — 병합 시에도 별도 INSERT)
     await supabase.from("sim_trades").insert({
         user_id: userId,
         position_id: position.id,
@@ -299,7 +276,6 @@ export async function openPosition(
         fee,
     });
 
-    // 잔고 차감
     const newBalance = account.balance - totalCost;
     const { data: updatedAccount } = await supabase
         .from("sim_accounts")
@@ -313,8 +289,6 @@ export async function openPosition(
         account: updatedAccount as SimAccount,
     };
 }
-
-/* ── 포지션 종료 ── */
 
 export async function closePosition(
     userId: string,
@@ -340,7 +314,6 @@ export async function closePosition(
     const fee = position.quantity * closePrice * TAKER_FEE;
     const returnAmount = position.margin + pnl - fee;
 
-    // 포지션 업데이트
     await supabase
         .from("sim_positions")
         .update({
@@ -351,7 +324,6 @@ export async function closePosition(
         })
         .eq("id", positionId);
 
-    // 거래 기록
     await supabase.from("sim_trades").insert({
         user_id: userId,
         position_id: positionId,
@@ -364,7 +336,6 @@ export async function closePosition(
         fee,
     });
 
-    // 잔고 반환
     const { data: account } = await supabase
         .from("sim_accounts")
         .select("*")
@@ -381,8 +352,6 @@ export async function closePosition(
 
     return { pnl, account: updatedAccount as SimAccount };
 }
-
-/* ── 청산 ── */
 
 export async function liquidatePosition(
     userId: string,
@@ -420,10 +389,7 @@ export async function liquidatePosition(
         pnl: -position.margin,
         fee: 0,
     });
-    // margin은 이미 차감되어 있으므로 추가 차감 없음 (전액 손실)
 }
-
-/* ── 미체결 주문 체결 ── */
 
 export async function fillOrder(
     userId: string,
@@ -443,13 +409,11 @@ export async function fillOrder(
     const fee = order.quantity * fillPrice * TAKER_FEE;
     const orderMarginMode: MarginMode = order.margin_mode ?? "CROSS";
 
-    // 주문 체결
     await supabase
         .from("sim_orders")
         .update({ status: "FILLED" })
         .eq("id", orderId);
 
-    // 같은 심볼에 다른 마진 모드 포지션이 있는지 확인
     const { data: conflictPos } = await supabase
         .from("sim_positions")
         .select("margin_mode")
@@ -461,7 +425,6 @@ export async function fillOrder(
         .maybeSingle();
 
     if (conflictPos) {
-        // 충돌 시 주문 취소 처리
         await supabase
             .from("sim_orders")
             .update({ status: "CANCELLED" })
@@ -469,7 +432,6 @@ export async function fillOrder(
         return null;
     }
 
-    // 기존 같은 심볼+방향+마진모드 포지션 확인 (병합)
     const { data: existingPos } = await supabase
         .from("sim_positions")
         .select("*")
@@ -548,7 +510,6 @@ export async function fillOrder(
         position = created as SimPosition;
     }
 
-    // 거래 기록
     await supabase.from("sim_trades").insert({
         user_id: userId,
         position_id: position.id,
@@ -563,8 +524,6 @@ export async function fillOrder(
 
     return position;
 }
-
-/* ── 주문 취소 ── */
 
 export async function cancelOrder(
     userId: string,
@@ -586,7 +545,6 @@ export async function cancelOrder(
         .update({ status: "CANCELLED" })
         .eq("id", orderId);
 
-    // 증거금 반환
     const margin = order.quantity * order.price / order.leverage;
     const fee = order.quantity * order.price * TAKER_FEE;
     const returnAmount = margin + fee;
@@ -608,8 +566,6 @@ export async function cancelOrder(
     return updated as SimAccount;
 }
 
-/* ── TP/SL 수정 ── */
-
 export async function updatePositionTpSl(
     userId: string,
     positionId: string,
@@ -623,8 +579,6 @@ export async function updatePositionTpSl(
         .eq("user_id", userId)
         .eq("status", "OPEN");
 }
-
-/* ── 데이터 조회 ── */
 
 export async function getOpenPositions(userId: string): Promise<SimPosition[]> {
     const { data } = await supabase

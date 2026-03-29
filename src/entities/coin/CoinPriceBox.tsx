@@ -6,7 +6,6 @@ import Image from "next/image";
 import SymbolPickerModal from "@/components/SymbolPickerModal";
 import { supabase } from "@/shared/lib/supabase-browser";
 
-// 코인 로고 URL 생성 (USDT 제거한 base symbol 사용)
 function getCoinLogoUrl(symbol: string): string {
     const base = symbol.toUpperCase().replace(/USDT$/, "").toLowerCase();
     return `https://assets.coincap.io/assets/icons/${base}@2x.png`;
@@ -14,7 +13,6 @@ function getCoinLogoUrl(symbol: string): string {
 
 type Props = { boxId: string; defaultSymbol?: string; fadeDelay?: number };
 
-// Binance ExchangeInfo 타입
 interface BinanceExchangeInfo {
     symbols: {
         symbol: string;
@@ -25,11 +23,9 @@ interface BinanceExchangeInfo {
     }[];
 }
 
-// 모듈 레벨 precision 캐시 (모든 인스턴스가 공유)
 const globalPrecisionCache: Record<string, number> = {};
 const pendingRequests: Record<string, Promise<number>> = {};
 
-// 배치 ticker fetch (50ms 내 요청을 모아 한번에 호출 → 동시에 표시)
 type TickerData = { lastPrice: string; priceChangePercent: string; symbol: string };
 type TickerCallback = (d: TickerData | null) => void;
 let tickerQueue: { symbol: string; resolve: TickerCallback }[] = [];
@@ -73,7 +69,6 @@ async function fetchPrecision(sym: string): Promise<number> {
     const key = sym.toUpperCase();
     if (globalPrecisionCache[key] != null) return globalPrecisionCache[key];
 
-    // 동일 심볼 동시 요청 중복 방지
     if (key in pendingRequests) return pendingRequests[key];
 
     pendingRequests[key] = (async () => {
@@ -134,7 +129,6 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
         return price != null ? `$${usdFormatter.format(price)}` : "$—";
     };
 
-    // 세션 + 심볼 불러오기
     useEffect(() => {
         const { data: sub } = supabase.auth.onAuthStateChange(
             async (_e, session) => {
@@ -179,12 +173,10 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
         return () => sub.subscription.unsubscribe();
     }, [boxId, initialSymbol]);
 
-    // precision 불러오기
     useEffect(() => {
         loadPrecision(symbol);
     }, [symbol]);
 
-    // Binance WebSocket
     useEffect(() => {
         const myVer = ++verRef.current;
         setPrice(null);
@@ -198,7 +190,6 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
             wsRef.current = null;
         }
 
-        // 배치 REST로 현재가 즉시 fetch (50ms 내 요청 모아서 1회 호출 → 4개 동시 표시)
         fetchTickerBatched(symbol).then((d) => {
             if (!d || verRef.current !== myVer) return;
             const p = parseFloat(d.lastPrice);
@@ -221,7 +212,6 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                 const changePct = parseFloat(d?.P);
 
                 if (!Number.isNaN(last)) {
-                    // 가격 변동 플래시 효과
                     if (prevPriceRef.current !== null && last !== prevPriceRef.current) {
                         setPriceFlash(last > prevPriceRef.current ? "up" : "down");
                         setTimeout(() => setPriceFlash(null), 600);
@@ -333,7 +323,6 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                             className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] z-50 w-[200px] rounded-lg bg-surface-elevated border border-border-default py-2 px-3 text-[11px] text-text-primary shadow-lg pointer-events-none"
                         >
                             클릭 시 코인 심볼을 변경할 수 있습니다.
-                            {/* 테두리가 있는 삼각형 화살표 */}
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-border-default" />
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-surface-elevated" />
                         </motion.div>

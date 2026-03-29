@@ -98,7 +98,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
     const isLong = side === "LONG";
     const leveragePct = ((leverage - 1) / (125 - 1)) * 100;
 
-    // 공통 스타일 토큰
     const bg = isLight ? "bg-white" : "bg-neutral-950";
     const cardBg = isLight ? "bg-neutral-50" : "bg-neutral-900/60";
     const inputBg = isLight ? "bg-white border-neutral-200 text-neutral-900 placeholder:text-neutral-400" : "bg-neutral-900 border-zinc-800 text-white placeholder:text-neutral-600";
@@ -114,7 +113,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
     return (
         <div className={`h-full flex flex-col ${bg} rounded-2xl overflow-hidden border ${border}`}>
 
-            {/* ── 계정 카드 ── */}
             <div className="px-5 pt-5 pb-4 flex-shrink-0">
                 <div className="flex items-start justify-between mb-1">
                     <span className={`text-[10px] font-medium ${textTertiary} tracking-widest uppercase`}>Demo Account</span>
@@ -170,10 +168,8 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
 
             <div className={`h-px ${divider} mx-4 flex-shrink-0`} />
 
-            {/* ── 주문 폼 ── */}
             <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-none">
 
-                {/* Long / Short 슬라이딩 토글 */}
                 <div className={`relative grid grid-cols-2 ${pillBg} rounded-2xl p-1`}>
                     <div className={`absolute top-1 bottom-1 rounded-xl transition-all duration-200 ease-out pointer-events-none ${
                         isLong
@@ -194,7 +190,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                     >Short</button>
                 </div>
 
-                {/* 주문타입 + 마진모드 */}
                 <div className="grid grid-cols-2 gap-2">
                     <div className={`flex ${pillBg} rounded-xl p-0.5 gap-0.5 border ${border}`}>
                         {(["MARKET", "LIMIT"] as OrderType[]).map((t) => (
@@ -232,7 +227,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                     <p className={`text-[9px] ${textTertiary} -mt-1 pl-0.5`}>포지션 보유 중 마진 모드 변경 불가</p>
                 )}
 
-                {/* 지정가 입력 */}
                 {orderType === "LIMIT" && (
                     <div className="relative">
                         <input
@@ -246,7 +240,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                     </div>
                 )}
 
-                {/* 레버리지 */}
                 <div className={`${cardBg} rounded-2xl px-3.5 py-3 border ${border}`}>
                     <div className="flex items-center justify-between mb-3">
                         <span className={`text-[11px] ${textSecondary} font-medium`}>레버리지</span>
@@ -257,9 +250,7 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                         </span>
                     </div>
 
-                    {/* 커스텀 슬라이더: 투명 input + 절대위치 thumb */}
                     <div className="relative h-5 mb-3">
-                        {/* 트랙 배경 */}
                         <div className="absolute top-1/2 -translate-y-1/2 inset-x-0 h-[3px] rounded-full overflow-hidden" style={{ background: isLight ? "#e5e7eb" : "#262626" }}>
                             <div
                                 className={`h-full rounded-full transition-all duration-75 ${
@@ -268,13 +259,11 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                                 style={{ width: `${leveragePct}%` }}
                             />
                         </div>
-                        {/* 인터랙션 영역 (투명) */}
                         <input
                             type="range" min={1} max={125} value={leverage}
                             onChange={(e) => setLeverage(Number(e.target.value))}
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         />
-                        {/* 커스텀 thumb – 정확히 세로 중앙, 가로 위치 */}
                         <div
                             className="absolute w-[14px] h-[14px] rounded-full shadow-md pointer-events-none transition-[left] duration-75"
                             style={{
@@ -302,7 +291,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                     </div>
                 </div>
 
-                {/* 주문 금액 */}
                 <div>
                     <div className="relative mb-1.5">
                         <input
@@ -336,7 +324,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                     </div>
                 </div>
 
-                {/* TP / SL */}
                 <div>
                     <button
                         onClick={() => setShowTpSl(!showTpSl)}
@@ -377,7 +364,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                     </div>
                 </div>
 
-                {/* 주문 요약 */}
                 {amount > 0 && (
                     <div className={`space-y-2 pt-2.5 border-t ${border}`}>
                         {[
@@ -394,7 +380,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                     </div>
                 )}
 
-                {/* 에러 */}
                 {error && (
                     <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-red-500/8 border border-red-500/15">
                         <svg className="w-3.5 h-3.5 text-red-500 shrink-0 mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -405,7 +390,6 @@ export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositi
                 )}
             </div>
 
-            {/* ── 주문 버튼 ── */}
             <div className={`flex-shrink-0 px-4 pb-5 pt-3 border-t ${border}`}>
                 <button
                     onClick={handleSubmit}

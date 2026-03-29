@@ -90,7 +90,6 @@ export default function MarketIndicesWidget({ pollMs = 30000, fadeDelay = 0 }: {
 
             setData(result);
         } catch {
-            // 에러 시 기존 데이터 유지
         }
     }, []);
 

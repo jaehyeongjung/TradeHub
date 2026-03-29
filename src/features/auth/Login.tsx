@@ -7,7 +7,6 @@ import type { User, AuthError } from "@supabase/supabase-js";
 function mapAuthError(error: AuthError): string {
     const msg = (error.message || "").toLowerCase();
 
-    // message 기반 매핑 (v2 SDK는 별도 code 필드가 없고 message/status 중심)
     if (msg.includes("user already registered") || msg.includes("already")) {
         return "이미 가입된 이메일입니다.";
     }
@@ -37,7 +36,6 @@ export default function AuthBox({ isDark = true }: { isDark?: boolean }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
 
-    // 세션 초기화 + 구독 (익명 사용자 제외)
     useEffect(() => {
         supabase.auth.getUser().then(({ data }) => {
             const u = data.user;
@@ -74,7 +72,6 @@ export default function AuthBox({ isDark = true }: { isDark?: boolean }) {
             return;
         }
 
-        // 이미 가입된 이메일 보정: identities가 빈 배열이면 기존 사용자
         const identities = data?.user?.identities;
         const already =
             !data?.user ||
@@ -109,14 +106,12 @@ export default function AuthBox({ isDark = true }: { isDark?: boolean }) {
             setErr(mapAuthError(error));
             return;
         }
-        // 성공 시 onAuthStateChange로 user 상태 자동 반영
     };
 
     const signOut = async () => {
         setErr(null);
         setInfo(null);
         await supabase.auth.signOut();
-        // 익명 로그인이 완료될 때까지 기다리기
         await new Promise(resolve => setTimeout(resolve, 500));
     };
 
@@ -164,13 +159,11 @@ export default function AuthBox({ isDark = true }: { isDark?: boolean }) {
                 void signIn();
             }}
         >
-            {/* 헤더 */}
             <div className="mb-5">
                 <h3 className={`text-lg font-semibold ${isDark ? "text-neutral-200" : "text-neutral-800"}`}>Welcome</h3>
                 <p className={`text-xs mt-1 ${isDark ? "text-neutral-400" : "text-neutral-500"}`}>계정에 로그인하거나 새로 가입하세요</p>
             </div>
 
-            {/* 알림 메시지 */}
             {info && (
                 <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-400 text-xs mb-4">
                     <div className="flex items-center gap-2">
@@ -192,7 +185,6 @@ export default function AuthBox({ isDark = true }: { isDark?: boolean }) {
                 </div>
             )}
 
-            {/* 입력 필드 */}
             <div className="space-y-3 mb-4">
                 <div>
                     <label className={`block text-xs font-medium mb-1.5 ml-1 ${isDark ? "text-neutral-400" : "text-neutral-500"}`}>이메일</label>
@@ -226,7 +218,6 @@ export default function AuthBox({ isDark = true }: { isDark?: boolean }) {
                 </div>
             </div>
 
-            {/* 버튼 */}
             <div className="flex gap-2">
                 <button
                     type="submit"
@@ -249,7 +240,6 @@ export default function AuthBox({ isDark = true }: { isDark?: boolean }) {
                 </button>
             </div>
 
-            {/* 안내 텍스트 */}
             <p className={`text-[10px] mt-4 text-center leading-relaxed ${isDark ? "text-neutral-500" : "text-neutral-400"}`}>
                 회원가입 시 이메일 인증이 필요합니다<br/>
                 스팸함도 확인해주세요

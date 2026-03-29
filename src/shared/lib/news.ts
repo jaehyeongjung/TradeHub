@@ -9,7 +9,6 @@ export type NewsItem = {
     published_at: string;
 };
 
-// 서버 컴포넌트용: 단일 뉴스 조회
 export async function getNewsById(id: string): Promise<NewsItem | null> {
     const { data, error } = await supabaseAdmin
         .from("news_items")
@@ -21,7 +20,6 @@ export async function getNewsById(id: string): Promise<NewsItem | null> {
     return data as NewsItem;
 }
 
-// Sitemap 생성용: 전체 뉴스 ID 목록
 export async function getAllNewsIds(limit = 500) {
     const { data, error } = await supabaseAdmin
         .from("news_items")

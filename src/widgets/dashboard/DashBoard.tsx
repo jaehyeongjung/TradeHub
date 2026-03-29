@@ -25,10 +25,10 @@ export const DashBoard = () => {
 
     const router = useRouter();
 
-    const pathname = usePathname() ?? "/"; // string 보장
-    const sp = useSearchParams(); // ReadonlyURLSearchParams | null
-    const paramsForRead = sp ?? new URLSearchParams(); // 읽기용 대체
-    const paramsForWrite = new URLSearchParams(sp?.toString() ?? ""); // 쓰기용 복사본
+    const pathname = usePathname() ?? "/";
+    const sp = useSearchParams();
+    const paramsForRead = sp ?? new URLSearchParams();
+    const paramsForWrite = new URLSearchParams(sp?.toString() ?? "");
 
     const raw = paramsForRead.get("tab");
     const activeTab: TabKey = raw === "board" ? "board" : "news";
@@ -55,11 +55,8 @@ export const DashBoard = () => {
             aria-label="커뮤니티 게시판 및 채팅"
             className="flex gap-3 2xl:gap-5 mt-3 2xl:mt-5 flex-1 min-h-0 overflow-hidden"
         >
-                {/* 왼쪽: 게시판/뉴스 카드 */}
                 <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-surface-card border border-border-subtle">
-                    {/* 상단 바: 탭 + (우측) 글쓰기 버튼 */}
                     <div className={`relative z-20 flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14 transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: "50ms", transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-                        {/* 탭 버튼 */}
                         <div className={`inline-flex items-center rounded-xl p-1 shrink-0 ${isLight ? "bg-neutral-100 border border-neutral-200" : "bg-surface-input/60 border border-border-subtle"}`}>
                             <button
                                 onClick={() => switchTab("board")}

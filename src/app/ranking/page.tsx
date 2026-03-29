@@ -5,7 +5,6 @@ import { fetchRankingData } from "@/lib/fetchRanking";
 
 const SITE = "https://www.tradehub.kr";
 
-/* ─── 동적 메타데이터 — 실데이터 기반 ─── */
 export async function generateMetadata(): Promise<Metadata> {
     const coins = await fetchRankingData();
     const btc   = coins?.find((c) => c.id === "bitcoin");
@@ -47,12 +46,10 @@ export async function generateMetadata(): Promise<Metadata> {
     };
 }
 
-/* ─── SSR 페이지 ─── */
 export default async function RankingPage() {
     const coins = await fetchRankingData();
 
-    /* ItemList JSON-LD — 상위 10개 코인 (Featured Snippet 노림) */
-    const itemListJsonLd = {
+const itemListJsonLd = {
         "@context": "https://schema.org",
         "@type": "ItemList",
         name: "코인 시가총액 순위 TOP 100",

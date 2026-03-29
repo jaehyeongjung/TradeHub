@@ -3,10 +3,8 @@ export const runtime = "nodejs";
 import Parser from "rss-parser";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
-/** 개별 피드 URL/소스 타입 */
 type FeedUrl = { source: string; url: string };
 
-/** RSS 항목 타입(우리가 쓰는 필드만 정의) */
 type CustomItem = {
     title?: string;
     link?: string;
@@ -15,12 +13,10 @@ type CustomItem = {
     contentSnippet?: string;
 };
 
-/** 피드 타입 */
 type CustomFeed = {
     items: CustomItem[];
 };
 
-/** .env 없을 때 기본 한국어 소스 사용 */
 function getFeedUrls(): FeedUrl[] {
     const raw = process.env.NEWS_FEEDS ?? "";
     const list = raw
@@ -29,10 +25,7 @@ function getFeedUrls(): FeedUrl[] {
         .filter((s) => s.length > 0);
 
     const defaults: string[] = [
-        //"https://www.coindeskkorea.com/rss/allArticle.xml",
-        // "https://www.tokenpost.kr/rss",
         "https://www.blockmedia.co.kr/feed",
-        // "https://kr.cointelegraph.com/rss",
     ];
 
     const src = list.length ? list : defaults;
@@ -47,7 +40,6 @@ function getFeedUrls(): FeedUrl[] {
     });
 }
 
-/** 제목에서 간단 심볼 추출 */
 function extractSymbols(text: string): string[] {
     const match = (text || "").match(/\b[A-Z]{2,6}\b/g);
     return match ? Array.from(new Set(match)).slice(0, 4) : [];
@@ -57,14 +49,13 @@ export async function GET(): Promise<Response> {
     try {
         const feeds = getFeedUrls();
 
-        // 제네릭으로 커스텀 타입 지정
         const parser = new Parser<CustomFeed, CustomItem>({
             headers: { "User-Agent": "TradeHubBot/1.0" },
         });
 
         for (const f of feeds) {
             try {
-                const feed = await parser.parseURL(f.url); // 타입: CustomFeed & { items: CustomItem[] }
+                const feed = await parser.parseURL(f.url);
 
                 for (const item of feed.items ?? []) {
                     const title = item.title ?? "";

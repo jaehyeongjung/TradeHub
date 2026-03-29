@@ -117,7 +117,6 @@ export default function LongShortRatioBox({
       const t = setInterval(() => { void fetchRatio(); }, pollMs);
       return () => clearInterval(t);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol, period, source, pollMs, isTreemapOpen]);
 
   const isLongDominant = longPct !== null && longPct >= 50;
@@ -139,12 +138,10 @@ export default function LongShortRatioBox({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* 방향 accent 바 */}
       <div className={`absolute left-0 inset-y-0 w-[3px] transition-colors duration-500 ${accentBg}`} />
 
       <div className="pl-5 pr-4 pt-4 pb-4 2xl:pl-6 2xl:pr-5 2xl:pt-5 2xl:pb-5 h-full flex flex-col justify-between">
 
-        {/* 헤더 */}
         <div className="flex items-center justify-between mb-3">
           <span className={`text-[11px] 2xl:text-xs font-medium ${labelColor}`}>롱/숏 비율</span>
           <div className="flex items-center gap-1.5">
@@ -163,7 +160,6 @@ export default function LongShortRatioBox({
           <div className="text-xs text-amber-500 flex-1 flex items-center">데이터 없음</div>
         ) : (
           <>
-            {/* 히어로 숫자 */}
             <div className="flex items-end justify-between mb-3">
               <div>
                 <div className={`text-[9px] 2xl:text-[10px] font-medium mb-0.5 ${labelColor}`}>Long</div>
@@ -179,7 +175,6 @@ export default function LongShortRatioBox({
               </div>
             </div>
 
-            {/* 분할 바 */}
             <div className={`h-1.5 rounded-full overflow-hidden ${isLight ? "bg-red-100" : "bg-red-500/20"}`}>
               <motion.div
                 className="h-full bg-emerald-500 rounded-full"
@@ -189,7 +184,6 @@ export default function LongShortRatioBox({
               />
             </div>
 
-            {/* 타임스탬프 */}
             {ts && (
               <div className={`mt-2 text-[9px] 2xl:text-[10px] ${labelColor}`}>
                 {formatRelativeTime(ts)}
@@ -199,7 +193,6 @@ export default function LongShortRatioBox({
         )}
       </div>
 
-      {/* 툴팁 */}
       <AnimatePresence>
         {isHovered && (
           <motion.div

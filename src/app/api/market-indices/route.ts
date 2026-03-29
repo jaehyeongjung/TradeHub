@@ -4,7 +4,6 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const runtime = "nodejs";
 
-// 응답 타입
 export type MarketIndex = {
     symbol: string;
     name: string;
@@ -20,7 +19,6 @@ export type MarketIndicesResponse = {
     updatedAt: string;
 };
 
-// Yahoo Finance 심볼 매핑
 const INDICES = [
     { symbol: "^IXIC", name: "NASDAQ" },
     { symbol: "^KS11", name: "KOSPI" },
@@ -89,16 +87,14 @@ async function fetchYahooQuote(symbol: string): Promise<{
     }
 }
 
-// 메모리 캐시
 let lastGood: MarketIndicesResponse | null = null;
 let lastUpdated = 0;
-const CACHE_TTL_MS = 30_000; // 30초
+const CACHE_TTL_MS = 30_000;
 
 export async function GET() {
     try {
         const now = Date.now();
 
-        // 캐시가 유효하면 반환
         if (lastGood && now - lastUpdated < CACHE_TTL_MS) {
             return NextResponse.json(lastGood, {
                 headers: { "Cache-Control": "no-store, must-revalidate" },
@@ -127,7 +123,6 @@ export async function GET() {
             updatedAt: new Date().toISOString(),
         };
 
-        // 캐시 업데이트
         if (!degraded) {
             lastGood = response;
             lastUpdated = now;
@@ -137,7 +132,6 @@ export async function GET() {
             headers: { "Cache-Control": "no-store, must-revalidate" },
         });
     } catch {
-        // 에러 시 캐시 반환
         if (lastGood) {
             return NextResponse.json(
                 { ...lastGood, degraded: true },

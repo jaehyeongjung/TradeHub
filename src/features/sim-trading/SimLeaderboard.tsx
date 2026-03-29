@@ -13,7 +13,6 @@ interface Props {
     userId: string | null;
 }
 
-// ── 추상 트레이더 정체성 ──────────────────────────────────────────────
 const ADJS = ["냉정한", "날카로운", "대담한", "신중한", "빠른", "강인한", "조용한", "예리한", "침착한", "용감한"];
 const ANIMALS = ["고래", "독수리", "황소", "호랑이", "매", "곰", "사자", "여우", "늑대", "표범"];
 const EMOJIS  = ["🐋",   "🦅",      "🐂",    "🐯",     "🦅", "🐻", "🦁",   "🦊",   "🐺",   "🐆"];
@@ -49,11 +48,10 @@ function traderAlias(userId: string) {
     };
 }
 
-// ── 순위 배지 색상 ─────────────────────────────────────────────────────
 const RANK_BADGE = [
-    { text: "text-amber-400",   bg: "bg-amber-500/15",   border: "border-amber-500/30"   }, // 1st
-    { text: "text-neutral-300", bg: "bg-neutral-500/10", border: "border-neutral-500/20" }, // 2nd
-    { text: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/20"  }, // 3rd
+    { text: "text-amber-400",   bg: "bg-amber-500/15",   border: "border-amber-500/30"   },
+    { text: "text-neutral-300", bg: "bg-neutral-500/10", border: "border-neutral-500/20" },
+    { text: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/20"  },
 ];
 
 export default function SimLeaderboard({ userId }: Props) {
@@ -81,7 +79,6 @@ export default function SimLeaderboard({ userId }: Props) {
         return () => clearInterval(t);
     }, [fetchLeaderboard]);
 
-    // ── 테마 토큰 ──────────────────────────────────────────────────────
     const card    = isLight ? "bg-white border-neutral-200"           : "bg-neutral-950 border-white/[0.06]";
     const divider = isLight ? "border-neutral-100 divide-neutral-100" : "border-white/[0.04] divide-white/[0.04]";
     const t1 = isLight ? "text-neutral-900" : "text-white";
@@ -89,7 +86,6 @@ export default function SimLeaderboard({ userId }: Props) {
     const t3 = isLight ? "text-neutral-400" : "text-neutral-600";
     const rowHover = isLight ? "hover:bg-neutral-50" : "hover:bg-white/[0.025]";
 
-    // ── 로딩 스켈레톤 ─────────────────────────────────────────────────
     if (loading) {
         const sk = isLight ? "bg-neutral-100 animate-pulse" : "bg-white/[0.05] animate-pulse";
         return (
@@ -138,7 +134,6 @@ export default function SimLeaderboard({ userId }: Props) {
     return (
         <div className={`rounded-2xl border overflow-hidden ${card}`}>
 
-            {/* ── 헤더 ────────────────────────────────────────────── */}
             <div className={`flex items-center justify-between px-5 py-3.5 border-b ${divider}`}>
                 <div className="flex items-center gap-2">
                     <span className={`text-[13px] font-bold tracking-tight ${t1}`}>수익률 랭킹</span>
@@ -154,7 +149,6 @@ export default function SimLeaderboard({ userId }: Props) {
                 </div>
             </div>
 
-            {/* ── TOP 3 카드 리스트 ─────────────────────────────────── */}
             <div className={`p-3 space-y-1.5 border-b ${divider}`}>
                 {top3.map((entry, i) => {
                     const alias      = traderAlias(entry.user_id);
@@ -176,7 +170,6 @@ export default function SimLeaderboard({ userId }: Props) {
                                         : "bg-white/[0.03] border border-white/[0.05]"
                             }`}
                         >
-                            {/* ROI 게이지 바 (배경) */}
                             <div
                                 className={`absolute left-0 top-0 h-full rounded-2xl pointer-events-none transition-all duration-700 ${
                                     isPositive ? "bg-emerald-500/[0.06]" : "bg-red-500/[0.06]"
@@ -185,12 +178,10 @@ export default function SimLeaderboard({ userId }: Props) {
                             />
 
                             <div className="relative flex items-center gap-3">
-                                {/* 순위 뱃지 */}
                                 <span className={`text-[9px] font-black tracking-widest w-8 text-center py-1 rounded-lg border flex-shrink-0 ${badge.text} ${badge.bg} ${badge.border}`}>
                                     {i + 1}위
                                 </span>
 
-                                {/* 이모지 아바타 */}
                                 <div className={`w-9 h-9 rounded-full flex items-center justify-center text-[18px] flex-shrink-0 ${
                                     isMe
                                         ? "ring-2 ring-amber-500/50 ring-offset-1 ring-offset-transparent"
@@ -199,7 +190,6 @@ export default function SimLeaderboard({ userId }: Props) {
                                     {alias.emoji}
                                 </div>
 
-                                {/* 이름 + 자산 */}
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-1.5">
                                         <span className={`text-[12px] font-semibold truncate ${i === 0 ? (isLight ? "text-amber-700" : "text-amber-300") : t1}`}>
@@ -214,7 +204,6 @@ export default function SimLeaderboard({ userId }: Props) {
                                     </span>
                                 </div>
 
-                                {/* ROI */}
                                 <span className={`text-[14px] font-bold font-mono tabular-nums flex-shrink-0 ${
                                     isPositive ? "text-emerald-500" : "text-red-400"
                                 }`}>
@@ -226,7 +215,6 @@ export default function SimLeaderboard({ userId }: Props) {
                 })}
             </div>
 
-            {/* ── 나머지 순위 ──────────────────────────────────────── */}
             <div className={`divide-y ${divider} max-h-[300px] overflow-y-auto scrollbar-none`}>
                 {rest.map((entry, i) => {
                     const alias      = traderAlias(entry.user_id);
@@ -245,19 +233,16 @@ export default function SimLeaderboard({ userId }: Props) {
                         >
                             {isMe && <div className="absolute left-0 inset-y-0 w-[2px] bg-amber-500 rounded-r" />}
 
-                            {/* 순위 */}
                             <span className={`w-5 text-right text-[11px] font-mono font-medium flex-shrink-0 ${isMe ? "text-amber-500" : t3}`}>
                                 {rank}
                             </span>
 
-                            {/* 이모지 아바타 */}
                             <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[14px] flex-shrink-0 ${
                                 isMe ? "bg-amber-500/20" : alias.palette.split(" ")[0]
                             }`}>
                                 {alias.emoji}
                             </div>
 
-                            {/* 이름 + 자산 */}
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-1">
                                     <span className={`text-[12px] font-medium truncate ${isMe ? "text-amber-400" : t2}`}>
@@ -272,7 +257,6 @@ export default function SimLeaderboard({ userId }: Props) {
                                 </span>
                             </div>
 
-                            {/* ROI 필 */}
                             <span className={`text-[12px] font-bold font-mono tabular-nums px-2 py-0.5 rounded-lg flex-shrink-0 ${
                                 isPositive
                                     ? "text-emerald-500 bg-emerald-500/[0.08]"
@@ -285,7 +269,6 @@ export default function SimLeaderboard({ userId }: Props) {
                 })}
             </div>
 
-            {/* ── 내 순위 고정 배너 ─────────────────────────────────── */}
             {myRank > 12 && userId && data[myRank] && (() => {
                 const me      = data[myRank];
                 const alias   = traderAlias(userId);

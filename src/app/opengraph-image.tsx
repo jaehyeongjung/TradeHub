@@ -20,7 +20,6 @@ export default function Image() {
                     fontFamily: "sans-serif",
                 }}
             >
-                {/* 로고 */}
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                     <span
                         style={{
@@ -43,7 +42,6 @@ export default function Image() {
                     />
                 </div>
 
-                {/* 메인 텍스트 */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     <span
                         style={{
@@ -69,7 +67,6 @@ export default function Image() {
                     </span>
                 </div>
 
-                {/* 하단 */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                     <span style={{ fontSize: "18px", color: "rgba(255,255,255,0.45)", letterSpacing: "-0.01em" }}>
                         더 큰 화면으로, 더 자세하게 즐겨보세요.

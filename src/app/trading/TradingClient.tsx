@@ -9,7 +9,6 @@ import ForceTabReturnReload from "@/components/ForceTabReturnReload";
 function SimTradingSkeleton() {
     return (
         <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto animate-pulse">
-            {/* 헤더 바 */}
             <div className="flex items-center gap-4 px-4 py-2.5 bg-neutral-950 rounded-xl h-[52px]">
                 <div className="w-7 h-7 rounded-full bg-neutral-800 flex-shrink-0" />
                 <div className="w-24 h-4 rounded-md bg-neutral-800" />
@@ -24,12 +23,9 @@ function SimTradingSkeleton() {
                 </div>
             </div>
 
-            {/* 메인 영역 */}
             <div className="flex gap-3 h-[calc(100vh-200px)] min-h-[480px]">
-                {/* 차트 */}
                 <div className="flex-1 min-w-0 bg-neutral-950 rounded-xl" />
 
-                {/* 호가창 */}
                 <div className="w-[280px] flex-shrink-0 bg-neutral-950 rounded-xl flex flex-col p-3 gap-2">
                     <div className="w-20 h-3 rounded bg-neutral-800" />
                     <div className="flex justify-between mb-1">
@@ -52,7 +48,6 @@ function SimTradingSkeleton() {
                     ))}
                 </div>
 
-                {/* 주문 패널 */}
                 <div className="w-[300px] flex-shrink-0 bg-neutral-950 rounded-2xl flex flex-col p-5 gap-4">
                     <div className="flex justify-between items-start">
                         <div className="flex flex-col gap-2">
@@ -82,7 +77,6 @@ function SimTradingSkeleton() {
                 </div>
             </div>
 
-            {/* 하단 탭 */}
             <div className="bg-neutral-950 rounded-2xl overflow-hidden">
                 <div className="flex">
                     {[0, 1, 2, 3].map((i) => (

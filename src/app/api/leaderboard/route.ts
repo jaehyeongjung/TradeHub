@@ -17,7 +17,6 @@ export async function GET() {
         .select("user_id, margin, unrealized_pnl")
         .eq("status", "OPEN");
 
-    // 유저별 열린 포지션 집계
     const positionsByUser: Record<string, { margin: number; unrealized_pnl: number }[]> = {};
     for (const pos of positions ?? []) {
         if (!positionsByUser[pos.user_id]) positionsByUser[pos.user_id] = [];

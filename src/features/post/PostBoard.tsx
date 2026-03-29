@@ -179,7 +179,6 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
         return new Date(dateStr).toLocaleDateString();
     };
 
-    // 스타일 변수
     const dividerColor = isLight ? "border-neutral-100" : "border-border-subtle";
     const titleColor = isLight ? "text-neutral-800 group-hover:text-teal-600" : "text-text-primary group-hover:text-white";
     const bodyColor = isLight ? "text-neutral-500" : "text-text-tertiary";
@@ -212,7 +211,6 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                 className={`p-3 h-full flex flex-col min-h-0 transition-[opacity,transform] duration-700 ${postsLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                 style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
             >
-                {/* 목록 */}
                 {mode === "list" && (
                     <div
                         ref={listRef}
@@ -236,7 +234,6 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                             </button>
                         )}
 
-                        {/* 스켈레톤 */}
                         {!postsLoaded && (
                             <div className="space-y-0">
                                 {[...Array(5)].map((_, i) => (
@@ -296,10 +293,8 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                     </div>
                 )}
 
-                {/* 상세 */}
                 {mode === "detail" && selected && (
                     <div className="flex-1 overflow-auto scrollbar-hide">
-                        {/* 네비 */}
                         <div className="flex items-center justify-between mb-4">
                             <button className={backBtnClass} onClick={() => setMode("list")}>
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -329,7 +324,6 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                             )}
                         </div>
 
-                        {/* 본문 카드 */}
                         <article className={`rounded-2xl p-4 2xl:p-5 ${articleBg}`}>
                             <h2 className={`text-lg 2xl:text-xl font-bold mb-3 leading-snug ${isLight ? "text-neutral-800" : "text-text-primary"}`}>
                                 {selected.title}
@@ -349,19 +343,16 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                             <DetailImage url={selected.image_url} />
                         </article>
 
-                        {/* 댓글 */}
                         <div className="mt-4">
                             <Comments postId={selected.id} userId={userId} isLight={isLight} />
                         </div>
                     </div>
                 )}
 
-                {/* 글쓰기 */}
                 {mode === "write" && (
                     <WriteForm onCancel={() => setMode("list")} onSubmit={handleCreate} isLight={isLight} />
                 )}
 
-                {/* 수정 */}
                 {mode === "edit" && selected && (
                     <WriteForm
                         initialTitle={selected.title}

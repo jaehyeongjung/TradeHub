@@ -22,14 +22,12 @@ export default function SimTradeHistory({ trades }: Props) {
 
     return (
         <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden">
-            {/* 헤더 */}
             <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
                 <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
                     Trade History
                 </h3>
             </div>
 
-            {/* 테이블 헤더 */}
             <div className="grid grid-cols-[1fr_0.8fr_1fr_1fr_1fr_0.8fr] gap-2 px-5 py-2 text-[10px] text-neutral-500 border-b border-zinc-800/40">
                 <div>심볼</div>
                 <div className="text-right">유형</div>
@@ -39,7 +37,6 @@ export default function SimTradeHistory({ trades }: Props) {
                 <div className="text-right">시간</div>
             </div>
 
-            {/* 거래 리스트 */}
             <div className="divide-y divide-zinc-800/30 max-h-60 overflow-y-auto">
                 {trades.map((t) => {
                     const isLiq = t.type === "LIQUIDATION";
@@ -55,7 +52,6 @@ export default function SimTradeHistory({ trades }: Props) {
                             key={t.id}
                             className="grid grid-cols-[1fr_0.8fr_1fr_1fr_1fr_0.8fr] gap-2 items-center px-5 py-2.5 hover:bg-white/[0.015] transition-colors"
                         >
-                            {/* 심볼 */}
                             <div className="flex items-center gap-2">
                                 <div className={`w-1 h-6 rounded-full ${
                                     isLiq ? "bg-orange-500" : isLong ? "bg-emerald-500" : "bg-red-500"
@@ -74,7 +70,6 @@ export default function SimTradeHistory({ trades }: Props) {
                                 </div>
                             </div>
 
-                            {/* 유형 */}
                             <div className="text-right">
                                 <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${
                                     isLiq
@@ -87,21 +82,18 @@ export default function SimTradeHistory({ trades }: Props) {
                                 </span>
                             </div>
 
-                            {/* 가격 */}
                             <div className="text-right">
                                 <div className="text-[12px] text-neutral-200 font-mono tabular-nums">
                                     {t.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                                 </div>
                             </div>
 
-                            {/* 규모 */}
                             <div className="text-right">
                                 <div className="text-[12px] text-neutral-300 font-mono tabular-nums">
                                     ${notional.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                                 </div>
                             </div>
 
-                            {/* 손익 */}
                             <div className="text-right">
                                 {isOpen ? (
                                     <span className="text-[11px] text-neutral-600">—</span>
@@ -118,7 +110,6 @@ export default function SimTradeHistory({ trades }: Props) {
                                 )}
                             </div>
 
-                            {/* 시간 */}
                             <div className="text-right">
                                 <div className="text-[10px] text-neutral-500 font-mono tabular-nums">
                                     {timeStr}

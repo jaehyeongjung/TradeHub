@@ -9,7 +9,6 @@ export default function MobileSuggestModal() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // 모바일 판별: UA + 뷰포트 폭
     const ua = navigator.userAgent || "";
     const isMobileUA = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
     const isNarrow =
@@ -26,7 +25,6 @@ export default function MobileSuggestModal() {
     <AnimatePresence>
       {open && (
         <>
-          {/* Dim */}
           <motion.div
             className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-[2px]"
             initial={{ opacity: 0 }}
@@ -34,7 +32,6 @@ export default function MobileSuggestModal() {
             exit={{ opacity: 0 }}
           />
 
-          {/* Modal */}
           <motion.div
             className="fixed inset-0 z-[61] flex items-end sm:items-center justify-center p-4"
             initial={{ opacity: 0, y: 16 }}

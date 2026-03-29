@@ -66,7 +66,6 @@ export default function FearGreedGauge({
                 className={`transition-[opacity,transform] duration-700 ${isLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
                 style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
             >
-                {/* 헤더 */}
                 <div className="flex items-center justify-between mb-2 2xl:mb-4">
                     <h3 className={headerLabelClass}>{title}</h3>
                     <div className={`px-2 py-0.5 rounded-full text-[10px] 2xl:text-xs font-medium ${state.bgLight}`}>
@@ -74,7 +73,6 @@ export default function FearGreedGauge({
                     </div>
                 </div>
 
-                {/* 메인 숫자 */}
                 <div className="flex items-baseline gap-2 mb-2 2xl:mb-4">
                     <span className={heroNumClass}>
                         <SlotNumber value={slotValue} />
@@ -82,15 +80,12 @@ export default function FearGreedGauge({
                     <span className={subNumClass}>/100</span>
                 </div>
 
-                {/* 프로그레스 바 */}
                 <div className="space-y-2">
                     <div className={`relative h-1.5 rounded-full overflow-hidden ${trackClass}`}>
-                        {/* 그라데이션 전체 배경 (스펙트럼 맥락) */}
                         <div
                             className="absolute inset-0 opacity-25 rounded-full"
                             style={{ background: "linear-gradient(to right, #ef4444, #f97316, #eab308, #84cc16, #22c55e)" }}
                         />
-                        {/* 진행 바 */}
                         <motion.div
                             className="absolute left-0 top-0 bottom-0 rounded-full"
                             style={{ background: "linear-gradient(to right, #ef4444, #f97316, #eab308, #84cc16, #22c55e)" }}
@@ -98,7 +93,6 @@ export default function FearGreedGauge({
                             animate={{ width: `${v}%` }}
                             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                         />
-                        {/* 인디케이터 dot */}
                         <motion.div
                             className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full shadow-md ${isLight ? "bg-white border-2 border-neutral-300" : "bg-white border-2 border-surface-card"}`}
                             initial={{ left: 0 }}
@@ -107,7 +101,6 @@ export default function FearGreedGauge({
                         />
                     </div>
 
-                    {/* 레이블 */}
                     <div className={`flex justify-between ${edgeLabelClass}`}>
                         <span>공포</span>
                         <span>탐욕</span>
@@ -115,7 +108,6 @@ export default function FearGreedGauge({
                 </div>
             </div>
 
-            {/* 툴팁 */}
             <AnimatePresence>
                 {isHovered && (
                     <motion.div

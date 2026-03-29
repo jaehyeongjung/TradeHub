@@ -3,8 +3,6 @@
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
-// 네브 순서 기반 지그재그 방향
-// 짝수(0,2,4) → 오른쪽 이동(x: -6%), 홀수(1,3) → 왼쪽 이동(x: +6%)
 const PAGE_ORDER: Record<string, number> = {
     "/dashboard": 0,
     "/trading":   1,
@@ -20,7 +18,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
         return <>{children}</>;
     }
 
-    const fromRight = order % 2 === 1; // 홀수 페이지는 오른쪽에서 진입
+    const fromRight = order % 2 === 1;
 
     return (
         <div className="overflow-hidden">

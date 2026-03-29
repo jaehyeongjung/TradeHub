@@ -6,7 +6,6 @@ const BOT_UA = /Googlebot|bingbot|Baiduspider|YandexBot|DuckDuckBot|Slurp|facebo
 export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
-    // 이미 /mobile이거나 /guide, 정적 파일이면 스킵
     if (
         pathname.startsWith("/mobile") ||
         pathname.startsWith("/guide") ||
@@ -18,7 +17,6 @@ export function middleware(req: NextRequest) {
 
     const ua = req.headers.get("user-agent") ?? "";
 
-    // 크롤러/봇은 리디렉트 제외 — Googlebot(iPhone)이 /mobile로 막히는 문제 방지
     if (BOT_UA.test(ua)) {
         return NextResponse.next();
     }

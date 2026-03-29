@@ -24,7 +24,7 @@ type Msg = {
     room_id?: string;
 };
 type Reaction = { count: number; mine: boolean };
-type ReactionsState = Record<string, Record<string, Reaction>>; // msgId → emoji → {count, mine}
+type ReactionsState = Record<string, Record<string, Reaction>>;
 
 const REACTION_EMOJIS = ["👍", "❤️", "🚀", "😂", "🔥"] as const;
 type Position = {
@@ -81,7 +81,6 @@ function linkify(text: string): ReactNode[] {
 
 export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fadeDelay?: number }) {
     const [userId, setUserId] = useState<string | null>(null);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_isAnonymous, setIsAnonymous] = useState(false);
     const [msgs, setMsgs] = useState<Msg[]>([]);
     const [initialLoading, setInitialLoading] = useState(true);
@@ -195,7 +194,6 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
         const uid = userIdRef.current;
         const isMine = reactions[messageId]?.[emoji]?.mine ?? false;
 
-        // 낙관적 업데이트
         setReactions((prev) => {
             const curr = prev[messageId]?.[emoji] ?? { count: 0, mine: false };
             const next = { count: Math.max(0, curr.count + (isMine ? -1 : 1)), mine: !isMine };
@@ -357,7 +355,6 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
     const longPct = Math.round(ratio.long_ratio * 100);
     const shortPct = 100 - longPct;
 
-    // 스타일 변수
     const headerBg = isLight ? "bg-white border-neutral-200" : "bg-surface-elevated border-border-subtle";
     const labelColor = isLight ? "text-neutral-500" : "text-text-muted";
     const pillBg = isLight ? "bg-neutral-100 text-neutral-600" : "bg-surface-input text-text-tertiary";
@@ -372,9 +369,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
             className={`h-full flex flex-col w-full transition-[opacity,transform] duration-700 ${initialLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
             style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
         >
-            {/* 포지션 헤더 */}
             <div className={`mb-2 rounded-2xl border p-3 2xl:p-4 ${headerBg}`}>
-                {/* 상단: 내 포지션 + 참여 수 */}
                 <div className="flex items-center justify-between mb-2.5">
                     <div className="flex items-center gap-2">
                         <span className={`text-[10px] font-medium ${labelColor}`}>포지션</span>
@@ -403,7 +398,6 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                     </span>
                 </div>
 
-                {/* 비율 바 */}
                 <div className={`h-1.5 rounded-full overflow-hidden mb-1.5 ${isLight ? "bg-red-100" : "bg-red-500/20"}`}>
                     <motion.div
                         className="h-full bg-emerald-500 rounded-full"
@@ -417,7 +411,6 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                     <span className="text-[9px] font-medium text-red-400 tabular-nums">Short {shortPct}%</span>
                 </div>
 
-                {/* Long/Short 버튼 */}
                 {!myChoice && (
                     <div className="flex gap-2 mt-2.5">
                         <motion.button
@@ -450,7 +443,6 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                 )}
             </div>
 
-            {/* 메시지 리스트 */}
             <div className={`relative flex-1 min-h-0 rounded-2xl overflow-hidden ${msgAreaBg}`}>
                 <div
                     ref={listRef}
@@ -478,9 +470,7 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                         transition={{ duration: 0.2 }}
                                         className="group relative py-[3px] min-w-0"
                                     >
-                                        {/* 메시지 행 */}
                                         <div className="flex items-baseline gap-1.5">
-                                            {/* 포지션 pill */}
                                             {userChoice ? (
                                                 <span className={`text-[8px] font-bold px-1 py-[1px] rounded shrink-0 leading-none ${
                                                     userChoice === "long"
@@ -492,17 +482,13 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                             ) : (
                                                 <span className="w-[14px] shrink-0" />
                                             )}
-                                            {/* 이름 */}
                                             <span className={`text-[11px] font-semibold shrink-0 ${nameColor}`}>
                                                 {isMe ? "나" : m.user_id.slice(0, 6)}
                                             </span>
-                                            {/* 구분자 */}
                                             <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-300" : "text-text-muted"}`}>·</span>
-                                            {/* 내용 */}
                                             <span className={`text-[12px] whitespace-pre-wrap break-anywhere flex-1 ${contentColor}`}>
                                                 {linkify(m.content)}
                                             </span>
-                                            {/* 리액션 추가 버튼 (hover시) */}
                                             <button
                                                 onClick={() => setPickerOpenId(isPickerOpen ? null : m.id)}
                                                 className={`shrink-0 text-[11px] w-5 h-5 flex items-center justify-center rounded-md transition-all cursor-pointer ${
@@ -515,7 +501,6 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                             </button>
                                         </div>
 
-                                        {/* 이모지 피커 (인라인 팝업) */}
                                         <AnimatePresence>
                                             {isPickerOpen && (
                                                 <motion.div
@@ -546,7 +531,6 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                                             )}
                                         </AnimatePresence>
 
-                                        {/* 리액션 pills */}
                                         {hasReactions && (
                                             <div className="flex flex-wrap gap-1 mt-1 pl-[22px]">
                                                 {REACTION_EMOJIS.filter((e) => (msgReactions[e]?.count ?? 0) > 0).map((emoji) => {
@@ -583,7 +567,6 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                     )}
                 </div>
 
-                {/* 스크롤 다운 버튼 */}
                 <AnimatePresence>
                     {showScrollBtn && (
                         <motion.button
@@ -603,7 +586,6 @@ export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: str
                 </AnimatePresence>
             </div>
 
-            {/* 입력바 */}
             <div className={`pt-3 pb-1 px-1 border-t mt-3 ${isLight ? "border-neutral-200" : "border-border-subtle"}`}>
                 <div className="flex gap-2">
                     <input

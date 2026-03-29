@@ -1,20 +1,18 @@
-// 바이낸스 Kline REST 응답 1행
 export type KlineRow = [
-    number, // 0: open time (ms)
-    string, // 1: open
-    string, // 2: high
-    string, // 3: low
-    string, // 4: close
-    string, // 5: volume
-    number, // 6: close time (ms)
-    string, // 7: quote volume
-    number, // 8: trades
-    string, // 9: taker buy base vol
-    string, // 10: taker buy quote vol
-    string // 11: ignore
+    number,
+    string,
+    string,
+    string,
+    string,
+    string,
+    number,
+    string,
+    number,
+    string,
+    string,
+    string
 ];
 
-// 바이낸스 Kline WebSocket 메시지(필요 필드만)
 export type Interval =
     | "1s"
     | "1m"
@@ -36,17 +34,17 @@ export type Interval =
 export type KlineMessage = {
     e: "kline";
     E: number;
-    s: string; // symbol
+    s: string;
     k: {
-        t: number; // start time (ms)
-        T: number; // close time (ms)
-        s: string; // symbol
+        t: number;
+        T: number;
+        s: string;
         i: Interval;
         o: string;
         h: string;
         l: string;
         c: string;
-        v: string; // base asset volume
-        x: boolean; // is closed
+        v: string;
+        x: boolean;
     };
 };

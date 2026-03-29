@@ -50,7 +50,6 @@ export default function WriteForm({
 
     return (
         <div className="flex flex-col h-full">
-            {/* 헤더 */}
             <div className={`flex items-center justify-between pb-3 mb-4 border-b ${dividerColor}`}>
                 <h2 className={headerTitleClass}>
                     {initialTitle ? "글 수정" : "새 글 작성"}
@@ -62,9 +61,7 @@ export default function WriteForm({
                 </button>
             </div>
 
-            {/* 폼 */}
             <div className="flex-1 flex flex-col gap-4 min-h-0">
-                {/* 제목 */}
                 <div>
                     <div className="flex items-center justify-between mb-1.5">
                         <label className={labelClass}>제목</label>
@@ -81,7 +78,6 @@ export default function WriteForm({
                     />
                 </div>
 
-                {/* 내용 */}
                 <div className="flex-1 flex flex-col min-h-0">
                     <div className="flex items-center justify-between mb-1.5">
                         <label className={labelClass}>내용</label>
@@ -98,7 +94,6 @@ export default function WriteForm({
                     />
                 </div>
 
-                {/* 이미지 첨부 */}
                 <div>
                     <label className={`block ${labelClass} mb-1.5`}>이미지 첨부</label>
                     <label className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl cursor-pointer transition ${
@@ -129,7 +124,6 @@ export default function WriteForm({
                 </div>
             </div>
 
-            {/* 하단 버튼 */}
             <div className={`flex gap-3 pt-4 mt-4 border-t ${dividerColor}`}>
                 <button
                     onClick={onCancel}

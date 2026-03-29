@@ -11,7 +11,6 @@ const ZONE_KO: Record<string, string> = {
     neutral: "중립 구간",
 };
 
-/* ─── 동적 메타데이터 ─── */
 export async function generateMetadata(): Promise<Metadata> {
     const data = await fetchAltseasonData();
     const score    = data?.score ?? 0;
@@ -42,14 +41,12 @@ export async function generateMetadata(): Promise<Metadata> {
     };
 }
 
-/* ─── SSR 페이지 ─── */
 export default async function AltseasonPage() {
     const data = await fetchAltseasonData();
     const score  = data?.score ?? 0;
     const zoneKo = ZONE_KO[data?.zone ?? "neutral"];
 
-    /* FAQ JSON-LD — Featured Snippet + 음성 검색 노림 */
-    const faqJsonLd = {
+const faqJsonLd = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
         mainEntity: [
@@ -88,7 +85,6 @@ export default async function AltseasonPage() {
         ],
     };
 
-    /* ItemList JSON-LD — BTC 초과 상위 코인 */
     const topAlts = data?.alts.filter((c) => c.outperformedBtc).slice(0, 10) ?? [];
     const altListJsonLd = topAlts.length > 0 ? {
         "@context": "https://schema.org",

@@ -15,7 +15,7 @@ function HeaderNavInner() {
 
     useEffect(() => {
         const saved = localStorage.getItem("theme");
-        const dark = saved !== "light"; // 저장값 없으면 다크 디폴트
+        const dark = saved !== "light";
         setIsDark(dark);
         document.documentElement.classList.toggle("light", !dark);
     }, []);
@@ -50,13 +50,11 @@ function HeaderNavInner() {
 
     return (
         <header suppressHydrationWarning className="fixed top-0 left-0 right-0 z-50 h-12 w-full bg-[var(--surface-card)] border-b border-[var(--border-subtle)] flex items-center px-4">
-            {/* 브랜드 */}
             <Link href="/dashboard" className="flex items-center gap-1.5 mr-6 flex-shrink-0">
                 <span className="font-black tracking-[-0.08em] text-sm text-text-primary select-none">TRADEHUB</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" aria-hidden="true" />
             </Link>
 
-            {/* 네비 */}
             <nav className="flex items-center gap-1" aria-label="주요 메뉴">
                 <Link href="/dashboard" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isDashboard ? activeClass : inactiveClass}`} aria-current={isDashboard ? "page" : undefined}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +83,6 @@ function HeaderNavInner() {
                 </Link>
             </nav>
 
-            {/* 바이비트 레퍼럴 */}
             <a
                 href="https://www.bybit.com/invite?ref=ADYNPO"
                 target="_blank"
@@ -104,9 +101,7 @@ function HeaderNavInner() {
                 <span className="sm:hidden">Bybit $20</span>
             </a>
 
-            {/* 우측 액션 */}
             <div className="flex items-center gap-1 ml-3">
-                {/* 트리맵 */}
                 <button type="button" onClick={() => setTreemapOpen(true)} aria-label="트리맵 보기" className={iconBtnClass}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M3 3h8v8H3V3zm0 10h8v8H3v-8zm10-10h8v8h-8V3zm0 10h8v8h-8v-8z" />
@@ -114,7 +109,6 @@ function HeaderNavInner() {
                     <span className="hidden sm:inline whitespace-nowrap">트리맵</span>
                 </button>
 
-                {/* 다크모드 */}
                 <button type="button" onClick={toggleTheme} aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"} className={iconBtnClass}>
                     {isDark ? (
                         <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -128,7 +122,6 @@ function HeaderNavInner() {
                     <span className="hidden sm:inline whitespace-nowrap">{isDark ? "라이트" : "다크"}</span>
                 </button>
 
-                {/* 로그인 */}
                 <button type="button" onClick={() => setLoginOpen(true)} aria-haspopup="dialog" aria-expanded={loginOpen} aria-controls="login-drawer" className={iconBtnClass}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2a5 5 0 1 1 0 10a5 5 0 0 1 0-10m0 12c5.33 0 8 2.67 8 6v2H4v-2c0-3.33 2.67-6 8-6" />

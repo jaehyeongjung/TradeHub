@@ -11,7 +11,6 @@ type CoinItem = {
     price_change_percentage_30d_in_currency: number | null;
 };
 
-/** 서버 컴포넌트(SSR/generateMetadata)에서 직접 호출하는 함수 */
 export async function fetchAltseasonData(): Promise<AltseasonData | null> {
     try {
         const r = await fetch(
