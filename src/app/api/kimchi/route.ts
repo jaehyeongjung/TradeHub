@@ -198,7 +198,7 @@ export async function GET(req: Request) {
     return NextResponse.json(body, {
       headers: { "Cache-Control": "no-store, must-revalidate" },
     });
-  } catch (_e) {
+  } catch {
     if (lastGood) {
       return NextResponse.json({ ...lastGood, degraded: true, cached: true }, {
         headers: { "Cache-Control": "no-store, must-revalidate" },

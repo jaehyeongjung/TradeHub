@@ -216,6 +216,7 @@ export function CoinChart({
     positionsRef.current = positions;
 
     const candleDataRef = useRef<CandlestickData<UTCTimestamp>[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const indicatorSeriesMapRef = useRef<Map<string, ISeriesApi<any>[]>>(new Map());
 
     const hlPriceLineRefs = useRef<Map<string, IPriceLine>>(new Map());
@@ -742,6 +743,7 @@ export function CoinChart({
                 .filter(Boolean) as { time: UTCTimestamp; value: number }[];
 
         for (const ind of activeIndicators.filter((i) => i.enabled)) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const seriesList: ISeriesApi<any>[] = [];
 
             try {

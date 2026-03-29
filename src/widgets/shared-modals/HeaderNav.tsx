@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useAtom, useSetAtom } from "jotai";
 import { treemapOpenAtom, loginDrawerOpenAtom } from "@/shared/store/atoms";
 
 function HeaderNavInner() {
     const pathname = usePathname();
-    const searchParams = useSearchParams();
     const setTreemapOpen = useSetAtom(treemapOpenAtom);
     const [loginOpen, setLoginOpen] = useAtom(loginDrawerOpenAtom);
     const [isDark, setIsDark] = useState(false);

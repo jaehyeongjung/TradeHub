@@ -310,7 +310,7 @@ export function CryptoTreemap({ onClose }: { onClose: () => void }) {
                             className="absolute inset-0"
                         >
                             <svg width={dimensions.width} height={dimensions.height}>
-                                {layout.map(({ item, x, y, w, h }, index) => {
+                                {layout.map(({ item, x, y, w, h }) => {
                                     const padding = 8;
                                     const innerW = w - padding * 2;
                                     const innerH = h - padding * 2;

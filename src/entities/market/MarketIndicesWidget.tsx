@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { useAtomValue } from "jotai";
 import { useVisibilityPolling } from "@/shared/hooks/useVisibilityPolling";

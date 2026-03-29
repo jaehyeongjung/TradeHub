@@ -81,7 +81,7 @@ function linkify(text: string): ReactNode[] {
 
 export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fadeDelay?: number }) {
     const [userId, setUserId] = useState<string | null>(null);
-    const [_isAnonymous, setIsAnonymous] = useState(false);
+    const [, setIsAnonymous] = useState(false);
     const [msgs, setMsgs] = useState<Msg[]>([]);
     const [initialLoading, setInitialLoading] = useState(true);
     const isLight = useTheme();
