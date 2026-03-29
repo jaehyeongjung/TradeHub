@@ -36,7 +36,7 @@ const WATCH_SYMBOLS = ["btcusdt", "ethusdt", "solusdt", "bnbusdt", "xrpusdt"];
 const MIN_USD_VALUE = 50000;
 const MAX_ITEMS = 15;
 
-export default function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
+export function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
     const [trades, setTrades] = useState<WhaleTrade[]>([]);
     const [isConnected, setIsConnected] = useState(false);
     const [isHovered, setIsHovered] = useState(false);

@@ -18,7 +18,7 @@ interface Props {
     isLight?: boolean;
 }
 
-export default function SimSymbolSelector({ isLight = false }: Props) {
+export function SimSymbolSelector({ isLight = false }: Props) {
     const [simSymbol, setSimSymbol] = useAtom(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);
     const changes = useAtomValue(simChangesAtom);

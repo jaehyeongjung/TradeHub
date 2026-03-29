@@ -56,7 +56,7 @@ const DESCRIPTION_MAP: Record<Source, string> = {
   taker: "테이커(시장가) 매수/매도 비율\n즉각적인 공격적 주문 흐름을 반영합니다.",
 };
 
-export default function LongShortRatioBox({
+export function LongShortRatioBox({
   symbol = "BTCUSDT",
   period = "5m",
   source = "global",

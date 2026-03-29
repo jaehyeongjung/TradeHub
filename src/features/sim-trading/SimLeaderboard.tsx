@@ -54,7 +54,7 @@ const RANK_BADGE = [
     { text: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/20"  },
 ];
 
-export default function SimLeaderboard({ userId }: Props) {
+export function SimLeaderboard({ userId }: Props) {
     const isLight = useTheme();
     const [data, setData]       = useState<LeaderboardEntry[]>([]);
     const [loading, setLoading] = useState(true);

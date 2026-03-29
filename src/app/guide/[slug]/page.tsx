@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { guides, getGuideBySlug, getAllGuideSlugs } from "@/lib/guides";
-import type { Guide } from "@/lib/guides";
+import { guides, getGuideBySlug, getAllGuideSlugs } from "@/shared/lib/guides";
+import type { Guide } from "@/shared/lib/guides";
 
 export function generateStaticParams() {
   return getAllGuideSlugs().map((slug) => ({ slug }));

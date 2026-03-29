@@ -162,7 +162,7 @@ type Props = {
     symbols?: string[];
 };
 
-export default function SymbolPickerModal({
+export function SymbolPickerModal({
     open,
     initialSymbol,
     onClose,

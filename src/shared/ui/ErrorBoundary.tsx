@@ -53,4 +53,3 @@ export function WidgetErrorFallback({ message = "로딩 실패" }: { message?: s
     );
 }
 
-export default ErrorBoundary;

@@ -33,7 +33,7 @@ type BinanceForceOrder = {
 const MIN_USD_VALUE = 5000;
 const MAX_ITEMS = 15;
 
-export default function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number }) {
+export function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number }) {
     const [liquidations, setLiquidations] = useState<Liquidation[]>([]);
     const [isConnected, setIsConnected] = useState(false);
     const [isHovered, setIsHovered] = useState(false);

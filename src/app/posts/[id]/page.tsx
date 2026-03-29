@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPostById } from "@/lib/posts";
+import { getPostById } from "@/shared/lib/posts";
 import Script from "next/script";
 
 type Props = {

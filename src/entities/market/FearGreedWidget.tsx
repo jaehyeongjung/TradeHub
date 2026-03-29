@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import FearGreedGauge from "@/entities/market/FearGreedGauge";
+import { FearGreedGauge } from "@/entities/market/FearGreedGauge";
 
-export default function FearGreedCard({ fadeDelay = 0 }: { fadeDelay?: number }) {
+export function FearGreedCard({ fadeDelay = 0 }: { fadeDelay?: number }) {
     const [val, setVal] = useState<number | null>(null);
     const [label, setLabel] = useState<string | undefined>(undefined);
 

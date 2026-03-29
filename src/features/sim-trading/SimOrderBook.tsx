@@ -18,7 +18,7 @@ interface Props {
     onPriceClick?: (price: number) => void;
 }
 
-export default function SimOrderBook({ onPriceClick }: Props) {
+export function SimOrderBook({ onPriceClick }: Props) {
     const simSymbol = useAtomValue(simSymbolAtom);
     const activePage = useAtomValue(activePageAtom);
     const prices = useAtomValue(simPricesAtom);

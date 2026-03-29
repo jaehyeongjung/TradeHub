@@ -4,15 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import Chat from "@/features/chat/Chat";
-import PostBoard, { PostBoardHandle } from "@/features/post/PostBoard";
-import LiveStatsBox from "@/entities/coin/LiveStatsBox";
-import FearGreedWidget from "@/entities/market/FearGreedWidget";
-import YouTubeSeamlessPlayer from "@/widgets/shared-modals/YouTubeBGMPlayer";
-import NewsPanel from "@/features/news/NewsPanel";
-import KimchiWidget from "@/entities/market/KimchiWidget";
-import HotSymbolsTicker from "@/entities/coin/HotCoin";
-import MarketIndicesWidget from "@/entities/market/MarketIndicesWidget";
+import { Chat } from "@/features/chat/Chat";
+import { PostBoard, PostBoardHandle } from "@/features/post/PostBoard";
+import { LiveStatsBox } from "@/entities/coin/LiveStatsBox";
+import { FearGreedCard } from "@/entities/market/FearGreedWidget";
+import { YouTubeBGMPlayer } from "@/widgets/shared-modals/YouTubeBGMPlayer";
+import { NewsPanel } from "@/features/news/NewsPanel";
+import { KimchiWidget } from "@/entities/market/KimchiWidget";
+import { HotSymbolsTicker } from "@/entities/coin/HotCoin";
+import { MarketIndicesWidget } from "@/entities/market/MarketIndicesWidget";
 
 type TabKey = "board" | "news";
 
@@ -149,8 +149,8 @@ export const DashBoard = () => {
                 >
                     <KimchiWidget fadeDelay={200} />
                     <LiveStatsBox fadeDelay={280} />
-                    <FearGreedWidget fadeDelay={350} />
-                    <YouTubeSeamlessPlayer videoId="j23SO29LNWE" />
+                    <FearGreedCard fadeDelay={350} />
+                    <YouTubeBGMPlayer videoId="j23SO29LNWE" />
                 </aside>
 
                 <div className="flex flex-col gap-2 2xl:gap-5 min-w-115 2xl:min-w-140">
@@ -168,4 +168,3 @@ export const DashBoard = () => {
     );
 };
 
-export default DashBoard;

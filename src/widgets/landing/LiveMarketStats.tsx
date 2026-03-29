@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-export default function LiveMarketStats() {
+export function LiveMarketStats() {
     const [btcPrice, setBtcPrice] = useState<number>(0);
     const [volume, setVolume] = useState<string>("---,---");
     const [isRising, setIsRising] = useState<boolean>(false);

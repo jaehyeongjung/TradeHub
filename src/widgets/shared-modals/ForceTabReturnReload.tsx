@@ -9,7 +9,7 @@ function hasPersisted(e: unknown): e is { persisted: boolean } {
     );
 }
 
-export default function ForceTabReturnReload() {
+export function ForceTabReturnReload() {
     const wasHiddenRef = useRef(false);
     const activePage = useAtomValue(activePageAtom);
     const activePageRef = useRef(activePage);

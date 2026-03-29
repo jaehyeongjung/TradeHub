@@ -13,7 +13,7 @@ interface Props {
     onUpdateTpSl?: (positionId: string, tp: number | null, sl: number | null) => Promise<void>;
 }
 
-export default function SimPositions({ positions, onClose, onUpdateTpSl }: Props) {
+export function SimPositions({ positions, onClose, onUpdateTpSl }: Props) {
     const isLight = useTheme();
     const prices = useAtomValue(simPricesAtom);
     const [editingId, setEditingId] = useState<string | null>(null);

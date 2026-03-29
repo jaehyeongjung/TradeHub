@@ -17,7 +17,7 @@ import {
 import { toKstUtcTimestamp } from "@/shared/lib/time";
 import type { KlineRow, KlineMessage, Interval } from "@/shared/types/binance.types";
 import type { SimPosition } from "@/shared/types/sim-trading.types";
-import SymbolPickerModal from "@/components/SymbolPickerModal";
+import { SymbolPickerModal } from "@/widgets/shared-modals/SymbolPickerModal";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -191,7 +191,7 @@ function defaultAddForm(type: IndicatorType): AddForm {
 }
 
 
-export default function CoinChart({
+export function CoinChart({
     boxId = "chart-1",
     symbol = "BTCUSDT",
     interval: defaultInterval = "1m",

@@ -2,10 +2,10 @@
 
 import dynamic from "next/dynamic";
 import { CoinPriceBox } from "@/entities/coin/CoinPriceBox";
-import LiquidationFeed from "@/entities/whale/LiquidationFeed";
-import WhaleTrades from "@/entities/whale/WhaleTrades";
+import { LiquidationFeed } from "@/entities/whale/LiquidationFeed";
+import { WhaleTrades } from "@/entities/whale/WhaleTrades";
 
-const CoinChart = dynamic(() => import("@/entities/coin/CoinChart"), {
+const CoinChart = dynamic(() => import("@/entities/coin/CoinChart").then(m => ({ default: m.CoinChart })), {
     ssr: false,
     loading: () => (
         <div className="w-full h-full min-h-35 2xl:min-h-50 bg-surface-elevated rounded-xl animate-pulse" />

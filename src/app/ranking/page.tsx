@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import RankingClient from "./RankingClient";
-import { fetchRankingData } from "@/lib/fetchRanking";
+import { fetchRankingData } from "@/shared/lib/fetchRanking";
 
 const SITE = "https://www.tradehub.kr";
 

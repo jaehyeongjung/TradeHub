@@ -67,7 +67,7 @@ const CustomModal: React.FC<{
     );
 };
 
-export default function Comments({
+export function Comments({
     postId,
     userId,
     isLight = false,

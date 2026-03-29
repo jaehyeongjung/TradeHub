@@ -6,17 +6,17 @@ import { useAtomValue } from "jotai";
 import { simSymbolAtom, simPricesAtom, simChangesAtom } from "@/shared/store/atoms";
 import { useSimPriceStream } from "@/features/sim-trading/useSimPriceStream";
 import { useSimAccount } from "@/features/sim-trading/useSimAccount";
-import SimOrderPanel from "@/features/sim-trading/SimOrderPanel";
-import SimPositions from "@/features/sim-trading/SimPositions";
-import SimOrders from "@/features/sim-trading/SimOrders";
-import SimTradeHistory from "@/features/sim-trading/SimTradeHistory";
-import SimOrderBook from "@/features/sim-trading/SimOrderBook";
-import SimMarketData from "@/features/sim-trading/SimMarketData";
-import SimLeaderboard from "@/features/sim-trading/SimLeaderboard";
-import SimSymbolSelector from "@/features/sim-trading/SimSymbolSelector";
+import { SimOrderPanel } from "@/features/sim-trading/SimOrderPanel";
+import { SimPositions } from "@/features/sim-trading/SimPositions";
+import { SimOrders } from "@/features/sim-trading/SimOrders";
+import { SimTradeHistory } from "@/features/sim-trading/SimTradeHistory";
+import { SimOrderBook } from "@/features/sim-trading/SimOrderBook";
+import { SimMarketData } from "@/features/sim-trading/SimMarketData";
+import { SimLeaderboard } from "@/features/sim-trading/SimLeaderboard";
+import { SimSymbolSelector } from "@/features/sim-trading/SimSymbolSelector";
 import { useTheme } from "@/shared/hooks/useTheme";
 
-const CoinChart = dynamic(() => import("@/entities/coin/CoinChart"), {
+const CoinChart = dynamic(() => import("@/entities/coin/CoinChart").then(m => ({ default: m.CoinChart })), {
     ssr: false,
     loading: () => (
         <div className="w-full h-full min-h-[300px] bg-neutral-900 rounded-xl animate-pulse" />
@@ -33,9 +33,8 @@ const TABS = [
 
 type TabKey = typeof TABS[number]["key"];
 
-const ORDER_BOOK_NATURAL_H = 770;
 
-export default function SimTradingPage() {
+export function SimTradingPage() {
     const isLight = useTheme();
     const simSymbol = useAtomValue(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);

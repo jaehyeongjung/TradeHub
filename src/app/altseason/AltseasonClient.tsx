@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import type { AltseasonData } from "@/app/api/altseason/route";
-import { useVirtualList } from "@/hooks/useVirtualList";
+import { useVirtualList } from "@/shared/hooks/useVirtualList";
 import { useTheme } from "@/shared/hooks/useTheme";
 
 type FilterMode = "all" | "outperform" | "underperform";

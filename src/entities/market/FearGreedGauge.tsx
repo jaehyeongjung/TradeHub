@@ -13,7 +13,7 @@ type Props = {
     fadeDelay?: number;
 };
 
-export default function FearGreedGauge({
+export function FearGreedGauge({
     value,
     title = "공포 & 탐욕 지수",
     subLabel,

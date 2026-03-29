@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "@/shared/hooks/useTheme";
 
-export default function SeoFooter() {
+export function SeoFooter() {
     const isLight = useTheme();
 
     const borderColor = isLight ? "border-neutral-200" : "border-neutral-800";

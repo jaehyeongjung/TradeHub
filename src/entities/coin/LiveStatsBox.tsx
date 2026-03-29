@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { useAtomValue } from "jotai";
 import { supabase } from "@/shared/lib/supabase-browser";
-import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
+import { useVisibilityPolling } from "@/shared/hooks/useVisibilityPolling";
 import { treemapOpenAtom } from "@/shared/store/atoms";
 import { SlotNumber } from "@/shared/ui/AnimatedNumber";
 
@@ -16,7 +16,7 @@ function getDeviceId() {
     return id;
 }
 
-export default function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } = {}) {
+export function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } = {}) {
     const deviceIdRef = useRef<string>(getDeviceId());
     const [onlineNow, setOnlineNow] = useState<number>(0);
     const [ready, setReady] = useState(false);

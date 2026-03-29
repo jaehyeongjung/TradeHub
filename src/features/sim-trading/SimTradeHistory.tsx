@@ -6,7 +6,7 @@ interface Props {
     trades: SimTrade[];
 }
 
-export default function SimTradeHistory({ trades }: Props) {
+export function SimTradeHistory({ trades }: Props) {
     if (trades.length === 0) {
         return (
             <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5">

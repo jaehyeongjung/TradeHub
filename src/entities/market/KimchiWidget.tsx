@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtomValue } from "jotai";
-import { useVisibilityPolling } from "@/hooks/useVisibilityPolling";
+import { useVisibilityPolling } from "@/shared/hooks/useVisibilityPolling";
 import { treemapOpenAtom } from "@/shared/store/atoms";
 import type { KimchiResponse } from "@/app/api/kimchi/route";
 
@@ -37,7 +37,7 @@ async function fetchKimchiWithRetry(symbol: string, signal?: AbortSignal): Promi
     throw new Error("fetch failed");
 }
 
-export default function KimchiWidget({
+export function KimchiWidget({
     symbol = "BTC",
     pollMs = 5000,
     fadeDelay = 0,

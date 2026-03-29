@@ -1,11 +1,11 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import AuthGate from "@/components/AuthGate";
+import { AuthGate } from "@/features/auth/AuthGate";
 import Script from "next/script";
-import FloatingLoginSidebar from "@/components/FloatingLoginDrawer";
-import HeaderNav from "@/widgets/shared-modals/HeaderNav";
-import JotaiProvider from "@/shared/ui/JotaiProvider";
+import { FloatingLoginSidebar } from "@/features/auth/FloatingLoginDrawer";
+import { HeaderNav } from "@/widgets/shared-modals/HeaderNav";
+import { JotaiProvider } from "@/shared/ui/JotaiProvider";
 
 const inter = Inter({
     subsets: ["latin"],

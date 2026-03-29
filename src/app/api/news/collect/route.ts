@@ -1,7 +1,7 @@
 export const runtime = "nodejs";
 
 import Parser from "rss-parser";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { supabaseAdmin } from "@/shared/lib/supabase-admin";
 
 type FeedUrl = { source: string; url: string };
 

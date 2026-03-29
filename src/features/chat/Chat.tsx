@@ -79,7 +79,7 @@ function linkify(text: string): ReactNode[] {
     return parts;
 }
 
-export default function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fadeDelay?: number }) {
+export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fadeDelay?: number }) {
     const [userId, setUserId] = useState<string | null>(null);
     const [_isAnonymous, setIsAnonymous] = useState(false);
     const [msgs, setMsgs] = useState<Msg[]>([]);

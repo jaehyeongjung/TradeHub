@@ -24,7 +24,7 @@ function formatRelativeTime(iso: string): string {
     return `${Math.floor(h / 24)}일 전`;
 }
 
-export default function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; fadeDelay?: number }) {
+export function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; fadeDelay?: number }) {
     const { showToast } = useToast();
     const [news, setNews] = useState<NewsItem[]>([]);
     const [userId, setUserId] = useState<string | null>(null);

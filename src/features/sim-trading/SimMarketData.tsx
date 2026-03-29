@@ -27,7 +27,7 @@ interface LongShortRatio {
     shortAccount: number;
 }
 
-export default function SimMarketData() {
+export function SimMarketData() {
     const simSymbol = useAtomValue(simSymbolAtom);
     const activePage = useAtomValue(activePageAtom);
     const prices = useAtomValue(simPricesAtom);

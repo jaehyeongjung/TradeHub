@@ -6,7 +6,7 @@ import { activePageAtom } from "@/shared/store/atoms";
 import dynamic from "next/dynamic";
 
 const SimTradingPage = dynamic(
-    () => import("@/components/SimTrading/SimTradingPage"),
+    () => import("@/widgets/sim-trading/SimTradingPage").then(m => ({ default: m.SimTradingPage })),
     {
         ssr: false,
         loading: () => (
@@ -38,7 +38,7 @@ const variants = {
     }),
 };
 
-export default function PageSlider({ children }: Props) {
+export function PageSlider({ children }: Props) {
     const activePage = useAtomValue(activePageAtom);
     const direction = activePage === "sim" ? 1 : -1;
     const isSim = activePage === "sim";

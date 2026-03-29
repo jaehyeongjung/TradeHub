@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import LiveMarketStats from "@/components/Landing/LiveMarketStats";
+import { LiveMarketStats } from "@/widgets/landing/LiveMarketStats";
 import { useRef, useCallback } from "react";
 
 const SITE = "https://www.tradehub.kr";

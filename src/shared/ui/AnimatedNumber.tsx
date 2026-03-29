@@ -12,7 +12,7 @@ interface AnimatedNumberProps {
     formatter?: (value: number) => string;
 }
 
-export default function AnimatedNumber({
+export function AnimatedNumber({
     value,
     duration = 500,
     decimals = 0,

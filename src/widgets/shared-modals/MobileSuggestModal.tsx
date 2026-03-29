@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-export default function MobileSuggestModal() {
+export function MobileSuggestModal() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {

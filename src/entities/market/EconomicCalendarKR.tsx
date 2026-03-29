@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-export default function EconomicCalendarKR() {
+export function EconomicCalendarKR() {
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {

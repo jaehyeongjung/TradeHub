@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { activePageAtom } from "@/shared/store/atoms";
 import dynamic from "next/dynamic";
-import ForceTabReturnReload from "@/components/ForceTabReturnReload";
+import { ForceTabReturnReload } from "@/widgets/shared-modals/ForceTabReturnReload";
 
 function SimTradingSkeleton() {
     return (
@@ -92,7 +92,7 @@ function SimTradingSkeleton() {
 }
 
 const SimTradingPage = dynamic(
-    () => import("@/components/SimTrading/SimTradingPage"),
+    () => import("@/widgets/sim-trading/SimTradingPage").then(m => ({ default: m.SimTradingPage })),
     {
         ssr: false,
         loading: () => <SimTradingSkeleton />,

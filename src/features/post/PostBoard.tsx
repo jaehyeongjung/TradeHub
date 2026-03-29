@@ -10,8 +10,8 @@ import React, {
 import { useTheme } from "@/shared/hooks/useTheme";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { sanitizeText } from "@/shared/lib/sanitize";
-import WriteForm from "@/features/post/WriteForm";
-import Comments from "@/features/post/Comment";
+import { WriteForm } from "@/features/post/WriteForm";
+import { Comments } from "@/features/post/Comment";
 import Image from "next/image";
 import { useToast } from "@/shared/ui/Toast";
 
@@ -79,7 +79,7 @@ type Props = {
     fadeDelay?: number;
 };
 
-const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
+export const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
     { showInternalWriteButton = false, fadeDelay = 0 },
     ref
 ) {
@@ -378,4 +378,3 @@ const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
     );
 });
 
-export default PostBoard;

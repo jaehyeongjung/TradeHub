@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
 
-export default function BybitBanner({ fadeDelay = 0 }: { fadeDelay?: number }) {
+export function BybitBanner({ fadeDelay = 0 }: { fadeDelay?: number }) {
     const [mounted, setMounted] = useState(false);
     const isLight = useTheme();
 

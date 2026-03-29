@@ -1,4 +1,4 @@
-import SeoFooter from "@/components/SeoFooter";
+import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 
 export default function GuideLayout({
   children,

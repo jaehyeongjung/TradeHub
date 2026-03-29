@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { uploadImageToBucket } from "@/shared/lib/upload-image";
 
-export default function WriteForm({
+export function WriteForm({
     onCancel,
     onSubmit,
     initialTitle = "",

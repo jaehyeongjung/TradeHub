@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { RankingCoin } from "@/app/api/ranking/route";
-import { useVirtualList } from "@/hooks/useVirtualList";
+import { useVirtualList } from "@/shared/hooks/useVirtualList";
 import { fmtPrice, fmtLarge } from "@/shared/lib/formatting";
 import { useTheme } from "@/shared/hooks/useTheme";
 

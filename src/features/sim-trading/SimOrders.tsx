@@ -7,7 +7,7 @@ interface Props {
     onCancel: (orderId: string) => Promise<void>;
 }
 
-export default function SimOrders({ orders, onCancel }: Props) {
+export function SimOrders({ orders, onCancel }: Props) {
     if (orders.length === 0) {
         return (
             <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5">

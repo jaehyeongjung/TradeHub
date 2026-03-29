@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getNewsById } from "@/lib/news";
+import { getNewsById } from "@/shared/lib/news";
 import Script from "next/script";
 
 type Props = {

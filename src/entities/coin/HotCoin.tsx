@@ -41,7 +41,7 @@ function formatPrice(p: number) {
     return p.toPrecision(3);
 }
 
-export default function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {}) {
+export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {}) {
     const [list, setList] = useState<Ticker24h[]>([]);
     const [idx, setIdx] = useState(0);
     const [showTooltip, setShowTooltip] = useState(false);

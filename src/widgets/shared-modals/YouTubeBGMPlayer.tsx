@@ -42,7 +42,7 @@ type Props = {
     initialVolume?: number;
 };
 
-export default function YouTubeBGMPlayer({
+export function YouTubeBGMPlayer({
     videoId,
     initialVolume = 30,
 }: Props) {

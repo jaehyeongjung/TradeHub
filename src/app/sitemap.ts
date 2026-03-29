@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
-import { getAllNewsIds } from "@/lib/news";
-import { getAllPostIds } from "@/lib/posts";
-import { guides } from "@/lib/guides";
+import { getAllNewsIds } from "@/shared/lib/news";
+import { getAllPostIds } from "@/shared/lib/posts";
+import { guides } from "@/shared/lib/guides";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const base = "https://www.tradehub.kr";

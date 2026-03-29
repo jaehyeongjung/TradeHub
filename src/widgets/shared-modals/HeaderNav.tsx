@@ -133,7 +133,7 @@ function HeaderNavInner() {
     );
 }
 
-export default function HeaderNav() {
+export function HeaderNav() {
     return (
         <Suspense fallback={null}>
             <HeaderNavInner />

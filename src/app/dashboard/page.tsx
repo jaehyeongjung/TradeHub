@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { RealTimeSection } from "@/components/RealTimeSection";
-import { DashBoard } from "@/components/DashBoard";
-import MobileSuggestModal from "@/components/MobileSuggestModal";
+import { RealTimeSection } from "@/widgets/dashboard/RealTimeSection";
+import { DashBoard } from "@/widgets/dashboard/DashBoard";
+import { MobileSuggestModal } from "@/widgets/shared-modals/MobileSuggestModal";
 import Script from "next/script";
-import ForceTabReturnReload from "@/components/ForceTabReturnReload";
-import SeoFooter from "@/widgets/shared-modals/SeoFooter";
+import { ForceTabReturnReload } from "@/widgets/shared-modals/ForceTabReturnReload";
+import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 
 const SITE = "https://www.tradehub.kr";
 

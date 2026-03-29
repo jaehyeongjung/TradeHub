@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import AltseasonClient from "./AltseasonClient";
-import { fetchAltseasonData } from "@/lib/fetchAltseason";
+import { fetchAltseasonData } from "@/shared/lib/fetchAltseason";
 
 const SITE = "https://www.tradehub.kr";
 

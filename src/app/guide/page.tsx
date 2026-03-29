@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
-import { guides } from "@/lib/guides";
+import { guides } from "@/shared/lib/guides";
 
 const SITE = "https://www.tradehub.kr";
 

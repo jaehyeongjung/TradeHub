@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { ToastProvider } from "@/shared/ui/Toast";
 
-export default function AuthGate({ children }: { children: React.ReactNode }) {
+export function AuthGate({ children }: { children: React.ReactNode }) {
     const [ready, setReady] = useState(false);
 
     useEffect(() => {

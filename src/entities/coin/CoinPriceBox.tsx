@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import SymbolPickerModal from "@/components/SymbolPickerModal";
+import { SymbolPickerModal } from "@/widgets/shared-modals/SymbolPickerModal";
 import { supabase } from "@/shared/lib/supabase-browser";
 
 function getCoinLogoUrl(symbol: string): string {

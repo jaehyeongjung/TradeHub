@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { useAtom } from "jotai";
-import AuthBox from "@/features/auth/Login";
-import CryptoTreemap from "@/components/CryptoTreemap";
+import { AuthBox } from "@/features/auth/Login";
+import { CryptoTreemap } from "@/entities/market/CryptoTreemap";
 import { treemapOpenAtom, loginDrawerOpenAtom } from "@/shared/store/atoms";
 
-export default function FloatingLoginSidebar() {
+export function FloatingLoginSidebar() {
     const [open, setOpen] = useAtom(loginDrawerOpenAtom);
     const [isDark, setIsDark] = useState(false);
     const [showTreemap, setShowTreemap] = useAtom(treemapOpenAtom);

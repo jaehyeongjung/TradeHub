@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { simSymbolAtom, simPricesAtom, simMarginModeAtom } from "@/shared/store/atoms";
 import { calcLiqPrice, calcLiqPriceCross } from "@/shared/lib/sim-trading";
-import AnimatedNumber from "@/shared/ui/AnimatedNumber";
+import { AnimatedNumber } from "@/shared/ui/AnimatedNumber";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { LEVERAGE_PRESETS } from "@/shared/constants/sim-trading.constants";
 import type { SimAccount, OpenPositionInput, PositionSide, OrderType, MarginMode } from "@/shared/types/sim-trading.types";
@@ -20,7 +20,7 @@ interface Props {
     lockedMarginMode: MarginMode | null;
 }
 
-export default function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode }: Props) {
+export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode }: Props) {
     const isLight = useTheme();
     const simSymbol = useAtomValue(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);

@@ -28,7 +28,7 @@ function mapAuthError(error: AuthError): string {
     return error.message || "알 수 없는 오류가 발생했습니다.";
 }
 
-export default function AuthBox({ isDark = true }: { isDark?: boolean }) {
+export function AuthBox({ isDark = true }: { isDark?: boolean }) {
     const [email, setE] = useState("");
     const [pw, setP] = useState("");
     const [err, setErr] = useState<string | null>(null);

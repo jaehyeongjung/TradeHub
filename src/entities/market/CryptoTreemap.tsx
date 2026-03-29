@@ -158,7 +158,7 @@ const SKELETON_BLOCKS = [
     { x: 68,   y: 80,   w: 32,  h: 20 },
 ];
 
-export default function CryptoTreemap({ onClose }: { onClose: () => void }) {
+export function CryptoTreemap({ onClose }: { onClose: () => void }) {
     const [data, setData] = useState<TreemapItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
