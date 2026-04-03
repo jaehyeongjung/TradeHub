@@ -8,6 +8,7 @@ import { SymbolSelector } from "@/shared/ui/SymbolSelector";
 import { SUPPORTED_SYMBOLS, SYMBOL_NAMES } from "@/shared/constants/sim-trading.constants";
 import { useTheme } from "@/shared/hooks/useTheme";
 import type { Interval } from "@/shared/types/binance.types";
+import type { Locale } from "@/shared/types/locale.types";
 
 const AnalysisChart = dynamic(
     () => import("@/features/analysis/AnalysisChart").then(m => ({ default: m.AnalysisChart })),
@@ -17,15 +18,27 @@ const AnalysisChart = dynamic(
 type LeverageTier = "high" | "mid" | "low";
 
 const TIER_CONFIG: Record<LeverageTier, {
-    label: string;
-    sub: string;
+    ko: { label: string; sub: string };
+    en: { label: string; sub: string };
     interval: Interval;
     leverageRange: [number, number];
     color: string;
 }> = {
-    high: { label: "고배율",  sub: "단기 스캘핑",       interval: "1h", leverageRange: [10, 20], color: "text-red-400"     },
-    mid:  { label: "중배율",  sub: "스윙 트레이딩",     interval: "4h", leverageRange: [5,  10], color: "text-amber-400"   },
-    low:  { label: "저배율",  sub: "포지션 트레이딩",   interval: "1d", leverageRange: [3,  5],  color: "text-emerald-400" },
+    high: {
+        ko: { label: "고배율",  sub: "단기 스캘핑"     },
+        en: { label: "High Lev", sub: "Scalping"       },
+        interval: "1h", leverageRange: [10, 20], color: "text-red-400",
+    },
+    mid: {
+        ko: { label: "중배율",  sub: "스윙 트레이딩"   },
+        en: { label: "Mid Lev",  sub: "Swing Trading"  },
+        interval: "4h", leverageRange: [5, 10],  color: "text-amber-400",
+    },
+    low: {
+        ko: { label: "저배율",  sub: "포지션 트레이딩" },
+        en: { label: "Low Lev",  sub: "Position Trade" },
+        interval: "1d", leverageRange: [3, 5],   color: "text-emerald-400",
+    },
 };
 
 const TIER_ORDER: LeverageTier[] = ["high", "mid", "low"];
@@ -34,7 +47,26 @@ const DEFAULT_TIER: LeverageTier = "mid";
 
 type ViewTab = "chart" | "analysis";
 
-export function AnalysisPage() {
+const UI = {
+    ko: {
+        chart: "차트", analysis: "분석",
+        analyze: "분석하기", analyzing: "분석 중",
+        selectSymbol: "종목을 선택하세요",
+        selectHint: "인터벌을 선택하면 차트를 불러옵니다",
+        resultTitle: "분석 결과",
+        resultHint: "분석하기를 눌러\n추세선·지지저항·시그널을 확인하세요",
+    },
+    en: {
+        chart: "Chart", analysis: "Analysis",
+        analyze: "Analyze", analyzing: "Analyzing",
+        selectSymbol: "Select a symbol",
+        selectHint: "Chart will load when interval is selected",
+        resultTitle: "Analysis Result",
+        resultHint: "Click Analyze to see\ntrend lines, S/R levels & signals",
+    },
+} as const;
+
+export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
     const isLight = useTheme();
     const { candles, result, candlesLoading, loading, error, loadCandles, run } = useAnalysis();
 
@@ -43,6 +75,8 @@ export function AnalysisPage() {
     const [activeTab, setActiveTab] = useState<ViewTab>("chart");
     const [hasMoreBelow, setHasMoreBelow] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
+
+    const t = UI[locale];
 
     const checkScroll = useCallback(() => {
         const el = panelRef.current;
@@ -84,6 +118,7 @@ export function AnalysisPage() {
     const showPanel  = !!result && !loading;
     const anyLoading = candlesLoading || loading;
     const currentTier = TIER_CONFIG[tier];
+    const tierLabel = currentTier[locale];
 
     return (
         <div className="min-h-screen pt-14 bg-surface-page">
@@ -114,7 +149,7 @@ export function AnalysisPage() {
                                     }`}
                                 >
                                     <span className={`text-xs font-semibold ${isActive ? cfg.color : ""}`}>
-                                        {cfg.label}
+                                        {cfg[locale].label}
                                     </span>
                                     <span className={`text-[10px] hidden sm:inline ${isActive ? "opacity-60" : "opacity-40"}`}>
                                         {cfg.leverageRange[0]}x~{cfg.leverageRange[1]}x
@@ -126,23 +161,23 @@ export function AnalysisPage() {
 
                     {/* 모바일 차트/분석 탭 토글 */}
                     <div className={`inline-flex items-center rounded-xl p-1 gap-0.5 xl:hidden ${tabWrap}`}>
-                        {(["chart", "analysis"] as ViewTab[]).map(t => (
+                        {(["chart", "analysis"] as ViewTab[]).map(tab => (
                             <button
-                                key={t}
+                                key={tab}
                                 type="button"
-                                onClick={() => setActiveTab(t)}
+                                onClick={() => setActiveTab(tab)}
                                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                                    activeTab === t ? tabActive : tabInactive
+                                    activeTab === tab ? tabActive : tabInactive
                                 }`}
                             >
-                                {t === "chart" ? "차트" : "분석"}
+                                {tab === "chart" ? t.chart : t.analysis}
                             </button>
                         ))}
                     </div>
 
                     <button
                         type="button"
-                        onClick={() => run(symbol, currentTier.interval)}
+                        onClick={() => run(symbol, currentTier.interval, locale)}
                         disabled={anyLoading}
                         className="ml-auto flex items-center gap-2 px-5 py-1.5 rounded-lg text-xs font-semibold active:scale-[0.97] disabled:cursor-not-allowed transition-all hover:opacity-90"
                         style={{ background: "linear-gradient(90deg, #f7a600 0%, #e09500 100%)", color: "#000" }}
@@ -153,9 +188,9 @@ export function AnalysisPage() {
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                                 </svg>
-                                분석 중
+                                {t.analyzing}
                             </>
-                        ) : "분석하기"}
+                        ) : t.analyze}
                     </button>
                 </div>
 
@@ -181,6 +216,7 @@ export function AnalysisPage() {
                                     candles={candles}
                                     overlay={result}
                                     isLight={isLight}
+                                    locale={locale}
                                 />
                             )}
                             {loading && (
@@ -190,7 +226,7 @@ export function AnalysisPage() {
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                                         </svg>
-                                        분석 중
+                                        {t.analyzing}
                                     </div>
                                 </div>
                             )}
@@ -213,14 +249,15 @@ export function AnalysisPage() {
                                         candlestickPatterns={result.candlestickPatterns}
                                         currentPrice={candles[candles.length - 1].close}
                                         leverageRange={currentTier.leverageRange}
-                                        tierLabel={currentTier.label}
-                                        tierSub={currentTier.sub}
+                                        tierLabel={tierLabel.label}
+                                        tierSub={tierLabel.sub}
+                                        locale={locale}
                                     />
                                 ) : (
                                     <div className="rounded-xl border border-border-subtle bg-surface-card h-full flex flex-col items-center justify-center px-6 py-12 text-center gap-2">
-                                        <p className="text-sm font-medium text-text-primary">분석 결과</p>
-                                        <p className="text-xs text-text-muted leading-relaxed">
-                                            분석하기를 눌러<br />추세선·지지저항·시그널을 확인하세요
+                                        <p className="text-sm font-medium text-text-primary">{t.resultTitle}</p>
+                                        <p className="text-xs text-text-muted leading-relaxed whitespace-pre-line">
+                                            {t.resultHint}
                                         </p>
                                     </div>
                                 )}
@@ -244,8 +281,8 @@ export function AnalysisPage() {
                     <div className="mt-4 rounded-xl border border-border-subtle bg-surface-card overflow-hidden animate-pulse h-[calc(100vh-200px)] min-h-[480px]" />
                 ) : (
                     <div className="mt-4 rounded-xl border border-border-subtle bg-surface-card px-6 py-16 text-center">
-                        <p className="text-sm font-medium text-text-primary">종목을 선택하세요</p>
-                        <p className="mt-1 text-xs text-text-muted">인터벌을 선택하면 차트를 불러옵니다</p>
+                        <p className="text-sm font-medium text-text-primary">{t.selectSymbol}</p>
+                        <p className="mt-1 text-xs text-text-muted">{t.selectHint}</p>
                     </div>
                 )}
             </div>

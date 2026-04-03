@@ -11,17 +11,19 @@ import {
     type LineStyle,
 } from "lightweight-charts";
 import type { Candle, AnalysisResult } from "@/shared/lib/technical-analysis/types";
+import type { Locale } from "@/shared/types/locale.types";
 
 type Props = {
     candles: Candle[];
     overlay?: AnalysisResult | null;
     isLight: boolean;
+    locale?: Locale;
 };
 
 const LINE_STYLE_DASHED = 2 as LineStyle;
 const LINE_STYLE_DOTTED = 1 as LineStyle;
 
-export function AnalysisChart({ candles, overlay, isLight }: Props) {
+export function AnalysisChart({ candles, overlay, isLight, locale = "ko" }: Props) {
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef     = useRef<IChartApi | null>(null);
 
@@ -46,6 +48,7 @@ export function AnalysisChart({ candles, overlay, isLight }: Props) {
             crosshair: { mode: 1 },
             rightPriceScale: { borderColor, scaleMargins: { top: 0.08, bottom: 0.08 } },
             timeScale: { borderColor, timeVisible: true, secondsVisible: false },
+            localization: { locale: locale === "en" ? "en-US" : "ko-KR" },
             handleScale: true,
             handleScroll: true,
         });
@@ -147,11 +150,14 @@ export function AnalysisChart({ candles, overlay, isLight }: Props) {
 
             // 진입/손절/목표가
             const { setup } = overlay;
+            const lbl = locale === "en"
+                ? { entry: "Entry", sl: "SL", tp1: "TP1", tp2: "TP2" }
+                : { entry: "진입", sl: "손절", tp1: "목표1", tp2: "목표2" };
             if (setup.direction !== "neutral") {
-                candleSeries.createPriceLine({ price: setup.entry,       color: "#3182F6", lineWidth: 1 as LineWidth, lineStyle: LINE_STYLE_DASHED, axisLabelVisible: true, title: "진입" });
-                candleSeries.createPriceLine({ price: setup.stopLoss,    color: "#FF4B4B", lineWidth: 1 as LineWidth, lineStyle: LINE_STYLE_DASHED, axisLabelVisible: true, title: "손절" });
-                candleSeries.createPriceLine({ price: setup.takeProfit1, color: "#0DC268", lineWidth: 1 as LineWidth, lineStyle: LINE_STYLE_DASHED, axisLabelVisible: true, title: "목표1" });
-                candleSeries.createPriceLine({ price: setup.takeProfit2, color: "#0DC268", lineWidth: 1 as LineWidth, lineStyle: LINE_STYLE_DOTTED, axisLabelVisible: true, title: "목표2" });
+                candleSeries.createPriceLine({ price: setup.entry,       color: "#3182F6", lineWidth: 1 as LineWidth, lineStyle: LINE_STYLE_DASHED, axisLabelVisible: true, title: lbl.entry });
+                candleSeries.createPriceLine({ price: setup.stopLoss,    color: "#FF4B4B", lineWidth: 1 as LineWidth, lineStyle: LINE_STYLE_DASHED, axisLabelVisible: true, title: lbl.sl });
+                candleSeries.createPriceLine({ price: setup.takeProfit1, color: "#0DC268", lineWidth: 1 as LineWidth, lineStyle: LINE_STYLE_DASHED, axisLabelVisible: true, title: lbl.tp1 });
+                candleSeries.createPriceLine({ price: setup.takeProfit2, color: "#0DC268", lineWidth: 1 as LineWidth, lineStyle: LINE_STYLE_DOTTED, axisLabelVisible: true, title: lbl.tp2 });
             }
 
             // 추세선 타점: 미래 진입 예상 가격 마커
@@ -186,7 +192,9 @@ export function AnalysisChart({ candles, overlay, isLight }: Props) {
                     lineWidth: 1 as LineWidth,
                     lineStyle: LINE_STYLE_DOTTED,
                     axisLabelVisible: true,
-                    title: isLong ? "↑눌림진입" : "↓반등진입",
+                    title: locale === "en"
+                        ? (isLong ? "↑Pullback Entry" : "↓Bounce Entry")
+                        : (isLong ? "↑눌림진입" : "↓반등진입"),
                 });
                 candleSeries.createPriceLine({
                     price: ts.stopLoss,

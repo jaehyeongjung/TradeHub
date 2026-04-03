@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from "react";
 import type { KlineRow, Interval } from "@/shared/types/binance.types";
+import type { Locale } from "@/shared/types/locale.types";
 import type { AnalysisResult, Candle } from "@/shared/lib/technical-analysis/types";
 import { detectPivots } from "@/shared/lib/technical-analysis/pivot";
 import { detectTrendLines } from "@/shared/lib/technical-analysis/trendline";
@@ -80,7 +81,7 @@ export type AnalysisState = {
     loading: boolean
     error: string | null
     loadCandles: (symbol: string, interval: Interval) => Promise<void>
-    run: (symbol: string, interval: Interval) => Promise<void>
+    run: (symbol: string, interval: Interval, locale?: Locale) => Promise<void>
 }
 
 export function useAnalysis(): AnalysisState {
@@ -109,7 +110,7 @@ export function useAnalysis(): AnalysisState {
         }
     }, []);
 
-    const run = useCallback(async (symbol: string, interval: Interval) => {
+    const run = useCallback(async (symbol: string, interval: Interval, locale: Locale = "ko") => {
         abortRef.current?.abort();
         abortRef.current = new AbortController();
 
@@ -127,7 +128,7 @@ export function useAnalysis(): AnalysisState {
             const fibonacci           = calculateFibonacci(pivots);
             const marketStructure     = analyzeMarketStructure(data, pivots);
             const candlestickPatterns = detectCandlestickPatterns(data);
-            const setup               = generateSignal(data, trendLines, srLevels, fibonacci, marketStructure, candlestickPatterns);
+            const setup               = generateSignal(data, trendLines, srLevels, fibonacci, marketStructure, candlestickPatterns, locale);
             const trendLineSetups     = generateTrendLineSetups(data, trendLines, srLevels);
 
             setResult({
