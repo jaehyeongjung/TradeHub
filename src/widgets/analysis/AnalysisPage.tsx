@@ -25,7 +25,7 @@ const TIER_CONFIG: Record<LeverageTier, {
 }> = {
     high: { label: "고배율",  sub: "단기 스캘핑",       interval: "1h", leverageRange: [10, 20], color: "text-red-400"     },
     mid:  { label: "중배율",  sub: "스윙 트레이딩",     interval: "4h", leverageRange: [5,  10], color: "text-amber-400"   },
-    low:  { label: "저배율",  sub: "포지션 트레이딩",   interval: "1d", leverageRange: [1,  5],  color: "text-emerald-400" },
+    low:  { label: "저배율",  sub: "포지션 트레이딩",   interval: "1d", leverageRange: [3,  5],  color: "text-emerald-400" },
 };
 
 const TIER_ORDER: LeverageTier[] = ["high", "mid", "low"];
