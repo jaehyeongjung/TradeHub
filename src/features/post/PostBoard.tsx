@@ -7,6 +7,7 @@ import React, {
     forwardRef,
     useImperativeHandle,
 } from "react";
+import { motion } from "framer-motion";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { sanitizeText } from "@/shared/lib/sanitize";
@@ -264,9 +265,16 @@ export const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                             </div>
                         ) : postsLoaded && (
                             <ul className="pr-1">
-                                {posts.map((p) => (
-                                    <li
+                                {posts.map((p, idx) => (
+                                    <motion.li
                                         key={p.id}
+                                        initial={{ opacity: 0, y: 14 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{
+                                            delay: Math.min(idx, 14) * 0.04,
+                                            duration: 0.35,
+                                            ease: [0.16, 1, 0.3, 1],
+                                        }}
                                         className={`group flex items-center gap-3 py-3 border-b last:border-b-0 cursor-pointer transition-colors ${dividerColor} ${isLight ? "hover:bg-neutral-50" : "hover:bg-neutral-800/20"}`}
                                         onClick={() => { setSelected(p); setMode("detail"); }}
                                     >
@@ -286,7 +294,7 @@ export const PostBoard = forwardRef<PostBoardHandle, Props>(function PostBoard(
                                                 <span>{formatRelativeTime(p.created_at)}</span>
                                             </div>
                                         </div>
-                                    </li>
+                                    </motion.li>
                                 ))}
                             </ul>
                         )}

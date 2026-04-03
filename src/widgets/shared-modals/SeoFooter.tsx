@@ -75,7 +75,7 @@ export function SeoFooter() {
                             코인 트레이더를 위한 올인원 대시보드
                         </p>
                         <div className="flex flex-wrap gap-1.5">
-                            {["실시간 청산", "고래 거래", "트리맵", "김치프리미엄", "모의투자", "펀딩비", "알트시즌", "코인랭킹", "무료"].map((tag) => (
+                            {["실시간 청산", "고래 거래", "트리맵", "김치프리미엄", "모의투자", "펀딩비", "차트분석", "코인랭킹", "무료"].map((tag) => (
                                 <span
                                     key={tag}
                                     className={`text-[9px] font-medium px-2 py-[3px] rounded-full ${pillBg}`}
@@ -114,7 +114,7 @@ export function SeoFooter() {
                         <div className={`mt-3 pt-3 border-t flex flex-col gap-0.5 ${isLight ? "divide-neutral-100 border-neutral-100" : "divide-neutral-800 border-neutral-800"}`}>
                             <GuideLink href="/ranking">코인 시가총액 순위</GuideLink>
                             <GuideLink href="/funding">코인 펀딩비 순위</GuideLink>
-                            <GuideLink href="/altseason">알트코인 시즌 지수</GuideLink>
+                            <GuideLink href="/analysis">차트 기술 분석</GuideLink>
                         </div>
                     </article>
 

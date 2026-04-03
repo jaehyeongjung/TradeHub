@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import type { RankingCoin } from "@/app/api/ranking/route";
 import { useVirtualList } from "@/shared/hooks/useVirtualList";
 import { fmtPrice, fmtLarge } from "@/shared/lib/formatting";
@@ -93,8 +93,21 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
     const [coins, setCoins] = useState<RankingCoin[]>(initialData ?? []);
     const [loading, setLoading] = useState(!initialData || initialData.length === 0);
     const [sortMode, setSortMode] = useState<SortMode>("market_cap");
+    const [direction, setDirection] = useState(0);
+    const prevTabRef = useRef<SortMode>("market_cap");
     const isLight = useTheme();
     const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+
+    const tabOrder: Record<SortMode, number> = {
+        market_cap: 0, volume: 1, gainers: 2, losers: 3, ath_drop: 4,
+    };
+
+    const switchTab = (next: SortMode) => {
+        if (next === sortMode) return;
+        setDirection(tabOrder[next] > tabOrder[prevTabRef.current] ? 1 : -1);
+        prevTabRef.current = next;
+        setSortMode(next);
+    };
 
     useEffect(() => {
         if (initialData && initialData.length > 0) {
@@ -169,7 +182,7 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                         {TABS.map((tab) => (
                             <button
                                 key={tab.key}
-                                onClick={() => setSortMode(tab.key)}
+                                onClick={() => switchTab(tab.key)}
                                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                                     sortMode === tab.key ? tabActive : tabInactive
                                 }`}
@@ -182,7 +195,7 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
 
                 <div className={`rounded-2xl border overflow-hidden ${cardBg}`}>
 
-                    <div className={`hidden md:flex items-center gap-3 px-4 py-2 text-[11px] font-medium border-b ${colHead}`}>
+                    <div className={`hidden md:flex items-center gap-3 px-4 py-2 text-[11px] font-medium border-b ${colHead} relative z-10`}>
                         <span className="w-5 text-right shrink-0">#</span>
                         <span className="flex-1">코인</span>
                         <span className="w-28 text-right shrink-0">현재가</span>
@@ -197,6 +210,20 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                         <SkeletonRow key={i} isLight={isLight} />
                     ))}
 
+                    <AnimatePresence initial={false} custom={direction} mode="wait">
+                    <motion.div
+                        key={sortMode}
+                        custom={direction}
+                        variants={{
+                            enter: (d: number) => ({ x: d > 0 ? "40%" : "-40%", opacity: 0 }),
+                            center: { x: 0, opacity: 1 },
+                            exit:  (d: number) => ({ x: d > 0 ? "-40%" : "40%", opacity: 0 }),
+                        }}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                    >
                     {!loading && visibleItems.map((coin, idx) => {
                         const pct    = coin.price_change_percentage_24h ?? 0;
                         const isUp   = pct >= 0;
@@ -273,6 +300,8 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                     {!loading && hasMore && (
                         <div ref={sentinelRef} className="h-px" aria-hidden />
                     )}
+                    </motion.div>
+                    </AnimatePresence>
                 </div>
 
                 {!loading && hasMore && (

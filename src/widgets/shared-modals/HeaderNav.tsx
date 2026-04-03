@@ -40,8 +40,7 @@ function HeaderNavInner() {
     const isDashboard = pathname === "/dashboard";
     const isSim = pathname === "/trading";
     const isRanking = pathname === "/ranking";
-
-    const isAltseason = pathname === "/altseason";
+    const isAnalysis = pathname === "/analysis";
 
     const activeClass = "text-text-primary font-semibold";
     const inactiveClass = "text-text-muted hover:text-text-secondary transition-colors";
@@ -74,11 +73,11 @@ function HeaderNavInner() {
                     <span className="hidden sm:inline whitespace-nowrap">코인랭킹</span>
                 </Link>
 
-                <Link href="/altseason" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isAltseason ? activeClass : inactiveClass}`} aria-current={isAltseason ? "page" : undefined}>
+<Link href="/analysis" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isAnalysis ? activeClass : inactiveClass}`} aria-current={isAnalysis ? "page" : undefined}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 2v3m0 10v3M6 5h4v10H6V5zm10-1v4m0 6v4m-2-9h4v9h-4v-9z" />
                     </svg>
-                    <span className="hidden sm:inline whitespace-nowrap">알트시즌</span>
+                    <span className="hidden sm:inline whitespace-nowrap">차트분석</span>
                 </Link>
             </nav>
 

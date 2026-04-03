@@ -89,7 +89,7 @@ export function SimTradingPage() {
     const contentBg = isLight ? "bg-neutral-50" : "";
 
     return (
-        <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto">
+        <div className="flex flex-col gap-3 w-full min-w-[1320px] mx-auto mt-3 2xl:mt-4">
 
             <div className={`flex items-center gap-4 px-4 py-2.5 rounded-xl border overflow-x-auto scrollbar-none ${headerBg}`}>
                 <SimSymbolSelector isLight={isLight} />

@@ -214,7 +214,7 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
 
                             <div
                                 ref={scrollRef}
-                                className="overflow-y-auto scrollbar-hide max-h-[calc(100vh-550px)] lg:max-h-[calc(100vh-350px)] 2xl:max-h-[calc(100vh-450px)]"
+                                className="overflow-y-auto scrollbar-hide max-h-[calc(100vh-565px)] lg:max-h-[calc(100vh-365px)] 2xl:max-h-[calc(100vh-465px)]"
                                 style={{
                                     maskImage: `linear-gradient(to bottom, ${canScrollUp ? "transparent 0px, black 32px" : "black 0px"}, black calc(100% - ${canScrollDown ? "32px" : "0px"}), ${canScrollDown ? "transparent 100%" : "black 100%"})`,
                                     WebkitMaskImage: `linear-gradient(to bottom, ${canScrollUp ? "transparent 0px, black 32px" : "black 0px"}, black calc(100% - ${canScrollDown ? "32px" : "0px"}), ${canScrollDown ? "transparent 100%" : "black 100%"})`,

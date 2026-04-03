@@ -7,7 +7,7 @@ const PAGE_ORDER: Record<string, number> = {
     "/dashboard": 0,
     "/trading":   1,
     "/ranking":   2,
-    "/altseason": 3,
+    "/analysis":  3,
 };
 
 export default function Template({ children }: { children: React.ReactNode }) {

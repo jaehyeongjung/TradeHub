@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { createPortal } from "react-dom";
 import { supabase } from "@/shared/lib/supabase-browser";
@@ -152,10 +153,7 @@ export function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; fadeDelay
                     )}
 
                     {!loading && (
-                        <div
-                            className={`transition-[opacity,transform] duration-700 opacity-100 translate-y-0`}
-                            style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
-                        >
+                        <>
                             {news.length === 0 ? (
                                 <div className={`flex flex-col items-center justify-center py-16 ${timeColor}`}>
                                     <svg className="w-8 h-8 mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,9 +163,16 @@ export function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; fadeDelay
                                 </div>
                             ) : (
                                 <ul className="px-3">
-                                    {news.map((n) => (
-                                        <li
+                                    {news.map((n, idx) => (
+                                        <motion.li
                                             key={n.id}
+                                            initial={{ opacity: 0, y: 14 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{
+                                                delay: Math.min(idx, 14) * 0.04,
+                                                duration: 0.35,
+                                                ease: [0.16, 1, 0.3, 1],
+                                            }}
                                             className={`flex items-start gap-3 py-3 border-b last:border-b-0 ${dividerColor}`}
                                         >
                                             <div className="flex-1 min-w-0">
@@ -210,11 +215,11 @@ export function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; fadeDelay
                                                     </button>
                                                 </div>
                                             </div>
-                                        </li>
+                                        </motion.li>
                                     ))}
                                 </ul>
                             )}
-                        </div>
+                        </>
                     )}
                 </div>
             </div>
