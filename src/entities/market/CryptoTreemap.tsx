@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -162,7 +163,9 @@ export function CryptoTreemap({ onClose }: { onClose: () => void }) {
     const [data, setData] = useState<TreemapItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-    const isLight = useTheme();
+    const isLight  = useTheme();
+    const pathname = usePathname();
+    const isEn     = pathname.startsWith("/en/");
 
     useEffect(() => {
         const HEADER_H = 48;
@@ -228,9 +231,9 @@ export function CryptoTreemap({ onClose }: { onClose: () => void }) {
                     <svg width="15" height="15" viewBox="0 0 24 24" className={isLight ? "text-neutral-500" : "text-neutral-400"}>
                         <path fill="currentColor" d="M3 3h8v8H3zm10 0h8v5h-8zm0 7h8v11h-8zM3 13h8v8H3z"/>
                     </svg>
-                    <span className={`text-sm font-semibold ${isLight ? "text-neutral-900" : "text-white"}`}>코인 트리맵</span>
+                    <span className={`text-sm font-semibold ${isLight ? "text-neutral-900" : "text-white"}`}>{isEn ? "Crypto Heatmap" : "코인 트리맵"}</span>
                     <div className={`w-px h-3.5 ${isLight ? "bg-neutral-300" : "bg-neutral-700"}`} />
-                    <span className={`text-xs ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>24h 거래대금 기준</span>
+                    <span className={`text-xs ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>{isEn ? "24h Volume Based" : "24h 거래대금 기준"}</span>
                 </div>
 
                 <div className="flex items-center gap-2">

@@ -66,6 +66,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: "hourly",
             priority: 0.95,
         },
+        {
+            url: `${base}/en/dashboard`,
+            lastModified: new Date(),
+            changeFrequency: "hourly",
+            priority: 0.85,
+        },
+        {
+            url: `${base}/en/trading`,
+            lastModified: new Date(),
+            changeFrequency: "hourly",
+            priority: 0.85,
+        },
+        {
+            url: `${base}/en/ranking`,
+            lastModified: new Date(),
+            changeFrequency: "hourly",
+            priority: 0.85,
+        },
 {
             url: `${base}/guide`,
             lastModified: new Date(),
