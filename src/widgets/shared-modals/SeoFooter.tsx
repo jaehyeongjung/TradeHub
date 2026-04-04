@@ -160,7 +160,17 @@ export function SeoFooter() {
                             <Link href="/trading" className={`transition-colors ${moreColor}`}>비트코인 모의투자</Link>를 한 화면에서 제공하는 코인 트레이더 대시보드입니다.</>
                         )}
                     </p>
-                    <span className={`text-[11px] shrink-0 md:ml-4 ${taglineColor}`}>© 2026 TradeHub</span>
+                    <div className={`flex items-center gap-3 shrink-0 md:ml-4 text-[11px] ${taglineColor}`}>
+                        <Link href={isEn ? "/en/privacy" : "/privacy"} className="hover:text-zinc-300 transition-colors whitespace-nowrap">
+                            {isEn ? "Privacy Policy" : "개인정보처리방침"}
+                        </Link>
+                        <span>·</span>
+                        <Link href={isEn ? "/en/terms" : "/terms"} className="hover:text-zinc-300 transition-colors whitespace-nowrap">
+                            {isEn ? "Terms of Service" : "이용약관"}
+                        </Link>
+                        <span>·</span>
+                        <span>© 2026 TradeHub</span>
+                    </div>
                 </div>
 
             </div>
