@@ -22,7 +22,9 @@ export function middleware(req: NextRequest) {
     }
 
     if (MOBILE_UA.test(ua)) {
-        return NextResponse.redirect(new URL("/mobile", req.url));
+        const isEn = pathname.startsWith("/en");
+        const target = isEn ? "/mobile?lang=en" : "/mobile";
+        return NextResponse.redirect(new URL(target, req.url));
     }
 
     return NextResponse.next();

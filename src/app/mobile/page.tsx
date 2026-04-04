@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
 import Image from "next/image";
 
-const FEATURES = [
+const FEATURES_KO = [
     {
         color: "bg-amber-500/10",
         iconColor: "text-amber-400",
@@ -46,9 +48,19 @@ const FEATURES = [
     },
 ];
 
-export default function MobilePage() {
+const FEATURES_EN = [
+    { ...FEATURES_KO[0], label: "Futures Sim Trading", desc: "Up to 125x leverage · Long/Short" },
+    { ...FEATURES_KO[1], label: "Live Dashboard", desc: "Liquidations · Whales · Kimchi Premium · Fear & Greed" },
+    { ...FEATURES_KO[2], label: "Volume Treemap", desc: "150+ coins — price change heatmap" },
+];
+
+function MobilePageInner() {
     const [copied, setCopied] = useState(false);
     const isLight = useTheme();
+    const searchParams = useSearchParams();
+    const isEn = searchParams.get("lang") === "en";
+
+    const FEATURES = isEn ? FEATURES_EN : FEATURES_KO;
 
     const handleCopy = () => {
         navigator.clipboard.writeText("https://www.tradehub.kr");
@@ -83,18 +95,25 @@ export default function MobilePage() {
                         </svg>
                     </div>
                     <h1 className="text-[30px] font-bold leading-[1.2] tracking-tight mb-3">
-                        PC에서{" "}
-                        <span className="text-emerald-500">더 잘</span>{" "}
-                        보여요
+                        {isEn ? (
+                            <><span className="text-emerald-500">Better</span> on desktop.</>
+                        ) : (
+                            <>PC에서 <span className="text-emerald-500">더 잘</span> 보여요</>
+                        )}
                     </h1>
                     <p className={`text-[15px] leading-relaxed ${isLight ? "text-neutral-500" : "text-neutral-500"}`}>
-                        TradeHub는 PC 환경에 최적화되어 있어요.<br />
-                        아래 주소를 복사해서 PC 브라우저에서 접속해보세요.
+                        {isEn ? (
+                            <>TradeHub is optimized for desktop.<br />Copy the link and open it on your PC.</>
+                        ) : (
+                            <>TradeHub는 PC 환경에 최적화되어 있어요.<br />아래 주소를 복사해서 PC 브라우저에서 접속해보세요.</>
+                        )}
                     </p>
                 </section>
 
                 <div className={`border rounded-2xl p-5 mb-3 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800"}`}>
-                    <p className={`text-[11px] mb-3 font-medium tracking-wide uppercase ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>접속 주소</p>
+                    <p className={`text-[11px] mb-3 font-medium tracking-wide uppercase ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>
+                        {isEn ? "URL" : "접속 주소"}
+                    </p>
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 min-w-0">
                             <svg className={`w-4 h-4 shrink-0 ${isLight ? "text-neutral-400" : "text-neutral-600"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,13 +131,15 @@ export default function MobilePage() {
                                         : "bg-neutral-800 text-neutral-200 hover:bg-neutral-700"
                             }`}
                         >
-                            {copied ? "복사됨 ✓" : "복사"}
+                            {copied ? (isEn ? "Copied ✓" : "복사됨 ✓") : (isEn ? "Copy" : "복사")}
                         </button>
                     </div>
                 </div>
 
                 <section className="mt-10">
-                    <p className={`text-[11px] font-bold uppercase tracking-widest mb-4 ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>주요 기능</p>
+                    <p className={`text-[11px] font-bold uppercase tracking-widest mb-4 ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>
+                        {isEn ? "Features" : "주요 기능"}
+                    </p>
                     <div className="space-y-3">
                         {FEATURES.map((f) => (
                             <div key={f.label} className={`border rounded-2xl overflow-hidden ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-neutral-800/60"}`}>
@@ -159,10 +180,20 @@ export default function MobilePage() {
                                 : "bg-white text-neutral-950 shadow-white/10"
                     }`}
                 >
-                    {copied ? "✓  주소가 복사됐어요" : "PC 주소 복사하기"}
+                    {copied
+                        ? (isEn ? "✓  Link copied!" : "✓  주소가 복사됐어요")
+                        : (isEn ? "Copy desktop link" : "PC 주소 복사하기")}
                 </button>
                 <p className={`text-center text-[11px] mt-3 pointer-events-none ${isLight ? "text-neutral-400" : "text-neutral-700"}`}>© 2026 TradeHub. All rights reserved.</p>
             </div>
         </div>
+    );
+}
+
+export default function MobilePage() {
+    return (
+        <Suspense fallback={null}>
+            <MobilePageInner />
+        </Suspense>
     );
 }
