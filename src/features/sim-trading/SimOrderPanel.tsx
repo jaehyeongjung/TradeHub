@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { simSymbolAtom, simPricesAtom, simMarginModeAtom } from "@/shared/store/atoms";
 import { calcLiqPrice, calcLiqPriceCross } from "@/shared/lib/sim-trading";
@@ -18,9 +18,10 @@ interface Props {
     onReset: () => void;
     clickedPrice: number | null;
     lockedMarginMode: MarginMode | null;
+    isEn?: boolean;
 }
 
-export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode }: Props) {
+export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode, isEn = false }: Props) {
     const isLight = useTheme();
     const simSymbol = useAtomValue(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);
@@ -37,6 +38,23 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
     const [showTpSl, setShowTpSl] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [hasMoreBelow, setHasMoreBelow] = useState(false);
+
+    const checkScroll = useCallback(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        setHasMoreBelow(el.scrollHeight - el.scrollTop - el.clientHeight > 8);
+    }, []);
+
+    useEffect(() => {
+        checkScroll();
+        const el = scrollRef.current;
+        if (!el) return;
+        const ro = new ResizeObserver(checkScroll);
+        ro.observe(el);
+        return () => ro.disconnect();
+    }, [checkScroll]);
 
     useEffect(() => {
         if (lockedMarginMode) setMarginMode(lockedMarginMode);
@@ -72,25 +90,25 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
 
     const handleSubmit = async () => {
         setError("");
-        if (!currentPrice) { setError("가격 정보를 불러오는 중입니다"); return; }
-        if (amount <= 0) { setError("주문 금액을 입력하세요"); return; }
-        if (orderType !== "MARKET" && (!limitPrice || parseFloat(limitPrice) <= 0)) { setError("지정가를 입력하세요"); return; }
-        if (margin > balance) { setError("잔고가 부족합니다"); return; }
+        if (!currentPrice) { setError(isEn ? "Loading price data…" : "가격 정보를 불러오는 중입니다"); return; }
+        if (amount <= 0) { setError(isEn ? "Enter order amount" : "주문 금액을 입력하세요"); return; }
+        if (orderType !== "MARKET" && (!limitPrice || parseFloat(limitPrice) <= 0)) { setError(isEn ? "Enter limit price" : "지정가를 입력하세요"); return; }
+        if (margin > balance) { setError(isEn ? "Insufficient balance" : "잔고가 부족합니다"); return; }
         const tp = tpPrice ? parseFloat(tpPrice) : null;
         const sl = slPrice ? parseFloat(slPrice) : null;
         if (side === "LONG") {
-            if (tp !== null && tp <= price) { setError("롱 TP는 진입가보다 높아야 합니다"); return; }
-            if (sl !== null && sl >= price) { setError("롱 SL은 진입가보다 낮아야 합니다"); return; }
+            if (tp !== null && tp <= price) { setError(isEn ? "Long TP must be above entry" : "롱 TP는 진입가보다 높아야 합니다"); return; }
+            if (sl !== null && sl >= price) { setError(isEn ? "Long SL must be below entry" : "롱 SL은 진입가보다 낮아야 합니다"); return; }
         } else {
-            if (tp !== null && tp >= price) { setError("숏 TP는 진입가보다 낮아야 합니다"); return; }
-            if (sl !== null && sl <= price) { setError("숏 SL은 진입가보다 높아야 합니다"); return; }
+            if (tp !== null && tp >= price) { setError(isEn ? "Short TP must be below entry" : "숏 TP는 진입가보다 낮아야 합니다"); return; }
+            if (sl !== null && sl <= price) { setError(isEn ? "Short SL must be above entry" : "숏 SL은 진입가보다 높아야 합니다"); return; }
         }
         setSubmitting(true);
         try {
             await onSubmit({ symbol: simSymbol, side, orderType, price, quantityUsdt: amount, leverage, tpPrice: tpPrice ? parseFloat(tpPrice) : undefined, slPrice: slPrice ? parseFloat(slPrice) : undefined, marginMode });
             setAmountUsdt(""); setLimitPrice(""); setTpPrice(""); setSlPrice(""); setError("");
         } catch (e: unknown) {
-            setError(e instanceof Error ? e.message : "주문 실패");
+            setError(e instanceof Error ? e.message : (isEn ? "Order failed" : "주문 실패"));
         }
         setSubmitting(false);
     };
@@ -120,7 +138,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                         onClick={onReset}
                         className={`text-[10px] px-2.5 py-1 rounded-lg border ${border} ${textTertiary} hover:text-red-400 hover:border-red-400/30 transition-all cursor-pointer`}
                     >
-                        초기화
+                        {isEn ? "Reset" : "초기화"}
                     </button>
                 </div>
 
@@ -136,7 +154,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                 />
                             </div>
                         )}
-                        <div className={`text-[10px] ${textTertiary} mt-1`}>총 자산 (USDT)</div>
+                        <div className={`text-[10px] ${textTertiary} mt-1`}>{isEn ? "Total Equity (USDT)" : "총 자산 (USDT)"}</div>
                     </div>
                     {!loading && (
                         <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl ${roe >= 0 ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
@@ -153,9 +171,9 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                 {!loading && (
                     <div className="grid grid-cols-3 gap-1.5">
                         {[
-                            { label: "가용잔고", value: balance.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: textPrimary },
-                            { label: "사용증거금", value: totalPositionMargin.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: isLight ? "text-amber-600" : "text-amber-400" },
-                            { label: "미실현 PnL", value: `${totalUnrealizedPnl >= 0 ? "+" : ""}${totalUnrealizedPnl.toFixed(1)}`, color: totalUnrealizedPnl >= 0 ? "text-emerald-500" : "text-red-500" },
+                            { label: isEn ? "Available" : "가용잔고", value: balance.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: textPrimary },
+                            { label: isEn ? "Margin Used" : "사용증거금", value: totalPositionMargin.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: isLight ? "text-amber-600" : "text-amber-400" },
+                            { label: isEn ? "Unreal. PnL" : "미실현 PnL", value: `${totalUnrealizedPnl >= 0 ? "+" : ""}${totalUnrealizedPnl.toFixed(1)}`, color: totalUnrealizedPnl >= 0 ? "text-emerald-500" : "text-red-500" },
                         ].map(({ label, value, color }) => (
                             <div key={label} className={`${cardBg} rounded-xl px-2.5 py-2 border ${border}`}>
                                 <div className={`text-[9px] ${textTertiary} mb-0.5`}>{label}</div>
@@ -168,7 +186,8 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
 
             <div className={`h-px ${divider} mx-4 flex-shrink-0`} />
 
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 scrollbar-none">
+            <div className="relative flex-1 min-h-0">
+            <div ref={scrollRef} onScroll={checkScroll} className="h-full overflow-y-auto px-4 py-3 space-y-3 scrollbar-none">
 
                 <div className={`relative grid grid-cols-2 ${pillBg} rounded-2xl p-1`}>
                     <div className={`absolute top-1 bottom-1 rounded-xl transition-all duration-200 ease-out pointer-events-none ${
@@ -200,7 +219,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                     orderType === t ? pillActive : pillInactive
                                 }`}
                             >
-                                {t === "MARKET" ? "시장가" : "지정가"}
+                                {t === "MARKET" ? (isEn ? "Market" : "시장가") : (isEn ? "Limit" : "지정가")}
                             </button>
                         ))}
                     </div>
@@ -218,13 +237,13 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                         : pillInactive
                                 }`}
                             >
-                                {mode === "CROSS" ? "교차" : "격리"}
+                                {mode === "CROSS" ? (isEn ? "Cross" : "교차") : (isEn ? "Isolated" : "격리")}
                             </button>
                         ))}
                     </div>
                 </div>
                 {lockedMarginMode && (
-                    <p className={`text-[9px] ${textTertiary} -mt-1 pl-0.5`}>포지션 보유 중 마진 모드 변경 불가</p>
+                    <p className={`text-[9px] ${textTertiary} -mt-1 pl-0.5`}>{isEn ? "Cannot change margin mode with open position" : "포지션 보유 중 마진 모드 변경 불가"}</p>
                 )}
 
                 {orderType === "LIMIT" && (
@@ -233,7 +252,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                             type="number"
                             value={limitPrice}
                             onChange={(e) => setLimitPrice(e.target.value)}
-                            placeholder={`지정가 ${currentPrice > 0 ? `≈ ${currentPrice.toLocaleString()}` : ""}`}
+                            placeholder={isEn ? `Limit price${currentPrice > 0 ? ` ≈ ${currentPrice.toLocaleString()}` : ""}` : `지정가 ${currentPrice > 0 ? `≈ ${currentPrice.toLocaleString()}` : ""}`}
                             className={`w-full text-[12px] rounded-xl px-3.5 py-2.5 border outline-none focus:border-zinc-500 transition-colors pr-14 ${inputBg}`}
                         />
                         <span className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] ${textTertiary} font-medium`}>USDT</span>
@@ -242,7 +261,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
 
                 <div className={`${cardBg} rounded-2xl px-3.5 py-3 border ${border}`}>
                     <div className="flex items-center justify-between mb-3">
-                        <span className={`text-[11px] ${textSecondary} font-medium`}>레버리지</span>
+                        <span className={`text-[11px] ${textSecondary} font-medium`}>{isEn ? "Leverage" : "레버리지"}</span>
                         <span className={`text-[15px] font-bold font-mono tabular-nums ${
                             leverage >= 50 ? "text-red-500" : leverage >= 20 ? (isLight ? "text-amber-600" : "text-amber-400") : textPrimary
                         }`}>
@@ -297,7 +316,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                             type="number"
                             value={amountUsdt}
                             onChange={(e) => setAmountUsdt(e.target.value)}
-                            placeholder="주문 금액 (USDT)"
+                            placeholder={isEn ? "Order amount (USDT)" : "주문 금액 (USDT)"}
                             className={`w-full text-[13px] rounded-xl px-3.5 py-3 border outline-none focus:border-zinc-500 transition-colors pr-16 ${inputBg}`}
                         />
                         <span className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] ${textTertiary} font-medium`}>USDT</span>
@@ -307,7 +326,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                             { pct: 0.25, label: "25%" },
                             { pct: 0.5, label: "50%" },
                             { pct: 0.75, label: "75%" },
-                            { pct: 1, label: "최대" },
+                            { pct: 1, label: isEn ? "Max" : "최대" },
                         ].map(({ pct, label }) => (
                             <button
                                 key={pct}
@@ -333,10 +352,10 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                             <svg className={`w-3.5 h-3.5 transition-transform duration-200 ${showTpSl ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
-                            익절 / 손절 (TP/SL)
+                            {isEn ? "Take Profit / Stop Loss (TP/SL)" : "익절 / 손절 (TP/SL)"}
                         </span>
                         {(tpPrice || slPrice) && !showTpSl && (
-                            <span className={`text-[9px] px-2 py-0.5 bg-amber-500/10 rounded-full font-medium ${isLight ? "text-amber-600" : "text-amber-400"}`}>설정됨</span>
+                            <span className={`text-[9px] px-2 py-0.5 bg-amber-500/10 rounded-full font-medium ${isLight ? "text-amber-600" : "text-amber-400"}`}>{isEn ? "Set" : "설정됨"}</span>
                         )}
                     </button>
 
@@ -346,7 +365,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                 <input
                                     type="number" value={tpPrice}
                                     onChange={(e) => setTpPrice(e.target.value)}
-                                    placeholder="익절가 (TP)"
+                                    placeholder={isEn ? "Take Profit (TP)" : "익절가 (TP)"}
                                     className={`flex-1 text-[11px] rounded-xl px-3 py-2.5 border outline-none focus:border-emerald-500/40 transition-colors text-emerald-500 ${
                                         isLight ? "bg-white border-neutral-200 placeholder:text-neutral-400" : "bg-neutral-900 border-zinc-800 placeholder:text-neutral-700"
                                     }`}
@@ -354,7 +373,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                 <input
                                     type="number" value={slPrice}
                                     onChange={(e) => setSlPrice(e.target.value)}
-                                    placeholder="손절가 (SL)"
+                                    placeholder={isEn ? "Stop Loss (SL)" : "손절가 (SL)"}
                                     className={`flex-1 text-[11px] rounded-xl px-3 py-2.5 border outline-none focus:border-red-500/40 transition-colors text-red-500 ${
                                         isLight ? "bg-white border-neutral-200 placeholder:text-neutral-400" : "bg-neutral-900 border-zinc-800 placeholder:text-neutral-700"
                                     }`}
@@ -367,10 +386,10 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                 {amount > 0 && (
                     <div className={`space-y-2 pt-2.5 border-t ${border}`}>
                         {[
-                            { label: "필요 증거금", value: `${margin.toFixed(2)} USDT`, color: textSecondary },
-                            { label: "거래 수량", value: `${coinQty.toFixed(6)} ${simSymbol.replace("USDT", "")}`, color: textTertiary },
-                            { label: "예상 청산가", value: estLiqPrice > 0 ? `$${estLiqPrice.toFixed(2)}` : "—", color: "text-orange-500" },
-                            { label: "거래 수수료", value: `${(amount * 0.0004).toFixed(3)} USDT`, color: textTertiary },
+                            { label: isEn ? "Required Margin" : "필요 증거금", value: `${margin.toFixed(2)} USDT`, color: textSecondary },
+                            { label: isEn ? "Quantity" : "거래 수량", value: `${coinQty.toFixed(6)} ${simSymbol.replace("USDT", "")}`, color: textTertiary },
+                            { label: isEn ? "Est. Liq. Price" : "예상 청산가", value: estLiqPrice > 0 ? `$${estLiqPrice.toFixed(2)}` : "—", color: "text-orange-500" },
+                            { label: isEn ? "Trading Fee" : "거래 수수료", value: `${(amount * 0.0004).toFixed(3)} USDT`, color: textTertiary },
                         ].map(({ label, value, color }) => (
                             <div key={label} className="flex items-center justify-between">
                                 <span className={`text-[10px] ${textTertiary}`}>{label}</span>
@@ -390,6 +409,16 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                 )}
             </div>
 
+            {hasMoreBelow && (
+                <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 flex flex-col items-center justify-end pb-2"
+                    style={{ background: isLight ? "linear-gradient(to top, rgba(255,255,255,0.95) 0%, transparent 100%)" : "linear-gradient(to top, rgba(10,10,10,0.95) 0%, transparent 100%)" }}>
+                    <svg className="w-4 h-4 text-neutral-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            )}
+            </div>
+
             <div className={`flex-shrink-0 px-4 pb-5 pt-3 border-t ${border}`}>
                 <button
                     onClick={handleSubmit}
@@ -406,10 +435,10 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                             </svg>
-                            처리 중…
+                            {isEn ? "Processing…" : "처리 중…"}
                         </span>
                     ) : (
-                        isLong ? "매수 (Long)" : "매도 (Short)"
+                        isLong ? (isEn ? "Buy / Long" : "매수 (Long)") : (isEn ? "Sell / Short" : "매도 (Short)")
                     )}
                 </button>
             </div>

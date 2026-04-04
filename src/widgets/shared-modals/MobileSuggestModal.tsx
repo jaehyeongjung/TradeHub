@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 
 export function MobileSuggestModal() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const isEn = pathname.startsWith("/en/");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -40,11 +43,15 @@ export function MobileSuggestModal() {
           >
             <div className="w-full max-w-md rounded-2xl border border-neutral-700 bg-neutral-900 text-neutral-100 shadow-2xl overflow-hidden">
               <div className="p-5">
-                <h2 className="text-lg font-bold">PC 접속을 권장합니다</h2>
+                <h2 className="text-lg font-bold">
+                  {isEn ? "Desktop recommended" : "PC 접속을 권장합니다"}
+                </h2>
                 <p className="mt-2 text-sm text-neutral-300">
-                  TradeHub는 현재 데스크톱 환경에 최적화되어 있어요.
-                  <br />
-                  모바일에서는 일부 기능/레이아웃이 제한될 수 있습니다.
+                  {isEn ? (
+                    <>TradeHub is optimized for desktop.<br />Some features may be limited on mobile.</>
+                  ) : (
+                    <>TradeHub는 현재 데스크톱 환경에 최적화되어 있어요.<br />모바일에서는 일부 기능/레이아웃이 제한될 수 있습니다.</>
+                  )}
                 </p>
 
                 <div className="mt-4 flex justify-end">
@@ -52,7 +59,7 @@ export function MobileSuggestModal() {
                     onClick={close}
                     className="px-4 py-2 rounded-lg border border-neutral-700 hover:border-neutral-600 text-neutral-200 cursor-pointer"
                   >
-                    닫기
+                    {isEn ? "Close" : "닫기"}
                   </button>
                 </div>
               </div>

@@ -93,8 +93,7 @@ export function SeoFooter() {
                                 : "150개 코인 거래량 트리맵, 김치프리미엄, 공포탐욕지수로 시장 심리를 한눈에 확인하세요."}
                         </p>
                         <div className={`mt-3 pt-3 border-t flex flex-col gap-0.5 ${isLight ? "divide-neutral-100 border-neutral-100" : "divide-neutral-800 border-neutral-800"}`}>
-                            <GuideLink href="/ranking">{isEn ? "Coin Market Cap Rankings" : "코인 시가총액 순위"}</GuideLink>
-                            <GuideLink href="/funding">{isEn ? "Funding Rate Rankings" : "코인 펀딩비 순위"}</GuideLink>
+                            <GuideLink href={isEn ? "/en/ranking" : "/ranking"}>{isEn ? "Coin Market Cap Rankings" : "코인 시가총액 순위"}</GuideLink>
                             <GuideLink href={isEn ? "/en/analysis" : "/analysis"}>{isEn ? "Chart Technical Analysis" : "차트 기술 분석"}</GuideLink>
                         </div>
                     </article>
@@ -104,7 +103,7 @@ export function SeoFooter() {
                             {isEn ? "Free Practice" : "무료 연습"}
                         </div>
                         <h3 className={`text-xs font-bold mb-2 leading-snug ${subTitleColor}`}>
-                            <Link href="/trading" className={`transition-colors ${isLight ? "hover:text-teal-600" : "hover:text-teal-400"}`}>
+                            <Link href={isEn ? "/en/trading" : "/trading"} className={`transition-colors ${isLight ? "hover:text-teal-600" : "hover:text-teal-400"}`}>
                                 {isEn ? "Bitcoin Sim Trading" : "비트코인 모의투자"}
                             </Link>
                         </h3>
@@ -122,12 +121,12 @@ export function SeoFooter() {
                             {isEn ? "Trading Guide" : "투자 가이드"}
                         </div>
                         <ul className={`divide-y ${isLight ? "divide-neutral-100" : "divide-neutral-800"}`}>
-                            <li><GuideLink href="/guide/kimchi-premium">{isEn ? "What is Kimchi Premium?" : "김치프리미엄이란?"}</GuideLink></li>
-                            <li><GuideLink href="/guide/fear-greed-index">{isEn ? "How to Read Fear & Greed" : "공포탐욕지수 보는법"}</GuideLink></li>
-                            <li><GuideLink href="/guide/bitcoin-paper-trading">{isEn ? "How to Sim Trade Bitcoin" : "비트코인 모의투자 하는법"}</GuideLink></li>
+                            <li><GuideLink href={isEn ? "/en/guide/kimchi-premium" : "/guide/kimchi-premium"}>{isEn ? "What is Kimchi Premium?" : "김치프리미엄이란?"}</GuideLink></li>
+                            <li><GuideLink href={isEn ? "/en/guide/fear-greed-index" : "/guide/fear-greed-index"}>{isEn ? "How to Read Fear & Greed" : "공포탐욕지수 보는법"}</GuideLink></li>
+                            <li><GuideLink href={isEn ? "/en/guide/bitcoin-paper-trading" : "/guide/bitcoin-paper-trading"}>{isEn ? "How to Sim Trade Bitcoin" : "비트코인 모의투자 하는법"}</GuideLink></li>
                         </ul>
                         <div className="pt-2">
-                            <Link href="/guide" className={`group flex items-center gap-1 text-[10px] font-medium transition-colors ${moreColor}`}>
+                            <Link href={isEn ? "/en/guide" : "/guide"} className={`group flex items-center gap-1 text-[10px] font-medium transition-colors ${moreColor}`}>
                                 {isEn ? "All Guides" : "전체 가이드"}
                                 <svg className="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -155,7 +154,7 @@ export function SeoFooter() {
                     <p className={`text-[11px] leading-relaxed ${taglineColor}`}>
                         {isEn ? (
                             <>TradeHub is a crypto trader dashboard offering real-time liquidations, whale trades, heatmap, funding rates, news, and{" "}
-                            <Link href="/trading" className={`transition-colors ${moreColor}`}>Bitcoin sim trading</Link> — all in one place.</>
+                            <Link href="/en/trading" className={`transition-colors ${moreColor}`}>Bitcoin sim trading</Link> — all in one place.</>
                         ) : (
                             <>TradeHub는 실시간 청산·고래 거래·트리맵·김프·공포탐욕지수·뉴스·채팅·{" "}
                             <Link href="/trading" className={`transition-colors ${moreColor}`}>비트코인 모의투자</Link>를 한 화면에서 제공하는 코인 트레이더 대시보드입니다.</>

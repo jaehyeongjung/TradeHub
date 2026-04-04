@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtomValue } from "jotai";
 import { useVisibilityPolling } from "@/shared/hooks/useVisibilityPolling";
@@ -51,6 +52,8 @@ export function KimchiWidget({
     const [data, setData] = useState<Data | null>(null);
     const [isHovered, setIsHovered] = useState(false);
     const isLight = useTheme();
+    const pathname = usePathname();
+    const isEn = pathname.startsWith("/en/");
     const [flash, setFlash] = useState<"up" | "down" | null>(null);
     const prevPctRef = useRef<number | null>(null);
     const abortRef = useRef<AbortController | null>(null);
@@ -119,7 +122,7 @@ export function KimchiWidget({
             >
                 <div className="flex items-center justify-between mb-3">
                     <span className={`text-[11px] 2xl:text-xs font-medium tracking-wide ${subLabelColor}`}>
-                        김치프리미엄
+                        {isEn ? "Kimchi Premium" : "김치프리미엄"}
                     </span>
                     <span className={`text-[10px] 2xl:text-[11px] font-medium px-2 py-0.5 rounded-full ${symbolPill}`}>
                         {data?.symbol ?? symbol}
@@ -132,14 +135,14 @@ export function KimchiWidget({
                     {pct != null ? `${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%` : "—"}
                 </div>
                 <div className={`mt-1.5 text-[11px] 2xl:text-xs font-medium ${heroColor} opacity-80`}>
-                    {isNeutral ? "데이터 로딩 중" : isPositive ? "▲ 한국이 해외보다 비쌈" : "▼ 해외가 한국보다 비쌈"}
+                    {isNeutral ? (isEn ? "Loading…" : "데이터 로딩 중") : isPositive ? (isEn ? "▲ Korea > Global" : "▲ 한국이 해외보다 비쌈") : (isEn ? "▼ Global > Korea" : "▼ 해외가 한국보다 비쌈")}
                 </div>
 
                 <div className={`mt-3 mb-2 2xl:mt-4 2xl:mb-3 border-t ${dividerColor}`} />
 
                 <div className="grid grid-cols-3 gap-8">
                     <div>
-                        <div className={`text-[9px] 2xl:text-[10px] mb-0.5 ${labelColor}`}>업비트</div>
+                        <div className={`text-[9px] 2xl:text-[10px] mb-0.5 ${labelColor}`}>Upbit</div>
                         <div className={`text-[11px] 2xl:text-xs font-mono font-semibold tabular-nums ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>
                             {data?.upbitKrw != null
                                 ? `${Math.round(data.upbitKrw).toLocaleString()}`
@@ -147,7 +150,7 @@ export function KimchiWidget({
                         </div>
                     </div>
                     <div className="ml-2">
-                        <div className={`text-[9px] 2xl:text-[10px] mb-0.5 ${labelColor}`}>바이낸스</div>
+                        <div className={`text-[9px] 2xl:text-[10px] mb-0.5 ${labelColor}`}>Binance</div>
                         <div className="text-[11px] 2xl:text-xs font-mono font-semibold text-amber-400 tabular-nums">
                             {data?.binanceUsdt != null
                                 ? `${data.binanceUsdt.toLocaleString(undefined, { maximumFractionDigits: 1 })}`
@@ -155,10 +158,12 @@ export function KimchiWidget({
                         </div>
                     </div>
                     <div>
-                        <div className={`text-[9px] 2xl:text-[10px] mb-0.5 ${labelColor}`}>환율</div>
-                        <div className={`text-[11px] 2xl:text-xs font-mono font-semibold tabular-nums ${isLight ? "text-neutral-600" : "text-text-secondary"}`}>
+                        <div className={`text-[9px] 2xl:text-[10px] mb-0.5 ${labelColor}`}>{isEn ? "FX Rate" : "환율"}</div>
+                        <div className={`text-[11px] 2xl:text-xs font-mono font-semibold tabular-nums whitespace-nowrap ${isLight ? "text-neutral-600" : "text-text-secondary"}`}>
                             {data?.usdkrw != null
-                                ? `${Math.round(data.usdkrw).toLocaleString()}원`
+                                ? isEn
+                                    ? <>{Math.round(data.usdkrw).toLocaleString()}<span className="text-[8px] 2xl:text-[9px] ml-0.5 font-medium">KRW</span></>
+                                    : `${Math.round(data.usdkrw).toLocaleString()}원`
                                 : "—"}
                         </div>
                     </div>
@@ -178,13 +183,17 @@ export function KimchiWidget({
                                 : "bg-surface-elevated border-border-default text-text-secondary"
                         }`}
                     >
-                        <div className="font-semibold text-amber-400 mb-1.5">지표 설명</div>
+                        <div className="font-semibold text-amber-400 mb-1.5">{isEn ? "About" : "지표 설명"}</div>
                         <p className="leading-relaxed">
-                            업비트 원화 가격과 바이낸스 달러 가격,
-                            환율(USD/KRW)을 비교해 계산한 프리미엄입니다.
-                            <br /><br />
-                            <span className="text-emerald-400 font-medium">• 양수</span>: 한국이 해외보다 비쌈<br />
-                            <span className="text-rose-400 font-medium">• 음수</span>: 해외가 한국보다 비쌈
+                            {isEn ? (
+                                <>Premium calculated by comparing Upbit (KRW) vs Binance (USD) prices and the USD/KRW FX rate.<br /><br />
+                                <span className="text-emerald-400 font-medium">• Positive</span>: Korea more expensive<br />
+                                <span className="text-rose-400 font-medium">• Negative</span>: Global more expensive</>
+                            ) : (
+                                <>업비트 원화 가격과 바이낸스 달러 가격, 환율(USD/KRW)을 비교해 계산한 프리미엄입니다.<br /><br />
+                                <span className="text-emerald-400 font-medium">• 양수</span>: 한국이 해외보다 비쌈<br />
+                                <span className="text-rose-400 font-medium">• 음수</span>: 해외가 한국보다 비쌈</>
+                            )}
                         </p>
                         <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent ${isLight ? "border-b-neutral-200" : "border-b-border-default"}`} />
                         <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent ${isLight ? "border-b-white" : "border-b-surface-elevated"}`} />

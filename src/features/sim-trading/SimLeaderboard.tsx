@@ -11,10 +11,13 @@ interface LeaderboardEntry {
 
 interface Props {
     userId: string | null;
+    isEn?: boolean;
 }
 
-const ADJS = ["냉정한", "날카로운", "대담한", "신중한", "빠른", "강인한", "조용한", "예리한", "침착한", "용감한"];
-const ANIMALS = ["고래", "독수리", "황소", "호랑이", "매", "곰", "사자", "여우", "늑대", "표범"];
+const ADJS_KO = ["냉정한", "날카로운", "대담한", "신중한", "빠른", "강인한", "조용한", "예리한", "침착한", "용감한"];
+const ANIMALS_KO = ["고래", "독수리", "황소", "호랑이", "매", "곰", "사자", "여우", "늑대", "표범"];
+const ADJS_EN = ["Calm", "Sharp", "Bold", "Careful", "Swift", "Iron", "Silent", "Keen", "Steady", "Brave"];
+const ANIMALS_EN = ["Whale", "Eagle", "Bull", "Tiger", "Hawk", "Bear", "Lion", "Fox", "Wolf", "Leopard"];
 const EMOJIS  = ["🐋",   "🦅",      "🐂",    "🐯",     "🦅", "🐻", "🦁",   "🦊",   "🐺",   "🐆"];
 const PALETTES = [
     "bg-blue-500/20 text-blue-400",
@@ -37,8 +40,10 @@ function stableHash(id: string): number {
     return Math.abs(h);
 }
 
-function traderAlias(userId: string) {
+function traderAlias(userId: string, en = false) {
     const h = stableHash(userId);
+    const ADJS = en ? ADJS_EN : ADJS_KO;
+    const ANIMALS = en ? ANIMALS_EN : ANIMALS_KO;
     const adj     = ADJS[h % ADJS.length];
     const animalI = Math.floor(h / ADJS.length) % ANIMALS.length;
     return {
@@ -54,7 +59,7 @@ const RANK_BADGE = [
     { text: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/20"  },
 ];
 
-export function SimLeaderboard({ userId }: Props) {
+export function SimLeaderboard({ userId, isEn = false }: Props) {
     const isLight = useTheme();
     const [data, setData]       = useState<LeaderboardEntry[]>([]);
     const [loading, setLoading] = useState(true);
@@ -67,11 +72,11 @@ export function SimLeaderboard({ userId }: Props) {
             setData(await res.json());
             setError(null);
         } catch {
-            setError("랭킹 데이터를 불러오지 못했습니다.");
+            setError(isEn ? "Failed to load rankings." : "랭킹 데이터를 불러오지 못했습니다.");
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [isEn]);
 
     useEffect(() => {
         fetchLeaderboard();
@@ -120,7 +125,7 @@ export function SimLeaderboard({ userId }: Props) {
         return (
             <div className={`rounded-2xl border p-12 text-center ${card}`}>
                 <p className={`text-[12px] ${error ? "text-red-400" : t3}`}>
-                    {error ?? "아직 랭킹 데이터가 없습니다"}
+                    {error ?? (isEn ? "No ranking data yet" : "아직 랭킹 데이터가 없습니다")}
                 </p>
             </div>
         );
@@ -136,22 +141,22 @@ export function SimLeaderboard({ userId }: Props) {
 
             <div className={`flex items-center justify-between px-5 py-3.5 border-b ${divider}`}>
                 <div className="flex items-center gap-2">
-                    <span className={`text-[13px] font-bold tracking-tight ${t1}`}>수익률 랭킹</span>
+                    <span className={`text-[13px] font-bold tracking-tight ${t1}`}>{isEn ? "ROI Rankings" : "수익률 랭킹"}</span>
                     {myRank >= 0 && (
                         <span className="text-[10px] px-2 py-[3px] bg-amber-500/15 text-amber-500 rounded-full font-semibold border border-amber-500/25">
-                            내 순위 {myRank + 1}위
+                            {isEn ? `My Rank #${myRank + 1}` : `내 순위 ${myRank + 1}위`}
                         </span>
                     )}
                 </div>
                 <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
-                    <span className={`text-[10px] ${t3}`}>실시간</span>
+                    <span className={`text-[10px] ${t3}`}>{isEn ? "Live" : "실시간"}</span>
                 </div>
             </div>
 
             <div className={`p-3 space-y-1.5 border-b ${divider}`}>
                 {top3.map((entry, i) => {
-                    const alias      = traderAlias(entry.user_id);
+                    const alias      = traderAlias(entry.user_id, isEn);
                     const isMe       = !!(userId && entry.user_id === userId);
                     const isPositive = entry.roi >= 0;
                     const badge      = RANK_BADGE[i];
@@ -179,7 +184,7 @@ export function SimLeaderboard({ userId }: Props) {
 
                             <div className="relative flex items-center gap-3">
                                 <span className={`text-[9px] font-black tracking-widest w-8 text-center py-1 rounded-lg border flex-shrink-0 ${badge.text} ${badge.bg} ${badge.border}`}>
-                                    {i + 1}위
+                                    {isEn ? `#${i + 1}` : `${i + 1}위`}
                                 </span>
 
                                 <div className={`w-9 h-9 rounded-full flex items-center justify-center text-[18px] flex-shrink-0 ${
@@ -196,7 +201,7 @@ export function SimLeaderboard({ userId }: Props) {
                                             {alias.name}
                                         </span>
                                         {isMe && (
-                                            <span className="text-[8px] px-1.5 py-px bg-amber-500/20 text-amber-400 rounded-full font-bold flex-shrink-0">나</span>
+                                            <span className="text-[8px] px-1.5 py-px bg-amber-500/20 text-amber-400 rounded-full font-bold flex-shrink-0">{isEn ? "Me" : "나"}</span>
                                         )}
                                     </div>
                                     <span className={`text-[10px] font-mono ${t3}`}>
@@ -217,7 +222,7 @@ export function SimLeaderboard({ userId }: Props) {
 
             <div className={`divide-y ${divider} max-h-[300px] overflow-y-auto scrollbar-none`}>
                 {rest.map((entry, i) => {
-                    const alias      = traderAlias(entry.user_id);
+                    const alias      = traderAlias(entry.user_id, isEn);
                     const rank       = i + 4;
                     const isMe       = !!(userId && entry.user_id === userId);
                     const isPositive = entry.roi >= 0;
@@ -249,7 +254,7 @@ export function SimLeaderboard({ userId }: Props) {
                                         {alias.name}
                                     </span>
                                     {isMe && (
-                                        <span className="text-[8px] px-1.5 py-px bg-amber-500/20 text-amber-400 rounded-full font-bold flex-shrink-0">나</span>
+                                        <span className="text-[8px] px-1.5 py-px bg-amber-500/20 text-amber-400 rounded-full font-bold flex-shrink-0">{isEn ? "Me" : "나"}</span>
                                     )}
                                 </div>
                                 <span className={`text-[10px] font-mono ${t3}`}>
@@ -271,7 +276,7 @@ export function SimLeaderboard({ userId }: Props) {
 
             {myRank > 12 && userId && data[myRank] && (() => {
                 const me      = data[myRank];
-                const alias   = traderAlias(userId);
+                const alias   = traderAlias(userId, isEn);
                 const isPositive = me.roi >= 0;
                 return (
                     <div className={`border-t ${divider} px-5 py-3 ${isLight ? "bg-amber-50/50" : "bg-amber-500/[0.04]"}`}>

@@ -152,17 +152,18 @@ type Props = {
     enableIndicators?: boolean;
     positions?: SimPosition[];
     onUpdateTpSl?: (positionId: string, tp: number | null, sl: number | null) => Promise<void>;
+    locale?: "ko" | "en";
 };
 
-const INTERVAL_OPTIONS: { value: Interval; label: string }[] = [
-    { value: "1m", label: "1분" },
-    { value: "5m", label: "5분" },
-    { value: "15m", label: "15분" },
-    { value: "1h", label: "1시간" },
-    { value: "4h", label: "4시간" },
-    { value: "1d", label: "1일" },
-    { value: "1w", label: "1주" },
-    { value: "1M", label: "1월" },
+const INTERVAL_OPTIONS: { value: Interval; label: string; labelEn: string }[] = [
+    { value: "1m",  label: "1분",   labelEn: "1m"  },
+    { value: "5m",  label: "5분",   labelEn: "5m"  },
+    { value: "15m", label: "15분",  labelEn: "15m" },
+    { value: "1h",  label: "1시간", labelEn: "1H"  },
+    { value: "4h",  label: "4시간", labelEn: "4H"  },
+    { value: "1d",  label: "1일",   labelEn: "1D"  },
+    { value: "1w",  label: "1주",   labelEn: "1W"  },
+    { value: "1M",  label: "1월",   labelEn: "1M"  },
 ];
 
 interface AddForm {
@@ -202,6 +203,7 @@ export function CoinChart({
     enableIndicators = false,
     positions,
     onUpdateTpSl,
+    locale = "ko",
 }: Props) {
     const outerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<HTMLDivElement>(null);
@@ -501,6 +503,7 @@ export function CoinChart({
             },
             rightPriceScale: { borderColor: isLight ? "#d0d0d0" : "#1F2D40" },
             timeScale: { borderColor: isLight ? "#d0d0d0" : "#1F2D40" },
+            localization: { locale: locale === "en" ? "en-US" : "ko-KR" },
         });
         chartApiRef.current = chart;
 
@@ -713,7 +716,7 @@ export function CoinChart({
             }
             try { chart.remove(); } catch {}
         };
-    }, [sym, interval, historyLimit, isLight]);
+    }, [sym, interval, historyLimit, isLight, locale]);
 
     useEffect(() => {
         const chart = chartApiRef.current;
@@ -1026,7 +1029,7 @@ export function CoinChart({
                                     }}
                                     className={`px-1.5 py-0.5 text-[10px] 2xl:text-xs rounded-md transition-all cursor-pointer ${interval === opt.value ? "bg-amber-500/20 text-amber-300 font-medium" : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/50"}`}
                                 >
-                                    {opt.label}
+                                    {locale === "en" ? opt.labelEn : opt.label}
                                 </button>
                             ))}
                         </div>
@@ -1062,7 +1065,7 @@ export function CoinChart({
                                 </button>
                                 {drawnHLines.length > 0 && (
                                     <button
-                                        title="전체 삭제"
+                                        title={locale === "en" ? "Clear all" : "전체 삭제"}
                                         onClick={clearAllDrawings}
                                         className="p-1 rounded-md transition-all cursor-pointer text-neutral-600 hover:text-red-400 hover:bg-red-500/10"
                                     >
@@ -1082,7 +1085,7 @@ export function CoinChart({
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
-                                지표
+                                {locale === "en" ? "Indicators" : "지표"}
                                 {activeIndicators.filter((i) => i.enabled).length > 0 && (
                                     <span className="bg-amber-500 text-neutral-900 text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                                         {activeIndicators.filter((i) => i.enabled).length}
@@ -1100,7 +1103,7 @@ export function CoinChart({
                                         className="absolute top-[calc(100%+6px)] left-0 z-50 w-64 bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden"
                                     >
                                         <div className="flex items-center justify-between px-3 py-2 border-b border-neutral-800">
-                                            <span className="text-[11px] font-semibold text-neutral-200">기술적 지표</span>
+                                            <span className="text-[11px] font-semibold text-neutral-200">{locale === "en" ? "Technical Indicators" : "기술적 지표"}</span>
                                             <button onClick={() => { setIndicatorPanelOpen(false); setAddForm(null); }} className="text-neutral-500 hover:text-neutral-300 transition-colors cursor-pointer">
                                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1111,7 +1114,7 @@ export function CoinChart({
                                         <div className="py-1 max-h-[200px] overflow-y-auto">
                                             {activeIndicators.length === 0 && !addForm && (
                                                 <div className="px-3 py-4 text-center text-[11px] text-neutral-500">
-                                                    추가된 지표가 없습니다
+                                                    {locale === "en" ? "No indicators added" : "추가된 지표가 없습니다"}
                                                 </div>
                                             )}
                                             {activeIndicators.map((ind) => (
@@ -1139,15 +1142,15 @@ export function CoinChart({
                                         {addForm ? (
                                             <div className="border-t border-neutral-800 px-3 py-2.5 space-y-2">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">종류</span>
+                                                    <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">{locale === "en" ? "Type" : "종류"}</span>
                                                     <select
                                                         value={addForm.type}
                                                         onChange={(e) => setAddForm(defaultAddForm(e.target.value as IndicatorType))}
                                                         className="flex-1 bg-neutral-800 border border-neutral-700 rounded-md px-2 py-1 text-[11px] text-neutral-200 cursor-pointer outline-none"
                                                     >
-                                                        <option value="MA">MA (이동평균)</option>
-                                                        <option value="EMA">EMA (지수이동평균)</option>
-                                                        <option value="BB">BB (볼린저밴드)</option>
+                                                        <option value="MA">{locale === "en" ? "MA (Moving Average)" : "MA (이동평균)"}</option>
+                                                        <option value="EMA">{locale === "en" ? "EMA (Exp. Moving Avg)" : "EMA (지수이동평균)"}</option>
+                                                        <option value="BB">{locale === "en" ? "BB (Bollinger Bands)" : "BB (볼린저밴드)"}</option>
                                                         <option value="RSI">RSI</option>
                                                         <option value="MACD">MACD</option>
                                                     </select>
@@ -1155,7 +1158,7 @@ export function CoinChart({
 
                                                 {addForm.type !== "MACD" && (
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">기간</span>
+                                                        <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">{locale === "en" ? "Period" : "기간"}</span>
                                                         <input
                                                             type="number"
                                                             min={2} max={500}
@@ -1168,7 +1171,7 @@ export function CoinChart({
 
                                                 {addForm.type === "BB" && (
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">표준편차</span>
+                                                        <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">{locale === "en" ? "Std Dev" : "표준편차"}</span>
                                                         <input
                                                             type="number"
                                                             min={0.5} max={5} step={0.5}
@@ -1203,7 +1206,7 @@ export function CoinChart({
                                                 )}
 
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">색상</span>
+                                                    <span className="text-[10px] text-neutral-500 w-12 flex-shrink-0">{locale === "en" ? "Color" : "색상"}</span>
                                                     <div className="flex items-center gap-2">
                                                         <input
                                                             type="color"
@@ -1220,13 +1223,13 @@ export function CoinChart({
                                                         onClick={addIndicator}
                                                         className="flex-1 py-1.5 text-[11px] font-medium bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 transition-colors cursor-pointer"
                                                     >
-                                                        추가
+                                                        {locale === "en" ? "Add" : "추가"}
                                                     </button>
                                                     <button
                                                         onClick={() => setAddForm(null)}
                                                         className="flex-1 py-1.5 text-[11px] text-neutral-400 border border-neutral-700 rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
                                                     >
-                                                        취소
+                                                        {locale === "en" ? "Cancel" : "취소"}
                                                     </button>
                                                 </div>
                                             </div>
@@ -1239,7 +1242,7 @@ export function CoinChart({
                                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                                     </svg>
-                                                    지표 추가
+                                                    {locale === "en" ? "Add Indicator" : "지표 추가"}
                                                 </button>
                                             </div>
                                         )}
@@ -1257,7 +1260,7 @@ export function CoinChart({
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
-                            변경
+                            {locale === "en" ? "Change" : "변경"}
                         </button>
                     )}
                 </div>
@@ -1271,12 +1274,23 @@ export function CoinChart({
                             transition={{ duration: 0.18 }}
                             className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] z-50 w-[295px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg pointer-events-none"
                         >
-                            <div className="font-semibold text-amber-300 mb-1">차트 사용 안내</div>
+                            <div className="font-semibold text-amber-300 mb-1">{locale === "en" ? "Chart Guide" : "차트 사용 안내"}</div>
                             <p className="leading-snug whitespace-nowrap">
-                                • 좌측 상단에서 <b>인터벌</b>을 선택하세요.
-                                <br />• <b>지표</b> 버튼으로 기술적 지표를 추가하세요.
-                                <br />• 우측 하단 <b>변경</b> 버튼으로 코인을 바꿀 수 있습니다.
-                                <br />• 차트를 <b>드래그</b>해서 과거 데이터를 확인하세요.
+                                {locale === "en" ? (
+                                    <>
+                                        • Select an <b>interval</b> in the top-left.<br />
+                                        • Use the <b>Indicators</b> button to add overlays.<br />
+                                        • Click <b>Change</b> (bottom-right) to switch coins.<br />
+                                        • <b>Drag</b> the chart to view historical data.
+                                    </>
+                                ) : (
+                                    <>
+                                        • 좌측 상단에서 <b>인터벌</b>을 선택하세요.
+                                        <br />• <b>지표</b> 버튼으로 기술적 지표를 추가하세요.
+                                        <br />• 우측 하단 <b>변경</b> 버튼으로 코인을 바꿀 수 있습니다.
+                                        <br />• 차트를 <b>드래그</b>해서 과거 데이터를 확인하세요.
+                                    </>
+                                )}
                             </p>
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />

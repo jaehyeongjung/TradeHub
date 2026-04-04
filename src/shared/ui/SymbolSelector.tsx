@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 function getCoinLogoUrl(symbol: string) {
     const base = symbol.toUpperCase().replace(/USDT$/, "").toLowerCase();
@@ -37,6 +38,8 @@ export function SymbolSelector({
     const buttonRef = useRef<HTMLButtonElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const pathname = usePathname();
+    const isEn = pathname.startsWith("/en/");
 
     const openDropdown = () => {
         if (!buttonRef.current) return;
@@ -112,7 +115,7 @@ export function SymbolSelector({
                         ref={inputRef}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="코인 검색 (예: BTC, ETH)"
+                        placeholder={isEn ? "Search coin (e.g. BTC, ETH)" : "코인 검색 (예: BTC, ETH)"}
                         className={`flex-1 bg-transparent text-[12px] outline-none placeholder-neutral-600 ${isLight ? "text-neutral-800" : "text-neutral-200"}`}
                     />
                     {query && (
@@ -127,7 +130,7 @@ export function SymbolSelector({
 
             <div className="max-h-[340px] overflow-y-auto py-1.5 scrollbar-hide">
                 {filtered.length === 0 ? (
-                    <div className="text-center text-[11px] text-neutral-600 py-8">검색 결과가 없습니다</div>
+                    <div className="text-center text-[11px] text-neutral-600 py-8">{isEn ? "No results found" : "검색 결과가 없습니다"}</div>
                 ) : (
                     filtered.map((sym) => {
                         const base = sym.replace("USDT", "");

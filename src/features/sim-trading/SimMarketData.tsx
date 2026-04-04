@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useAtomValue } from "jotai";
+import { usePathname } from "next/navigation";
 import { simSymbolAtom, simPricesAtom, activePageAtom } from "@/shared/store/atoms";
 
 interface FundingInfo {
@@ -32,6 +33,8 @@ export function SimMarketData() {
     const activePage = useAtomValue(activePageAtom);
     const prices = useAtomValue(simPricesAtom);
     const currentPrice = prices[simSymbol] ?? 0;
+    const pathname = usePathname();
+    const isEn = pathname.startsWith("/en/");
 
     const [funding, setFunding] = useState<FundingInfo | null>(null);
     const [ticker, setTicker] = useState<TickerInfo | null>(null);
@@ -131,27 +134,27 @@ export function SimMarketData() {
         <div className="flex flex-1 items-center min-w-0">
             <div className="w-px h-6 bg-gradient-to-b from-transparent via-zinc-600/70 to-transparent flex-shrink-0 mx-3" />
 
-            <Item label="24h 변동">
+            <Item label={isEn ? "24h Change" : "24h 변동"}>
                 <span className={`text-[12.5px] font-bold font-mono tabular-nums ${isPosPct ? "text-emerald-400" : "text-red-400"}`}>
                     {ticker ? `${isPosPct ? "+" : ""}${pct.toFixed(2)}%` : "—"}
                 </span>
             </Item>
 
-            <Item label="24h 고가">
+            <Item label={isEn ? "24h High" : "24h 고가"}>
                 {val(ticker ? ticker.high.toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—")}
             </Item>
 
-            <Item label="24h 저가">
+            <Item label={isEn ? "24h Low" : "24h 저가"}>
                 {val(ticker ? ticker.low.toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—")}
             </Item>
 
-            <Item label="24h 거래대금">
+            <Item label={isEn ? "24h Volume" : "24h 거래대금"}>
                 {val(ticker ? formatVolume(ticker.quoteVolume) : "—")}
             </Item>
 
             <Item label={
                 <span className="flex items-center gap-1">
-                    펀딩비
+                    {isEn ? "Funding" : "펀딩비"}
                     {countdown && <span className="text-[9px] text-neutral-700 font-mono">{countdown}</span>}
                 </span>
             }>
@@ -160,11 +163,11 @@ export function SimMarketData() {
                 </span>
             </Item>
 
-            <Item label="미결제약정">
+            <Item label={isEn ? "Open Interest" : "미결제약정"}>
                 {val(oi ? formatVolume(oi.openInterest * currentPrice) : "—")}
             </Item>
 
-            <Item label="롱/숏 비율">
+            <Item label={isEn ? "Long/Short" : "롱/숏 비율"}>
                 <div className="flex items-center gap-1.5">
                     <span className="text-[11.5px] font-mono font-semibold text-emerald-400">{longPct}%</span>
                     <div className="flex gap-[2px] h-1.5 w-16 items-center">

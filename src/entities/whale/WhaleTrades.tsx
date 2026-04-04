@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtomValue } from "jotai";
+import { usePathname } from "next/navigation";
 import { treemapOpenAtom } from "@/shared/store/atoms";
 import { fmtUsdCompact, fmtRelativeTime } from "@/shared/lib/formatting";
 
@@ -44,6 +45,8 @@ export function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
     const wsRef = useRef<WebSocket | null>(null);
     const reconnectTimerRef = useRef<number | null>(null);
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
+    const pathname = usePathname();
+    const isEn = pathname.startsWith("/en/");
 
     useEffect(() => { setMounted(true); }, []);
 
@@ -123,7 +126,7 @@ export function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                 <div className="flex items-center justify-between mb-2 flex-shrink-0">
                     <div className="flex items-center gap-2">
                         <span className="text-[11px] 2xl:text-xs font-medium text-text-tertiary tracking-wide">
-                            고래 거래
+                            {isEn ? "Whale Trades" : "고래 거래"}
                         </span>
                         {isConnected && (
                             <span className="flex items-center gap-1 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-full">
@@ -142,7 +145,7 @@ export function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                         <div className="flex items-center justify-center h-full gap-1.5">
                             <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isConnected ? "bg-emerald-500" : "bg-neutral-600"}`} />
                             <span className="text-[10px] text-neutral-500">
-                                {isConnected ? "수신 대기 중" : "연결 중"}
+                                {isConnected ? (isEn ? "Waiting for data…" : "수신 대기 중") : (isEn ? "Connecting…" : "연결 중")}
                             </span>
                         </div>
                     ) : (
@@ -190,12 +193,19 @@ export function WhaleTrades({ fadeDelay = 0 }: { fadeDelay?: number }) {
                         transition={{ duration: 0.18 }}
                         className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[235px] text-[11px] bg-surface-elevated border border-border-default text-text-secondary rounded-xl py-4 px-5 shadow-xl z-50 pointer-events-none"
                     >
-                        <div className="font-semibold text-amber-400 mb-1.5">지표 설명</div>
+                        <div className="font-semibold text-amber-400 mb-1.5">{isEn ? "About" : "지표 설명"}</div>
                         <p className="leading-relaxed">
-                            바이낸스 현물 대규모 체결 데이터입니다.<br /><br />
-                            <span className="text-emerald-400 font-medium">• BUY</span>: 시장가 매수 체결<br />
-                            <span className="text-red-400 font-medium">• SELL</span>: 시장가 매도 체결<br /><br />
-                            고래의 움직임은 시장 방향의 중요한 신호가 될 수 있습니다.
+                            {isEn ? (
+                                <>Binance spot large-fill data ($50K+).<br /><br />
+                                <span className="text-emerald-400 font-medium">• BUY</span>: Market buy executed<br />
+                                <span className="text-red-400 font-medium">• SELL</span>: Market sell executed<br /><br />
+                                Whale moves are key signals for market direction.</>
+                            ) : (
+                                <>바이낸스 현물 대규모 체결 데이터입니다.<br /><br />
+                                <span className="text-emerald-400 font-medium">• BUY</span>: 시장가 매수 체결<br />
+                                <span className="text-red-400 font-medium">• SELL</span>: 시장가 매도 체결<br /><br />
+                                고래의 움직임은 시장 방향의 중요한 신호가 될 수 있습니다.</>
+                            )}
                         </p>
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-border-default" />
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-surface-elevated" />

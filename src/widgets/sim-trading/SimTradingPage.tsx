@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useAtomValue } from "jotai";
+import { usePathname } from "next/navigation";
 import { simSymbolAtom, simPricesAtom, simChangesAtom } from "@/shared/store/atoms";
 import { useSimPriceStream } from "@/features/sim-trading/useSimPriceStream";
 import { useSimAccount } from "@/features/sim-trading/useSimAccount";
@@ -24,18 +25,26 @@ const CoinChart = dynamic(() => import("@/entities/coin/CoinChart").then(m => ({
 });
 
 
-const TABS = [
+const TABS_KO = [
     { key: "positions", label: "포지션" },
     { key: "orders", label: "주문" },
     { key: "history", label: "거래내역" },
     { key: "ranking", label: "랭킹" },
 ] as const;
 
-type TabKey = typeof TABS[number]["key"];
+const TABS_EN = [
+    { key: "positions", label: "Positions" },
+    { key: "orders", label: "Orders" },
+    { key: "history", label: "History" },
+    { key: "ranking", label: "Rankings" },
+] as const;
 
+type TabKey = typeof TABS_KO[number]["key"];
 
 export function SimTradingPage() {
     const isLight = useTheme();
+    const pathname = usePathname();
+    const isEn = pathname.startsWith("/en/");
     const simSymbol = useAtomValue(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);
     const changes = useAtomValue(simChangesAtom);
@@ -128,6 +137,7 @@ export function SimTradingPage() {
                         enableIndicators
                         positions={positions}
                         onUpdateTpSl={updateTpSl}
+                        locale={isEn ? "en" : "ko"}
                     />
                 </div>
                 <div className="w-[280px] flex-shrink-0">
@@ -143,6 +153,7 @@ export function SimTradingPage() {
                         onReset={resetAccount}
                         clickedPrice={clickedPrice}
                         lockedMarginMode={lockedMarginMode}
+                        isEn={isEn}
                     />
                 </div>
             </div>
@@ -153,7 +164,7 @@ export function SimTradingPage() {
                         className="absolute bottom-0 h-[2px] bg-amber-500 rounded-full transition-all duration-200 ease-out"
                         style={{ left: indicatorStyle.left, width: indicatorStyle.width }}
                     />
-                    {TABS.map(({ key, label }) => {
+                    {(isEn ? TABS_EN : TABS_KO).map(({ key, label }) => {
                         const count =
                             key === "positions" ? positions.length :
                             key === "orders" ? orders.length : null;
@@ -184,16 +195,16 @@ export function SimTradingPage() {
 
                 <div className={`p-4 ${contentBg}`}>
                     {bottomTab === "positions" && (
-                        <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} />
+                        <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} isEn={isEn} />
                     )}
                     {bottomTab === "orders" && (
-                        <SimOrders orders={orders} onCancel={cancelOrder} />
+                        <SimOrders orders={orders} onCancel={cancelOrder} isEn={isEn} />
                     )}
                     {bottomTab === "history" && (
-                        <SimTradeHistory trades={trades} />
+                        <SimTradeHistory trades={trades} isEn={isEn} />
                     )}
                     {bottomTab === "ranking" && (
-                        <SimLeaderboard userId={userId} />
+                        <SimLeaderboard userId={userId} isEn={isEn} />
                     )}
                 </div>
             </div>

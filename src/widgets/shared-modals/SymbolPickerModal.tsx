@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
+import { usePathname } from "next/navigation";
 
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -173,6 +174,8 @@ export function SymbolPickerModal({
     const [selected, setSelected] = useState(initialSymbol.toLowerCase());
     const isLight = useTheme();
     const inputRef = useRef<HTMLInputElement>(null);
+    const pathname = usePathname();
+    const isEn = pathname.startsWith("/en/");
 
     useEffect(() => {
         if (open) {
@@ -246,8 +249,8 @@ export function SymbolPickerModal({
                         <div className="flex-shrink-0 px-5 pt-4 pb-4">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <h2 className={`text-[17px] font-bold tracking-tight ${isLight ? "text-neutral-900" : "text-white"}`}>코인 선택</h2>
-                                    <p className="text-[11px] text-neutral-500 mt-0.5">{symbols.length}개 코인 지원</p>
+                                    <h2 className={`text-[17px] font-bold tracking-tight ${isLight ? "text-neutral-900" : "text-white"}`}>{isEn ? "Select Coin" : "코인 선택"}</h2>
+                                    <p className="text-[11px] text-neutral-500 mt-0.5">{isEn ? `${symbols.length} coins available` : `${symbols.length}개 코인 지원`}</p>
                                 </div>
                                 <button
                                     onClick={onClose}
@@ -276,7 +279,7 @@ export function SymbolPickerModal({
                                     type="text"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="코인 이름 또는 심볼 검색"
+                                    placeholder={isEn ? "Search by name or symbol" : "코인 이름 또는 심볼 검색"}
                                     className={`flex-1 bg-transparent text-[13px] outline-none ${isLight ? "text-neutral-900 placeholder-neutral-400" : "text-white placeholder-neutral-600"}`}
                                 />
                                 {search && (
@@ -300,7 +303,7 @@ export function SymbolPickerModal({
                                         <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                         </svg>
-                                        <span className="text-[11px] font-semibold text-amber-400 tracking-wider uppercase">인기</span>
+                                        <span className="text-[11px] font-semibold text-amber-400 tracking-wider uppercase">{isEn ? "Popular" : "인기"}</span>
                                     </div>
                                     <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
                                         {popularFiltered.map((s) => {
@@ -340,8 +343,8 @@ export function SymbolPickerModal({
                                         <svg className="w-3 h-3 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                                         </svg>
-                                        <span className="text-[11px] font-semibold text-neutral-500 tracking-wider uppercase">전체</span>
-                                        <span className={`text-[10px] font-mono ${isLight ? "text-neutral-400" : "text-neutral-700"}`}>{otherSymbols.length}개</span>
+                                        <span className="text-[11px] font-semibold text-neutral-500 tracking-wider uppercase">{isEn ? "All" : "전체"}</span>
+                                        <span className={`text-[10px] font-mono ${isLight ? "text-neutral-400" : "text-neutral-700"}`}>{isEn ? otherSymbols.length : `${otherSymbols.length}개`}</span>
                                     </div>
                                 )}
 
@@ -353,8 +356,8 @@ export function SymbolPickerModal({
                                             </svg>
                                         </div>
                                         <div className="text-center">
-                                            <p className={`text-[14px] font-semibold ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>결과 없음</p>
-                                            <p className="text-[12px] text-neutral-400 mt-1">다른 검색어를 입력해보세요</p>
+                                            <p className={`text-[14px] font-semibold ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>{isEn ? "No results" : "결과 없음"}</p>
+                                            <p className="text-[12px] text-neutral-400 mt-1">{isEn ? "Try a different search term" : "다른 검색어를 입력해보세요"}</p>
                                         </div>
                                     </div>
                                 ) : (
@@ -425,7 +428,7 @@ export function SymbolPickerModal({
                                         unoptimized
                                     />
                                 </div>
-                                <span className="text-[12px] text-neutral-500">현재 선택</span>
+                                <span className="text-[12px] text-neutral-500">{isEn ? "Selected" : "현재 선택"}</span>
                                 <span className="text-[12px] font-semibold text-amber-500">
                                     {selected.replace("usdt", "").toUpperCase()}
                                 </span>

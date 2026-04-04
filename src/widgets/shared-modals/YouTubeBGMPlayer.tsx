@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
+import { usePathname } from "next/navigation";
 
 interface YTPlayer {
     playVideo: () => void;
@@ -50,6 +51,8 @@ export function YouTubeBGMPlayer({
     const [isReady, setIsReady] = useState(false);
     const isLight = useTheme();
     const playerRef = useRef<YTPlayer | null>(null);
+    const pathname = usePathname();
+    const isEn = pathname.startsWith("/en/");
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -159,7 +162,7 @@ export function YouTubeBGMPlayer({
                         ? isLight ? "text-neutral-400" : "text-neutral-500"
                         : "text-emerald-500"
                     }`}>
-                        {isMuted ? "클릭하여 켜기" : "재생 중 · 클릭하여 끄기"}
+                        {isMuted ? (isEn ? "Click to play" : "클릭하여 켜기") : (isEn ? "Playing · Click to stop" : "재생 중 · 클릭하여 끄기")}
                     </p>
                 </div>
 

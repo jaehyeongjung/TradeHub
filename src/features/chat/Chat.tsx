@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { supabase } from "@/shared/lib/supabase-browser";
 import type { PostgrestSingleResponse } from "@supabase/supabase-js";
@@ -85,6 +86,8 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
     const [msgs, setMsgs] = useState<Msg[]>([]);
     const [initialLoading, setInitialLoading] = useState(true);
     const isLight = useTheme();
+    const pathname = usePathname();
+    const isEn = pathname.startsWith("/en/");
     const inputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
     const userIdRef = useRef<string | null>(null);
@@ -372,9 +375,9 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
             <div className={`mb-2 rounded-2xl border p-3 2xl:p-4 ${headerBg}`}>
                 <div className="flex items-center justify-between mb-2.5">
                     <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-medium ${labelColor}`}>포지션</span>
+                        <span className={`text-[10px] font-medium ${labelColor}`}>{isEn ? "Position" : "포지션"}</span>
                         {loadingChoice && userId ? (
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${pillBg}`}>로딩 중</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${pillBg}`}>{isEn ? "Loading…" : "로딩 중"}</span>
                         ) : myChoice ? (
                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
                                 myChoice === "long"
@@ -390,11 +393,11 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                                 </button>
                             </span>
                         ) : (
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${pillBg}`}>미참여</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${pillBg}`}>{isEn ? "Not voted" : "미참여"}</span>
                         )}
                     </div>
                     <span className={`text-[9px] 2xl:text-[10px] ${labelColor}`}>
-                        총 {ratio.total}명 참여
+                        {isEn ? `${ratio.total} participants` : `총 ${ratio.total}명 참여`}
                     </span>
                 </div>
 
@@ -483,7 +486,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                                                 <span className="w-[14px] shrink-0" />
                                             )}
                                             <span className={`text-[11px] font-semibold shrink-0 ${nameColor}`}>
-                                                {isMe ? "나" : m.user_id.slice(0, 6)}
+                                                {isMe ? (isEn ? "Me" : "나") : m.user_id.slice(0, 6)}
                                             </span>
                                             <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-300" : "text-text-muted"}`}>·</span>
                                             <span className={`text-[12px] whitespace-pre-wrap break-anywhere flex-1 ${contentColor}`}>
@@ -561,7 +564,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                     ) : (
                         <div className="absolute inset-0 flex items-center justify-center">
                             <p className={`text-[11px] text-center px-4 leading-relaxed ${emptyTextColor}`}>
-                                아직 메시지가 없어요.<br />오늘의 첫 포지션을 잡고 이야기해보세요!
+                                {isEn ? <>No messages yet.<br />Take a position and start the conversation!</> : <>아직 메시지가 없어요.<br />오늘의 첫 포지션을 잡고 이야기해보세요!</>}
                             </p>
                         </div>
                     )}
@@ -580,7 +583,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                             </svg>
-                            {unreadCount > 0 ? `새 메시지 ${unreadCount}개` : "최신으로"}
+                            {unreadCount > 0 ? (isEn ? `${unreadCount} new` : `새 메시지 ${unreadCount}개`) : (isEn ? "Latest" : "최신으로")}
                         </motion.button>
                     )}
                 </AnimatePresence>
@@ -594,7 +597,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                         onCompositionEnd={() => (composingRef.current = false)}
                         onKeyDown={onKeyDown}
                         className={`flex-1 border px-3 py-2 rounded-xl text-[12px] focus:outline-none transition-colors ${inputBg}`}
-                        placeholder="익명으로도 채팅 가능"
+                        placeholder={isEn ? "Chat anonymously" : "익명으로도 채팅 가능"}
                         maxLength={2000}
                         disabled={!userId}
                     />
@@ -610,7 +613,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                         }`}
                         disabled={!userId}
                     >
-                        전송
+                        {isEn ? "Send" : "전송"}
                     </motion.button>
                 </div>
             </div>

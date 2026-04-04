@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useAtom, useSetAtom } from "jotai";
 import { treemapOpenAtom, loginDrawerOpenAtom } from "@/shared/store/atoms";
+import { FlagKR, FlagUS } from "@/shared/ui/FlagIcons";
 
 function HeaderNavInner() {
     const pathname = usePathname();
@@ -35,7 +36,7 @@ function HeaderNavInner() {
         setTimeout(() => document.getElementById("__theme-transition__")?.remove(), 400);
     };
 
-    if (pathname === "/" || pathname.startsWith("/mobile")) return null;
+    if (pathname === "/" || pathname === "/en" || pathname.startsWith("/mobile")) return null;
 
     const isEn = pathname.startsWith("/en/");
 
@@ -50,7 +51,7 @@ function HeaderNavInner() {
 
     return (
         <header suppressHydrationWarning className="fixed top-0 left-0 right-0 z-50 h-12 w-full bg-[var(--surface-card)] border-b border-[var(--border-subtle)] flex items-center px-4">
-            <Link href="/dashboard" className="flex items-center gap-1.5 mr-6 flex-shrink-0">
+            <Link href={isEn ? "/en/dashboard" : "/dashboard"} className="flex items-center gap-1.5 mr-6 flex-shrink-0">
                 <span className="font-black tracking-[-0.08em] text-sm text-text-primary select-none">TRADEHUB</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" aria-hidden="true" />
             </Link>
@@ -82,11 +83,14 @@ function HeaderNavInner() {
                 </Link>
             </nav>
 
-            <a
+            <div className="ml-auto flex items-center gap-2 flex-shrink-0">
+                <LangSwitcher pathname={pathname} isEn={isEn} />
+
+                <a
                 href="https://www.bybit.com/invite?ref=ADYNPO"
                 target="_blank"
                 rel="noopener noreferrer sponsored"
-                className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-90 active:scale-[0.97] cursor-pointer flex-shrink-0"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-90 active:scale-[0.97] cursor-pointer flex-shrink-0"
                 style={{ background: "linear-gradient(90deg, #f7a600 0%, #e09500 100%)", color: "#000" }}
                 aria-label="Bybit partner link"
             >
@@ -99,6 +103,8 @@ function HeaderNavInner() {
                 <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Join Bybit — Get $20" : "Bybit 가입 시 $20 지급"}</span>
                 <span className="sm:hidden">Bybit $20</span>
             </a>
+
+            </div>
 
             <div className="flex items-center gap-1 ml-3">
                 <button type="button" onClick={() => setTreemapOpen(true)} aria-label={isEn ? "Open Heatmap" : "트리맵 보기"} className={iconBtnClass}>
@@ -137,5 +143,22 @@ export function HeaderNav() {
         <Suspense fallback={null}>
             <HeaderNavInner />
         </Suspense>
+    );
+}
+
+function LangSwitcher({ pathname, isEn }: { pathname: string; isEn: boolean }) {
+    const targetPath = isEn
+        ? pathname === "/en" ? "/" : pathname.replace(/^\/en/, "")
+        : pathname === "/" ? "/en" : "/en" + pathname;
+
+    return (
+        <Link
+            href={targetPath}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-[var(--border-subtle)] hover:border-[var(--border-default)] transition-all hover:scale-105 active:scale-95"
+            aria-label={isEn ? "한국어로 전환" : "Switch to English"}
+            title={isEn ? "한국어" : "English"}
+        >
+            {isEn ? <FlagKR size={20} /> : <FlagUS size={20} />}
+        </Link>
     );
 }

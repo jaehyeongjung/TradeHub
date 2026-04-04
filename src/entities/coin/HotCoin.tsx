@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAtomValue } from "jotai";
 import { treemapOpenAtom } from "@/shared/store/atoms";
@@ -47,6 +48,8 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
     const [showTooltip, setShowTooltip] = useState(false);
     const [showListTooltip, setShowListTooltip] = useState(false);
     const isLight = useTheme();
+    const pathname = usePathname();
+    const isEn = pathname.startsWith("/en/");
     const timerRef = useRef<number | null>(null);
     const listTooltipRef = useRef<HTMLDivElement>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -143,8 +146,8 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
                             transition={{ duration: 0.2 }}
                             className={`absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[200px] text-[11px] rounded-xl px-4 py-3 z-[100] border pointer-events-none ${tooltipBg}`}
                         >
-                            <div className={`font-semibold mb-1 ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>기준 설명</div>
-                            <p className="leading-relaxed text-[10px]">24h 거래대금(USDT) + 등락률 가중 점수</p>
+                            <div className={`font-semibold mb-1 ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>{isEn ? "About" : "기준 설명"}</div>
+                            <p className="leading-relaxed text-[10px]">{isEn ? "24h volume (USDT) + price change weighted score" : "24h 거래대금(USDT) + 등락률 가중 점수"}</p>
                             <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent ${arrowBorder}`} />
                             <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent ${arrowFill}`} />
                         </motion.div>
@@ -202,13 +205,13 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
                                     <span className={`font-bold text-xs tracking-wide ${isLight ? "text-neutral-700" : "text-text-primary"}`}>HOT</span>
                                     <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${isLight ? "bg-neutral-100 text-neutral-500" : "bg-surface-input text-text-muted"}`}>TOP 15</span>
                                 </div>
-                                <span className={`text-[9px] ${colLabelColor}`}>30초 갱신</span>
+                                <span className={`text-[9px] ${colLabelColor}`}>{isEn ? "30s refresh" : "30초 갱신"}</span>
                             </div>
 
                             <div className={`flex items-center px-4 py-2 border-b ${dividerColor}`}>
                                 <span className={`text-[9px] font-medium w-5 mr-3 shrink-0 text-right ${colLabelColor}`}>#</span>
-                                <span className={`text-[9px] font-medium flex-1 ${colLabelColor}`}>코인</span>
-                                <span className={`text-[9px] font-medium w-20 text-right ${colLabelColor}`}>가격</span>
+                                <span className={`text-[9px] font-medium flex-1 ${colLabelColor}`}>{isEn ? "Coin" : "코인"}</span>
+                                <span className={`text-[9px] font-medium w-20 text-right ${colLabelColor}`}>{isEn ? "Price" : "가격"}</span>
                                 <span className={`text-[9px] font-medium w-16 text-right ${colLabelColor}`}>24h</span>
                             </div>
 

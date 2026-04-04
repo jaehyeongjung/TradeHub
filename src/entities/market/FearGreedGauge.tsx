@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { SlotNumber } from "@/shared/ui/AnimatedNumber";
 
@@ -15,7 +16,7 @@ type Props = {
 
 export function FearGreedGauge({
     value,
-    title = "공포 & 탐욕 지수",
+    title,
     subLabel,
     isLoading = false,
     fadeDelay = 0,
@@ -23,6 +24,8 @@ export function FearGreedGauge({
     const v = Math.max(0, Math.min(100, value));
     const [isHovered, setIsHovered] = useState(false);
     const isLight = useTheme();
+    const pathname = usePathname();
+    const isEn = pathname.startsWith("/en/");
     const [slotValue, setSlotValue] = useState(0);
 
     useEffect(() => {
@@ -30,14 +33,15 @@ export function FearGreedGauge({
     }, [isLoading, v]);
 
     const getStateInfo = (val: number) => {
-        if (val < 25) return { text: "극도의 공포", color: "text-red-400", barColor: "bg-red-500", bgLight: isLight ? "bg-red-50 text-red-600" : "bg-red-500/10 text-red-400" };
-        if (val < 45) return { text: "공포", color: "text-orange-400", barColor: "bg-orange-500", bgLight: isLight ? "bg-orange-50 text-orange-600" : "bg-orange-500/10 text-orange-400" };
-        if (val < 55) return { text: "중립", color: "text-yellow-400", barColor: "bg-yellow-500", bgLight: isLight ? "bg-yellow-50 text-yellow-600" : "bg-yellow-500/10 text-yellow-400" };
-        if (val < 75) return { text: "탐욕", color: "text-lime-400", barColor: "bg-lime-500", bgLight: isLight ? "bg-lime-50 text-lime-600" : "bg-lime-500/10 text-lime-400" };
-        return { text: "극도의 탐욕", color: "text-emerald-400", barColor: "bg-emerald-500", bgLight: isLight ? "bg-emerald-50 text-emerald-600" : "bg-emerald-500/10 text-emerald-400" };
+        if (val < 25) return { text: isEn ? "Extreme Fear" : "극도의 공포", color: "text-red-400", barColor: "bg-red-500", bgLight: isLight ? "bg-red-50 text-red-600" : "bg-red-500/10 text-red-400" };
+        if (val < 45) return { text: isEn ? "Fear" : "공포", color: "text-orange-400", barColor: "bg-orange-500", bgLight: isLight ? "bg-orange-50 text-orange-600" : "bg-orange-500/10 text-orange-400" };
+        if (val < 55) return { text: isEn ? "Neutral" : "중립", color: "text-yellow-400", barColor: "bg-yellow-500", bgLight: isLight ? "bg-yellow-50 text-yellow-600" : "bg-yellow-500/10 text-yellow-400" };
+        if (val < 75) return { text: isEn ? "Greed" : "탐욕", color: "text-lime-400", barColor: "bg-lime-500", bgLight: isLight ? "bg-lime-50 text-lime-600" : "bg-lime-500/10 text-lime-400" };
+        return { text: isEn ? "Extreme Greed" : "극도의 탐욕", color: "text-emerald-400", barColor: "bg-emerald-500", bgLight: isLight ? "bg-emerald-50 text-emerald-600" : "bg-emerald-500/10 text-emerald-400" };
     };
 
     const state = getStateInfo(v);
+    const resolvedTitle = title ?? (isEn ? "Fear & Greed Index" : "공포 & 탐욕 지수");
     const displayLabel = subLabel ?? state.text;
 
     const cardClass = isLight
@@ -53,8 +57,8 @@ export function FearGreedGauge({
     const trackClass = isLight ? "bg-neutral-200" : "bg-surface-input";
     const edgeLabelClass = isLight ? "text-[10px] 2xl:text-xs text-neutral-400" : "text-[10px] 2xl:text-xs text-text-muted";
     const tooltipClass = isLight
-        ? "absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-[240px] text-[11px] bg-white border border-neutral-200 text-neutral-600 rounded-xl py-3 px-4 shadow-lg z-50 pointer-events-none"
-        : "absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] w-[240px] text-[11px] bg-surface-elevated border border-border-default text-text-secondary rounded-xl py-3 px-4 shadow-xl z-50 pointer-events-none";
+        ? "absolute left-1/2 -translate-x-1/2 bottom-[calc(100%+12px)] w-[240px] text-[11px] bg-white border border-neutral-200 text-neutral-600 rounded-xl py-3 px-4 shadow-lg z-50 pointer-events-none"
+        : "absolute left-1/2 -translate-x-1/2 bottom-[calc(100%+12px)] w-[240px] text-[11px] bg-surface-elevated border border-border-default text-text-secondary rounded-xl py-3 px-4 shadow-xl z-50 pointer-events-none";
 
     return (
         <div
@@ -67,7 +71,7 @@ export function FearGreedGauge({
                 style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
             >
                 <div className="flex items-center justify-between mb-2 2xl:mb-4">
-                    <h3 className={headerLabelClass}>{title}</h3>
+                    <h3 className={headerLabelClass}>{resolvedTitle}</h3>
                     <div className={`px-2 py-0.5 rounded-full text-[10px] 2xl:text-xs font-medium ${state.bgLight}`}>
                         {displayLabel}
                     </div>
@@ -102,8 +106,8 @@ export function FearGreedGauge({
                     </div>
 
                     <div className={`flex justify-between ${edgeLabelClass}`}>
-                        <span>공포</span>
-                        <span>탐욕</span>
+                        <span>{isEn ? "Fear" : "공포"}</span>
+                        <span>{isEn ? "Greed" : "탐욕"}</span>
                     </div>
                 </div>
             </div>
@@ -111,17 +115,19 @@ export function FearGreedGauge({
             <AnimatePresence>
                 {isHovered && (
                     <motion.div
-                        initial={{ opacity: 0, y: 6 }}
+                        initial={{ opacity: 0, y: -6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 6 }}
+                        exit={{ opacity: 0, y: -6 }}
                         transition={{ duration: 0.18 }}
                         className={tooltipClass}
                     >
                         <p className="leading-relaxed">
-                            가격 변동성, 거래량, 소셜 트렌드 등을 종합해 시장 심리를 0~100으로 표현합니다.
+                            {isEn
+                                ? "A composite score (0–100) based on price volatility, volume, and social trends to measure market sentiment."
+                                : "가격 변동성, 거래량, 소셜 트렌드 등을 종합해 시장 심리를 0~100으로 표현합니다."}
                         </p>
-                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[6px] w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent ${isLight ? "border-b-neutral-200" : "border-b-border-default"}`} />
-                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[4px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[5px] border-transparent ${isLight ? "border-b-white" : "border-b-surface-elevated"}`} />
+                        <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[6px] w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent ${isLight ? "border-t-neutral-200" : "border-t-border-default"}`} />
+                        <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[4px] w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-transparent ${isLight ? "border-t-white" : "border-t-surface-elevated"}`} />
                     </motion.div>
                 )}
             </AnimatePresence>

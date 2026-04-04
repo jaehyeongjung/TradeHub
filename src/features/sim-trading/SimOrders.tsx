@@ -5,9 +5,10 @@ import type { SimOrder } from "@/shared/types/sim-trading.types";
 interface Props {
     orders: SimOrder[];
     onCancel: (orderId: string) => Promise<void>;
+    isEn?: boolean;
 }
 
-export function SimOrders({ orders, onCancel }: Props) {
+export function SimOrders({ orders, onCancel, isEn = false }: Props) {
     if (orders.length === 0) {
         return (
             <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5">
@@ -15,7 +16,7 @@ export function SimOrders({ orders, onCancel }: Props) {
                     Open Orders
                 </h3>
                 <div className="text-[11px] text-neutral-600 text-center py-6">
-                    미체결 주문이 없습니다
+                    {isEn ? "No open orders" : "미체결 주문이 없습니다"}
                 </div>
             </div>
         );
@@ -33,11 +34,11 @@ export function SimOrders({ orders, onCancel }: Props) {
             </div>
 
             <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-2 px-5 py-2 text-[10px] text-neutral-500 border-b border-zinc-800/40">
-                <div>심볼</div>
-                <div className="text-right">주문 유형</div>
-                <div className="text-right">주문가</div>
-                <div className="text-right">수량</div>
-                <div className="text-right">규모</div>
+                <div>{isEn ? "Symbol" : "심볼"}</div>
+                <div className="text-right">{isEn ? "Type" : "주문 유형"}</div>
+                <div className="text-right">{isEn ? "Price" : "주문가"}</div>
+                <div className="text-right">{isEn ? "Qty" : "수량"}</div>
+                <div className="text-right">{isEn ? "Notional" : "규모"}</div>
                 <div className="text-right w-[52px]"></div>
             </div>
 
@@ -81,7 +82,7 @@ export function SimOrders({ orders, onCancel }: Props) {
 
                             <div className="text-right">
                                 <span className="text-[11px] px-2 py-0.5 rounded bg-neutral-800 text-neutral-400 font-medium">
-                                    {ord.order_type === "LIMIT" ? "지정가" : "스탑"}
+                                    {ord.order_type === "LIMIT" ? (isEn ? "Limit" : "지정가") : (isEn ? "Stop" : "스탑")}
                                 </span>
                             </div>
 
@@ -108,7 +109,7 @@ export function SimOrders({ orders, onCancel }: Props) {
                                     onClick={() => onCancel(ord.id)}
                                     className="text-[10px] px-3 py-1.5 bg-neutral-800 hover:bg-red-500/20 text-neutral-400 hover:text-red-400 rounded-lg border border-neutral-700/50 transition-all cursor-pointer"
                                 >
-                                    취소
+                                    {isEn ? "Cancel" : "취소"}
                                 </button>
                             </div>
                         </div>
