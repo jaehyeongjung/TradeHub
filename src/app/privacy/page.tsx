@@ -29,7 +29,7 @@ export default function PrivacyPage() {
                 <section>
                     <h2 className="text-lg font-bold text-white mb-3">1. 개요</h2>
                     <p>
-                        TradeHub(이하 "서비스")는 이용자의 개인정보를 소중히 여기며, 관련 법령을 준수합니다.
+                        TradeHub(이하 &ldquo;서비스&rdquo;)는 이용자의 개인정보를 소중히 여기며, 관련 법령을 준수합니다.
                         본 방침은 서비스가 수집하는 정보의 종류, 이용 목적, 보관 기간 및 제3자 제공에 관한 사항을 안내합니다.
                     </p>
                 </section>

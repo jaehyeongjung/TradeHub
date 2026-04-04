@@ -35,7 +35,7 @@ export default function TermsPageEN() {
                 <section>
                     <h2 className="text-lg font-bold text-white mb-3">1. Purpose</h2>
                     <p>
-                        These Terms govern your access to and use of TradeHub ("Service"), including its
+                        These Terms govern your access to and use of TradeHub (&ldquo;Service&rdquo;), including its
                         cryptocurrency simulated trading and market analysis features.
                         By using the Service you agree to these Terms.
                     </p>

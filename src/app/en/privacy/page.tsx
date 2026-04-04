@@ -35,7 +35,7 @@ export default function PrivacyPageEN() {
                 <section>
                     <h2 className="text-lg font-bold text-white mb-3">1. Overview</h2>
                     <p>
-                        TradeHub ("Service") values your privacy and complies with applicable data protection laws.
+                        TradeHub (&ldquo;Service&rdquo;) values your privacy and complies with applicable data protection laws.
                         This policy explains what information we collect, how we use it, how long we retain it,
                         and when we share it with third parties.
                     </p>
@@ -78,7 +78,7 @@ export default function PrivacyPageEN() {
 
                 <section>
                     <h2 className="text-lg font-bold text-white mb-3">4. Third-Party Services</h2>
-                    <p className="mb-4">TradeHub uses the following third-party services. Each service's own privacy policy applies.</p>
+                    <p className="mb-4">TradeHub uses the following third-party services. Each service&apos;s own privacy policy applies.</p>
                     <div className="space-y-4">
                         {[
                             {
@@ -118,7 +118,7 @@ export default function PrivacyPageEN() {
                     <h2 className="text-lg font-bold text-white mb-3">6. Data Retention</h2>
                     <p>
                         Account information is deleted immediately upon account termination, unless retention is required by applicable law.
-                        Data stored in your browser's local storage can be cleared by you at any time through your browser settings.
+                        Data stored in your browser&apos;s local storage can be cleared by you at any time through your browser settings.
                     </p>
                 </section>
 
