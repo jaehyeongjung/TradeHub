@@ -403,11 +403,15 @@ export function generateSignal(
             ? Math.max(resistance.price + atr * 0.25, entry + atr * 1.5)
             : entry + atr * 1.5;
         stopLoss = Math.min(entry + atr * 3.5, slCandidate);
-        const risk = stopLoss - entry;
+        // tp2 = entry - risk * 3.5 이므로, risk <= entry / 3.5 * 0.9 이어야 tp2 > 0
+        const risk = Math.min(stopLoss - entry, (entry / 3.5) * 0.9);
         tp1 = support
             ? Math.max(support.price * 1.001, entry - risk * 2)
             : entry - risk * 2;
         tp2 = entry - risk * 3.5;
+        // 안전 보정: TP는 반드시 양수이고 entry보다 낮아야 함
+        tp1 = Math.max(entry * 0.001, Math.min(entry * 0.9999, tp1));
+        tp2 = Math.max(entry * 0.001, Math.min(tp1 * 0.9999, tp2));
     } else {
         entry    = price;
         stopLoss = price - atr * 1.5;
