@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import TradingClient from "./TradingClient";
+import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -15,7 +16,13 @@ export const metadata: Metadata = {
         "코인 청산이란", "TP SL 설정 방법", "선물거래 손절 자동",
         "바이낸스 선물 연습", "코인 선물 초보", "무료 모의투자 코인",
     ],
-    alternates: { canonical: "/trading" },
+    alternates: {
+        canonical: "https://www.tradehub.kr/trading",
+        languages: {
+            "ko": "https://www.tradehub.kr/trading",
+            "en": "https://www.tradehub.kr/en/trading",
+        },
+    },
     openGraph: {
         type: "website",
         url: `${SITE}/trading`,
@@ -129,6 +136,7 @@ export default function TradingPage() {
                 {JSON.stringify(BREADCRUMB_JSONLD)}
             </Script>
             <TradingClient />
+            <SeoFooter />
         </>
     );
 }

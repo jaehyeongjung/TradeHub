@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import TradingClient from "@/app/trading/TradingClient";
+import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -34,5 +35,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-    return <TradingClient />;
+    return (
+        <>
+            <TradingClient />
+            <SeoFooter />
+        </>
+    );
 }

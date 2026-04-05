@@ -33,7 +33,14 @@ export const metadata: Metadata = {
         "코인 거래대금 순위 실시간", "비트코인 현재 가격",
         "TradeHub", "코인 대시보드 무료",
     ],
-    alternates: { canonical: "/" },
+    alternates: {
+        canonical: "/",
+        languages: {
+            "ko": "https://www.tradehub.kr",
+            "en": "https://www.tradehub.kr/en",
+            "x-default": "https://www.tradehub.kr",
+        },
+    },
     openGraph: {
         type: "website",
         url: SITE,

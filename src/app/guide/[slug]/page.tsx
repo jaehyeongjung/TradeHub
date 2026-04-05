@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { guides, getGuideBySlug, getAllGuideSlugs } from "@/shared/lib/guides";
 import type { Guide } from "@/shared/lib/guides";
+import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
 
 export function generateStaticParams() {
   return getAllGuideSlugs().map((slug) => ({ slug }));
@@ -21,7 +22,13 @@ export async function generateMetadata({
     title: guide.title,
     description: guide.description,
     keywords: guide.keywords,
-    alternates: { canonical: `/guide/${guide.slug}` },
+    alternates: {
+      canonical: `https://www.tradehub.kr/guide/${guide.slug}`,
+      languages: {
+        "ko": `https://www.tradehub.kr/guide/${guide.slug}`,
+        "en": `https://www.tradehub.kr/en/guide/${guide.slug}`,
+      },
+    },
     openGraph: {
       title: `${guide.title} | TradeHub`,
       description: guide.description,
@@ -232,6 +239,9 @@ export default async function GuidePage({
           </section>
         ))}
       </article>
+
+      {/* AdSense: 아티클 하단, FAQ 상단 — 슬롯 ID는 AdSense 대시보드에서 생성 후 교체 */}
+      <AdSenseUnit slot="7318540125" className="my-10" />
 
       {guide.faqs.length > 0 && (
         <section className="mt-16">

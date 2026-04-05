@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { guidesEn, getGuideBySlugEn } from "@/shared/lib/guides-en";
 import type { Guide } from "@/shared/lib/guides";
 import { getAllGuideSlugs } from "@/shared/lib/guides";
+import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
 
 export function generateStaticParams() {
   return getAllGuideSlugs().map((slug) => ({ slug }));
@@ -22,7 +23,13 @@ export async function generateMetadata({
     title: guide.title,
     description: guide.description,
     keywords: guide.keywords,
-    alternates: { canonical: `/en/guide/${guide.slug}` },
+    alternates: {
+      canonical: `https://www.tradehub.kr/en/guide/${guide.slug}`,
+      languages: {
+        "ko": `https://www.tradehub.kr/guide/${guide.slug}`,
+        "en": `https://www.tradehub.kr/en/guide/${guide.slug}`,
+      },
+    },
     openGraph: {
       title: `${guide.title} | TradeHub`,
       description: guide.description,
@@ -74,7 +81,7 @@ function buildJsonLd(guide: Guide) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/en/dashboard` },
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/en` },
       { "@type": "ListItem", position: 2, name: "Guide", item: `${SITE}/en/guide` },
       { "@type": "ListItem", position: 3, name: guide.title, item: `${SITE}/en/guide/${guide.slug}` },
     ],
@@ -109,7 +116,7 @@ export default async function EnGuidePage({
 
       <nav aria-label="breadcrumb" className="mb-8 text-sm text-zinc-500">
         <ol className="flex items-center gap-1">
-          <li><Link href="/en/dashboard" className="hover:text-zinc-300">Home</Link></li>
+          <li><Link href="/en" className="hover:text-zinc-300">Home</Link></li>
           <li>/</li>
           <li><Link href="/en/guide" className="hover:text-zinc-300">Guide</Link></li>
           <li>/</li>
@@ -183,6 +190,9 @@ export default async function EnGuidePage({
           </section>
         ))}
       </article>
+
+      {/* AdSense: below article, above FAQ — replace slot ID from AdSense dashboard */}
+      <AdSenseUnit slot="7318540125" className="my-10" />
 
       {guide.faqs.length > 0 && (
         <section className="mt-16">

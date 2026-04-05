@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AnalysisPage } from "@/widgets/analysis/AnalysisPage";
+import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 
 export const metadata: Metadata = {
     title: "Crypto Futures Chart Analysis · Stop Loss, Entry Price & Leverage Calculator | TradeHub",
@@ -42,8 +43,11 @@ export const metadata: Metadata = {
 
 export default function Page() {
     return (
-        <main>
-            <AnalysisPage locale="en" />
-        </main>
+        <>
+            <main>
+                <AnalysisPage locale="en" />
+            </main>
+            <SeoFooter />
+        </>
     );
 }

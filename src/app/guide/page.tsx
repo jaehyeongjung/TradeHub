@@ -16,7 +16,13 @@ export const metadata: Metadata = {
     "코인 초보 가이드", "암호화폐 투자 공부", "선물거래 용어",
     "롱 숏 뜻", "격리마진 뜻", "모의투자란",
   ],
-  alternates: { canonical: "/guide" },
+  alternates: {
+    canonical: "https://www.tradehub.kr/guide",
+    languages: {
+      "ko": "https://www.tradehub.kr/guide",
+      "en": "https://www.tradehub.kr/en/guide",
+    },
+  },
   openGraph: {
     title: "코인 투자 가이드 — 선물거래·지표·용어 쉽게 배우기 | TradeHub",
     description:

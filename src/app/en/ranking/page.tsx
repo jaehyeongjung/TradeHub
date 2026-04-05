@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import RankingClient from "@/app/ranking/RankingClient";
 import { fetchRankingData } from "@/shared/lib/fetchRanking";
+import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -37,8 +38,11 @@ export const metadata: Metadata = {
 export default async function Page() {
     const coins = await fetchRankingData();
     return (
-        <main className="pt-12">
-            <RankingClient initialData={coins ?? []} />
-        </main>
+        <>
+            <main className="pt-12">
+                <RankingClient initialData={coins ?? []} />
+            </main>
+            <SeoFooter />
+        </>
     );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AnalysisPage } from "@/widgets/analysis/AnalysisPage";
+import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 
 export const metadata: Metadata = {
     title: "코인 선물 차트 분석 · 손절가·진입가·손익비 자동계산 | TradeHub",
@@ -18,7 +19,13 @@ export const metadata: Metadata = {
         "이더리움 선물 분석",
         "코인 선물거래 분석",
     ],
-    alternates: { canonical: "https://www.tradehub.kr/analysis" },
+    alternates: {
+        canonical: "https://www.tradehub.kr/analysis",
+        languages: {
+            "ko": "https://www.tradehub.kr/analysis",
+            "en": "https://www.tradehub.kr/en/analysis",
+        },
+    },
     openGraph: {
         title: "코인 선물 차트 분석 · 손절가·진입가·손익비 자동계산",
         description: "BTC·ETH 선물거래를 위한 기술적 분석 — 추세선·지지저항선 자동 감지, 레버리지별 손절가·손익비 실시간 계산. 진입 타점을 무료로 확인하세요.",
@@ -36,8 +43,11 @@ export const metadata: Metadata = {
 
 export default function Page() {
     return (
-        <main>
-            <AnalysisPage />
-        </main>
+        <>
+            <main>
+                <AnalysisPage />
+            </main>
+            <SeoFooter />
+        </>
     );
 }

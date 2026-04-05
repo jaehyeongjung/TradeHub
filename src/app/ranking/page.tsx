@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import RankingClient from "./RankingClient";
 import { fetchRankingData } from "@/shared/lib/fetchRanking";
+import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -35,7 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
             "비트코인 현재 가격", "이더리움 현재 가격",
             "코인 시세 실시간", "코인 ATH 얼마나 빠졌나", "코인 불장 수혜주",
         ],
-        alternates: { canonical: "/ranking" },
+        alternates: {
+            canonical: "https://www.tradehub.kr/ranking",
+            languages: {
+                "ko": "https://www.tradehub.kr/ranking",
+                "en": "https://www.tradehub.kr/en/ranking",
+            },
+        },
         openGraph: {
             title,
             description: desc,
@@ -98,6 +105,7 @@ const itemListJsonLd = {
             <main className="pt-12">
                 <RankingClient initialData={coins ?? []} />
             </main>
+            <SeoFooter />
         </>
     );
 }

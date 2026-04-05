@@ -19,7 +19,13 @@ export const metadata: Metadata = {
         "바이낸스 청산 알림", "코인 대시보드 무료", "코인 시장 분석 무료",
         "비트코인 대형 거래 추적", "코인 불장 신호", "실시간 코인 시세 대시보드",
     ],
-    alternates: { canonical: "/dashboard" },
+    alternates: {
+        canonical: "https://www.tradehub.kr/dashboard",
+        languages: {
+            "ko": "https://www.tradehub.kr/dashboard",
+            "en": "https://www.tradehub.kr/en/dashboard",
+        },
+    },
     openGraph: {
         title: "실시간 코인 대시보드 — 청산 · 고래 · 트리맵 · 김프 | TradeHub",
         description:

@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllNewsIds } from "@/shared/lib/news";
 import { getAllPostIds } from "@/shared/lib/posts";
 import { guides } from "@/shared/lib/guides";
+import { guidesEn } from "@/shared/lib/guides-en";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const base = "https://www.tradehub.kr";
@@ -28,6 +29,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "monthly",
         priority: 0.8,
     }));
+
+    const enGuideSitemap: MetadataRoute.Sitemap = guidesEn.map((guide) => ({
+        url: `${base}/en/guide/${guide.slug}`,
+        lastModified: new Date(guide.updatedAt),
+        changeFrequency: "monthly",
+        priority: 0.8,
+    }));
+
+    const legalSitemap: MetadataRoute.Sitemap = [
+        { url: `${base}/terms`,    lastModified: new Date("2025-06-01"), changeFrequency: "yearly", priority: 0.4 },
+        { url: `${base}/privacy`,  lastModified: new Date("2025-06-01"), changeFrequency: "yearly", priority: 0.4 },
+        { url: `${base}/en/terms`, lastModified: new Date("2025-06-01"), changeFrequency: "yearly", priority: 0.4 },
+        { url: `${base}/en/privacy`, lastModified: new Date("2025-06-01"), changeFrequency: "yearly", priority: 0.4 },
+    ];
 
     return [
         {
@@ -90,7 +105,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: "weekly",
             priority: 0.7,
         },
+        {
+            url: `${base}/en/guide`,
+            lastModified: new Date(),
+            changeFrequency: "weekly",
+            priority: 0.7,
+        },
         ...guideSitemap,
+        ...enGuideSitemap,
+        ...legalSitemap,
         ...newsSitemap,
         ...postsSitemap,
     ];
