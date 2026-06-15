@@ -233,12 +233,16 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
                                     const isPos = pct >= 0;
                                     const isActive = i === idx;
                                     return (
-                                        <motion.div
+                                        <motion.a
                                             key={item.symbol}
+                                            href={`https://www.binance.com/en/futures/${item.symbol.toLowerCase()}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => e.stopPropagation()}
                                             initial={{ opacity: 0, x: -8 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ duration: 0.2, delay: i * 0.03, ease: [0.16, 1, 0.3, 1] }}
-                                            className={`relative flex items-center px-4 py-[6px] transition-colors ${
+                                            className={`relative flex items-center px-4 py-[6px] transition-colors cursor-pointer ${
                                                 isActive
                                                     ? isLight ? "bg-emerald-50" : "bg-emerald-500/8"
                                                     : isLight ? "hover:bg-neutral-50" : "hover:bg-neutral-800/50"
@@ -265,7 +269,7 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
                                             }`}>
                                                 {isPos ? "▲" : "▼"} {Math.abs(pct).toFixed(2)}%
                                             </span>
-                                        </motion.div>
+                                        </motion.a>
                                     );
                                 })}
                             </div>
