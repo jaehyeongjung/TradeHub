@@ -6,7 +6,7 @@ html {
 }
 
 :root {
-    --background: #060C14;
+    --background: #000000;
     --foreground: #EEF2F7;
 
     /* ============================================
@@ -14,7 +14,7 @@ html {
        ============================================ */
 
     /* Surface - 배경 레이어 */
-    --surface-page:     #060C14;   /* 페이지 배경 */
+    --surface-page:     #000000;   /* 페이지 배경 */
     --surface-card:     #0C1422;   /* 카드 (neutral-950) */
     --surface-elevated: #111C2D;   /* 모달/상위 카드 (neutral-900) */
     --surface-input:    #172133;   /* 입력/버튼 (neutral-800) */

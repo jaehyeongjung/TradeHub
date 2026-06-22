@@ -243,10 +243,10 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, c
             },
             {
                 num: "2",
-                color: "text-blue-500",
-                bg: isLight ? "bg-blue-50 border-blue-200/60" : "bg-blue-500/8 border-blue-500/20",
+                color: isLight ? "text-emerald-600" : "text-emerald-400",
+                bg: isLight ? "bg-emerald-50 border-emerald-200/60" : "bg-emerald-500/8 border-emerald-500/20",
                 icon: (
-                    <svg className="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-3 h-3 ${isLight ? "text-emerald-600" : "text-emerald-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                 ),
@@ -268,19 +268,12 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, c
         ];
 
         return (
-            <div className={`h-full flex flex-col ${cardBg} rounded-2xl border ${border} overflow-hidden`}>
+            <div className={`min-h-[200px] flex flex-col ${cardBg} rounded-2xl border ${border} overflow-hidden`}>
                 {steps.map((step, i) => (
-                    <div key={step.num} className={`flex-1 px-3 py-2 flex items-start gap-2.5 ${i < steps.length - 1 ? `border-b ${border}` : ""}`}>
-                        <div className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 border ${step.bg}`}>
-                            {step.icon}
-                        </div>
-                        <div className="min-w-0">
-                            <div className="flex items-center gap-1.5 mb-0.5">
-                                <span className={`text-[9px] font-bold ${step.color} uppercase tracking-wider`}>Step {step.num}</span>
-                                <span className={`text-[11px] font-semibold ${textPrimary}`}>{step.title}</span>
-                            </div>
-                            <p className={`text-[10px] ${textTertiary} leading-relaxed`}>{step.desc}</p>
-                        </div>
+                    <div key={step.num} className={`flex-1 px-4 py-2.5 flex flex-col justify-center gap-1 ${i < steps.length - 1 ? `border-b ${border}` : ""}`}>
+                        <span className={`text-[9px] font-bold ${step.color} tracking-wider`}>Step {step.num}</span>
+                        <span className={`text-[11px] font-semibold ${textPrimary}`}>{step.title}</span>
+                        <p className={`text-[10px] ${textTertiary} leading-relaxed`}>{step.desc}</p>
                     </div>
                 ))}
             </div>

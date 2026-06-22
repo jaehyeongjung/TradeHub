@@ -11,7 +11,7 @@ interface Props {
 export function SimOrders({ orders, onCancel, isEn = false }: Props) {
     if (orders.length === 0) {
         return (
-            <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5 min-h-[200px] flex flex-col justify-center">
+            <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5 flex-1 flex flex-col justify-center">
                 <div className="text-[11px] text-neutral-500 text-center">
                     {isEn ? "No open orders" : "미체결 주문이 없습니다"}
                 </div>
@@ -20,7 +20,7 @@ export function SimOrders({ orders, onCancel, isEn = false }: Props) {
     }
 
     return (
-        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden min-h-[200px]">
+        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden flex-1">
             <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
                 <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
                     Open Orders

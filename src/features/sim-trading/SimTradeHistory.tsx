@@ -10,7 +10,7 @@ interface Props {
 export function SimTradeHistory({ trades, isEn = false }: Props) {
     if (trades.length === 0) {
         return (
-            <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5 min-h-[200px] flex flex-col justify-center">
+            <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5 min-h-[214px] flex flex-col justify-center">
                 <div className="text-[11px] text-neutral-500 text-center">
                     {isEn ? "No trade history" : "거래 이력이 없습니다"}
                 </div>
@@ -19,13 +19,7 @@ export function SimTradeHistory({ trades, isEn = false }: Props) {
     }
 
     return (
-        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden min-h-[200px]">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
-                <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
-                    Trade History
-                </h3>
-            </div>
-
+        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden min-h-[214px]">
             <div className="grid grid-cols-[1fr_0.8fr_1fr_1fr_1fr_0.8fr] gap-2 px-5 py-2 text-[10px] text-neutral-500 border-b border-zinc-800/40">
                 <div>{isEn ? "Symbol" : "심볼"}</div>
                 <div className="text-right">{isEn ? "Type" : "유형"}</div>

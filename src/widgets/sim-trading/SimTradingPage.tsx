@@ -213,7 +213,7 @@ export function SimTradingPage() {
                     })}
                 </div>
 
-                <div className={`p-2.5 h-[210px] overflow-y-auto scrollbar-none ${contentBg}`}>
+                <div className={`p-2.5 flex flex-col ${bottomTab === "history" ? "h-[245px] overflow-y-auto scrollbar-none" : "min-h-[245px]"} ${contentBg}`}>
                     {bottomTab === "positions" && (
                         <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} isEn={isEn} />
                     )}

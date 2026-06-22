@@ -96,18 +96,18 @@ export function SimLeaderboard({ userId, isEn = false }: Props) {
     if (loading) {
         const sk = isLight ? "bg-neutral-100 animate-pulse" : "bg-white/[0.05] animate-pulse";
         return (
-            <div className={`rounded-2xl border overflow-hidden ${card}`}>
+            <div className={`rounded-2xl border overflow-hidden flex-1 ${card}`}>
                 <div className={`px-5 py-3.5 border-b ${divider} flex items-center justify-between`}>
                     <div className={`h-4 w-24 rounded-full ${sk}`} />
                     <div className={`h-3 w-12 rounded-full ${sk}`} />
                 </div>
                 <div className={`p-4 space-y-2 border-b ${divider}`}>
-                    {[0, 1, 2].map((i) => (
+                    {[0, 1].map((i) => (
                         <div key={i} className={`h-[68px] rounded-2xl ${sk}`} style={{ opacity: 1 - i * 0.15 }} />
                     ))}
                 </div>
                 <div className="divide-y divide-transparent">
-                    {[0, 1, 2, 3, 4].map((i) => (
+                    {[0, 1].map((i) => (
                         <div key={i} className="flex items-center gap-3 px-5 py-3">
                             <div className={`w-5 h-3 rounded-full ${sk}`} />
                             <div className={`w-8 h-8 rounded-full ${sk}`} />
@@ -125,7 +125,7 @@ export function SimLeaderboard({ userId, isEn = false }: Props) {
 
     if (error || data.length === 0) {
         return (
-            <div className={`rounded-2xl border p-12 text-center ${card}`}>
+            <div className={`rounded-2xl border p-12 text-center flex-1 flex flex-col justify-center ${card}`}>
                 <p className={`text-[12px] ${error ? "text-red-400" : t3}`}>
                     {error ?? (isEn ? "No ranking data yet" : "아직 랭킹 데이터가 없습니다")}
                 </p>
@@ -149,8 +149,8 @@ export function SimLeaderboard({ userId, isEn = false }: Props) {
     const maxRoi = Math.max(...data.map((e) => Math.abs(e.roi)), 1);
 
     return (
-        <div className="relative">
-        <div ref={scrollRef} onScroll={handleScroll} className={`rounded-2xl border overflow-y-auto max-h-[210px] scrollbar-none ${card}`}>
+        <div className="relative flex-1 flex flex-col">
+        <div ref={scrollRef} onScroll={handleScroll} className={`rounded-2xl border overflow-y-auto flex-1 scrollbar-none ${card}`}>
 
             <div className={`flex items-center justify-between px-5 py-3.5 border-b ${divider}`}>
                 <div className="flex items-center gap-2">

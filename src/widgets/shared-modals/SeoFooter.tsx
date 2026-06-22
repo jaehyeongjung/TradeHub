@@ -38,8 +38,10 @@ export function SeoFooter() {
         ? ["Liquidations", "Whale Trades", "Heatmap", "Kimchi Premium", "Sim Trading", "Funding Rate", "Chart Analysis", "Rankings", "Free"]
         : ["실시간 청산", "고래 거래", "트리맵", "김치프리미엄", "모의투자", "펀딩비", "차트분석", "코인랭킹", "무료"];
 
+    const footerBg = isLight ? "bg-white" : "bg-black";
+
     return (
-        <section aria-labelledby="seo-footer-heading" className={`border-t ${borderColor} mt-5`}>
+        <section aria-labelledby="seo-footer-heading" className={`border-t ${borderColor} mt-5 ${footerBg}`}>
             <div className="mx-auto w-full max-w-screen-xl px-5 py-10">
 
                 <div className="flex items-start gap-4 mb-8">
