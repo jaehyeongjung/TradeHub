@@ -38,7 +38,9 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
     const [showTpSl, setShowTpSl] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
+    const [amountError, setAmountError] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const amountInputRef = useRef<HTMLInputElement>(null);
     const [hasMoreBelow, setHasMoreBelow] = useState(false);
 
     const checkScroll = useCallback(() => {
@@ -86,12 +88,17 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
         return calcLiqPrice(side, price, leverage);
     })();
 
-    const handlePercentage = (pct: number) => setAmountUsdt((balance * leverage * pct).toFixed(2));
+    const handlePercentage = (pct: number) => { setAmountUsdt((balance * leverage * pct).toFixed(2)); setAmountError(false); };
 
     const handleSubmit = async () => {
         setError("");
         if (!currentPrice) { setError(isEn ? "Loading price data…" : "가격 정보를 불러오는 중입니다"); return; }
-        if (amount <= 0) { setError(isEn ? "Enter order amount" : "주문 금액을 입력하세요"); return; }
+        if (amount <= 0) {
+            setAmountError(true);
+            amountInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+            amountInputRef.current?.focus();
+            return;
+        }
         if (orderType !== "MARKET" && (!limitPrice || parseFloat(limitPrice) <= 0)) { setError(isEn ? "Enter limit price" : "지정가를 입력하세요"); return; }
         if (margin > balance) { setError(isEn ? "Insufficient balance" : "잔고가 부족합니다"); return; }
         const tp = tpPrice ? parseFloat(tpPrice) : null;
@@ -133,7 +140,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
 
             <div className="px-5 pt-5 pb-4 flex-shrink-0">
                 <div className="flex items-start justify-between mb-1">
-                    <span className={`text-[10px] font-medium ${textTertiary} tracking-widest uppercase`}>Demo Account</span>
+                    <span className={`text-xs font-medium ${isLight ? "text-neutral-500" : "text-neutral-400"}`}>Demo Account</span>
                     <button
                         onClick={onReset}
                         className={`text-[10px] px-2.5 py-1 rounded-lg border ${border} ${textTertiary} hover:text-red-400 hover:border-red-400/30 transition-all cursor-pointer`}
@@ -313,14 +320,26 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                 <div>
                     <div className="relative mb-1.5">
                         <input
+                            ref={amountInputRef}
                             type="number"
                             value={amountUsdt}
-                            onChange={(e) => setAmountUsdt(e.target.value)}
+                            onChange={(e) => { setAmountUsdt(e.target.value); setAmountError(false); }}
                             placeholder={isEn ? "Order amount (USDT)" : "주문 금액 (USDT)"}
-                            className={`w-full text-[13px] rounded-xl px-3.5 py-3 border outline-none focus:border-zinc-500 transition-colors pr-16 ${inputBg}`}
+                            className={`w-full text-[13px] rounded-xl px-3.5 py-3 border outline-none transition-colors pr-16 ${
+                                amountError
+                                    ? isLight
+                                        ? "bg-red-50 border-red-400 text-neutral-900 placeholder:text-red-300 focus:border-red-400"
+                                        : "bg-red-500/8 border-red-500 text-white placeholder:text-red-400/50 focus:border-red-500"
+                                    : `${inputBg} focus:border-zinc-500`
+                            }`}
                         />
-                        <span className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] ${textTertiary} font-medium`}>USDT</span>
+                        <span className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] ${amountError ? "text-red-400" : textTertiary} font-medium`}>USDT</span>
                     </div>
+                    {amountError && (
+                        <p className="text-[10px] text-red-500 mb-1.5 pl-1">
+                            {isEn ? "Please enter an order amount" : "주문 금액을 입력해 주세요"}
+                        </p>
+                    )}
                     <div className="grid grid-cols-4 gap-1.5">
                         {[
                             { pct: 0.25, label: "25%" },

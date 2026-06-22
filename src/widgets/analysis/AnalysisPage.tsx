@@ -240,6 +240,32 @@ function LineSwatch({ color, style }: { color: string; style: string }) {
     );
 }
 
+// ── 분석 완료 효과음 ─────────────────────────────────────────────────────────
+
+function playChime() {
+    try {
+        const ctx = new AudioContext();
+        const notes = [
+            { freq: 1046.5, start: 0,    dur: 0.35, peak: 0.28 }, // C6 (띠)
+            { freq: 1567.9, start: 0.13, dur: 0.75, peak: 0.18 }, // G6 (링~)
+        ];
+        notes.forEach(({ freq, start, dur, peak }) => {
+            const osc = ctx.createOscillator();
+            const g   = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.value = freq;
+            g.gain.setValueAtTime(0, ctx.currentTime + start);
+            g.gain.linearRampToValueAtTime(peak, ctx.currentTime + start + 0.008);
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+            osc.connect(g);
+            g.connect(ctx.destination);
+            osc.start(ctx.currentTime + start);
+            osc.stop(ctx.currentTime + start + dur);
+        });
+        setTimeout(() => ctx.close(), 1200);
+    } catch {}
+}
+
 // ── AnalysisPage ──────────────────────────────────────────────────────────────
 
 export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
@@ -253,6 +279,7 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
     const [displayPct, setDisplayPct] = useState(0);
     const rafRef = useRef<number | null>(null);
     const panelRef = useRef<HTMLDivElement>(null);
+    const prevShowPanelRef = useRef(false);
 
     // 게이지 % 부드럽게 카운트업
     useEffect(() => {
@@ -291,6 +318,13 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
         if (result) setActiveTab("analysis");
     }, [result]);
 
+    const showPanel  = !!result && !loading;
+
+    useEffect(() => {
+        if (showPanel && !prevShowPanelRef.current) playChime();
+        prevShowPanelRef.current = showPanel;
+    }, [showPanel]);
+
     const handleSymbolChange = (s: string) => {
         setSymbol(s);
         loadCandles(s, TIER_CONFIG[tier].interval);
@@ -302,22 +336,21 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
 
     const tabWrap = isLight
         ? "bg-neutral-100 border border-neutral-200"
-        : "bg-surface-input/60 border border-border-subtle";
+        : "bg-neutral-800/60 border border-zinc-800/60";
     const tabActive = isLight
         ? "bg-white text-neutral-800 shadow-sm border border-neutral-200"
-        : "bg-surface-hover text-white shadow-sm";
+        : "bg-neutral-700 text-white shadow-sm";
     const tabInactive = isLight
         ? "text-neutral-500 hover:text-neutral-700"
-        : "text-text-muted hover:text-text-secondary";
+        : "text-neutral-500 hover:text-neutral-300";
 
     const cardBg = isLight
         ? "bg-white border border-neutral-200"
-        : "bg-surface-card border border-border-subtle";
+        : "bg-neutral-950 border border-zinc-800/60";
 
-    const iconBg = isLight ? "bg-neutral-100" : "bg-white/6";
+    const iconBg = isLight ? "bg-neutral-100" : "bg-neutral-800";
 
     const showChart  = candles && candles.length > 0;
-    const showPanel  = !!result && !loading;
     const anyLoading = candlesLoading || loading;
     const currentTier = TIER_CONFIG[tier];
     const tierLabel = currentTier[locale];
@@ -325,7 +358,7 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
     const chartLegend = CHART_LEGEND[locale];
 
     return (
-        <div className="h-screen overflow-hidden flex flex-col bg-surface-page px-5 pt-12 pb-3 2xl:pb-4">
+        <div className="h-screen overflow-hidden flex flex-col bg-black px-5 pt-12 pb-3 2xl:pb-4">
             <div className="flex flex-col gap-3 flex-1 min-h-0 mt-3">
 
                 {/* 컨트롤 바 */}
@@ -364,7 +397,7 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
 
                     {/* 현재 인터벌 배지 */}
                     <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium ${
-                        isLight ? "bg-neutral-100 text-neutral-500" : "bg-white/5 text-text-muted"
+                        isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800/60 text-neutral-500"
                     }`}>
                         <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${currentTier.dot}`} />
                         {currentTier.interval.toUpperCase()} · {tierLabel.sub}
@@ -422,11 +455,11 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                             }`}
                         >
                             {candlesLoading ? (
-                                <div className="w-full h-full bg-surface-card animate-pulse" />
+                                <div className="w-full h-full bg-neutral-950 animate-pulse" />
                             ) : (
                                 <AnalysisChart
                                     candles={candles}
-                                    overlay={result}
+                                    overlay={showPanel ? result : null}
                                     isLight={isLight}
                                     locale={locale}
                                 />
@@ -437,7 +470,7 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                                 <div className="absolute inset-0 backdrop-blur-[3px] flex flex-col items-center justify-center gap-5 px-12 transition-colors duration-500"
                                     style={{ background: displayPct === 100
                                         ? "rgba(2,192,118,0.08)"
-                                        : isLight ? "rgba(255,255,255,0.75)" : "rgba(12,20,34,0.75)"
+                                        : isLight ? "rgba(255,255,255,0.75)" : "rgba(10,10,10,0.82)"
                                     }}
                                 >
                                     <div className="w-full max-w-xs space-y-2.5">
@@ -507,7 +540,7 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                                         <div className={`px-5 py-4 border-b transition-colors duration-500 ${
                                             displayPct === 100
                                                 ? isLight ? "border-emerald-200" : "border-emerald-500/20"
-                                                : isLight ? "border-neutral-100" : "border-border-subtle"
+                                                : isLight ? "border-neutral-100" : "border-zinc-800/60"
                                         }`}>
                                             <motion.p
                                                 className={`text-sm font-bold transition-colors duration-300 ${
@@ -587,11 +620,11 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                                 ) : (
                                     /* 분석 전 - 기능 목록 */
                                     <div className={`rounded-xl ${cardBg} h-full flex flex-col overflow-hidden`}>
-                                        <div className={`px-5 py-4 border-b ${isLight ? "border-neutral-100" : "border-border-subtle"}`}>
+                                        <div className={`px-5 py-4 border-b ${isLight ? "border-neutral-100" : "border-zinc-800/60"}`}>
                                             <p className="text-sm font-bold text-text-primary">{t.pendingTitle}</p>
                                             <p className="text-xs text-text-muted mt-0.5">{t.pendingHint}</p>
                                         </div>
-                                        <div className={`divide-y ${isLight ? "divide-neutral-100" : "divide-border-subtle"} overflow-y-auto scrollbar-hide`}>
+                                        <div className={`divide-y ${isLight ? "divide-neutral-100" : "divide-zinc-800/60"} overflow-y-auto scrollbar-hide`}>
                                             {FEATURE_ITEMS.map((item, idx) => (
                                                 <div key={idx} className="flex items-center gap-3 px-5 py-3.5">
                                                     <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-text-tertiary ${iconBg}`}>
@@ -616,7 +649,7 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                                     className={`pointer-events-none absolute bottom-0 left-0 right-0 h-16 flex items-end justify-center pb-2 rounded-b-xl ${
                                         isLight
                                             ? "bg-gradient-to-t from-neutral-50 to-transparent"
-                                            : "bg-gradient-to-t from-surface-page to-transparent"
+                                            : "bg-gradient-to-t from-black to-transparent"
                                     }`}
                                 >
                                     <svg className="w-4 h-4 opacity-40 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -659,8 +692,8 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                                                 onClick={() => handleTierChange(g.tier)}
                                                 className={`w-full text-left rounded-lg px-3 py-2.5 transition-all cursor-pointer ${
                                                     isActiveTier
-                                                        ? isLight ? "bg-neutral-100" : "bg-white/6"
-                                                        : isLight ? "hover:bg-neutral-50" : "hover:bg-white/[0.03]"
+                                                        ? isLight ? "bg-neutral-100" : "bg-neutral-800"
+                                                        : isLight ? "hover:bg-neutral-50" : "hover:bg-neutral-800/40"
                                                 }`}
                                             >
                                                 <div className="flex items-center justify-between">
