@@ -91,9 +91,9 @@ export function SimTradingPage() {
     const headerBg = isLight ? "bg-white border-neutral-200" : "bg-neutral-950 border-zinc-800/60";
     const tabBg = isLight ? "bg-white border-neutral-200" : "bg-neutral-950 border-zinc-800/60";
     const tabBorder = isLight ? "border-neutral-100" : "border-zinc-800/60";
-    const tabActive = isLight ? "text-amber-600" : "text-amber-400";
+    const tabActive = isLight ? "text-emerald-600" : "text-emerald-400";
     const tabInactive = isLight ? "text-neutral-500 hover:text-neutral-700" : "text-neutral-500 hover:text-neutral-300";
-    const badgeActive = isLight ? "bg-amber-500/10 text-amber-600" : "bg-amber-500/10 text-amber-400";
+    const badgeActive = isLight ? "bg-emerald-600/10 text-emerald-600" : "bg-emerald-400/10 text-emerald-400";
     const badgeInactive = isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-500";
     const contentBg = isLight ? "bg-neutral-50" : "";
 
@@ -126,7 +126,7 @@ export function SimTradingPage() {
                 <SimMarketData />
             </div>
 
-            <div className="flex gap-3 h-[calc(100vh-200px)] min-h-[480px]">
+            <div className="flex gap-3 h-[calc(100vh-450px)] min-h-[260px]">
                 <div className="flex-1 min-w-0">
                     <CoinChart
                         boxId="sim-chart"
@@ -158,10 +158,10 @@ export function SimTradingPage() {
                 </div>
             </div>
 
-            <div className={`rounded-2xl border overflow-hidden flex-shrink-0 ${tabBg}`}>
+            <div className={`rounded-2xl border overflow-hidden ${tabBg}`}>
                 <div className={`relative flex border-b ${tabBorder}`}>
                     <div
-                        className="absolute bottom-0 h-[2px] bg-amber-500 rounded-full transition-all duration-200 ease-out"
+                        className="absolute bottom-0 h-[2px] bg-emerald-400 rounded-full transition-all duration-200 ease-out"
                         style={{ left: indicatorStyle.left, width: indicatorStyle.width }}
                     />
                     {(isEn ? TABS_EN : TABS_KO).map(({ key, label }) => {
@@ -175,7 +175,7 @@ export function SimTradingPage() {
                                 key={key}
                                 ref={(el) => { tabRefs.current[key] = el; }}
                                 onClick={() => setBottomTab(key)}
-                                className={`relative flex-1 py-3 text-[12px] font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
+                                className={`relative flex-1 py-2 text-[12px] font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
                                     active ? tabActive : tabInactive
                                 }`}
                             >
@@ -193,7 +193,7 @@ export function SimTradingPage() {
                     })}
                 </div>
 
-                <div className={`p-4 ${contentBg}`}>
+                <div className={`p-2.5 ${contentBg}`}>
                     {bottomTab === "positions" && (
                         <SimPositions positions={positions} onClose={closePosition} onUpdateTpSl={updateTpSl} isEn={isEn} />
                     )}

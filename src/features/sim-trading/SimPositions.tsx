@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAtomValue } from "jotai";
 import { simPricesAtom } from "@/shared/store/atoms";
 import { calcRoe } from "@/shared/lib/sim-trading";
@@ -17,10 +19,11 @@ interface Props {
 export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }: Props) {
     const isLight = useTheme();
     const prices = useAtomValue(simPricesAtom);
-    const [editingId, setEditingId] = useState<string | null>(null);
+    const [tpSlPos, setTpSlPos] = useState<SimPosition | null>(null);
     const [editTp, setEditTp] = useState("");
     const [editSl, setEditSl] = useState("");
     const [tpSlError, setTpSlError] = useState("");
+    const [closePos, setClosePos] = useState<{ pos: SimPosition; cp: number } | null>(null);
 
     const prevPnlRef = useRef<Record<string, number>>({});
     const [flashMap, setFlashMap] = useState<Record<string, "up" | "down" | null>>({});
@@ -42,23 +45,23 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }:
     const subCardBg = isLight ? "bg-neutral-50" : "bg-neutral-900/60";
     const inputBg = isLight ? "bg-neutral-100 border-neutral-200" : "bg-neutral-800 border-neutral-700/50";
     const textPrimary = isLight ? "text-neutral-900" : "text-white";
-    const textSecondary = isLight ? "text-neutral-600" : "text-neutral-400";
-    const textTertiary = isLight ? "text-neutral-500" : "text-neutral-600";
+    const textSecondary = isLight ? "text-neutral-600" : "text-neutral-300";
+    const textTertiary = isLight ? "text-neutral-500" : "text-neutral-400";
     const btnClose = isLight
-        ? "bg-neutral-50 border-neutral-200 text-neutral-500 hover:bg-red-50 hover:text-red-500 hover:border-red-200"
-        : "bg-neutral-900 border-zinc-800 text-neutral-500 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/30";
+        ? "bg-red-500 border-red-500 text-white hover:bg-red-600 hover:border-red-600"
+        : "bg-red-500/20 border-red-500/50 text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500";
     const btnTpSl = isLight
-        ? "bg-neutral-50 border-neutral-200 text-neutral-500 hover:text-amber-600 hover:bg-amber-50 hover:border-amber-200"
-        : "bg-neutral-900 border-zinc-800 text-neutral-500 hover:text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/30";
+        ? "bg-neutral-700 border-neutral-700 text-white hover:bg-neutral-800 hover:border-neutral-800"
+        : "bg-neutral-600 border-neutral-500 text-white hover:bg-neutral-500 hover:border-neutral-400";
 
     if (positions.length === 0) {
         const steps = [
             {
                 num: "1",
-                color: isLight ? "text-amber-600" : "text-amber-400",
-                bg: isLight ? "bg-amber-50 border-amber-200/60" : "bg-amber-500/8 border-amber-500/20",
+                color: isLight ? "text-emerald-600" : "text-emerald-400",
+                bg: isLight ? "bg-emerald-50 border-emerald-200/60" : "bg-emerald-500/8 border-emerald-500/20",
                 icon: (
-                    <svg className={`w-4 h-4 ${isLight ? "text-amber-600" : "text-amber-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 ${isLight ? "text-emerald-600" : "text-emerald-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 ),
@@ -95,8 +98,8 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }:
             <div className="space-y-3">
                 <div className={`${cardBg} rounded-2xl border ${border} p-5`}>
                     <div className="flex items-center gap-3 mb-1">
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isLight ? "bg-amber-50" : "bg-amber-500/10"}`}>
-                            <svg className={`w-4 h-4 ${isLight ? "text-amber-600" : "text-amber-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isLight ? "bg-emerald-50" : "bg-emerald-500/10"}`}>
+                            <svg className={`w-4 h-4 ${isLight ? "text-emerald-600" : "text-emerald-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
                         </div>
@@ -134,15 +137,8 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }:
     }
 
     return (
-        <div className="space-y-2">
-            <div className="flex items-center gap-2 px-1">
-                <span className={`text-[11px] font-semibold ${textTertiary} uppercase tracking-wider`}>{isEn ? "Positions" : "포지션"}</span>
-                <span className={`inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold bg-amber-500/10 rounded-full ${isLight ? "text-amber-600" : "text-amber-400"}`}>
-                    {positions.length}
-                </span>
-            </div>
-
-            <div className="grid gap-2">
+        <div className="space-y-1.5">
+            <div className="grid gap-1.5">
                 {positions.map((pos) => {
                     const cp = prices[pos.symbol] ?? pos.entry_price;
                     const pnl = pos.unrealized_pnl;
@@ -153,15 +149,14 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }:
                     const liqDist = pos.entry_price > 0
                         ? Math.abs(cp - pos.liq_price) / cp * 100
                         : 0;
-                    const isEditing = editingId === pos.id;
                     const flash = flashMap[pos.id];
 
                     return (
                         <div key={pos.id} className={`${cardBg} rounded-2xl border ${border} overflow-hidden`}>
                             <div className={`h-[2px] ${isLong ? "bg-emerald-500" : "bg-red-500"}`} />
 
-                            <div className="p-4">
-                                <div className="flex items-start justify-between mb-3">
+                            <div className="p-2.5">
+                                <div className="flex items-start justify-between mb-2">
                                     <div className="flex items-center gap-2.5">
                                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[11px] font-black ${
                                             isLong ? "bg-emerald-500/15 text-emerald-500" : "bg-red-500/15 text-red-500"
@@ -178,9 +173,9 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }:
                                                 }`}>
                                                     {pos.side}
                                                 </span>
-                                                <span className={`text-[10px] font-bold font-mono ${isLight ? "text-amber-600" : "text-amber-400"}`}>{Number(pos.leverage).toFixed(0)}x</span>
+                                                <span className={`text-[10px] font-bold font-mono ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>{Number(pos.leverage).toFixed(0)}x</span>
                                                 <span className={`text-[9px] px-1.5 py-0.5 rounded-md ${
-                                                    isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800 text-neutral-400"
+                                                    isLight ? "bg-neutral-700 text-white" : "bg-neutral-600 text-white"
                                                 }`}>
                                                     {pos.margin_mode === "CROSS" ? (isEn ? "Cross" : "교차") : (isEn ? "Isolated" : "격리")}
                                                 </span>
@@ -196,15 +191,28 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }:
                                             </div>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => onClose(pos.id, cp)}
-                                        className={`text-[11px] px-3 py-1.5 rounded-xl border transition-all cursor-pointer font-medium ${btnClose}`}
-                                    >
-                                        {isEn ? "Close" : "청산"}
-                                    </button>
+                                    <div className="flex items-center gap-1.5">
+                                        <button
+                                            onClick={() => {
+                                                setTpSlPos(pos);
+                                                setEditTp(pos.tp_price ? String(pos.tp_price) : "");
+                                                setEditSl(pos.sl_price ? String(pos.sl_price) : "");
+                                                setTpSlError("");
+                                            }}
+                                            className={`text-[10px] px-3 py-1.5 font-semibold border rounded-xl transition-all cursor-pointer ${btnTpSl}`}
+                                        >
+                                            TP/SL
+                                        </button>
+                                        <button
+                                            onClick={() => setClosePos({ pos, cp })}
+                                            className={`text-[11px] px-3 py-1.5 rounded-xl border transition-all cursor-pointer font-medium ${btnClose}`}
+                                        >
+                                            {isEn ? "Close" : "청산"}
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <div className={`rounded-xl px-4 py-3 mb-3 transition-colors duration-300 ${
+                                <div className={`rounded-xl px-3 py-2 mb-2 transition-colors duration-300 ${
                                     flash === "up"
                                         ? "bg-emerald-500/25"
                                         : flash === "down"
@@ -213,14 +221,14 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }:
                                 }`}>
                                     <div className="flex items-end justify-between">
                                         <div>
-                                            <div className={`text-[24px] font-bold font-mono tabular-nums leading-none ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
+                                            <div className={`text-[18px] font-bold font-mono tabular-nums leading-none ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
                                                 {isProfit ? "+" : ""}{pnl.toFixed(2)}
-                                                <span className={`text-[13px] ml-1 font-medium ${isProfit ? "text-emerald-500/70" : "text-red-500/70"}`}>USDT</span>
+                                                <span className={`text-[11px] ml-1 font-medium ${isProfit ? "text-emerald-500/70" : "text-red-500/70"}`}>USDT</span>
                                             </div>
                                             <div className={`text-[10px] ${textTertiary} mt-1`}>{isEn ? "Unrealized PnL" : "미실현 손익"}</div>
                                         </div>
                                         <div className="text-right">
-                                            <div className={`text-[18px] font-bold font-mono tabular-nums ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
+                                            <div className={`text-[15px] font-bold font-mono tabular-nums ${isProfit ? "text-emerald-500" : "text-red-500"}`}>
                                                 {isProfit ? "+" : ""}{roe.toFixed(2)}%
                                             </div>
                                             <div className={`text-[10px] ${textTertiary} mt-1`}>{isEn ? "ROE" : "수익률 (ROE)"}</div>
@@ -228,21 +236,21 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }:
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-3 gap-2 mb-3">
+                                <div className="grid grid-cols-3 gap-1.5 mb-2">
                                     {[
-                                        { label: isEn ? "Entry" : "진입가", value: pos.entry_price.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: textSecondary },
-                                        { label: isEn ? "Mark" : "현재가", value: cp.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: isProfit ? "text-emerald-500" : "text-red-500" },
-                                        { label: isEn ? "Liq." : "청산가", value: pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: "text-orange-500" },
+                                        { label: isEn ? "Entry" : "진입가", value: pos.entry_price.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: isLight ? "text-neutral-700" : "text-neutral-100" },
+                                        { label: isEn ? "Mark" : "현재가", value: cp.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: isProfit ? "text-emerald-400" : "text-red-400" },
+                                        { label: isEn ? "Liq." : "청산가", value: pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 }), color: "text-orange-400" },
                                     ].map(({ label, value, color }) => (
-                                        <div key={label} className={`${subCardBg} rounded-xl px-3 py-2 border ${border}`}>
-                                            <div className={`text-[9px] ${textTertiary} mb-0.5`}>{label}</div>
-                                            <div className={`text-[12px] font-mono tabular-nums font-bold ${color}`}>{value}</div>
+                                        <div key={label} className={`rounded-xl px-2.5 py-2 border ${isLight ? "bg-white border-neutral-200" : "bg-neutral-800/80 border-zinc-700/50"}`}>
+                                            <div className={`text-[10px] font-medium mb-1 ${isLight ? "text-neutral-700" : "text-neutral-300"}`}>{label}</div>
+                                            <div className={`text-[13px] font-mono tabular-nums font-bold ${color}`}>{value}</div>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="mb-3">
-                                    <div className="flex items-center justify-between mb-1.5">
+                                <div className="mb-2">
+                                    <div className="flex items-center justify-between mb-1">
                                         <div className="flex items-center gap-1.5">
                                             <span className={`text-[9px] font-medium uppercase tracking-wide ${textTertiary}`}>{isEn ? "Distance to Liquidation" : "청산까지 안전거리"}</span>
                                             {liqDist < 5 && (
@@ -270,102 +278,142 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }:
                                             style={{ width: `${Math.max(2, Math.min(100, liqDist * 2))}%` }}
                                         />
                                     </div>
-                                    <div className="flex justify-between mt-1">
-                                        <span className={`text-[9px] ${textTertiary}`}>{isEn ? "Liq." : "청산가"} ${pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
-                                        <span className={`text-[9px] ${textTertiary}`}>{isEn ? "Mark" : "현재"} ${cp.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
-                                    </div>
                                 </div>
 
-                                {isEditing ? (
-                                    <div className={`${subCardBg} rounded-xl p-3 border ${border} space-y-2`}>
-                                        <div className="flex gap-2">
-                                            <div className="flex-1">
-                                                <label className="text-[9px] text-emerald-500 font-medium mb-1 block">Take Profit (TP)</label>
-                                                <input
-                                                    type="number" value={editTp}
-                                                    onChange={(e) => setEditTp(e.target.value)}
-                                                    placeholder={isEn ? "Not set" : "미설정"}
-                                                    className={`w-full text-emerald-500 text-[12px] font-mono rounded-xl px-3 py-2 border outline-none focus:border-emerald-500/50 transition-colors placeholder:text-neutral-500 ${inputBg}`}
-                                                />
-                                            </div>
-                                            <div className="flex-1">
-                                                <label className="text-[9px] text-red-500 font-medium mb-1 block">Stop Loss (SL)</label>
-                                                <input
-                                                    type="number" value={editSl}
-                                                    onChange={(e) => setEditSl(e.target.value)}
-                                                    placeholder={isEn ? "Not set" : "미설정"}
-                                                    className={`w-full text-red-500 text-[12px] font-mono rounded-xl px-3 py-2 border outline-none focus:border-red-500/50 transition-colors placeholder:text-neutral-500 ${inputBg}`}
-                                                />
-                                            </div>
-                                        </div>
-                                        {tpSlError && <p className="text-[10px] text-red-500">{tpSlError}</p>}
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={async () => {
-                                                    setTpSlError("");
-                                                    const tp = editTp ? parseFloat(editTp) : null;
-                                                    const sl = editSl ? parseFloat(editSl) : null;
-                                                    try {
-                                                        await onUpdateTpSl?.(pos.id, tp, sl);
-                                                        setEditingId(null);
-                                                    } catch (e) {
-                                                        setTpSlError(e instanceof Error ? e.message : (isEn ? "Failed to set TP/SL" : "TP/SL 설정 실패"));
-                                                    }
-                                                }}
-                                                className={`flex-1 py-2 text-[11px] font-bold bg-amber-500/10 rounded-xl border border-amber-500/20 hover:bg-amber-500/20 transition-colors cursor-pointer ${isLight ? "text-amber-600" : "text-amber-400"}`}
-                                            >
-                                                {isEn ? "Save" : "저장"}
-                                            </button>
-                                            <button
-                                                onClick={() => { setEditingId(null); setTpSlError(""); }}
-                                                className={`px-4 py-2 text-[11px] ${textTertiary} cursor-pointer transition-colors`}
-                                            >
-                                                {isEn ? "Cancel" : "취소"}
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex items-center gap-4 flex-1">
-                                            <div className="flex items-center gap-1.5">
-                                                <span className={`text-[9px] ${textTertiary} font-medium`}>TP</span>
-                                                {pos.tp_price ? (
-                                                    <span className="text-[11px] text-emerald-500 font-mono font-semibold">
-                                                        {pos.tp_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                                    </span>
-                                                ) : (
-                                                    <span className={`text-[11px] ${textTertiary}`}>{isEn ? "—" : "미설정"}</span>
-                                                )}
-                                            </div>
-                                            <div className="flex items-center gap-1.5">
-                                                <span className={`text-[9px] ${textTertiary} font-medium`}>SL</span>
-                                                {pos.sl_price ? (
-                                                    <span className="text-[11px] text-red-500 font-mono font-semibold">
-                                                        {pos.sl_price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                                                    </span>
-                                                ) : (
-                                                    <span className={`text-[11px] ${textTertiary}`}>{isEn ? "—" : "미설정"}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => {
-                                                setEditingId(pos.id);
-                                                setEditTp(pos.tp_price ? String(pos.tp_price) : "");
-                                                setEditSl(pos.sl_price ? String(pos.sl_price) : "");
-                                                setTpSlError("");
-                                            }}
-                                            className={`text-[10px] px-3 py-1.5 font-semibold border rounded-xl transition-all cursor-pointer ${btnTpSl}`}
-                                        >
-                                            {isEn ? "Set TP/SL" : "TP/SL 설정"}
-                                        </button>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     );
                 })}
             </div>
+
+            {typeof window !== "undefined" && createPortal(
+                <AnimatePresence>
+                    {tpSlPos && (
+                        <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                            onClick={() => setTpSlPos(null)}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                                transition={{ duration: 0.15 }}
+                                onClick={(e) => e.stopPropagation()}
+                                className={`w-[360px] rounded-2xl border p-5 space-y-4 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-zinc-800"}`}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <p className={`text-[14px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>
+                                        TP / SL — {tpSlPos.symbol.replace("USDT", "")}
+                                    </p>
+                                    <button onClick={() => setTpSlPos(null)} className={`text-[18px] leading-none ${isLight ? "text-neutral-400" : "text-neutral-500"} cursor-pointer`}>×</button>
+                                </div>
+                                <div className="flex gap-3">
+                                    <div className="flex-1">
+                                        <label className="text-[10px] text-emerald-500 font-medium mb-1.5 block">Take Profit (TP)</label>
+                                        <input
+                                            type="number" value={editTp}
+                                            onChange={(e) => setEditTp(e.target.value)}
+                                            placeholder={isEn ? "Not set" : "미설정"}
+                                            className={`w-full text-emerald-500 text-[13px] font-mono rounded-xl px-3 py-2.5 border outline-none focus:border-emerald-500/50 transition-colors placeholder:text-neutral-500 ${isLight ? "bg-neutral-100 border-neutral-200" : "bg-neutral-800 border-neutral-700/50"}`}
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="text-[10px] text-red-500 font-medium mb-1.5 block">Stop Loss (SL)</label>
+                                        <input
+                                            type="number" value={editSl}
+                                            onChange={(e) => setEditSl(e.target.value)}
+                                            placeholder={isEn ? "Not set" : "미설정"}
+                                            className={`w-full text-red-500 text-[13px] font-mono rounded-xl px-3 py-2.5 border outline-none focus:border-red-500/50 transition-colors placeholder:text-neutral-500 ${isLight ? "bg-neutral-100 border-neutral-200" : "bg-neutral-800 border-neutral-700/50"}`}
+                                        />
+                                    </div>
+                                </div>
+                                {tpSlError && <p className="text-[11px] text-red-500">{tpSlError}</p>}
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={async () => {
+                                            setTpSlError("");
+                                            const tp = editTp ? parseFloat(editTp) : null;
+                                            const sl = editSl ? parseFloat(editSl) : null;
+                                            try {
+                                                await onUpdateTpSl?.(tpSlPos.id, tp, sl);
+                                                setTpSlPos(null);
+                                            } catch (e) {
+                                                setTpSlError(e instanceof Error ? e.message : (isEn ? "Failed" : "설정 실패"));
+                                            }
+                                        }}
+                                        className={`flex-1 py-2.5 text-[12px] font-bold rounded-xl border transition-colors cursor-pointer ${isLight ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/20" : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"}`}
+                                    >
+                                        {isEn ? "Save" : "저장"}
+                                    </button>
+                                    <button
+                                        onClick={() => setTpSlPos(null)}
+                                        className={`px-5 py-2.5 text-[12px] rounded-xl cursor-pointer transition-colors ${isLight ? "text-neutral-500 hover:text-neutral-700" : "text-neutral-500 hover:text-neutral-300"}`}
+                                    >
+                                        {isEn ? "Cancel" : "취소"}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
+
+            {typeof window !== "undefined" && createPortal(
+                <AnimatePresence>
+                    {closePos && (
+                        <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                            onClick={() => setClosePos(null)}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                                transition={{ duration: 0.15 }}
+                                onClick={(e) => e.stopPropagation()}
+                                className={`w-[320px] rounded-2xl border p-5 space-y-4 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-zinc-800"}`}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <p className={`text-[14px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>
+                                        {isEn ? "Close Position" : "포지션 청산"}
+                                    </p>
+                                    <button onClick={() => setClosePos(null)} className={`text-[18px] leading-none cursor-pointer ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>×</button>
+                                </div>
+                                <p className={`text-[13px] ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
+                                    <span className="font-bold">{closePos.pos.symbol.replace("USDT", "")}</span>{" "}
+                                    {closePos.pos.side === "LONG" ? (isEn ? "Long" : "롱") : (isEn ? "Short" : "숏")}{" "}
+                                    {isEn ? "position will be closed at market price" : "포지션을 시장가로 청산하시겠습니까?"}
+                                </p>
+                                <div className={`rounded-xl px-4 py-3 ${isLight ? "bg-neutral-50 border border-neutral-200" : "bg-neutral-800/60 border border-zinc-700/50"}`}>
+                                    <div className="flex justify-between text-[12px]">
+                                        <span className={isLight ? "text-neutral-500" : "text-neutral-400"}>{isEn ? "Unrealized PnL" : "미실현 손익"}</span>
+                                        <span className={`font-mono font-bold ${closePos.pos.unrealized_pnl >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                                            {closePos.pos.unrealized_pnl >= 0 ? "+" : ""}{closePos.pos.unrealized_pnl.toFixed(2)} USDT
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={async () => {
+                                            await onClose(closePos.pos.id, closePos.cp);
+                                            setClosePos(null);
+                                        }}
+                                        className="flex-1 py-2.5 text-[12px] font-bold rounded-xl border bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors cursor-pointer"
+                                    >
+                                        {isEn ? "Close" : "청산 확인"}
+                                    </button>
+                                    <button
+                                        onClick={() => setClosePos(null)}
+                                        className={`px-5 py-2.5 text-[12px] rounded-xl cursor-pointer transition-colors ${isLight ? "text-neutral-500 hover:text-neutral-700" : "text-neutral-500 hover:text-neutral-300"}`}
+                                    >
+                                        {isEn ? "Cancel" : "취소"}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 }

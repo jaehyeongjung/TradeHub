@@ -11,11 +11,8 @@ interface Props {
 export function SimOrders({ orders, onCancel, isEn = false }: Props) {
     if (orders.length === 0) {
         return (
-            <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5">
-                <h3 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">
-                    Open Orders
-                </h3>
-                <div className="text-[11px] text-neutral-600 text-center py-6">
+            <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5 min-h-[200px] flex flex-col justify-center">
+                <div className="text-[11px] text-neutral-500 text-center">
                     {isEn ? "No open orders" : "미체결 주문이 없습니다"}
                 </div>
             </div>
@@ -23,7 +20,7 @@ export function SimOrders({ orders, onCancel, isEn = false }: Props) {
     }
 
     return (
-        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden">
+        <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden min-h-[200px]">
             <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
                 <h3 className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
                     Open Orders
@@ -42,7 +39,7 @@ export function SimOrders({ orders, onCancel, isEn = false }: Props) {
                 <div className="text-right w-[52px]"></div>
             </div>
 
-            <div className="divide-y divide-zinc-800/30">
+            <div className="divide-y divide-zinc-800/30 max-h-[300px] overflow-y-auto">
                 {orders.map((ord) => {
                     const isLong = ord.side === "LONG";
                     const notional = ord.quantity * ord.price;

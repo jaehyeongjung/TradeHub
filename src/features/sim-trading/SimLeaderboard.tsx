@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
 
 interface LeaderboardEntry {
@@ -64,6 +64,8 @@ export function SimLeaderboard({ userId, isEn = false }: Props) {
     const [data, setData]       = useState<LeaderboardEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState<string | null>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [atBottom, setAtBottom] = useState(false);
 
     const fetchLeaderboard = useCallback(async () => {
         try {
@@ -131,13 +133,24 @@ export function SimLeaderboard({ userId, isEn = false }: Props) {
         );
     }
 
+    const handleScroll = () => {
+        const el = scrollRef.current;
+        if (!el) return;
+        setAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 4);
+    };
+
+    const scrollDown = () => {
+        scrollRef.current?.scrollBy({ top: 120, behavior: "smooth" });
+    };
+
     const myRank = userId ? data.findIndex((e) => e.user_id === userId) : -1;
     const top3   = data.slice(0, 3);
     const rest   = data.slice(3);
     const maxRoi = Math.max(...data.map((e) => Math.abs(e.roi)), 1);
 
     return (
-        <div className={`rounded-2xl border overflow-hidden ${card}`}>
+        <div className="relative">
+        <div ref={scrollRef} onScroll={handleScroll} className={`rounded-2xl border overflow-y-auto max-h-[210px] scrollbar-none ${card}`}>
 
             <div className={`flex items-center justify-between px-5 py-3.5 border-b ${divider}`}>
                 <div className="flex items-center gap-2">
@@ -305,6 +318,18 @@ export function SimLeaderboard({ userId, isEn = false }: Props) {
                     </div>
                 );
             })()}
+        </div>
+
+        {!atBottom && (
+            <button
+                onClick={scrollDown}
+                className="absolute bottom-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-neutral-800/90 border border-zinc-700 flex items-center justify-center shadow-lg hover:bg-neutral-700 transition-colors cursor-pointer z-10"
+            >
+                <svg className="w-3.5 h-3.5 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+        )}
         </div>
     );
 }
