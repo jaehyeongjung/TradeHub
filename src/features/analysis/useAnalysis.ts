@@ -14,14 +14,12 @@ import { analyzeMarketStructure } from "@/shared/lib/technical-analysis/market-s
 import { detectCandlestickPatterns } from "@/shared/lib/technical-analysis/candlestick-patterns";
 import { getBinanceRestBase } from "@/shared/lib/binance";
 
-// ── 타임프레임별 가져올 캔들 수 ────────────────────────────────────────────
-// 짧은 봉일수록 더 많이 가져와 충분한 히스토리 확보
 const FETCH_TOTAL: Partial<Record<Interval, number>> = {
-    "15m": 2000,   // ~20일치 (2 페이지)
-    "1h":  2000,   // ~83일치 (2 페이지)
-    "4h":  1000,   // ~167일치 (1 페이지)
-    "1d":  500,    // ~2년치 (1 페이지)
-    "1w":  200,    // ~3.8년치 (1 페이지)
+    "15m": 2000,
+    "1h":  2000,
+    "4h":  1000,
+    "1d":  500,
+    "1w":  200,
 };
 const MAX_PER_PAGE = 1000;
 
@@ -39,7 +37,6 @@ function parseKlines(rows: KlineRow[]): Candle[] {
 async function fetchKlines(symbol: string, interval: Interval): Promise<Candle[]> {
     const total = FETCH_TOTAL[interval] ?? 500;
 
-    // 단일 페이지로 충분한 경우
     if (total <= MAX_PER_PAGE) {
         const res = await fetch(
             `${getBinanceRestBase(symbol)}/klines?symbol=${symbol}&interval=${interval}&limit=${total}`
@@ -48,7 +45,6 @@ async function fetchKlines(symbol: string, interval: Interval): Promise<Candle[]
         return parseKlines(await res.json() as KlineRow[]);
     }
 
-    // 다중 페이지 (오래된 데이터부터 최신까지 조합)
     const pages   = Math.ceil(total / MAX_PER_PAGE);
     const batches: Candle[][] = [];
     let endTime: number | undefined;
@@ -63,11 +59,10 @@ async function fetchKlines(symbol: string, interval: Interval): Promise<Candle[]
         const batch = parseKlines(await res.json() as KlineRow[]);
         if (batch.length === 0) break;
 
-        batches.unshift(batch);          // 오래된 배치를 앞에 추가
-        endTime = batch[0].time - 1;    // 다음 페이지는 이 시점 이전
+        batches.unshift(batch);
+        endTime = batch[0].time - 1;
     }
 
-    // 합치고 중복 제거 후 시간순 정렬
     const seen = new Set<number>();
     return batches
         .flat()
@@ -75,11 +70,31 @@ async function fetchKlines(symbol: string, interval: Interval): Promise<Candle[]
         .sort((a, b) => a.time - b.time);
 }
 
+export type AnalysisProgress = {
+    label: string;
+    pct: number;
+    stepIndex: number;
+};
+
+export const ANALYSIS_STEPS = [
+    { key: "pivot",   ko: "피벗 포인트 감지",   en: "Detecting pivots",      pct: 12 },
+    { key: "trend",   ko: "추세선 분석",         en: "Analyzing trend lines", pct: 26 },
+    { key: "sr",      ko: "지지/저항 계산",      en: "Calculating S/R",       pct: 40 },
+    { key: "fib",     ko: "피보나치 레벨",       en: "Fibonacci levels",      pct: 54 },
+    { key: "struct",  ko: "시장 구조 분석",      en: "Market structure",      pct: 66 },
+    { key: "candle",  ko: "캔들 패턴 인식",      en: "Candle patterns",       pct: 78 },
+    { key: "signal",  ko: "시그널 생성",         en: "Generating signal",     pct: 88 },
+    { key: "setup",   ko: "진입 타점 계산",      en: "Entry points",          pct: 96 },
+] as const;
+
+const tick = () => new Promise<void>(r => setTimeout(r, 90));
+
 export type AnalysisState = {
     candles: Candle[] | null
     result: AnalysisResult | null
     candlesLoading: boolean
     loading: boolean
+    progress: AnalysisProgress | null
     error: string | null
     loadCandles: (symbol: string, interval: Interval) => Promise<void>
     run: (symbol: string, interval: Interval, locale?: Locale) => Promise<void>
@@ -90,6 +105,7 @@ export function useAnalysis(): AnalysisState {
     const [result, setResult]                 = useState<AnalysisResult | null>(null);
     const [candlesLoading, setCandlesLoading] = useState(false);
     const [loading, setLoading]               = useState(false);
+    const [progress, setProgress]             = useState<AnalysisProgress | null>(null);
     const [error, setError]                   = useState<string | null>(null);
     const abortRef = useRef<AbortController | null>(null);
 
@@ -118,19 +134,45 @@ export function useAnalysis(): AnalysisState {
         setLoading(true);
         setError(null);
 
+        const step = (idx: number) => {
+            const s = ANALYSIS_STEPS[idx];
+            setProgress({ label: s[locale], pct: s.pct, stepIndex: idx });
+        };
+
         try {
+            step(0);
+            await tick();
             const data = candles ?? await fetchKlines(symbol, interval);
             if (!candles) setCandles(data);
+            const pivots = detectPivots(data);
 
-            // 분석 파이프라인
-            const pivots              = detectPivots(data);
-            const trendLines          = detectTrendLines(data, pivots);
-            const srLevels            = detectSRLevels(data, pivots);
-            const fibonacci           = calculateFibonacci(pivots);
-            const marketStructure     = analyzeMarketStructure(data, pivots);
+            step(1);
+            await tick();
+            const trendLines = detectTrendLines(data, pivots);
+
+            step(2);
+            await tick();
+            const srLevels = detectSRLevels(data, pivots);
+
+            step(3);
+            await tick();
+            const fibonacci = calculateFibonacci(pivots);
+
+            step(4);
+            await tick();
+            const marketStructure = analyzeMarketStructure(data, pivots);
+
+            step(5);
+            await tick();
             const candlestickPatterns = detectCandlestickPatterns(data);
-            const setup               = generateSignal(data, trendLines, srLevels, fibonacci, marketStructure, candlestickPatterns, locale);
-            const trendLineSetups     = generateTrendLineSetups(data, trendLines, srLevels);
+
+            step(6);
+            await tick();
+            const setup = generateSignal(data, trendLines, srLevels, fibonacci, marketStructure, candlestickPatterns, locale);
+
+            step(7);
+            await tick();
+            const trendLineSetups = generateTrendLineSetups(data, trendLines, srLevels);
 
             setResult({
                 candles: data,
@@ -149,8 +191,9 @@ export function useAnalysis(): AnalysisState {
             if (e instanceof Error && e.name !== "AbortError") setError(e.message);
         } finally {
             setLoading(false);
+            setProgress(null);
         }
     }, [candles]);
 
-    return { candles, result, candlesLoading, loading, error, loadCandles, run };
+    return { candles, result, candlesLoading, loading, progress, error, loadCandles, run };
 }

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useAtomValue } from "jotai";
 import { usePathname } from "next/navigation";
 import { simSymbolAtom, simPricesAtom, activePageAtom } from "@/shared/store/atoms";
+import { useTheme } from "@/hooks/useTheme";
 
 interface FundingInfo {
     fundingRate: number;
@@ -121,7 +122,7 @@ export function SimMarketData() {
 
     const Item = ({ label, children }: { label: React.ReactNode; children: React.ReactNode }) => (
         <div className="flex-1 min-w-0 group cursor-default px-2 py-0.5">
-            <div className="text-[10px] text-neutral-600 mb-[3px] whitespace-nowrap">{label}</div>
+            <div className="text-[10px] text-neutral-300 mb-[3px] whitespace-nowrap">{label}</div>
             <div>{children}</div>
         </div>
     );
@@ -155,7 +156,7 @@ export function SimMarketData() {
             <Item label={
                 <span className="flex items-center gap-1">
                     {isEn ? "Funding" : "펀딩비"}
-                    {countdown && <span className="text-[9px] text-neutral-700 font-mono">{countdown}</span>}
+                    {countdown && <span className="text-[9px] text-neutral-400 font-mono">{countdown}</span>}
                 </span>
             }>
                 <span className={`text-[12.5px] font-bold font-mono tabular-nums ${isFundPos ? "text-emerald-400" : "text-red-400"}`}>
