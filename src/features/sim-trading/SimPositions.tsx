@@ -14,9 +14,10 @@ interface Props {
     onClose: (positionId: string, closePrice: number) => Promise<unknown>;
     onUpdateTpSl?: (positionId: string, tp: number | null, sl: number | null) => Promise<void>;
     isEn?: boolean;
+    compact?: boolean;
 }
 
-export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }: Props) {
+export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, compact = false }: Props) {
     const isLight = useTheme();
     const prices = useAtomValue(simPricesAtom);
     const [tpSlPos, setTpSlPos] = useState<SimPosition | null>(null);
@@ -53,6 +54,162 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false }:
     const btnTpSl = isLight
         ? "bg-neutral-700 border-neutral-700 text-white hover:bg-neutral-800 hover:border-neutral-800"
         : "bg-neutral-600 border-neutral-500 text-white hover:bg-neutral-500 hover:border-neutral-400";
+
+    // ── 간이뷰 ────────────────────────────────────────────────────────────────
+    if (compact) {
+        const noPos = positions.length === 0;
+        return (
+            <>
+                <div className="flex flex-col gap-1.5">
+                    {noPos ? (
+                        <p className={`text-[11px] py-1 ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>
+                            {isEn ? "No open positions" : "포지션 없음"}
+                        </p>
+                    ) : positions.map(pos => {
+                        const cp  = prices[pos.symbol] ?? pos.entry_price;
+                        const pnl = pos.unrealized_pnl;
+                        const roe = calcRoe(pnl, pos.margin);
+                        const isLong = pos.side === "LONG";
+                        const isProfit = pnl >= 0;
+                        return (
+                            <div key={pos.id} className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border ${
+                                isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-zinc-800/60"
+                            }`}>
+                                {/* 방향 배지 */}
+                                <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black flex-shrink-0 ${
+                                    isLong ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
+                                }`}>
+                                    {isLong ? "L" : "S"}
+                                </div>
+
+                                {/* 심볼 + 배율 */}
+                                <div className="flex items-baseline gap-1 flex-shrink-0">
+                                    <span className={`text-[12px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>
+                                        {pos.symbol.replace("USDT", "")}
+                                    </span>
+                                    <span className={`text-[10px] ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>{Number(pos.leverage).toFixed(0)}x</span>
+                                </div>
+
+                                {/* PnL */}
+                                <div className="flex items-baseline gap-1 min-w-0">
+                                    <span className={`text-[12px] font-bold tabular-nums font-mono ${isProfit ? "text-emerald-400" : "text-red-400"}`}>
+                                        {isProfit ? "+" : ""}{pnl.toFixed(2)}
+                                    </span>
+                                    <span className={`text-[10px] tabular-nums ${isProfit ? "text-emerald-400/60" : "text-red-400/60"}`}>
+                                        ({isProfit ? "+" : ""}{roe.toFixed(1)}%)
+                                    </span>
+                                </div>
+
+                                {/* 청산가 */}
+                                <div className="flex items-baseline gap-1 flex-shrink-0 ml-auto">
+                                    <span className={`text-[10px] ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>{isEn ? "Liq." : "청산"}</span>
+                                    <span className="text-[11px] font-mono tabular-nums text-orange-400">
+                                        {pos.liq_price.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                                    </span>
+                                </div>
+
+                                {/* 버튼 */}
+                                <button
+                                    onClick={() => { setTpSlPos(pos); setEditTp(pos.tp_price ? String(pos.tp_price) : ""); setEditSl(pos.sl_price ? String(pos.sl_price) : ""); setTpSlError(""); }}
+                                    className={`flex-shrink-0 text-[10px] px-2.5 py-1 rounded-lg border font-semibold cursor-pointer transition-all ${btnTpSl}`}
+                                >
+                                    TP/SL
+                                </button>
+                                <button
+                                    onClick={() => setClosePos({ pos, cp })}
+                                    className={`flex-shrink-0 text-[10px] px-2.5 py-1 rounded-lg border font-semibold cursor-pointer transition-all ${btnClose}`}
+                                >
+                                    {isEn ? "Close" : "청산"}
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* 모달은 동일하게 유지 */}
+                {typeof window !== "undefined" && createPortal(
+                    <AnimatePresence>
+                        {tpSlPos && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                                onClick={() => setTpSlPos(null)}>
+                                <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                                    transition={{ duration: 0.15 }} onClick={e => e.stopPropagation()}
+                                    className={`w-[360px] rounded-2xl border p-5 space-y-4 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-zinc-800"}`}>
+                                    <div className="flex items-center justify-between">
+                                        <p className={`text-[14px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>TP / SL — {tpSlPos.symbol.replace("USDT", "")}</p>
+                                        <button onClick={() => setTpSlPos(null)} className={`text-[18px] leading-none cursor-pointer ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>×</button>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <div className="flex-1">
+                                            <label className="text-[10px] text-emerald-500 font-medium mb-1.5 block">Take Profit (TP)</label>
+                                            <input type="number" value={editTp} onChange={e => setEditTp(e.target.value)} placeholder={isEn ? "Not set" : "미설정"}
+                                                className={`w-full text-emerald-500 text-[13px] font-mono rounded-xl px-3 py-2.5 border outline-none focus:border-emerald-500/50 placeholder:text-neutral-500 ${inputBg}`} />
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className="text-[10px] text-red-500 font-medium mb-1.5 block">Stop Loss (SL)</label>
+                                            <input type="number" value={editSl} onChange={e => setEditSl(e.target.value)} placeholder={isEn ? "Not set" : "미설정"}
+                                                className={`w-full text-red-500 text-[13px] font-mono rounded-xl px-3 py-2.5 border outline-none focus:border-red-500/50 placeholder:text-neutral-500 ${inputBg}`} />
+                                        </div>
+                                    </div>
+                                    {tpSlError && <p className="text-[11px] text-red-500">{tpSlError}</p>}
+                                    <div className="flex gap-2">
+                                        <button onClick={async () => { setTpSlError(""); const tp = editTp ? parseFloat(editTp) : null; const sl = editSl ? parseFloat(editSl) : null; try { await onUpdateTpSl?.(tpSlPos.id, tp, sl); setTpSlPos(null); } catch (e) { setTpSlError(e instanceof Error ? e.message : (isEn ? "Failed" : "설정 실패")); } }}
+                                            className={`flex-1 py-2.5 text-[12px] font-bold rounded-xl border transition-colors cursor-pointer ${isLight ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/20" : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20"}`}>
+                                            {isEn ? "Save" : "저장"}
+                                        </button>
+                                        <button onClick={() => setTpSlPos(null)} className={`px-5 py-2.5 text-[12px] rounded-xl cursor-pointer transition-colors ${isLight ? "text-neutral-500 hover:text-neutral-700" : "text-neutral-500 hover:text-neutral-300"}`}>
+                                            {isEn ? "Cancel" : "취소"}
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>, document.body
+                )}
+                {typeof window !== "undefined" && createPortal(
+                    <AnimatePresence>
+                        {closePos && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                                onClick={() => setClosePos(null)}>
+                                <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                                    transition={{ duration: 0.15 }} onClick={e => e.stopPropagation()}
+                                    className={`w-[320px] rounded-2xl border p-5 space-y-4 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-zinc-800"}`}>
+                                    <div className="flex items-center justify-between">
+                                        <p className={`text-[14px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>{isEn ? "Close Position" : "포지션 청산"}</p>
+                                        <button onClick={() => setClosePos(null)} className={`text-[18px] leading-none cursor-pointer ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>×</button>
+                                    </div>
+                                    <p className={`text-[13px] ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
+                                        <span className="font-bold">{closePos.pos.symbol.replace("USDT", "")}</span>{" "}
+                                        {closePos.pos.side === "LONG" ? (isEn ? "Long" : "롱") : (isEn ? "Short" : "숏")}{" "}
+                                        {isEn ? "position will be closed at market price" : "포지션을 시장가로 청산하시겠습니까?"}
+                                    </p>
+                                    <div className={`rounded-xl px-4 py-3 ${isLight ? "bg-neutral-50 border border-neutral-200" : "bg-neutral-800/60 border border-zinc-700/50"}`}>
+                                        <div className="flex justify-between text-[12px]">
+                                            <span className={isLight ? "text-neutral-500" : "text-neutral-400"}>{isEn ? "Unrealized PnL" : "미실현 손익"}</span>
+                                            <span className={`font-mono font-bold ${closePos.pos.unrealized_pnl >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                                                {closePos.pos.unrealized_pnl >= 0 ? "+" : ""}{closePos.pos.unrealized_pnl.toFixed(2)} USDT
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button onClick={async () => { await onClose(closePos.pos.id, closePos.cp); setClosePos(null); }}
+                                            className="flex-1 py-2.5 text-[12px] font-bold rounded-xl border bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors cursor-pointer">
+                                            {isEn ? "Close" : "청산 확인"}
+                                        </button>
+                                        <button onClick={() => setClosePos(null)} className={`px-5 py-2.5 text-[12px] rounded-xl cursor-pointer transition-colors ${isLight ? "text-neutral-500 hover:text-neutral-700" : "text-neutral-500 hover:text-neutral-300"}`}>
+                                            {isEn ? "Cancel" : "취소"}
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>, document.body
+                )}
+            </>
+        );
+    }
 
     if (positions.length === 0) {
         const steps = [

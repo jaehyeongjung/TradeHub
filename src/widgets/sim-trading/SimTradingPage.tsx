@@ -52,8 +52,16 @@ export function SimTradingPage() {
     const [bottomTab, setBottomTab] = useState<TabKey>("positions");
     const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
     const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+    const [isCompact, setIsCompact] = useState(false);
 
     useSimPriceStream();
+
+    useEffect(() => {
+        const check = () => setIsCompact(window.innerHeight <= 900);
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
 
     const currentPrice = prices[simSymbol] ?? 0;
     const priceChange = changes[simSymbol] ?? null;
@@ -126,7 +134,7 @@ export function SimTradingPage() {
                 <SimMarketData />
             </div>
 
-            <div className="flex gap-3 h-[calc(100vh-450px)] min-h-[260px]">
+            <div className={`flex gap-3 ${isCompact ? "h-[calc(100vh-230px)]" : "h-[calc(100vh-450px)] min-h-[260px]"}`}>
                 <div className="flex-1 min-w-0">
                     <CoinChart
                         boxId="sim-chart"
@@ -158,7 +166,19 @@ export function SimTradingPage() {
                 </div>
             </div>
 
-            <div className={`rounded-2xl border overflow-hidden ${tabBg}`}>
+            {isCompact ? (
+                /* 간이뷰 — 900px 이하 화면 */
+                <div className={`rounded-2xl border px-3 py-2 ${tabBg}`}>
+                    <SimPositions
+                        positions={positions}
+                        onClose={closePosition}
+                        onUpdateTpSl={updateTpSl}
+                        isEn={isEn}
+                        compact
+                    />
+                </div>
+            ) : (
+                <div className={`rounded-2xl border overflow-hidden ${tabBg}`}>
                 <div className={`relative flex border-b ${tabBorder}`}>
                     <div
                         className="absolute bottom-0 h-[2px] bg-emerald-400 rounded-full transition-all duration-200 ease-out"
@@ -208,6 +228,7 @@ export function SimTradingPage() {
                     )}
                 </div>
             </div>
+            )}
         </div>
     );
 }
