@@ -4,7 +4,6 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useAtomValue } from "jotai";
 import { usePathname } from "next/navigation";
 import { simSymbolAtom, simPricesAtom, activePageAtom } from "@/shared/store/atoms";
-import { useTheme } from "@/hooks/useTheme";
 
 interface FundingInfo {
     fundingRate: number;
