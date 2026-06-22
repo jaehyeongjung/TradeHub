@@ -106,8 +106,8 @@ export function NewsPanel({ roomId, fadeDelay = 0 }: { roomId: string; fadeDelay
         : "bg-teal-500/10 text-teal-400";
     const timeColor = isLight ? "text-neutral-400" : "text-text-muted";
     const openBtn = isLight
-        ? "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-        : "bg-surface-input text-text-secondary hover:bg-surface-hover";
+        ? "bg-teal-50 text-teal-600 hover:bg-teal-100"
+        : "bg-teal-500/20 text-teal-400 hover:bg-teal-500/30";
     const shareBtn = "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer";
     const shareBtnDisabled = isLight
         ? "bg-neutral-100 text-neutral-400 cursor-not-allowed"

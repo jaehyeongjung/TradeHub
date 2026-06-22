@@ -87,7 +87,8 @@ export const ANALYSIS_STEPS = [
     { key: "setup",   ko: "진입 타점 계산",      en: "Entry points",          pct: 96 },
 ] as const;
 
-const tick = () => new Promise<void>(r => setTimeout(r, 90));
+const tick     = () => new Promise<void>(r => setTimeout(r, 100));
+const linger   = () => new Promise<void>(r => setTimeout(r, 3500));
 
 export type AnalysisState = {
     candles: Candle[] | null
@@ -187,6 +188,14 @@ export function useAnalysis(): AnalysisState {
                 interval,
                 symbol,
             });
+
+            // 100% 완료 상태를 잠깐 보여주고 결과 전환
+            setProgress({
+                label: locale === "en" ? "Complete" : "분석 완료",
+                pct: 100,
+                stepIndex: ANALYSIS_STEPS.length,
+            });
+            await linger();
         } catch (e) {
             if (e instanceof Error && e.name !== "AbortError") setError(e.message);
         } finally {
