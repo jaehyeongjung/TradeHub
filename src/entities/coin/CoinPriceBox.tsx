@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SymbolPickerModal } from "@/widgets/shared-modals/SymbolPickerModal";
 import { supabase } from "@/shared/lib/supabase-browser";
+import { getBinanceRestBase, FUTURES_ONLY } from "@/shared/lib/binance";
 
 function getCoinLogoUrl(symbol: string): string {
     const base = symbol.toUpperCase().replace(/USDT$/, "").toLowerCase();
@@ -42,17 +43,34 @@ function fetchTickerBatched(sym: string): Promise<TickerData | null> {
                 tickerTimer = null;
 
                 const symbols = [...new Set(batch.map((b) => b.symbol))];
+                const spotSymbols = symbols.filter((s) => !FUTURES_ONLY.has(s));
+                const futuresSymbols = symbols.filter((s) => FUTURES_ONLY.has(s));
+
+                const map = new Map<string, TickerData>();
+
                 try {
-                    const param = JSON.stringify(symbols);
-                    const res = await fetch(
-                        `https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(param)}`,
-                    );
-                    const list = (await res.json()) as TickerData[];
-                    const map = new Map(list.map((t) => [t.symbol, t]));
-                    batch.forEach((b) => b.resolve(map.get(b.symbol) ?? null));
+                    if (spotSymbols.length > 0) {
+                        const param = JSON.stringify(spotSymbols);
+                        const res = await fetch(
+                            `https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(param)}`,
+                        );
+                        const list = (await res.json()) as TickerData[];
+                        list.forEach((t) => map.set(t.symbol, t));
+                    }
+                    if (futuresSymbols.length > 0) {
+                        await Promise.all(futuresSymbols.map(async (s) => {
+                            const res = await fetch(
+                                `https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${s}`,
+                            );
+                            const t = (await res.json()) as TickerData;
+                            if (t?.symbol) map.set(t.symbol, t);
+                        }));
+                    }
                 } catch {
-                    batch.forEach((b) => b.resolve(null));
+                    // 개별 실패는 null 처리
                 }
+
+                batch.forEach((b) => b.resolve(map.get(b.symbol) ?? null));
             }, 50);
         }
     });
@@ -75,7 +93,7 @@ async function fetchPrecision(sym: string): Promise<number> {
     pendingRequests[key] = (async () => {
         try {
             const res = await fetch(
-                `https://api.binance.com/api/v3/exchangeInfo?symbol=${key}`,
+                `${getBinanceRestBase(key)}/exchangeInfo?symbol=${key}`,
             );
             const info = (await res.json()) as BinanceExchangeInfo;
             const filters = info.symbols?.[0]?.filters ?? [];

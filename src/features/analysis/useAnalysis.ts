@@ -12,6 +12,7 @@ import { generateSignal } from "@/shared/lib/technical-analysis/signal";
 import { generateTrendLineSetups } from "@/shared/lib/technical-analysis/trendline-setup";
 import { analyzeMarketStructure } from "@/shared/lib/technical-analysis/market-structure";
 import { detectCandlestickPatterns } from "@/shared/lib/technical-analysis/candlestick-patterns";
+import { getBinanceRestBase } from "@/shared/lib/binance";
 
 // ── 타임프레임별 가져올 캔들 수 ────────────────────────────────────────────
 // 짧은 봉일수록 더 많이 가져와 충분한 히스토리 확보
@@ -41,7 +42,7 @@ async function fetchKlines(symbol: string, interval: Interval): Promise<Candle[]
     // 단일 페이지로 충분한 경우
     if (total <= MAX_PER_PAGE) {
         const res = await fetch(
-            `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${total}`
+            `${getBinanceRestBase(symbol)}/klines?symbol=${symbol}&interval=${interval}&limit=${total}`
         );
         if (!res.ok) throw new Error("klines fetch failed");
         return parseKlines(await res.json() as KlineRow[]);
@@ -54,8 +55,8 @@ async function fetchKlines(symbol: string, interval: Interval): Promise<Candle[]
 
     for (let p = 0; p < pages; p++) {
         const url = endTime
-            ? `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${MAX_PER_PAGE}&endTime=${endTime}`
-            : `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${MAX_PER_PAGE}`;
+            ? `${getBinanceRestBase(symbol)}/klines?symbol=${symbol}&interval=${interval}&limit=${MAX_PER_PAGE}&endTime=${endTime}`
+            : `${getBinanceRestBase(symbol)}/klines?symbol=${symbol}&interval=${interval}&limit=${MAX_PER_PAGE}`;
 
         const res = await fetch(url);
         if (!res.ok) throw new Error("klines fetch failed");

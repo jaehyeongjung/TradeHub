@@ -15,6 +15,7 @@ import {
     type LineWidth,
 } from "lightweight-charts";
 import { toKstUtcTimestamp } from "@/shared/lib/time";
+import { getBinanceRestBase, getBinanceWsBase } from "@/shared/lib/binance";
 import type { KlineRow, KlineMessage, Interval } from "@/shared/types/binance.types";
 import type { SimPosition } from "@/shared/types/sim-trading.types";
 import { SymbolPickerModal } from "@/widgets/shared-modals/SymbolPickerModal";
@@ -140,6 +141,9 @@ interface BinanceExchangeInfo {
         }>;
     }>;
 }
+
+const binanceRestBase = getBinanceRestBase;
+const binanceWsBase = getBinanceWsBase;
 
 type Props = {
     boxId?: string;
@@ -543,7 +547,7 @@ export function CoinChart({
                     dec = precisionCache.current[key].decimals;
                     mm = precisionCache.current[key].minMove;
                 } else {
-                    const res = await fetch(`https://api.binance.com/api/v3/exchangeInfo?symbol=${key}`);
+                    const res = await fetch(`${binanceRestBase(key)}/exchangeInfo?symbol=${key}`);
                     const info = (await res.json()) as BinanceExchangeInfo;
                     const pf = info.symbols?.[0]?.filters?.find((f) => f.filterType === "PRICE_FILTER");
                     const tick = pf?.tickSize ?? "0.01";
@@ -577,7 +581,7 @@ export function CoinChart({
             if (range.from < 20 && !isLoadingMore && !allDataLoaded && oldestTime > 0) {
                 isLoadingMore = true;
                 try {
-                    const url = `https://api.binance.com/api/v3/klines?symbol=${sym}&interval=${interval}&endTime=${oldestTime - 1}&limit=${historyLimit}`;
+                    const url = `${binanceRestBase(sym)}/klines?symbol=${sym}&interval=${interval}&endTime=${oldestTime - 1}&limit=${historyLimit}`;
                     const res = await fetch(url);
                     const rows = (await res.json()) as KlineRow[];
                     if (destroyed) return;
@@ -626,7 +630,7 @@ export function CoinChart({
 
         async function loadHistory() {
             try {
-                const url = `https://api.binance.com/api/v3/klines?symbol=${sym}&interval=${interval}&limit=${historyLimit}`;
+                const url = `${binanceRestBase(sym)}/klines?symbol=${sym}&interval=${interval}&limit=${historyLimit}`;
                 const res = await fetch(url);
                 const rows = (await res.json()) as KlineRow[];
                 if (destroyed) return;
@@ -658,7 +662,7 @@ export function CoinChart({
 
         function openWs() {
             const stream = `${sym.toLowerCase()}@kline_${interval}`;
-            ws = new WebSocket(`wss://stream.binance.com:9443/ws/${stream}`);
+            ws = new WebSocket(`${binanceWsBase(sym)}/${stream}`);
             ws.onmessage = (ev: MessageEvent<string>) => {
                 if (destroyed) return;
                 try {
