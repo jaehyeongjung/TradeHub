@@ -234,7 +234,7 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, c
                 color: isLight ? "text-emerald-600" : "text-emerald-400",
                 bg: isLight ? "bg-emerald-50 border-emerald-200/60" : "bg-emerald-500/8 border-emerald-500/20",
                 icon: (
-                    <svg className={`w-4 h-4 ${isLight ? "text-emerald-600" : "text-emerald-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-3 h-3 ${isLight ? "text-emerald-600" : "text-emerald-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 ),
@@ -246,7 +246,7 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, c
                 color: "text-blue-500",
                 bg: isLight ? "bg-blue-50 border-blue-200/60" : "bg-blue-500/8 border-blue-500/20",
                 icon: (
-                    <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                 ),
@@ -258,7 +258,7 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, c
                 color: "text-emerald-500",
                 bg: isLight ? "bg-emerald-50 border-emerald-200/60" : "bg-emerald-500/8 border-emerald-500/20",
                 icon: (
-                    <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                 ),
@@ -268,43 +268,21 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, c
         ];
 
         return (
-            <div className="space-y-3">
-                <div className={`${cardBg} rounded-2xl border ${border} p-5`}>
-                    <div className="flex items-center gap-3 mb-1">
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${isLight ? "bg-emerald-50" : "bg-emerald-500/10"}`}>
-                            <svg className={`w-4 h-4 ${isLight ? "text-emerald-600" : "text-emerald-400"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
+            <div className={`h-full flex flex-col ${cardBg} rounded-2xl border ${border} overflow-hidden`}>
+                {steps.map((step, i) => (
+                    <div key={step.num} className={`flex-1 px-3 py-2 flex items-start gap-2.5 ${i < steps.length - 1 ? `border-b ${border}` : ""}`}>
+                        <div className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5 border ${step.bg}`}>
+                            {step.icon}
                         </div>
-                        <div>
-                            <p className={`text-[14px] font-bold ${textPrimary}`}>{isEn ? "Start Sim Trading" : "모의투자 시작하기"}</p>
-                            <p className={`text-[11px] ${textTertiary}`}>{isEn ? "Practice futures trading with no real money" : "실제 돈 없이 선물 거래를 연습해보세요"}</p>
+                        <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                                <span className={`text-[9px] font-bold ${step.color} uppercase tracking-wider`}>Step {step.num}</span>
+                                <span className={`text-[11px] font-semibold ${textPrimary}`}>{step.title}</span>
+                            </div>
+                            <p className={`text-[10px] ${textTertiary} leading-relaxed`}>{step.desc}</p>
                         </div>
                     </div>
-                </div>
-
-                <div className="space-y-2">
-                    {steps.map((step) => (
-                        <div key={step.num} className={`${cardBg} rounded-2xl border ${border} p-4 flex items-start gap-3`}>
-                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 border ${step.bg}`}>
-                                {step.icon}
-                            </div>
-                            <div className="min-w-0">
-                                <div className="flex items-center gap-1.5 mb-0.5">
-                                    <span className={`text-[9px] font-bold ${step.color} uppercase tracking-wider`}>Step {step.num}</span>
-                                </div>
-                                <p className={`text-[12px] font-semibold ${textPrimary} mb-0.5`}>{step.title}</p>
-                                <p className={`text-[11px] ${textTertiary} leading-relaxed`}>{step.desc}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className={`rounded-xl px-4 py-3 border ${isLight ? "bg-neutral-50 border-neutral-200" : "bg-neutral-900/50 border-zinc-800/60"}`}>
-                    <p className={`text-[11px] ${textTertiary} text-center`}>
-                        💡 {isEn ? "All trades use virtual funds — no real money involved" : "모든 거래는 가상 자산으로 진행되며 실제 손익이 발생하지 않습니다"}
-                    </p>
-                </div>
+                ))}
             </div>
         );
     }
