@@ -22,6 +22,20 @@ import { SymbolPickerModal } from "@/widgets/shared-modals/SymbolPickerModal";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { AnimatePresence, motion } from "framer-motion";
 
+const STOCK_SYMBOL_NAMES: Record<string, string> = {
+    "^IXIC": "NASDAQ",
+    "^GSPC": "S&P 500",
+    "^DJI":  "Dow Jones",
+    "^KS11": "KOSPI",
+    "^N225": "Nikkei",
+};
+
+function isStockSymbol(sym: string): boolean {
+    return sym.startsWith("^");
+}
+
+type OhlcvBar = { time: number; open: number; high: number; low: number; close: number; volume: number };
+
 type IndicatorType = "MA" | "EMA" | "BB" | "RSI" | "MACD";
 
 interface IndicatorConfig {
@@ -157,6 +171,7 @@ type Props = {
     positions?: SimPosition[];
     onUpdateTpSl?: (positionId: string, tp: number | null, sl: number | null) => Promise<void>;
     locale?: "ko" | "en";
+    showStockIndices?: boolean;
 };
 
 const INTERVAL_OPTIONS: { value: Interval; label: string; labelEn: string }[] = [
@@ -208,6 +223,7 @@ export function CoinChart({
     positions,
     onUpdateTpSl,
     locale = "ko",
+    showStockIndices = false,
 }: Props) {
     const outerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<HTMLDivElement>(null);
@@ -541,6 +557,10 @@ export function CoinChart({
 
         (async () => {
             try {
+                if (isStockSymbol(sym)) {
+                    if (!destroyed) candleSeries.applyOptions({ priceFormat: { type: "price", precision: 2, minMove: 0.01 } });
+                    return;
+                }
                 const key = sym.toUpperCase();
                 let dec = 2, mm = 0.01;
                 if (precisionCache.current[key]) {
@@ -569,6 +589,7 @@ export function CoinChart({
         let oldestTime = 0;
         let isLoadingMore = false;
         let allDataLoaded = false;
+        let stockPollId: number | null = null;
 
         chart.timeScale().subscribeVisibleLogicalRangeChange(async (range) => {
             if (!range || destroyed) return;
@@ -630,6 +651,30 @@ export function CoinChart({
 
         async function loadHistory() {
             try {
+                if (isStockSymbol(sym)) {
+                    const res = await fetch(`/api/market-chart?symbol=${encodeURIComponent(sym)}&interval=${interval}`);
+                    const json = (await res.json()) as { bars: OhlcvBar[] };
+                    if (destroyed) return;
+                    const bars = json.bars ?? [];
+                    dataLength = bars.length;
+                    allDataLoaded = true;
+                    if (bars.length > 0) oldestTime = bars[0].time * 1000;
+                    const candles = bars.map((b) => ({
+                        time: b.time as UTCTimestamp,
+                        open: b.open, high: b.high, low: b.low, close: b.close,
+                    }));
+                    candleSeries.setData(candles);
+                    volumeSeries.setData(bars.map((b) => ({
+                        time: b.time as UTCTimestamp,
+                        value: b.volume,
+                        color: b.close >= b.open ? "rgba(38,166,154,0.3)" : "rgba(239,83,80,0.3)",
+                    })));
+                    candleDataRef.current = candles;
+                    setCandleDataVersion((v) => v + 1);
+                    setChartLoading(false);
+                    return;
+                }
+
                 const url = `${binanceRestBase(sym)}/klines?symbol=${sym}&interval=${interval}&limit=${historyLimit}`;
                 const res = await fetch(url);
                 const rows = (await res.json()) as KlineRow[];
@@ -661,6 +706,25 @@ export function CoinChart({
         }
 
         function openWs() {
+            if (isStockSymbol(sym)) {
+                stockPollId = window.setInterval(async () => {
+                    if (destroyed) return;
+                    try {
+                        const res = await fetch(`/api/market-chart?symbol=${encodeURIComponent(sym)}&interval=${interval}`);
+                        const json = (await res.json()) as { bars: OhlcvBar[] };
+                        if (destroyed) return;
+                        const bars = json.bars ?? [];
+                        if (bars.length === 0) return;
+                        const last = bars[bars.length - 1];
+                        candleSeries.update({
+                            time: last.time as UTCTimestamp,
+                            open: last.open, high: last.high, low: last.low, close: last.close,
+                        });
+                    } catch {}
+                }, 30000);
+                return;
+            }
+
             const stream = `${sym.toLowerCase()}@kline_${interval}`;
             ws = new WebSocket(`${binanceWsBase(sym)}/${stream}`);
             ws.onmessage = (ev: MessageEvent<string>) => {
@@ -713,6 +777,7 @@ export function CoinChart({
             indicatorSeriesMapRef.current.clear();
             try { ro?.disconnect(); } catch {}
             ro = null;
+            if (stockPollId !== null) { clearInterval(stockPollId); stockPollId = null; }
             if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
             if (ws) {
                 try { ws.onmessage = null; ws.onclose = null; ws.onerror = null; ws.close(); } catch {}
@@ -1020,11 +1085,13 @@ export function CoinChart({
                     <div className="absolute top-2 left-2 flex items-center gap-1 z-20">
                         {!hideControls && (
                             <div className="px-2 py-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50">
-                                <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">{sym}</span>
+                                <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">
+                                    {STOCK_SYMBOL_NAMES[sym] ?? sym}
+                                </span>
                             </div>
                         )}
                         <div className="flex gap-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-lg p-0.5 border border-neutral-700/50">
-                            {INTERVAL_OPTIONS.filter(opt => enableIndicators || (opt.value !== "1w" && opt.value !== "1M")).map((opt) => (
+                            {INTERVAL_OPTIONS.filter(opt => enableIndicators || isStockSymbol(sym) || (opt.value !== "1w" && opt.value !== "1M")).map((opt) => (
                                 <button
                                     key={opt.value}
                                     onClick={() => {
@@ -1304,7 +1371,7 @@ export function CoinChart({
             </div>
 
             {!hideControls && (
-                <SymbolPickerModal open={open} initialSymbol={sym} onClose={() => setOpen(false)} onSelect={saveSymbol} />
+                <SymbolPickerModal open={open} initialSymbol={sym} onClose={() => setOpen(false)} onSelect={saveSymbol} showStockIndices={showStockIndices} />
             )}
         </>
     );

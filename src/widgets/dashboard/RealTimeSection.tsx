@@ -30,7 +30,7 @@ export const RealTimeSection = () => {
             </div>
 
             <div className="flex-[2] min-w-0">
-                <CoinChart fadeDelay={300} locale={isEn ? "en" : "ko"} />
+                <CoinChart fadeDelay={300} locale={isEn ? "en" : "ko"} showStockIndices />
             </div>
 
             <div className="flex gap-2 2xl:gap-4 flex-[2] min-w-0">

@@ -8,6 +8,14 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 
+const STOCK_INDICES = [
+    { symbol: "^IXIC", name: "NASDAQ",    label: "NASDAQ" },
+    { symbol: "^GSPC", name: "S&P 500",   label: "S&P500" },
+    { symbol: "^DJI",  name: "Dow Jones", label: "DJI" },
+    { symbol: "^KS11", name: "KOSPI",     label: "KOSPI" },
+    { symbol: "^N225", name: "Nikkei",    label: "Nikkei" },
+];
+
 const DEFAULT_SYMBOLS = [
     "1inchusdt", "aaveusdt", "adausdt", "agixusdt", "algousdt",
     "ankrusdt", "apeusdt", "aptusdt", "arbusdt", "arkusdt",
@@ -149,6 +157,11 @@ const SYMBOL_NAMES: Record<string, string> = {
     "zenusdt": "Horizen",
     "zilusdt": "Zilliqa",
     "zrxusdt": "0x",
+    "^IXIC": "NASDAQ",
+    "^GSPC": "S&P 500",
+    "^DJI":  "Dow Jones",
+    "^KS11": "KOSPI",
+    "^N225": "Nikkei",
 };
 
 function getCoinLogoUrl(symbol: string) {
@@ -162,6 +175,7 @@ type Props = {
     onClose: () => void;
     onSelect: (symbol: string) => void;
     symbols?: string[];
+    showStockIndices?: boolean;
 };
 
 export function SymbolPickerModal({
@@ -170,6 +184,7 @@ export function SymbolPickerModal({
     onClose,
     onSelect,
     symbols = DEFAULT_SYMBOLS,
+    showStockIndices = false,
 }: Props) {
     const [search, setSearch] = useState("");
     const [selected, setSelected] = useState(initialSymbol.toLowerCase());
@@ -298,6 +313,43 @@ export function SymbolPickerModal({
 
                         <div className="flex-1 overflow-y-auto px-5 pb-5 scrollbar-hide">
 
+                            {showStockIndices && !search.trim() && (
+                                <div className="mb-5">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <svg className="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                        </svg>
+                                        <span className="text-[11px] font-semibold text-blue-400 tracking-wider uppercase">{isEn ? "Indices" : "주가 지수"}</span>
+                                    </div>
+                                    <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                                        {STOCK_INDICES.map((idx) => {
+                                            const isActive = selected === idx.symbol;
+                                            return (
+                                                <button
+                                                    key={idx.symbol}
+                                                    onClick={() => handleSelect(idx.symbol)}
+                                                    className={`flex-shrink-0 flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-2xl border transition-all cursor-pointer ${
+                                                        isActive
+                                                            ? "bg-blue-500/15 border-blue-500/40 text-blue-400"
+                                                            : isLight
+                                                                ? "bg-neutral-50 border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-100"
+                                                                : "bg-neutral-900 border-zinc-800 text-neutral-300 hover:border-zinc-600 hover:bg-neutral-800/60"
+                                                    }`}
+                                                >
+                                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold flex-shrink-0 ${isActive ? "bg-blue-500/20 text-blue-400" : isLight ? "bg-neutral-200 text-neutral-600" : "bg-neutral-700 text-neutral-400"}`}>
+                                                        ↗
+                                                    </div>
+                                                    <div className="text-left">
+                                                        <div className="text-[12px] font-semibold leading-tight">{idx.label}</div>
+                                                        <div className={`text-[9px] ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>{idx.name}</div>
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
                             {popularFiltered.length > 0 && (
                                 <div className="mb-5">
                                     <div className="flex items-center gap-2 mb-3">
@@ -420,22 +472,28 @@ export function SymbolPickerModal({
                                 : "border-zinc-800/60 bg-neutral-950/80"
                         }`}>
                             <div className="flex items-center gap-2.5">
-                                <div className="relative w-5 h-5 flex-shrink-0">
-                                    <Image
-                                        src={getCoinLogoUrl(selected)}
-                                        alt={selected}
-                                        fill
-                                        className="object-contain rounded-full"
-                                        unoptimized
-                                    />
-                                </div>
+                                {selected.startsWith("^") ? (
+                                    <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-[10px] text-blue-400 font-bold flex-shrink-0">↗</div>
+                                ) : (
+                                    <div className="relative w-5 h-5 flex-shrink-0">
+                                        <Image
+                                            src={getCoinLogoUrl(selected)}
+                                            alt={selected}
+                                            fill
+                                            className="object-contain rounded-full"
+                                            unoptimized
+                                        />
+                                    </div>
+                                )}
                                 <span className="text-[12px] text-neutral-500">{isEn ? "Selected" : "현재 선택"}</span>
-                                <span className="text-[12px] font-semibold text-amber-500">
-                                    {selected.replace("usdt", "").toUpperCase()}
+                                <span className={`text-[12px] font-semibold ${selected.startsWith("^") ? "text-blue-400" : "text-amber-500"}`}>
+                                    {selected.startsWith("^") ? (SYMBOL_NAMES[selected] ?? selected) : selected.replace("usdt", "").toUpperCase()}
                                 </span>
-                                <span className={`text-[11px] ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>
-                                    · {SYMBOL_NAMES[selected] ?? ""}
-                                </span>
+                                {!selected.startsWith("^") && (
+                                    <span className={`text-[11px] ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>
+                                        · {SYMBOL_NAMES[selected] ?? ""}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </motion.div>
