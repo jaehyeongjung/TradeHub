@@ -530,7 +530,7 @@ export function CoinChart({
         chart.timeScale().applyOptions({
             timeVisible: true,
             secondsVisible: false,
-            rightOffset: 20,
+            rightOffset: 5,
             lockVisibleTimeRangeOnResize: true,
             shiftVisibleRangeOnNewBar: true,
         });
