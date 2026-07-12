@@ -29,7 +29,7 @@ export default function Image() {
                             letterSpacing: "-0.06em",
                         }}
                     >
-                        TRADEHUB
+                        TradeHub
                     </span>
                     <div
                         style={{

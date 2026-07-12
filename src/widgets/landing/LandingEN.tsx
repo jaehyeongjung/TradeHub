@@ -32,7 +32,7 @@ export function LandingEN() {
             <nav className="fixed top-0 z-[100] flex w-full items-center justify-between px-6 py-8 md:px-12 md:py-10">
                 <div className="flex items-baseline gap-3">
                     <span className="text-xl font-black tracking-[-0.08em] leading-none text-white">
-                        TRADEHUB
+                        TradeHub
                     </span>
                 </div>
                 <div className="flex items-center gap-3">

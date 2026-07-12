@@ -74,7 +74,7 @@ function MobilePageInner() {
             <header className="px-6 pt-14 pb-0 flex items-center justify-between">
                 <div className="flex flex-col">
                     <span className={`text-[22px] font-[900] tracking-[-0.08em] leading-none ${isLight ? "text-neutral-900" : "text-white"}`}>
-                        TRADEHUB
+                        TradeHub
                     </span>
                     <span className="text-[9px] font-bold tracking-[0.5em] text-emerald-500 mt-1 uppercase">
                         LIVE LAB
