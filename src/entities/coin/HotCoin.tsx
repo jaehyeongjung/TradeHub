@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,6 +35,41 @@ function scoreOf(t: Ticker24h) {
 
 function prettySym(sym: string) {
     return sym.replace(/USDT$/, "");
+}
+
+function getCoinLogoUrl(symbol: string) {
+    // 바이낸스 자체 로고 CDN — 상장 코인(밈/신규 포함) 커버리지가 넓고, 없는 심볼은 403이라 폴백 처리됨
+    const base = symbol.toUpperCase().replace(/USDT$/, "");
+    return `https://bin.bnbstatic.com/static/assets/logos/${base}.png`;
+}
+
+/** 코인 아이콘. 아이콘이 없으면 심볼 첫 글자 원형 배지로 폴백해 레이아웃이 비지 않게 한다. */
+function CoinIcon({ symbol, size = 18 }: { symbol: string; size?: number }) {
+    const [failed, setFailed] = useState(false);
+    const base = prettySym(symbol.toUpperCase());
+    if (failed) {
+        return (
+            <span
+                className="inline-flex items-center justify-center rounded-full bg-neutral-700 text-neutral-200 font-bold shrink-0"
+                style={{ width: size, height: size, fontSize: size * 0.42 }}
+            >
+                {base.charAt(0)}
+            </span>
+        );
+    }
+    return (
+        <Image
+            src={getCoinLogoUrl(symbol)}
+            alt={base}
+            width={size}
+            height={size}
+            unoptimized
+            // 바이낸스 CDN은 Referer가 있으면 403(핫링크 차단) → Referer 미전송
+            referrerPolicy="no-referrer"
+            className="rounded-full shrink-0"
+            onError={() => setFailed(true)}
+        />
+    );
 }
 
 function formatPrice(p: number) {
@@ -174,6 +210,7 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
                                 <span className={`text-[10px] tabular-nums w-6 text-right shrink-0 ${rankColor}`}>
                                     {idx + 1}
                                 </span>
+                                <CoinIcon symbol={current.symbol} size={20} />
                                 <span className={`font-semibold font-mono text-[13px] 2xl:text-sm ${symColor}`}>
                                     {prettySym(current.symbol)}
                                 </span>
@@ -254,7 +291,8 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
                                             }`}>
                                                 {i + 1}
                                             </span>
-                                            <span className={`flex-1 font-mono font-semibold text-[11px] 2xl:text-xs ${
+                                            <CoinIcon symbol={item.symbol} size={18} />
+                                            <span className={`flex-1 ml-2 font-mono font-semibold text-[11px] 2xl:text-xs ${
                                                 isActive
                                                     ? isLight ? "text-emerald-700" : "text-emerald-300"
                                                     : symColor
