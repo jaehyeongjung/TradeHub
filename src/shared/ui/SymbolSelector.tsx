@@ -6,8 +6,9 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 function getCoinLogoUrl(symbol: string) {
-    const base = symbol.toUpperCase().replace(/USDT$/, "").toLowerCase();
-    return `https://assets.coincap.io/assets/icons/${base}@2x.png`;
+    // 바이낸스 자체 로고 CDN — 상장 코인 커버리지가 넓음. 없는 심볼은 403 반환.
+    const base = symbol.toUpperCase().replace(/USDT$/, "");
+    return `https://bin.bnbstatic.com/static/assets/logos/${base}.png`;
 }
 
 interface DropdownPos { top: number; left: number; }
@@ -153,6 +154,8 @@ export function SymbolSelector({
                                     height={30}
                                     className="rounded-full flex-shrink-0"
                                     unoptimized
+                                    referrerPolicy="no-referrer"
+                                    onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
                                 />
                                 <div className="flex-1 text-left min-w-0">
                                     <div className="flex items-center gap-1.5">
@@ -204,6 +207,8 @@ export function SymbolSelector({
                     height={26}
                     className="rounded-full flex-shrink-0"
                     unoptimized
+                    referrerPolicy="no-referrer"
+                    onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
                 />
                 <div className="flex items-center gap-1.5">
                     <span className={`text-[15px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>

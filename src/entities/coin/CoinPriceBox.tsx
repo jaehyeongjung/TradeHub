@@ -9,8 +9,9 @@ import { supabase } from "@/shared/lib/supabase-browser";
 import { getBinanceRestBase, FUTURES_ONLY } from "@/shared/lib/binance";
 
 function getCoinLogoUrl(symbol: string): string {
-    const base = symbol.toUpperCase().replace(/USDT$/, "").toLowerCase();
-    return `https://assets.coincap.io/assets/icons/${base}@2x.png`;
+    // 바이낸스 자체 로고 CDN — 상장 코인 커버리지가 넓음. 없는 심볼은 403 반환.
+    const base = symbol.toUpperCase().replace(/USDT$/, "");
+    return `https://bin.bnbstatic.com/static/assets/logos/${base}.png`;
 }
 
 type Props = { boxId: string; defaultSymbol?: string; fadeDelay?: number };
@@ -311,6 +312,7 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                                 fill
                                 className="object-contain rounded-full"
                                 unoptimized
+                                referrerPolicy="no-referrer"
                                 onError={(e) => {
                                     e.currentTarget.style.display = 'none';
                                 }}

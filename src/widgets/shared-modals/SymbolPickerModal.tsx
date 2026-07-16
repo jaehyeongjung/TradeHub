@@ -165,8 +165,9 @@ const SYMBOL_NAMES: Record<string, string> = {
 };
 
 function getCoinLogoUrl(symbol: string) {
-    const base = symbol.replace(/usdt$/i, "").toLowerCase();
-    return `https://assets.coincap.io/assets/icons/${base}@2x.png`;
+    // 바이낸스 자체 로고 CDN — 상장 코인 커버리지가 넓음. 없는 심볼은 403 반환.
+    const base = symbol.replace(/usdt$/i, "").toUpperCase();
+    return `https://bin.bnbstatic.com/static/assets/logos/${base}.png`;
 }
 
 type Props = {
@@ -381,6 +382,8 @@ export function SymbolPickerModal({
                                                         height={20}
                                                         className="rounded-full flex-shrink-0"
                                                         unoptimized
+                                                        referrerPolicy="no-referrer"
+                                                        onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
                                                     />
                                                     <span className="text-[12px] font-semibold">{base}</span>
                                                 </button>
@@ -438,6 +441,7 @@ export function SymbolPickerModal({
                                                             fill
                                                             className="object-contain rounded-full"
                                                             unoptimized
+                                                            referrerPolicy="no-referrer"
                                                             onError={(e) => { e.currentTarget.style.display = "none"; }}
                                                         />
                                                     </div>
@@ -482,6 +486,8 @@ export function SymbolPickerModal({
                                             fill
                                             className="object-contain rounded-full"
                                             unoptimized
+                                            referrerPolicy="no-referrer"
+                                            onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
                                         />
                                     </div>
                                 )}
