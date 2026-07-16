@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
 import { usePathname } from "next/navigation";
 
@@ -184,15 +184,44 @@ export function SymbolPickerModal({
     initialSymbol,
     onClose,
     onSelect,
-    symbols = DEFAULT_SYMBOLS,
+    symbols: symbolsProp,
     showStockIndices = false,
 }: Props) {
     const [search, setSearch] = useState("");
     const [selected, setSelected] = useState(initialSymbol.toLowerCase());
+    // 바이낸스 거래량 상위 목록 (/api/symbols, 1시간 캐시). 실패 시 하드코딩 폴백.
+    const [fetchedSymbols, setFetchedSymbols] = useState<string[] | null>(null);
     const isLight = useTheme();
     const inputRef = useRef<HTMLInputElement>(null);
     const pathname = usePathname();
     const isEn = pathname.startsWith("/en/");
+
+    // 인기 섹션 가로 스크롤 표시용 — 양 끝 페이드(그라데이션) on/off
+    const popRef = useRef<HTMLDivElement>(null);
+    const [popEdge, setPopEdge] = useState<{ l: boolean; r: boolean }>({ l: false, r: false });
+    const measurePop = useCallback(() => {
+        const el = popRef.current;
+        if (!el) return;
+        setPopEdge({
+            l: el.scrollLeft > 4,
+            r: el.scrollLeft + el.clientWidth < el.scrollWidth - 4,
+        });
+    }, []);
+
+    // 명시적으로 넘겨준 목록 우선, 없으면 동적 목록, 그것도 없으면 하드코딩 기본값
+    const symbols = symbolsProp ?? fetchedSymbols ?? DEFAULT_SYMBOLS;
+
+    useEffect(() => {
+        if (symbolsProp || fetchedSymbols) return;
+        let aborted = false;
+        fetch("/api/symbols")
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d: { symbols?: string[] } | null) => {
+                if (!aborted && d?.symbols?.length) setFetchedSymbols(d.symbols);
+            })
+            .catch(() => {});
+        return () => { aborted = true; };
+    }, [symbolsProp, fetchedSymbols]);
 
     useEffect(() => {
         if (open) {
@@ -223,10 +252,15 @@ export function SymbolPickerModal({
         return POPULAR_SYMBOLS.filter((s) => symbols.includes(s));
     }, [search, symbols]);
 
-    const otherSymbols = useMemo(() => {
-        if (search.trim()) return filteredSymbols;
-        return filteredSymbols.filter((s) => !POPULAR_SYMBOLS.includes(s));
-    }, [search, filteredSymbols]);
+    // "전체" 섹션은 인기 코인을 포함한 전 목록 (헤더의 지원 개수와 일치). 인기 행은 위에 별도 표시(quick access).
+    const otherSymbols = filteredSymbols;
+
+    useEffect(() => {
+        if (!open) return;
+        const t = setTimeout(measurePop, 60);
+        window.addEventListener("resize", measurePop);
+        return () => { clearTimeout(t); window.removeEventListener("resize", measurePop); };
+    }, [open, popularFiltered.length, measurePop]);
 
     const handleSelect = (symbol: string) => {
         onSelect(symbol);
@@ -359,7 +393,15 @@ export function SymbolPickerModal({
                                         </svg>
                                         <span className="text-[11px] font-semibold text-amber-400 tracking-wider uppercase">{isEn ? "Popular" : "인기"}</span>
                                     </div>
-                                    <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                                    <div
+                                        ref={popRef}
+                                        onScroll={measurePop}
+                                        className="flex gap-2 overflow-x-auto scrollbar-hide pb-1"
+                                        style={{
+                                            maskImage: `linear-gradient(to right, ${popEdge.l ? "transparent 0, black 28px" : "black 0"}, black calc(100% - ${popEdge.r ? "28px" : "0px"}), ${popEdge.r ? "transparent 100%" : "black 100%"})`,
+                                            WebkitMaskImage: `linear-gradient(to right, ${popEdge.l ? "transparent 0, black 28px" : "black 0"}, black calc(100% - ${popEdge.r ? "28px" : "0px"}), ${popEdge.r ? "transparent 100%" : "black 100%"})`,
+                                        }}
+                                    >
                                         {popularFiltered.map((s) => {
                                             const base = s.replace("usdt", "").toUpperCase();
                                             const isActive = selected === s;
@@ -420,7 +462,7 @@ export function SymbolPickerModal({
                                     <div className="space-y-0.5">
                                         {otherSymbols.map((s) => {
                                             const base = s.replace("usdt", "").toUpperCase();
-                                            const name = SYMBOL_NAMES[s] || base;
+                                            const name = SYMBOL_NAMES[s] ?? "";
                                             const isActive = selected === s;
                                             return (
                                                 <button
@@ -449,7 +491,7 @@ export function SymbolPickerModal({
                                                         <div className={`text-[14px] font-semibold leading-tight ${isActive ? "text-amber-500" : isLight ? "text-neutral-900" : "text-white"}`}>
                                                             {base}
                                                         </div>
-                                                        <div className="text-[11px] text-neutral-500 mt-0.5 truncate">{name}</div>
+                                                        {name && <div className="text-[11px] text-neutral-500 mt-0.5 truncate">{name}</div>}
                                                     </div>
                                                     {isActive ? (
                                                         <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
