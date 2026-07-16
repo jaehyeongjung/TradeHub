@@ -9,12 +9,18 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 
 const STOCK_INDICES = [
-    { symbol: "^IXIC", name: "NASDAQ",    label: "NASDAQ" },
-    { symbol: "^GSPC", name: "S&P 500",   label: "S&P500" },
-    { symbol: "^DJI",  name: "Dow Jones", label: "DJI" },
-    { symbol: "^KS11", name: "KOSPI",     label: "KOSPI" },
-    { symbol: "^N225", name: "Nikkei",    label: "Nikkei" },
+    { symbol: "^IXIC", name: "NASDAQ",    label: "NASDAQ", flag: "🇺🇸" },
+    { symbol: "^GSPC", name: "S&P 500",   label: "S&P500", flag: "🇺🇸" },
+    { symbol: "^DJI",  name: "Dow Jones", label: "DJI",    flag: "🇺🇸" },
+    { symbol: "^KS11", name: "KOSPI",     label: "KOSPI",  flag: "🇰🇷" },
+    { symbol: "^N225", name: "Nikkei",    label: "Nikkei", flag: "🇯🇵" },
 ];
+
+// 심볼(대/소문자 무관)로 주가지수 메타 조회
+function findStockIndex(symbol: string) {
+    const s = symbol.toLowerCase();
+    return STOCK_INDICES.find((i) => i.symbol.toLowerCase() === s);
+}
 
 const DEFAULT_SYMBOLS = [
     "1inchusdt", "aaveusdt", "adausdt", "agixusdt", "algousdt",
@@ -358,7 +364,7 @@ export function SymbolPickerModal({
                                     </div>
                                     <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
                                         {STOCK_INDICES.map((idx) => {
-                                            const isActive = selected === idx.symbol;
+                                            const isActive = idx.symbol.toLowerCase() === selected;
                                             return (
                                                 <button
                                                     key={idx.symbol}
@@ -371,9 +377,9 @@ export function SymbolPickerModal({
                                                                 : "bg-neutral-900 border-zinc-800 text-neutral-300 hover:border-zinc-600 hover:bg-neutral-800/60"
                                                     }`}
                                                 >
-                                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold flex-shrink-0 ${isActive ? "bg-blue-500/20 text-blue-400" : isLight ? "bg-neutral-200 text-neutral-600" : "bg-neutral-700 text-neutral-400"}`}>
-                                                        ↗
-                                                    </div>
+                                                    <span className="w-5 h-5 flex items-center justify-center text-[15px] leading-none flex-shrink-0">
+                                                        {idx.flag}
+                                                    </span>
                                                     <div className="text-left">
                                                         <div className="text-[12px] font-semibold leading-tight">{idx.label}</div>
                                                         <div className={`text-[9px] ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>{idx.name}</div>
@@ -519,7 +525,9 @@ export function SymbolPickerModal({
                         }`}>
                             <div className="flex items-center gap-2.5">
                                 {selected.startsWith("^") ? (
-                                    <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center text-[10px] text-blue-400 font-bold flex-shrink-0">↗</div>
+                                    <span className="w-5 h-5 flex items-center justify-center text-[15px] leading-none flex-shrink-0">
+                                        {findStockIndex(selected)?.flag ?? "📈"}
+                                    </span>
                                 ) : (
                                     <div className="relative w-5 h-5 flex-shrink-0">
                                         <Image
@@ -535,11 +543,11 @@ export function SymbolPickerModal({
                                 )}
                                 <span className="text-[12px] text-neutral-500">{isEn ? "Selected" : "현재 선택"}</span>
                                 <span className={`text-[12px] font-semibold ${selected.startsWith("^") ? "text-blue-400" : "text-amber-500"}`}>
-                                    {selected.startsWith("^") ? (SYMBOL_NAMES[selected] ?? selected) : selected.replace("usdt", "").toUpperCase()}
+                                    {selected.startsWith("^") ? (findStockIndex(selected)?.name ?? selected.toUpperCase()) : selected.replace("usdt", "").toUpperCase()}
                                 </span>
-                                {!selected.startsWith("^") && (
+                                {!selected.startsWith("^") && SYMBOL_NAMES[selected] && (
                                     <span className={`text-[11px] ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>
-                                        · {SYMBOL_NAMES[selected] ?? ""}
+                                        · {SYMBOL_NAMES[selected]}
                                     </span>
                                 )}
                             </div>
