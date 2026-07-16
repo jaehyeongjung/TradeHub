@@ -516,6 +516,8 @@ export function CoinChart({
             layout: {
                 background: { color: isLight ? "#ffffff" : "#111C2D" },
                 textColor: isLight ? "#333333" : "#A8B4C8" ,
+                // 컴팩트(대시보드) 차트는 하단 x축 시간 라벨을 더 작게
+                fontSize: enableIndicators ? 11 : 9,
             },
             grid: {
                 vertLines: { color: isLight ? "#e0e0e0" : "#17243A" },
@@ -1067,6 +1069,10 @@ export function CoinChart({
         }
     };
 
+    // 컴팩트(대시보드) 모드: 지표 기능이 없는 좁은 차트는 헤더를 차트 위에 겹치지 않고
+    // 상단에 쌓아 배치하고, 차트 본체는 그 아래로 내린다.
+    const stacked = !enableIndicators;
+
     return (
         <>
             <div
@@ -1075,17 +1081,17 @@ export function CoinChart({
                 onMouseLeave={() => setHovered(false)}
                 className={`relative w-full ${className ?? ""}`}
             >
-                <div className={`relative w-full ${className ? "h-full" : "h-30 2xl:h-45"}`}>
+                <div className={`relative w-full ${stacked ? "flex flex-col rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900" : ""} ${className ? "h-full" : "h-30 2xl:h-45"}`}>
                     <div
                         ref={chartRef}
-                        className={`w-full h-full rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-900 transition-[opacity,transform] duration-700 ${drawTool === "cursor" ? "cursor-grab active:cursor-grabbing" : "cursor-crosshair"} ${chartLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
+                        className={`w-full ${stacked ? "flex-1 min-h-0" : "h-full rounded-2xl border border-neutral-800 bg-neutral-900"} overflow-hidden transition-[opacity,transform] duration-700 ${drawTool === "cursor" ? "cursor-grab active:cursor-grabbing" : "cursor-crosshair"} ${chartLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
                         style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
                     />
 
-                    <div className="absolute top-2 left-2 flex items-center gap-1 z-20">
+                    <div className={stacked ? "order-first flex items-center gap-1 px-2 pt-1.5 pb-1 shrink-0 z-20" : "absolute top-2 left-2 flex items-center gap-1 z-20"}>
                         {!hideControls && (
-                            <div className="px-2 py-0.5 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50">
-                                <span className="text-[10px] 2xl:text-xs text-neutral-300 font-medium">
+                            <div className="self-stretch inline-flex items-center px-2 bg-neutral-900/80 backdrop-blur-sm rounded-md border border-neutral-700/50">
+                                <span className="text-[10px] 2xl:text-xs leading-none text-neutral-300 font-medium">
                                     {STOCK_SYMBOL_NAMES[sym] ?? sym}
                                 </span>
                             </div>
