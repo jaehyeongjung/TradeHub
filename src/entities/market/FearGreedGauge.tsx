@@ -56,9 +56,7 @@ export function FearGreedGauge({
     const headerLabelClass = isLight ? "text-xs 2xl:text-sm text-neutral-500 font-medium" : "text-xs 2xl:text-sm text-text-tertiary font-medium";
     const trackClass = isLight ? "bg-neutral-200" : "bg-surface-input";
     const edgeLabelClass = isLight ? "text-[10px] 2xl:text-xs text-neutral-400" : "text-[10px] 2xl:text-xs text-text-muted";
-    const tooltipClass = isLight
-        ? "absolute left-1/2 -translate-x-1/2 bottom-[calc(100%+12px)] w-[240px] text-[11px] bg-white border border-neutral-200 text-neutral-600 rounded-xl py-3 px-4 shadow-lg z-50 pointer-events-none"
-        : "absolute left-1/2 -translate-x-1/2 bottom-[calc(100%+12px)] w-[240px] text-[11px] bg-surface-elevated border border-border-default text-text-secondary rounded-xl py-3 px-4 shadow-xl z-50 pointer-events-none";
+    const tooltipClass = "absolute left-1/2 -translate-x-1/2 bottom-[calc(100%+12px)] w-[240px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-xl py-3 px-4 shadow-lg z-50 pointer-events-none";
 
     return (
         <div
@@ -126,8 +124,8 @@ export function FearGreedGauge({
                                 ? "A composite score (0–100) based on price volatility, volume, and social trends to measure market sentiment."
                                 : "가격 변동성, 거래량, 소셜 트렌드 등을 종합해 시장 심리를 0~100으로 표현합니다."}
                         </p>
-                        <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[6px] w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent ${isLight ? "border-t-neutral-200" : "border-t-border-default"}`} />
-                        <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[4px] w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-transparent ${isLight ? "border-t-white" : "border-t-surface-elevated"}`} />
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[6px] w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-neutral-700" />
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[4px] w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-transparent border-t-neutral-900" />
                     </motion.div>
                 )}
             </AnimatePresence>

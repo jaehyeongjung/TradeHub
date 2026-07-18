@@ -157,8 +157,8 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
     const rankColor = isLight ? "text-neutral-500" : "text-neutral-600";
     const symColor = isLight ? "text-neutral-800" : "text-text-primary";
     const priceColor = isLight ? "text-neutral-600" : "text-text-tertiary";
-    const arrowBorder = isLight ? "border-b-neutral-200" : "border-b-border-default";
-    const arrowFill = isLight ? "border-b-white" : "border-b-surface-elevated";
+    const arrowBorder = "border-b-neutral-700";
+    const arrowFill = "border-b-neutral-900";
 
     return (
         <div
@@ -182,9 +182,9 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.2 }}
-                            className={`absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[200px] text-[11px] rounded-xl px-4 py-3 z-[100] border pointer-events-none ${tooltipBg}`}
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[200px] text-[11px] rounded-xl px-4 py-3 z-[100] border pointer-events-none bg-neutral-900 border-neutral-700 text-neutral-300 shadow-lg"
                         >
-                            <div className={`font-semibold mb-1 ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>{isEn ? "About" : "기준 설명"}</div>
+                            <div className="font-semibold mb-1 text-amber-300">{isEn ? "About" : "기준 설명"}</div>
                             <p className="leading-relaxed text-[10px]">{isEn ? "24h volume (USDT) + price change weighted score" : "24h 거래대금(USDT) + 등락률 가중 점수"}</p>
                             <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent ${arrowBorder}`} />
                             <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent ${arrowFill}`} />

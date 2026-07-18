@@ -345,11 +345,11 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 6 }}
                             transition={{ duration: 0.18 }}
-                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] z-50 w-[200px] rounded-lg bg-surface-elevated border border-border-default py-2 px-3 text-[11px] text-text-primary shadow-lg pointer-events-none"
+                            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] z-50 w-[200px] rounded-lg bg-neutral-900 border border-neutral-700 py-2 px-3 text-[11px] text-neutral-300 shadow-lg pointer-events-none"
                         >
                             {isEn ? "Click to change the coin symbol." : "클릭 시 코인 심볼을 변경할 수 있습니다."}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-border-default" />
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-surface-elevated" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
                         </motion.div>
                     )}
                 </AnimatePresence>

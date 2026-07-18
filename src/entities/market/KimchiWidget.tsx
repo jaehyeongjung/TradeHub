@@ -177,13 +177,9 @@ export function KimchiWidget({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 6 }}
                         transition={{ duration: 0.18 }}
-                        className={`absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[235px] text-[11px] rounded-xl py-4 px-5 shadow-xl z-50 pointer-events-none border ${
-                            isLight
-                                ? "bg-white border-neutral-200 text-neutral-500"
-                                : "bg-surface-elevated border-border-default text-text-secondary"
-                        }`}
+                        className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[235px] text-[11px] rounded-xl py-4 px-5 shadow-lg z-50 pointer-events-none border bg-neutral-900 border-neutral-700 text-neutral-300"
                     >
-                        <div className="font-semibold text-amber-400 mb-1.5">{isEn ? "About" : "지표 설명"}</div>
+                        <div className="font-semibold text-amber-300 mb-1.5">{isEn ? "About" : "지표 설명"}</div>
                         <p className="leading-relaxed">
                             {isEn ? (
                                 <>Premium calculated by comparing Upbit (KRW) vs Binance (USD) prices and the USD/KRW FX rate.<br /><br />
@@ -195,8 +191,8 @@ export function KimchiWidget({
                                 <span className="text-rose-400 font-medium">• 음수</span>: 해외가 한국보다 비쌈</>
                             )}
                         </p>
-                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent ${isLight ? "border-b-neutral-200" : "border-b-border-default"}`} />
-                        <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent ${isLight ? "border-b-white" : "border-b-surface-elevated"}`} />
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[9px] w-0 h-0 border-l-[5px] border-r-[5px] border-b-[9px] border-transparent border-b-neutral-700" />
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[7px] w-0 h-0 border-l-4 border-r-4 border-b-[8px] border-transparent border-b-neutral-900" />
                     </motion.div>
                 )}
             </AnimatePresence>

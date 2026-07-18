@@ -126,11 +126,9 @@ export function LongShortRatioBox({
   const cardBg = isLight ? "bg-white border-neutral-200" : "bg-surface-elevated border-border-subtle";
   const labelColor = isLight ? "text-neutral-400" : "text-text-muted";
   const pillBg = isLight ? "bg-neutral-100 text-neutral-500" : "bg-surface-input text-text-tertiary";
-  const tooltipBg = isLight
-    ? "bg-white border-neutral-200 text-neutral-600 shadow-lg"
-    : "bg-surface-elevated border-border-default text-text-secondary shadow-xl";
-  const arrowBorder = isLight ? "border-b-neutral-200" : "border-b-border-default";
-  const arrowFill = isLight ? "border-b-white" : "border-b-surface-elevated";
+  const tooltipBg = "bg-neutral-900 border-neutral-700 text-neutral-300 shadow-lg";
+  const arrowBorder = "border-b-neutral-700";
+  const arrowFill = "border-b-neutral-900";
 
   return (
     <div
@@ -202,7 +200,7 @@ export function LongShortRatioBox({
             transition={{ duration: 0.18 }}
             className={`absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] w-[230px] text-[11px] rounded-xl py-3.5 px-4 z-50 pointer-events-none border ${tooltipBg}`}
           >
-            <div className="font-semibold text-amber-500 mb-1.5">지표 설명</div>
+            <div className="font-semibold text-amber-300 mb-1.5">지표 설명</div>
             <p className="leading-relaxed whitespace-pre-line text-[10px]">
               {DESCRIPTION_MAP[source]}
             </p>
