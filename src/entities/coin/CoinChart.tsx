@@ -557,6 +557,14 @@ export function CoinChart({
             visible: false,
         });
 
+        // 컴팩트(대시보드) 차트는 높이가 매우 낮아 가격축 최상단 라벨이 상단 헤더에 붙어
+        // 답답하게 보임 → 위/아래 여백을 넉넉히 줘서 최상단 라벨을 헤더에서 떨어뜨림
+        chart.priceScale("right").applyOptions({
+            scaleMargins: enableIndicators
+                ? { top: 0.1, bottom: 0.1 }
+                : { top: 0.28, bottom: 0.2 },
+        });
+
         (async () => {
             try {
                 if (isStockSymbol(sym)) {
