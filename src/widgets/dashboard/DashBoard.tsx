@@ -150,7 +150,7 @@ export const DashBoard = () => {
                     <KimchiWidget fadeDelay={200} />
                     <LiveStatsBox fadeDelay={280} />
                     <FearGreedCard fadeDelay={350} />
-                    <YouTubeBGMPlayer videoId="j23SO29LNWE" />
+                    <YouTubeBGMPlayer />
                 </aside>
 
                 <div className="flex flex-col gap-2 2xl:gap-5 min-w-115 2xl:min-w-140">
