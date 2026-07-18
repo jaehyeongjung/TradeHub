@@ -173,6 +173,8 @@ const SYMBOL_NAMES: Record<string, string> = {
 function getCoinLogoUrl(symbol: string) {
     // 바이낸스 자체 로고 CDN — 상장 코인 커버리지가 넓음. 없는 심볼은 403 반환.
     const base = symbol.replace(/usdt$/i, "").toUpperCase();
+    // 바이낸스 CDN에 로고가 없는 선물 전용 코인 오버라이드
+    if (base === "HYPE") return "https://coin-images.coingecko.com/coins/images/50882/small/hyperliquid.jpg";
     return `https://bin.bnbstatic.com/static/assets/logos/${base}.png`;
 }
 

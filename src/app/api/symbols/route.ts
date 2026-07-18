@@ -27,18 +27,38 @@ const STABLE_BASES = new Set([
 
 const LIMIT = 200;
 
+// 바이낸스 호스트 폴백 — 해외 배포 서버는 api.binance.com이 지역 차단(451)되므로
+// 차단 없는 공개 데이터 미러(data-api.binance.vision)까지 순회. (kimchi 라우트와 동일 전략)
+const BINANCE_HOSTS = [
+    "api.binance.com",
+    "api1.binance.com",
+    "api2.binance.com",
+    "data-api.binance.vision",
+];
+
 function baseOf(symbol: string) {
     return symbol.slice(0, -"USDT".length);
 }
 
+async function fetchTicker24h(): Promise<Ticker24h[]> {
+    for (const host of BINANCE_HOSTS) {
+        try {
+            const res = await fetch(`https://${host}/api/v3/ticker/24hr`, {
+                cache: "no-store",
+                headers: { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" },
+            });
+            if (!res.ok) continue;
+            return (await res.json()) as Ticker24h[];
+        } catch {
+            // 다음 호스트로 폴백
+        }
+    }
+    throw new Error("all Binance hosts failed");
+}
+
 export async function GET() {
     try {
-        const res = await fetch("https://api.binance.com/api/v3/ticker/24hr", {
-            cache: "no-store",
-        });
-        if (!res.ok) throw new Error(`Binance HTTP ${res.status}`);
-
-        const all = (await res.json()) as Ticker24h[];
+        const all = await fetchTicker24h();
 
         const symbols = all
             .filter((t) => {
