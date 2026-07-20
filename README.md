@@ -38,6 +38,12 @@
 
 ## Demo Trading
 
+
+
+https://github.com/user-attachments/assets/9bf3364b-2624-4803-8c3a-072ca754d605
+
+
+
 ### 주요 기능
 
 | 항목 | 설명 |
@@ -58,6 +64,9 @@
 <br>
 
 ## TreeMap
+
+<img width="1920" height="968" alt="스크린샷 2026-07-20 오후 10 09 19" src="https://github.com/user-attachments/assets/dd8aa828-67ed-462d-b195-6e20fb605658" />
+
 
 **시각화 로직**
 - Binance 24hr ticker에서 거래대금 $500K 이상 필터링
