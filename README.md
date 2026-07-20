@@ -3,7 +3,7 @@
 ## Crypto Dashboard
 
 
-<img width="1920" height="968" alt="스크린샷 2026-07-20 오후 10 22 43" src="https://github.com/user-attachments/assets/62e869d6-272d-4301-9576-15fb5fee5ee0" />
+<img width="1920" height="968" alt="스크린샷 2026-07-20 오후 10 30 24" src="https://github.com/user-attachments/assets/cd98ce86-3240-4ad9-b868-a057ede9ea03" />
 
 
 
