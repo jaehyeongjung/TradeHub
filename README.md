@@ -1,53 +1,6 @@
-<img width="60" height="60" alt="favicon-512" src="https://github.com/user-attachments/assets/6557641a-0091-4d2a-a8ff-d1905a629115" />
+<img width="45" height="45" alt="favicon-512" src="https://github.com/user-attachments/assets/6557641a-0091-4d2a-a8ff-d1905a629115" />
 
-# TradeHub
-
-실시간 암호화폐 선물 모의투자 플랫폼
-
-선물 거래를 실전처럼 연습하고, 
-
-시장 분석에 필요한 모든 데이터를 실시간으로 확인하세요.
-
-
-<br>
-
-<p align="center">
-  <a href="https://www.tradehub.kr/" target="_blank" rel="noopener noreferrer">
-    <img src="https://img.shields.io/badge/tradehub.kr-10B981?style=for-the-badge&logo=vercel&logoColor=white&labelColor=000000" alt="Visit TradeHub" />
-  </a>
-</p>
-
-<br>
-
-## 선물 모의투자
-
-<img width="1440" height="688" alt="스크린샷 2026-03-05 오전 12 02 48" src="https://github.com/user-attachments/assets/e79f2143-2bfe-4372-97d0-3c9b85a1e04b" />
-
-https://github.com/user-attachments/assets/a8d60177-9063-4fdf-bd52-90e0d4b04e31
-
-
-
-### 트레이딩 기능
-
-| 항목 | 설명 |
-|------|------|
-| **지원 종목** | BTC, ETH, SOL, BNB, XRP, DOGE, ADA, AVAX, DOT, MATIC (USDT 페어) |
-| **실시간 시세** | Binance `@ticker` combined stream (WebSocket) |
-| **시장 데이터** | 펀딩비, Open Interest, 24h 통계, 롱숏비율 — 15초 폴링 |
-| **차트** | lightweight-charts 기반 캔들스틱 + 거래량 히스토그램 |
-| **TP/SL 관리** | 차트 위 드래그로 조절, Supabase 실시간 동기화 |
-| **포지션 저장** | Supabase 기반 주문/포지션 영속 저장 |
-
-<br>
-
-
-
-
-
-## 대시보드
-
-<img width="1440" height="688" alt="스크린샷 2026-03-05 오전 12 03 03" src="https://github.com/user-attachments/assets/0efd2409-ab35-404a-9adb-2e453cd6f6ce" />
-
+## Crypto Dashboard
 
 ### 주요 기능
 
@@ -66,17 +19,40 @@ https://github.com/user-attachments/assets/a8d60177-9063-4fdf-bd52-90e0d4b04e31
 | **뉴스 피드** | 최신 암호화폐 뉴스 30건 | Supabase | 마운트 시 1회 |
 | **현재 접속자** | 디바이스 기반 실시간 접속자 수 | Supabase Realtime | 15초 heartbeat |
 
+<br>
+
 **성능 최적화**
 - 폴링 기반 컴포넌트는 탭 비활성 시 자동 중지 (`useVisibilityPolling`)
 - WebSocket 연결 끊김 시 3초 후 자동 재연결
 
----
 
 <br>
 
-## 거래량 트리맵
 
-<img width="1437" height="684" alt="거래량 트리맵" src="https://github.com/user-attachments/assets/4b82ac3b-05d2-4c58-84ec-1edbccef0a6b" />
+<br>
+
+## Demo Trading
+
+### 주요 기능
+
+| 항목 | 설명 |
+|------|------|
+| **지원 종목** | BTC, ETH, SOL, BNB, XRP, DOGE, ADA, AVAX, DOT, MATIC (USDT 페어) |
+| **실시간 시세** | Binance `@ticker` combined stream (WebSocket) |
+| **시장 데이터** | 펀딩비, Open Interest, 24h 통계, 롱숏비율 — 15초 폴링 |
+| **차트** | lightweight-charts 기반 캔들스틱 + 거래량 히스토그램 |
+| **TP/SL 관리** | 차트 위 드래그로 조절, Supabase 실시간 동기화 |
+| **포지션 저장** | Supabase 기반 주문/포지션 영속 저장 |
+
+<br>
+
+
+
+
+
+<br>
+
+## TreeMap
 
 **시각화 로직**
 - Binance 24hr ticker에서 거래대금 $500K 이상 필터링
@@ -85,9 +61,9 @@ https://github.com/user-attachments/assets/a8d60177-9063-4fdf-bd52-90e0d4b04e31
 - 색상: 24h 변동률 기반 red-green gradient
 - 30초마다 자동 갱신
 
----
+<br>
 
-## 기술 스택
+## Skills
 
 | 구분 | 기술 |
 |------|------|
@@ -99,9 +75,9 @@ https://github.com/user-attachments/assets/a8d60177-9063-4fdf-bd52-90e0d4b04e31
 | **백엔드** | Supabase (PostgreSQL, Realtime, Auth, Storage) |
 | **배포** | Vercel |
 
----
+<br>
 
-## 개발 과정 블로그
+## Dev log
 
 프로젝트 기획부터 구현, 최적화까지의 과정을 시리즈로 기록했습니다.
 
@@ -118,9 +94,7 @@ https://github.com/user-attachments/assets/a8d60177-9063-4fdf-bd52-90e0d4b04e31
 | 9 | 사람들이 계속 돌아오게 하려면 | [Velog 보기](https://velog.io/@whird625/%EC%BD%94%EC%9D%B8-%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0%EB%A5%BC-%EB%A7%8C%EB%93%A4%EA%B8%B0%EB%A1%9C-%EB%A7%88%EC%9D%8C-%EB%A8%B9%EC%97%88%EB%8B%A4-9%ED%8E%B8-%EC%82%AC%EB%9E%8C%EB%93%A4%EC%9D%B4-%EA%B3%84%EC%86%8D-%EB%8F%8C%EC%95%84%EC%98%A4%EA%B2%8C-%ED%95%98%EB%A0%A4%EB%A9%B4) |
 
 
-
-
----
+----
 
 <p align="center">
   <sub>Built by 정재형 | Contact: whird398@naver.com</sub>
