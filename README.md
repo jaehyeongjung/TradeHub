@@ -2,6 +2,11 @@
 
 ## Crypto Dashboard
 
+
+<img width="1920" height="968" alt="스크린샷 2026-07-20 오후 10 22 43" src="https://github.com/user-attachments/assets/62e869d6-272d-4301-9576-15fb5fee5ee0" />
+
+
+
 ### 주요 기능
 
 | 기능 | 설명 | 데이터 소스 | 갱신 방식 |
