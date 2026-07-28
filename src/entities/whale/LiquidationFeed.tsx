@@ -31,8 +31,9 @@ type BinanceForceOrder = {
     };
 };
 
-const MIN_USD_VALUE = 5000;
+const MIN_USD_VALUE = 50000;
 const MAX_ITEMS = 15;
+const MIN_USD_LABEL = `$${MIN_USD_VALUE / 1000}K+`;
 
 export function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number }) {
     const [liquidations, setLiquidations] = useState<Liquidation[]>([]);
@@ -109,7 +110,7 @@ export function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number }) {
                         )}
                     </div>
                     <span className="text-[9px] 2xl:text-[10px] font-medium px-2 py-0.5 rounded-full bg-surface-input text-text-muted">
-                        $5K+
+                        {MIN_USD_LABEL}
                     </span>
                 </div>
 
