@@ -161,6 +161,8 @@ export function SimTradingPage() {
                         onReset={resetAccount}
                         clickedPrice={clickedPrice}
                         lockedMarginMode={lockedMarginMode}
+                        positionCount={positions.length}
+                        orderCount={orders.length}
                         isEn={isEn}
                     />
                 </div>
