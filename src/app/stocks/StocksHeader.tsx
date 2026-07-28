@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useThemeToggle, THEME_ICON_PATH } from "@/shared/hooks/useThemeToggle";
+import { KakaoShareButton } from "@/shared/ui/KakaoShareButton";
 
 /**
  * /stocks 전용 헤더. 코인 대시보드용 네비게이션(트리맵·모의투자·랭킹 등)은
@@ -26,16 +27,21 @@ export function StocksHeader() {
                     />
                 </Link>
 
-                <button
-                    type="button"
-                    onClick={toggleTheme}
-                    aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
-                    className="flex cursor-pointer items-center rounded-lg p-2 text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-primary)]"
-                >
-                    <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                        <path d={isDark ? THEME_ICON_PATH.sun : THEME_ICON_PATH.moon} />
-                    </svg>
-                </button>
+                <div className="flex items-center gap-1">
+                    {/* 카카오 옐로우라 헤더에서 유일한 유색 요소 — 자연히 시선이 간다 */}
+                    <KakaoShareButton />
+
+                    <button
+                        type="button"
+                        onClick={toggleTheme}
+                        aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
+                        className="flex cursor-pointer items-center rounded-lg p-2 text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-primary)]"
+                    >
+                        <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                            <path d={isDark ? THEME_ICON_PATH.sun : THEME_ICON_PATH.moon} />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </header>
     );
