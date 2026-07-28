@@ -591,12 +591,14 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
 
             <div className={`pt-3 pb-1 px-1 border-t mt-3 ${isLight ? "border-neutral-200" : "border-border-subtle"}`}>
                 <div className="flex gap-2">
+                    {/* 모바일에서 폰트가 16px 미만이면 iOS Safari가 포커스 시 화면을 확대한다.
+                        좁은 화면에서만 16px로 올리고 데스크톱은 기존 12px을 유지한다. */}
                     <input
                         ref={inputRef}
                         onCompositionStart={() => (composingRef.current = true)}
                         onCompositionEnd={() => (composingRef.current = false)}
                         onKeyDown={onKeyDown}
-                        className={`flex-1 border px-3 py-2 rounded-xl text-[12px] focus:outline-none transition-colors ${inputBg}`}
+                        className={`flex-1 border px-3 py-2 rounded-xl text-[16px] sm:text-[12px] focus:outline-none transition-colors ${inputBg}`}
                         placeholder={isEn ? "Chat anonymously" : "익명으로도 채팅 가능"}
                         maxLength={2000}
                         disabled={!userId}
