@@ -9,10 +9,10 @@ import {
 } from "@/shared/lib/stock-tokens";
 import { getStockDetail, type StockDetail } from "@/shared/lib/stock-tokens.server";
 import { getMarketStatus } from "@/shared/lib/market-hours";
-import { formatKrw } from "@/shared/lib/fx";
+
 import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
 import { Chat } from "@/features/chat/Chat";
-import { StockLivePrice } from "./StockLivePrice";
+import { StockLiveData } from "./StockLiveData";
 
 // 가격이 HTML에 박혀야 하므로 정적 생성 + 60초 재검증
 export const revalidate = 60;
@@ -166,48 +166,9 @@ function buildJsonLd(
 }
 
 
-function fmtUsd(n: number | null, digits = 2) {
-    if (n === null || !Number.isFinite(n)) return "—";
-    return `$${n.toLocaleString("en-US", {
-        minimumFractionDigits: digits,
-        maximumFractionDigits: digits,
-    })}`;
-}
-
-/** 원화 우선. 환율을 못 가져왔으면 달러로 폴백. */
-function fmtPrice(usd: number | null, usdKrw: number | null) {
-    if (usd === null || !Number.isFinite(usd)) return "—";
-    return usdKrw === null ? fmtUsd(usd) : formatKrw(usd * usdKrw);
-}
-
-function fmtCompactKrw(usd: number | null, usdKrw: number | null) {
-    if (usd === null || !Number.isFinite(usd)) return "—";
-    if (usdKrw === null) {
-        if (usd >= 1e9) return `$${(usd / 1e9).toFixed(2)}B`;
-        if (usd >= 1e6) return `$${(usd / 1e6).toFixed(1)}M`;
-        return `$${usd.toFixed(0)}`;
-    }
-    const krw = usd * usdKrw;
-    if (krw >= 1e12) return `${(krw / 1e12).toFixed(1)}조원`;
-    if (krw >= 1e8) return `${Math.round(krw / 1e8).toLocaleString("ko-KR")}억원`;
-    if (krw >= 1e4) return `${Math.round(krw / 1e4).toLocaleString("ko-KR")}만원`;
-    return formatKrw(krw);
-}
 
 const CARD = "rounded-3xl bg-[var(--surface-card)] ring-1 ring-[var(--border-subtle)]";
 
-/** 큰 숫자 하나 + 라벨. 통계 카드 안에서 hairline으로 구분된다. */
-function Cell({ label, value, sub }: { label: string; value: string; sub?: string }) {
-    return (
-        <div className="px-5 py-4">
-            <div className="text-[11px] font-medium text-[var(--text-tertiary)]">{label}</div>
-            <div className="mt-1 text-[15px] sm:text-base font-bold tabular-nums text-[var(--text-primary)]">
-                {value}
-            </div>
-            {sub && <div className="mt-0.5 text-[11px] tabular-nums text-[var(--text-muted)]">{sub}</div>}
-        </div>
-    );
-}
 
 function SectionTitle({ children, hint }: { children: React.ReactNode; hint?: string }) {
     return (
@@ -269,11 +230,17 @@ export default async function StockTokenPage({
                     </h1>
 
                     <div className="mt-4">
-                        <StockLivePrice
+                        <StockLiveData
                             symbol={token.symbol}
-                            initialPrice={detail.quote?.price ?? null}
-                            initialChangePercent={detail.quote?.changePercent ?? null}
                             usdKrw={detail.usdKrw}
+                            initial={{
+                                price: detail.quote?.price ?? null,
+                                changePercent: detail.quote?.changePercent ?? null,
+                                high: detail.quote?.high ?? null,
+                                low: detail.quote?.low ?? null,
+                                quoteVolume: detail.quote?.quoteVolume ?? null,
+                                openInterestUsd: detail.openInterestUsd,
+                            }}
                         />
                     </div>
                 </div>
@@ -323,30 +290,6 @@ export default async function StockTokenPage({
                 )}
             </section>
 
-            {/* ── 통계: 박스 4개 대신 카드 하나 안에서 hairline으로 나눈다 ── */}
-            <section className={`${CARD} mt-3 overflow-hidden`}>
-                <div className="grid grid-cols-2 divide-x divide-y divide-[var(--border-subtle)]">
-                    <Cell
-                        label="24시간 고가"
-                        value={fmtPrice(detail.quote?.high ?? null, detail.usdKrw)}
-                        sub={detail.usdKrw !== null ? fmtUsd(detail.quote?.high ?? null) : undefined}
-                    />
-                    <Cell
-                        label="24시간 저가"
-                        value={fmtPrice(detail.quote?.low ?? null, detail.usdKrw)}
-                        sub={detail.usdKrw !== null ? fmtUsd(detail.quote?.low ?? null) : undefined}
-                    />
-                    <Cell
-                        label="24시간 거래대금"
-                        value={fmtCompactKrw(detail.quote?.quoteVolume ?? null, detail.usdKrw)}
-                    />
-                    <Cell
-                        label="미결제약정"
-                        value={fmtCompactKrw(detail.openInterestUsd, detail.usdKrw)}
-                        sub="열려 있는 계약 규모"
-                    />
-                </div>
-            </section>
 
             {detail.usdKrw !== null && (
                 <p className="mt-3 px-1 text-[11px] leading-relaxed text-[var(--text-muted)]">

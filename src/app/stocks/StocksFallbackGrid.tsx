@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { stockTokens } from "@/shared/lib/stock-tokens";
-import { formatKrw } from "@/shared/lib/fx";
+import { formatKrw } from "./format";
 
 /**
  * 서버가 바이낸스에서 시세를 못 가져왔을 때(배포 리전 지역 차단 등) 브라우저에서 직접 받아온다.

@@ -47,7 +47,3 @@ export async function getUsdKrw(revalidate = 600): Promise<number | null> {
     return null;
 }
 
-/** 1,234,567원 형태 */
-export function formatKrw(n: number): string {
-    return `${Math.round(n).toLocaleString("ko-KR")}원`;
-}

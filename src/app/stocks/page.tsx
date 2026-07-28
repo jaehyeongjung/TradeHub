@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { stockTokens } from "@/shared/lib/stock-tokens";
 import { getAllTradfiRows, type TradfiRow } from "@/shared/lib/stock-tokens.server";
-import { getUsdKrw, formatKrw } from "@/shared/lib/fx";
+import { getUsdKrw } from "@/shared/lib/fx";
+import { fmtUsd, formatKrw, fmtCompactKrw as fmtCompactKrwShared } from "./format";
 import { getMarketStatus } from "@/shared/lib/market-hours";
 import { StocksFallbackGrid } from "./StocksFallbackGrid";
 import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
@@ -46,24 +47,7 @@ export const metadata: Metadata = {
     },
 };
 
-function fmtUsd(n: number) {
-    return `$${n.toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    })}`;
-}
 
-function fmtCompactKrw(usd: number, usdKrw: number | null) {
-    if (usdKrw === null) {
-        if (usd >= 1e9) return `$${(usd / 1e9).toFixed(2)}B`;
-        if (usd >= 1e6) return `$${(usd / 1e6).toFixed(1)}M`;
-        return `$${usd.toFixed(0)}`;
-    }
-    const krw = usd * usdKrw;
-    if (krw >= 1e12) return `${(krw / 1e12).toFixed(2)}조`;
-    if (krw >= 1e8) return `${(krw / 1e8).toFixed(0)}억`;
-    return `${(krw / 1e4).toFixed(0)}만`;
-}
 
 /**
  * 모바일에서 4열 테이블은 가로 스크롤이 생겨 읽기 나쁘다.
@@ -98,7 +82,7 @@ function StockCard({ row, usdKrw }: { row: TradfiRow; usdKrw: number | null }) {
             <div className="mt-1 flex items-center justify-between text-[11px] text-[var(--text-muted)]">
                 {usdKrw !== null && <span className="tabular-nums">{fmtUsd(row.price)}</span>}
                 <span className="tabular-nums ml-auto">
-                    거래 {fmtCompactKrw(row.quoteVolume, usdKrw)}
+                    거래 {fmtCompactKrwShared(row.quoteVolume, usdKrw)}
                 </span>
             </div>
         </>
