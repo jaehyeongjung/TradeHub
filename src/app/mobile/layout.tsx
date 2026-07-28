@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
     title: "모바일 안내 | TradeHub",
@@ -14,5 +15,6 @@ export default function MobileLayout({
 }: {
     children: React.ReactNode;
 }) {
-    return children;
+    // 페이지가 useSearchParams를 쓰므로 Suspense 경계가 필요하다
+    return <Suspense fallback={null}>{children}</Suspense>;
 }

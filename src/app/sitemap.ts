@@ -3,6 +3,7 @@ import { getAllNewsIds } from "@/shared/lib/news";
 import { getAllPostIds } from "@/shared/lib/posts";
 import { guides } from "@/shared/lib/guides";
 import { guidesEn } from "@/shared/lib/guides-en";
+import { stockTokens } from "@/shared/lib/stock-tokens";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const base = "https://www.tradehub.kr";
@@ -35,6 +36,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(guide.updatedAt),
         changeFrequency: "monthly",
         priority: 0.8,
+    }));
+
+    // 주식 토큰 — 시세가 계속 바뀌므로 daily
+    const stockSitemap: MetadataRoute.Sitemap = stockTokens.map((token) => ({
+        url: `${base}/stocks/${token.slug}`,
+        lastModified: new Date(),
+        changeFrequency: "daily",
+        priority: token.market === "KR" ? 0.9 : 0.8,
     }));
 
     const legalSitemap: MetadataRoute.Sitemap = [
@@ -105,6 +114,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             changeFrequency: "weekly",
             priority: 0.7,
         },
+        {
+            url: `${base}/stocks`,
+            lastModified: new Date(),
+            changeFrequency: "hourly",
+            priority: 0.95,
+        },
+        ...stockSitemap,
         ...guideSitemap,
         ...enGuideSitemap,
         ...legalSitemap,

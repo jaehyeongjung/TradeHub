@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { RealTimeSection } from "@/widgets/dashboard/RealTimeSection";
 import { DashBoard } from "@/widgets/dashboard/DashBoard";
 import { MobileSuggestModal } from "@/widgets/shared-modals/MobileSuggestModal";
@@ -213,7 +214,9 @@ export default function Home() {
 
             <main className="h-screen overflow-hidden flex flex-col px-5 bg-black min-w-310 pt-12 pb-3 2xl:pb-4">
                 <RealTimeSection />
-                <DashBoard />
+                <Suspense fallback={null}>
+                    <DashBoard />
+                </Suspense>
             </main>
             <SeoFooter />
             <MobileSuggestModal />

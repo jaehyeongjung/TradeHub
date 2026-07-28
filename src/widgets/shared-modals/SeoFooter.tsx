@@ -97,6 +97,10 @@ export function SeoFooter() {
                         <div className={`mt-3 pt-3 border-t flex flex-col gap-0.5 ${isLight ? "divide-neutral-100 border-neutral-100" : "divide-neutral-800 border-neutral-800"}`}>
                             <GuideLink href={isEn ? "/en/ranking" : "/ranking"}>{isEn ? "Coin Market Cap Rankings" : "코인 시가총액 순위"}</GuideLink>
                             <GuideLink href={isEn ? "/en/analysis" : "/analysis"}>{isEn ? "Chart Technical Analysis" : "차트 기술 분석"}</GuideLink>
+                            {/* 주식 토큰은 한국어 페이지만 있어 EN에서는 노출하지 않는다 */}
+                            {!isEn && <GuideLink href="/stocks">주식 토큰 실시간 가격</GuideLink>}
+                            {!isEn && <GuideLink href="/stocks/samsung">삼성전자 토큰 시세</GuideLink>}
+                            {!isEn && <GuideLink href="/stocks/sk-hynix">SK하이닉스 토큰 시세</GuideLink>}
                         </div>
                     </article>
 

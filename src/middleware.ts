@@ -9,6 +9,8 @@ export function middleware(req: NextRequest) {
     if (
         pathname.startsWith("/mobile") ||
         pathname.startsWith("/guide") ||
+        // 검색 유입 랜딩 페이지. 모바일에서 /mobile로 튕기면 유입된 콘텐츠를 못 보고 이탈한다.
+        pathname.startsWith("/stocks") ||
         pathname.startsWith("/_next") ||
         pathname.startsWith("/api")
     ) {
