@@ -16,6 +16,8 @@ import { StockLivePrice } from "./StockLivePrice";
 
 // 가격이 HTML에 박혀야 하므로 정적 생성 + 60초 재검증
 export const revalidate = 60;
+// 바이낸스는 미국 IP를 지역 차단한다. 서울 리전에서 실행해 시세 fetch가 막히지 않게 한다.
+export const preferredRegion = "icn1";
 
 const SITE = "https://www.tradehub.kr";
 

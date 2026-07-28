@@ -1189,3 +1189,12 @@ html.light .hero-no-text {
     0%, 100% { transform: scaleY(0.5); }
     50% { transform: scaleY(1); }
 }
+
+/* ============================================
+   AdSense 미충전 슬롯 숨기기
+   광고가 채워지지 않으면 AdSense가 ins에 data-ad-status="unfilled"를 붙인다.
+   이때 요소를 남겨두면 다크 테마 위에 큰 흰색 박스로 보이므로 접어준다.
+   ============================================ */
+ins.adsbygoogle[data-ad-status="unfilled"] {
+    display: none !important;
+}

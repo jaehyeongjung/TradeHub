@@ -4,9 +4,12 @@
 import { stockTokens } from "./stock-tokens";
 import { getUsdKrw } from "./fx";
 
-// 해외 배포 서버에서 fapi.binance.com이 지역 차단(451)될 수 있어 호스트를 순회한다.
-// (api/symbols 라우트와 동일 전략)
-const FAPI_HOSTS = ["fapi.binance.com", "fapi1.binance.com", "fapi2.binance.com"];
+// 해외 배포 서버에서 바이낸스가 지역 차단(451)될 수 있어 호스트를 순회한다.
+//
+// 주의: fapi1~4.binance.com은 302만 돌려주므로 폴백으로 쓸 수 없다. 현물처럼
+// data-api.binance.vision을 쓸 수도 없다 — 그 미러는 /fapi 경로를 서비스하지 않는다(404).
+// 실제로 동작이 확인된 대체 호스트는 www.binance.com이며 같은 /fapi/v1 경로를 받는다.
+const FAPI_HOSTS = ["fapi.binance.com", "www.binance.com"];
 
 const UA = { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" };
 

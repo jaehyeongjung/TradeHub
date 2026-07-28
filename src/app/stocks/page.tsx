@@ -7,6 +7,8 @@ import { getMarketStatus } from "@/shared/lib/market-hours";
 import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
 
 export const revalidate = 60;
+// 바이낸스는 미국 IP를 지역 차단한다. 서울 리전에서 실행해 시세 fetch가 막히지 않게 한다.
+export const preferredRegion = "icn1";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -203,6 +205,18 @@ export default async function StocksHubPage() {
                     ))}
                 </div>
             </header>
+
+            {/* 시세를 못 가져왔을 때 섹션이 통째로 사라져 페이지가 깨져 보이는 것을 막는다 */}
+            {rows.length === 0 && (
+                <div className="mt-10 rounded-2xl bg-[var(--surface-card)] p-6 text-center ring-1 ring-[var(--border-subtle)]">
+                    <p className="text-[14px] font-bold text-[var(--text-primary)]">
+                        시세를 불러오지 못했어요
+                    </p>
+                    <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-tertiary)]">
+                        잠시 후 다시 시도해 주세요. 데이터는 1분마다 갱신됩니다.
+                    </p>
+                </div>
+            )}
 
             {korean.length > 0 && (
                 <section className="mt-12">
