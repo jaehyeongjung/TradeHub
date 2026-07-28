@@ -52,7 +52,8 @@ export function LiquidationFeed({ fadeDelay = 0 }: { fadeDelay?: number }) {
         let destroyed = false;
         function connect() {
             if (destroyed) return;
-            const ws = new WebSocket("wss://fstream.binance.com/ws/!forceOrder@arr");
+            // forceOrder는 /market 라우트 전용. 라우트 없는 레거시 URL은 연결·구독은 되지만 데이터가 오지 않는다.
+            const ws = new WebSocket("wss://fstream.binance.com/market/ws/!forceOrder@arr");
             wsRef.current = ws;
             ws.onopen = () => { if (!destroyed) setIsConnected(true); };
             ws.onmessage = (ev: MessageEvent<string>) => {

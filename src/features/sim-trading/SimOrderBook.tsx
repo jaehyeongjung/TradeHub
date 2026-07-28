@@ -46,7 +46,8 @@ export function SimOrderBook({ onPriceClick }: Props) {
 
         function connect() {
             const stream = `${simSymbol.toLowerCase()}@depth20@100ms`;
-            const ws = new WebSocket(`wss://fstream.binance.com/ws/${stream}`);
+            // depth는 /public 라우트 소속 (레거시 URL도 아직 동작하지만 명시적으로 지정)
+            const ws = new WebSocket(`wss://fstream.binance.com/public/ws/${stream}`);
 
             ws.onmessage = (ev: MessageEvent<string>) => {
                 try {
