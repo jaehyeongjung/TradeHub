@@ -2,41 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
 import { useAtom, useSetAtom } from "jotai";
 import { treemapOpenAtom, loginDrawerOpenAtom } from "@/shared/store/atoms";
 import { FlagKR, FlagUS } from "@/shared/ui/FlagIcons";
+import { useThemeToggle } from "@/shared/hooks/useThemeToggle";
 
 function HeaderNavInner() {
     const pathname = usePathname();
     const setTreemapOpen = useSetAtom(treemapOpenAtom);
     const [loginOpen, setLoginOpen] = useAtom(loginDrawerOpenAtom);
-    const [isDark, setIsDark] = useState(false);
-
-    useEffect(() => {
-        const saved = localStorage.getItem("theme");
-        const dark = saved !== "light";
-        setIsDark(dark);
-        document.documentElement.classList.toggle("light", !dark);
-    }, []);
-
-    const toggleTheme = () => {
-        const newDark = !isDark;
-        const style = document.createElement("style");
-        style.id = "__theme-transition__";
-        style.textContent = `*, *::before, *::after {
-            transition: background-color 0.35s ease, color 0.25s ease,
-                border-color 0.35s ease, fill 0.25s ease,
-                stroke 0.25s ease, box-shadow 0.35s ease !important;
-        }`;
-        document.head.appendChild(style);
-        setIsDark(newDark);
-        localStorage.setItem("theme", newDark ? "dark" : "light");
-        document.documentElement.classList.toggle("light", !newDark);
-        setTimeout(() => document.getElementById("__theme-transition__")?.remove(), 400);
-    };
+    const { isDark, toggleTheme } = useThemeToggle();
 
     if (pathname === "/" || pathname === "/en" || pathname.startsWith("/mobile")) return null;
+    // /stocks는 전용 심플 헤더(StocksHeader)를 쓴다
+    if (pathname.startsWith("/stocks")) return null;
 
     const isEn = pathname.startsWith("/en/");
 

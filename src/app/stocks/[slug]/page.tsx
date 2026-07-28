@@ -29,7 +29,7 @@ function pageTitle(token: StockToken) {
 
 function pageDescription(token: StockToken) {
     const where = token.market === "KR" ? "한국 증시" : "미국 증시";
-    return `${token.koreanName}(${token.englishName}) 주식 토큰의 실시간 가격을 확인하세요. ${where}가 문을 닫은 시간에도 바이낸스 무기한 선물로 24시간 거래됩니다. 실시간 시세, 24시간 변동률, 펀딩비, 미결제약정을 무료로 제공합니다.`;
+    return `${token.koreanName}(${token.englishName}) 주식 토큰의 실시간 가격을 원화로 확인하세요. ${where}가 문을 닫은 새벽과 주말에도 바이낸스 무기한 선물로 24시간 거래됩니다. 실시간 시세, 24시간 변동률과 함께 같은 종목 투자자 대화방도 무료로 제공합니다.`;
 }
 
 export async function generateMetadata({
@@ -163,17 +163,6 @@ function buildJsonLd(
     return [product, faqPage, breadcrumb];
 }
 
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
-    return (
-        <div className="rounded-xl bg-zinc-900/60 p-3.5 sm:p-4 ring-1 ring-zinc-800">
-            <div className="text-[11px] sm:text-xs text-zinc-500">{label}</div>
-            <div className="mt-1 text-base sm:text-lg font-bold tabular-nums text-zinc-100 break-keep">
-                {value}
-            </div>
-            {sub && <div className="mt-0.5 text-[11px] text-zinc-600 tabular-nums">{sub}</div>}
-        </div>
-    );
-}
 
 function fmtUsd(n: number | null, digits = 2) {
     if (n === null || !Number.isFinite(n)) return "—";
@@ -183,7 +172,7 @@ function fmtUsd(n: number | null, digits = 2) {
     })}`;
 }
 
-/** 원화 우선. 환율이 없으면 달러로 폴백. */
+/** 원화 우선. 환율을 못 가져왔으면 달러로 폴백. */
 function fmtPrice(usd: number | null, usdKrw: number | null) {
     if (usd === null || !Number.isFinite(usd)) return "—";
     return usdKrw === null ? fmtUsd(usd) : formatKrw(usd * usdKrw);
@@ -197,10 +186,34 @@ function fmtCompactKrw(usd: number | null, usdKrw: number | null) {
         return `$${usd.toFixed(0)}`;
     }
     const krw = usd * usdKrw;
-    if (krw >= 1e12) return `${(krw / 1e12).toFixed(2)}조원`;
-    if (krw >= 1e8) return `${(krw / 1e8).toFixed(0)}억원`;
-    if (krw >= 1e4) return `${(krw / 1e4).toFixed(0)}만원`;
+    if (krw >= 1e12) return `${(krw / 1e12).toFixed(1)}조원`;
+    if (krw >= 1e8) return `${Math.round(krw / 1e8).toLocaleString("ko-KR")}억원`;
+    if (krw >= 1e4) return `${Math.round(krw / 1e4).toLocaleString("ko-KR")}만원`;
     return formatKrw(krw);
+}
+
+const CARD = "rounded-3xl bg-[var(--surface-card)] ring-1 ring-[var(--border-subtle)]";
+
+/** 큰 숫자 하나 + 라벨. 통계 카드 안에서 hairline으로 구분된다. */
+function Cell({ label, value, sub }: { label: string; value: string; sub?: string }) {
+    return (
+        <div className="px-5 py-4">
+            <div className="text-[11px] font-medium text-[var(--text-tertiary)]">{label}</div>
+            <div className="mt-1 text-[15px] sm:text-base font-bold tabular-nums text-[var(--text-primary)]">
+                {value}
+            </div>
+            {sub && <div className="mt-0.5 text-[11px] tabular-nums text-[var(--text-muted)]">{sub}</div>}
+        </div>
+    );
+}
+
+function SectionTitle({ children, hint }: { children: React.ReactNode; hint?: string }) {
+    return (
+        <div className="mb-4">
+            <h2 className="text-lg font-bold tracking-tight text-[var(--text-primary)]">{children}</h2>
+            {hint && <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-tertiary)]">{hint}</p>}
+        </div>
+    );
 }
 
 export default async function StockTokenPage({
@@ -220,7 +233,7 @@ export default async function StockTokenPage({
     const isUnlisted = token.category === "비상장";
 
     return (
-        <main className="mx-auto max-w-3xl px-5 py-16 text-white">
+        <main className="mx-auto max-w-2xl px-4 sm:px-5 pt-16 pb-20 text-[var(--text-primary)]">
             {jsonLdItems.map((item, i) => (
                 <script
                     key={i}
@@ -229,212 +242,181 @@ export default async function StockTokenPage({
                 />
             ))}
 
-            <nav aria-label="breadcrumb" className="mb-8 text-sm text-zinc-500">
-                <ol className="flex items-center gap-1">
-                    <li><Link href="/" className="hover:text-zinc-300">홈</Link></li>
-                    <li>/</li>
-                    <li><Link href="/stocks" className="hover:text-zinc-300">주식 토큰</Link></li>
-                    <li>/</li>
-                    <li className="text-zinc-300">{token.koreanName}</li>
+            <nav aria-label="breadcrumb" className="mb-5 text-[12px] text-[var(--text-muted)]">
+                <ol className="flex items-center gap-1.5">
+                    <li><Link href="/" className="hover:text-[var(--text-secondary)] transition-colors">홈</Link></li>
+                    <li aria-hidden>·</li>
+                    <li><Link href="/stocks" className="hover:text-[var(--text-secondary)] transition-colors">주식 토큰</Link></li>
                 </ol>
             </nav>
 
-            <header>
-                <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-bold text-[#02C076] tracking-wide">
-                        {token.market === "KR" ? "한국 " : "해외 "}
-                        {token.category}
-                    </span>
-                    <span className="text-xs text-zinc-600">·</span>
-                    <span className="text-xs text-zinc-500">{token.symbol}USDT</span>
+            {/* ── 히어로: 이 페이지에 온 이유(지금 얼마?)를 첫 화면에서 끝낸다 ── */}
+            <section className={`${CARD} overflow-hidden`}>
+                <div className="p-5 sm:p-6">
+                    <div className="flex items-center gap-2">
+                        <span className="rounded-full bg-[var(--surface-input)] px-2 py-0.5 text-[11px] font-semibold text-[var(--text-secondary)]">
+                            {token.market === "KR" ? "한국" : "해외"} {token.category}
+                        </span>
+                        <span className="text-[11px] font-medium text-[var(--text-muted)]">
+                            {token.symbol}USDT
+                        </span>
+                    </div>
+
+                    <h1 className="mt-3 text-[17px] font-bold tracking-tight text-[var(--text-secondary)]">
+                        {token.koreanName} 토큰 실시간 가격
+                    </h1>
+
+                    <div className="mt-4">
+                        <StockLivePrice
+                            symbol={token.symbol}
+                            initialPrice={detail.quote?.price ?? null}
+                            initialChangePercent={detail.quote?.changePercent ?? null}
+                            usdKrw={detail.usdKrw}
+                        />
+                    </div>
                 </div>
 
-                <h1 className="mt-2 text-3xl font-extrabold tracking-tight leading-snug">
-                    {token.koreanName} 토큰 실시간 가격
-                </h1>
-                <p className="mt-1 text-sm text-zinc-500">
-                    {token.englishName} · 바이낸스 무기한 선물
-                </p>
-
-                <div className="mt-6">
-                    <StockLivePrice
-                        symbol={token.symbol}
-                        initialPrice={detail.quote?.price ?? null}
-                        initialChangePercent={detail.quote?.changePercent ?? null}
-                        usdKrw={detail.usdKrw}
-                    />
-                </div>
-
-                {/* 이 페이지의 존재 이유 — 원장이 닫혀도 여기선 가격이 움직인다 */}
+                {/* 장 마감 시간대에 이 페이지의 존재 이유를 그대로 말해준다 */}
                 {!isUnlisted && (
                     <div
-                        className={`mt-6 rounded-xl p-4 ring-1 ${
-                            status.isOpen
-                                ? "bg-zinc-900/60 ring-zinc-800"
-                                : "bg-[#02C076]/10 ring-[#02C076]/30"
+                        className={`border-t border-[var(--border-subtle)] px-5 sm:px-6 py-4 ${
+                            status.isOpen ? "bg-transparent" : "bg-[var(--color-up-muted)]"
                         }`}
                     >
-                        <div className="flex items-center gap-2 text-sm font-bold">
-                            <span
-                                className={`w-2 h-2 rounded-full ${
-                                    status.isOpen ? "bg-[#02C076]" : "bg-amber-400"
-                                }`}
-                            />
-                            {status.label}
+                        <div className="flex items-center gap-2">
+                            <span className="relative flex h-2 w-2">
+                                <span
+                                    className={`absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping ${
+                                        status.isOpen ? "bg-[var(--color-accent)]" : "bg-amber-400"
+                                    }`}
+                                />
+                                <span
+                                    className={`relative inline-flex h-2 w-2 rounded-full ${
+                                        status.isOpen ? "bg-[var(--color-accent)]" : "bg-amber-400"
+                                    }`}
+                                />
+                            </span>
+                            <span className="text-[13px] font-bold text-[var(--text-primary)]">
+                                {status.label}
+                            </span>
                         </div>
-                        <p className="mt-2 text-sm text-zinc-400 leading-relaxed">
+                        <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-secondary)]">
                             {status.isOpen ? (
                                 <>
-                                    지금은 {status.marketName} 정규장({status.hours})이 열려 있습니다.
-                                    토큰 가격과 실제 주가가 대체로 가깝게 움직이는 시간대입니다.
+                                    지금은 {status.marketName} 정규장({status.hours})입니다. 토큰
+                                    가격과 실제 주가가 가깝게 움직이는 시간대예요.
                                 </>
                             ) : (
                                 <>
-                                    지금 {status.marketName}는 문을 닫았지만({status.hours} 기준),{" "}
-                                    <strong className="text-zinc-200">
-                                        {token.symbol} 토큰은 계속 거래되고 있습니다.
-                                    </strong>{" "}
-                                    위 가격은 정규장 종가가 아니라, 마감 이후 시장이 매긴 최신
+                                    {status.marketName}는 닫혔지만{" "}
+                                    <strong className="font-bold text-[var(--text-primary)]">
+                                        토큰은 계속 거래 중
+                                    </strong>
+                                    이에요. 위 가격은 종가가 아니라 마감 이후 매겨진 최신
                                     가격입니다.
                                 </>
                             )}
                         </p>
                     </div>
                 )}
-            </header>
+            </section>
 
-            <section className="mt-8 grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
-                <Stat
-                    label="24시간 고가"
-                    value={fmtPrice(detail.quote?.high ?? null, detail.usdKrw)}
-                    sub={detail.usdKrw !== null ? fmtUsd(detail.quote?.high ?? null) : undefined}
-                />
-                <Stat
-                    label="24시간 저가"
-                    value={fmtPrice(detail.quote?.low ?? null, detail.usdKrw)}
-                    sub={detail.usdKrw !== null ? fmtUsd(detail.quote?.low ?? null) : undefined}
-                />
-                <Stat
-                    label="24시간 거래대금"
-                    value={fmtCompactKrw(detail.quote?.quoteVolume ?? null, detail.usdKrw)}
-                />
-                <Stat
-                    label="미결제약정"
-                    value={fmtCompactKrw(detail.openInterestUsd, detail.usdKrw)}
-                    sub="열려 있는 계약 규모"
-                />
+            {/* ── 통계: 박스 4개 대신 카드 하나 안에서 hairline으로 나눈다 ── */}
+            <section className={`${CARD} mt-3 overflow-hidden`}>
+                <div className="grid grid-cols-2 divide-x divide-y divide-[var(--border-subtle)]">
+                    <Cell
+                        label="24시간 고가"
+                        value={fmtPrice(detail.quote?.high ?? null, detail.usdKrw)}
+                        sub={detail.usdKrw !== null ? fmtUsd(detail.quote?.high ?? null) : undefined}
+                    />
+                    <Cell
+                        label="24시간 저가"
+                        value={fmtPrice(detail.quote?.low ?? null, detail.usdKrw)}
+                        sub={detail.usdKrw !== null ? fmtUsd(detail.quote?.low ?? null) : undefined}
+                    />
+                    <Cell
+                        label="24시간 거래대금"
+                        value={fmtCompactKrw(detail.quote?.quoteVolume ?? null, detail.usdKrw)}
+                    />
+                    <Cell
+                        label="미결제약정"
+                        value={fmtCompactKrw(detail.openInterestUsd, detail.usdKrw)}
+                        sub="열려 있는 계약 규모"
+                    />
+                </div>
             </section>
 
             {detail.usdKrw !== null && (
-                <p className="mt-3 text-[11px] text-zinc-600">
-                    원화 환산 기준 환율 1달러 = {detail.usdKrw.toLocaleString("ko-KR", {
-                        maximumFractionDigits: 2,
-                    })}
-                    원 · 실제 체결은 USDT로 이루어집니다.
+                <p className="mt-3 px-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
+                    1달러 ={" "}
+                    {detail.usdKrw.toLocaleString("ko-KR", { maximumFractionDigits: 2 })}원 기준으로
+                    환산했어요. 실제 체결은 USDT로 이루어집니다.
                 </p>
             )}
 
-            {/* 같은 종목을 보는 사람끼리 모이는 곳. 대시보드에서 쓰는 채팅을 종목별 방으로 재사용한다. */}
+            {/* ── 대화방: 가격 보러 온 사람을 머물게 하는 자리 ── */}
             <section id="chat" className="mt-12">
-                <h2 className="text-xl font-bold tracking-tight">
+                <SectionTitle hint={`${token.koreanName}를 보고 있는 사람들과 지금 바로 이야기해보세요. 롱·숏 투표로 이 방의 분위기도 함께 보입니다.`}>
                     {token.koreanName} 투자자 대화방
-                </h2>
-                <p className="mt-2 text-sm text-zinc-500 leading-relaxed">
-                    {token.koreanName}를 보고 있는 사람들과 실시간으로 이야기하세요. 롱·숏 투표로
-                    지금 이 방의 분위기도 함께 확인할 수 있습니다.
-                </p>
-                <div className="mt-4 h-[560px] sm:h-[620px] rounded-2xl">
+                </SectionTitle>
+                <div className={`${CARD} h-[560px] sm:h-[620px] p-3 sm:p-4`}>
                     <Chat roomId={`stock:${token.slug}`} />
                 </div>
             </section>
 
-            <article className="mt-14 space-y-12">
-                <section id="what-is">
-                    <h2 className="text-xl font-bold tracking-tight">
-                        {token.koreanName} 토큰이란?
-                    </h2>
-                    <p className="mt-3 text-zinc-300 leading-relaxed">{token.summary}</p>
-                    <p className="mt-3 text-zinc-300 leading-relaxed">{token.angle}</p>
-                </section>
-
-                <section id="vs-stock">
-                    <h2 className="text-xl font-bold tracking-tight">
-                        실제 주식과 무엇이 다른가
-                    </h2>
-                    <p className="mt-3 text-zinc-300 leading-relaxed">
-                        가장 흔한 오해는 이 가격을 {token.koreanName}의 정규장 주가로 그대로
-                        받아들이는 것입니다. {token.symbol} 토큰은 주식이 아니라 주가를 추종하는
-                        USDT 표시 무기한 선물이며, 아래 차이를 알고 봐야 합니다.
-                    </p>
-                    <div className="mt-4 overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead>
-                                <tr className="border-b border-zinc-700">
-                                    <th className="py-2 pr-4 font-semibold text-zinc-300">구분</th>
-                                    <th className="py-2 pr-4 font-semibold text-zinc-300">
-                                        실제 {token.koreanName} 주식
-                                    </th>
-                                    <th className="py-2 pr-4 font-semibold text-zinc-300">
-                                        {token.symbol} 토큰
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {[
-                                    ["거래 시간", isUnlisted ? "거래 불가(비상장)" : status.hours, "24시간 · 주말 포함"],
-                                    ["표시 통화", token.market === "KR" ? "원(KRW)" : "달러(USD)", "USDT"],
-                                    ["소유권", "주주 지위 있음", "없음(파생상품)"],
-                                    ["배당·의결권", "있음", "없음"],
-                                    ["레버리지", "제한적", "가능(청산 위험)"],
-                                    ["추가 비용", "거래 수수료·세금", "거래 수수료 + 펀딩비"],
-                                ].map(([k, a, b]) => (
-                                    <tr key={k} className="border-b border-zinc-800 last:border-0">
-                                        <td className="py-2 pr-4 text-zinc-400">{k}</td>
-                                        <td className="py-2 pr-4 text-zinc-400">{a}</td>
-                                        <td className="py-2 pr-4 text-zinc-300">{b}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section id="how-to-read">
-                    <h2 className="text-xl font-bold tracking-tight">
-                        이 페이지를 보는 법
-                    </h2>
-                    <ul className="mt-4 space-y-2 text-zinc-300">
-                        {[
-                            `가격: 바이낸스 ${token.symbol}USDT 최신 체결가를 원화로 환산한 값입니다. 정규장이 닫혀 있어도 계속 갱신됩니다.`,
-                            "24시간 고가·저가: 정규장 시간이 아니라 최근 24시간 전체 기준입니다.",
-                            "미결제약정: 청산되지 않고 열려 있는 계약 규모입니다. 급증하면 변동성이 커질 수 있습니다.",
-                        ].map((item) => (
-                            <li key={item} className="flex gap-2">
-                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#02C076]" />
-                                <span>{item}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
-            </article>
-
-            <AdSenseUnit slot="7318540125" className="my-10" />
-
+            {/* ── 설명 ── */}
             <section className="mt-14">
-                <h2 className="text-xl font-bold tracking-tight">자주 묻는 질문</h2>
-                <div className="mt-4 space-y-3">
-                    {faqs.map((faq) => (
-                        <details
-                            key={faq.question}
-                            className="group rounded-xl bg-zinc-900/60 ring-1 ring-zinc-800 overflow-hidden"
+                <SectionTitle>{token.koreanName} 토큰이란?</SectionTitle>
+                <div className="space-y-3.5 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                    <p>{token.summary}</p>
+                    <p>{token.angle}</p>
+                </div>
+            </section>
+
+            <section className="mt-12">
+                <SectionTitle hint={`가장 흔한 오해는 이 가격을 ${token.koreanName}의 정규장 주가로 그대로 받아들이는 것입니다. 주식이 아니라 주가를 추종하는 무기한 선물이에요.`}>
+                    실제 주식과 무엇이 다른가
+                </SectionTitle>
+                <div className={`${CARD} overflow-hidden`}>
+                    {[
+                        ["거래 시간", isUnlisted ? "거래 불가(비상장)" : status.hours, "24시간 · 주말 포함"],
+                        ["표시 통화", token.market === "KR" ? "원(KRW)" : "달러(USD)", "USDT"],
+                        ["소유권", "주주 지위 있음", "없음(파생상품)"],
+                        ["배당·의결권", "있음", "없음"],
+                        ["레버리지", "제한적", "가능(청산 위험)"],
+                        ["추가 비용", "거래 수수료·세금", "수수료 + 펀딩비"],
+                    ].map(([k, a, b], i) => (
+                        <div
+                            key={k}
+                            className={`grid grid-cols-[5.5rem_1fr_1fr] gap-2 px-4 py-3 text-[13px] ${
+                                i > 0 ? "border-t border-[var(--border-subtle)]" : ""
+                            }`}
                         >
-                            <summary className="cursor-pointer p-5 text-sm font-semibold text-zinc-200 hover:text-white transition-colors list-none flex items-center justify-between gap-3">
+                            <span className="font-semibold text-[var(--text-tertiary)]">{k}</span>
+                            <span className="text-[var(--text-tertiary)]">{a}</span>
+                            <span className="font-medium text-[var(--text-primary)]">{b}</span>
+                        </div>
+                    ))}
+                </div>
+                <p className="mt-2.5 px-1 text-[11px] text-[var(--text-muted)]">
+                    왼쪽이 실제 {token.koreanName} 주식, 오른쪽이 {token.symbol} 토큰입니다.
+                </p>
+            </section>
+
+            <AdSenseUnit slot="7318540125" className="my-12" />
+
+            <section className="mt-12">
+                <SectionTitle>자주 묻는 질문</SectionTitle>
+                <div className="space-y-2">
+                    {faqs.map((faq) => (
+                        <details key={faq.question} className={`${CARD} group overflow-hidden`}>
+                            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 sm:p-5 text-[14px] font-semibold text-[var(--text-primary)] transition-colors hover:text-[var(--text-primary)]">
                                 {faq.question}
-                                <span className="text-zinc-500 group-open:rotate-180 transition-transform shrink-0">
-                                    ▼
+                                <span className="shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-open:rotate-45 text-lg leading-none">
+                                    +
                                 </span>
                             </summary>
-                            <p className="px-5 pb-5 text-sm text-zinc-400 leading-relaxed">
+                            <p className="px-4 sm:px-5 pb-5 text-[13px] leading-[1.75] text-[var(--text-secondary)]">
                                 {faq.answer}
                             </p>
                         </details>
@@ -442,52 +424,53 @@ export default async function StockTokenPage({
                 </div>
             </section>
 
-            <div className="mt-14 rounded-xl bg-gradient-to-r from-[#02C076]/20 to-transparent p-8 ring-1 ring-[#02C076]/30">
-                <h2 className="text-lg font-bold">실시간 차트로 보기</h2>
-                <p className="mt-2 text-sm text-zinc-400">
-                    TradeHub 대시보드에서 {token.koreanName} 토큰의 차트와 청산 데이터를 함께
-                    확인하세요.
-                </p>
-                <Link
-                    href="/dashboard"
-                    className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#02C076] px-6 py-3 text-sm font-bold text-black hover:bg-[#02A666] transition-colors"
-                >
-                    실시간 대시보드 열기
-                    <span>→</span>
-                </Link>
-            </div>
+            <section className="mt-12">
+                <div className="rounded-3xl bg-gradient-to-br from-[var(--color-accent)]/15 to-transparent p-6 ring-1 ring-[var(--color-accent)]/25">
+                    <h2 className="text-base font-bold text-[var(--text-primary)]">차트로도 보고 싶다면</h2>
+                    <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-secondary)]">
+                        TradeHub 대시보드에서 실시간 차트와 청산 데이터를 함께 확인하세요.
+                    </p>
+                    <Link
+                        href="/dashboard"
+                        className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-accent)] px-5 py-3 text-[13px] font-bold text-black transition-colors hover:opacity-90"
+                    >
+                        실시간 대시보드 열기
+                        <span aria-hidden>→</span>
+                    </Link>
+                </div>
+            </section>
 
-            <section className="mt-14">
-                <h2 className="text-lg font-bold">다른 주식 토큰</h2>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <section className="mt-12">
+                <SectionTitle>다른 종목도 보기</SectionTitle>
+                <div className="grid grid-cols-2 gap-2">
                     {related.map((r) => (
                         <Link
                             key={r.slug}
                             href={`/stocks/${r.slug}`}
-                            className="rounded-xl bg-zinc-900/60 p-5 ring-1 ring-zinc-800 hover:ring-[#02C076]/50 transition-colors"
+                            className={`${CARD} p-4 transition-colors hover:ring-[var(--color-accent)]/40`}
                         >
-                            <span className="text-xs text-[#02C076]">
+                            <div className="text-[11px] font-medium text-[var(--text-muted)]">
                                 {r.market === "KR" ? "한국" : "해외"} {r.category}
-                            </span>
-                            <h3 className="mt-1 text-sm font-semibold text-white">
-                                {r.koreanName} 토큰 실시간 가격
-                            </h3>
+                            </div>
+                            <div className="mt-1 truncate text-[14px] font-bold text-[var(--text-primary)]">
+                                {r.koreanName}
+                            </div>
                         </Link>
                     ))}
                 </div>
                 <Link
                     href="/stocks"
-                    className="mt-4 inline-block text-sm text-zinc-400 hover:text-[#02C076] transition-colors"
+                    className="mt-4 inline-block text-[13px] font-medium text-[var(--text-tertiary)] transition-colors hover:text-[var(--color-up)]"
                 >
                     주식 토큰 전체 보기 →
                 </Link>
             </section>
 
-            <p className="mt-14 text-xs leading-relaxed text-zinc-600">
-                본 페이지의 시세는 바이낸스 선물 시장 데이터를 제공하는 것으로, {token.koreanName}
-                의 정규장 주가나 공식 시세가 아닙니다. 무기한 선물은 레버리지와 청산 위험이 있는
-                고위험 파생상품이며, 국가별로 거래가 제한될 수 있습니다. 본 정보는 투자 권유가
-                아니며 투자 판단과 그 결과에 대한 책임은 이용자 본인에게 있습니다.
+            <p className="mt-14 px-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
+                본 페이지의 시세는 바이낸스 선물 시장 데이터로, {token.koreanName}의 정규장 주가나
+                공식 시세가 아닙니다. 무기한 선물은 레버리지와 청산 위험이 있는 고위험 파생상품이며
+                국가별로 거래가 제한될 수 있습니다. 본 정보는 투자 권유가 아니며 투자 판단과 그
+                결과에 대한 책임은 이용자 본인에게 있습니다.
             </p>
         </main>
     );

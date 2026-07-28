@@ -75,22 +75,24 @@ function StockCard({ row, usdKrw }: { row: TradfiRow; usdKrw: number | null }) {
         <>
             <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                    <div className="truncate text-sm font-bold text-zinc-100">{name}</div>
-                    <div className="mt-0.5 text-[11px] text-zinc-500">{row.base}</div>
+                    <div className="truncate text-[14px] font-bold text-[var(--text-primary)]">{name}</div>
+                    <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">{row.base}</div>
                 </div>
                 <span
-                    className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-bold tabular-nums ${
+                    className={`shrink-0 rounded-lg px-1.5 py-0.5 text-[11px] font-bold tabular-nums ${
                         isUp
-                            ? "text-[#02C076] bg-[#02C076]/10"
-                            : "text-[#F6465D] bg-[#F6465D]/10"
+                            ? "text-[var(--color-up)] bg-[var(--color-up-muted)]"
+                            : "text-[var(--color-down)] bg-[var(--color-down-muted)]"
                     }`}
                 >
                     {isUp ? "▲" : "▼"} {Math.abs(row.changePercent).toFixed(2)}%
                 </span>
             </div>
 
-            <div className="mt-3 text-lg font-extrabold tabular-nums text-white">{price}</div>
-            <div className="mt-1 flex items-center justify-between text-[11px] text-zinc-600">
+            <div className="mt-3 text-[19px] font-extrabold tabular-nums tracking-[-0.02em] text-[var(--text-primary)]">
+                {price}
+            </div>
+            <div className="mt-1 flex items-center justify-between text-[11px] text-[var(--text-muted)]">
                 {usdKrw !== null && <span className="tabular-nums">{fmtUsd(row.price)}</span>}
                 <span className="tabular-nums ml-auto">
                     거래 {fmtCompactKrw(row.quoteVolume, usdKrw)}
@@ -99,11 +101,10 @@ function StockCard({ row, usdKrw }: { row: TradfiRow; usdKrw: number | null }) {
         </>
     );
 
-    const cls =
-        "block rounded-2xl bg-zinc-900/60 p-4 ring-1 ring-zinc-800 transition-colors";
+    const cls = "block rounded-2xl bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)] transition-colors";
 
     return row.slug ? (
-        <Link href={`/stocks/${row.slug}`} className={`${cls} hover:ring-[#02C076]/50`}>
+        <Link href={`/stocks/${row.slug}`} className={`${cls} hover:ring-[var(--color-accent)]/40`}>
             {inner}
         </Link>
     ) : (
@@ -152,7 +153,7 @@ export default async function StocksHubPage() {
     };
 
     return (
-        <main className="mx-auto max-w-4xl px-5 py-16 text-white">
+        <main className="mx-auto max-w-2xl px-4 sm:px-5 pt-16 pb-20 text-[var(--text-primary)]">
             {[itemList, breadcrumb].map((item, i) => (
                 <script
                     key={i}
@@ -161,22 +162,22 @@ export default async function StocksHubPage() {
                 />
             ))}
 
-            <nav aria-label="breadcrumb" className="mb-8 text-sm text-zinc-500">
-                <ol className="flex items-center gap-1">
-                    <li><Link href="/" className="hover:text-zinc-300">홈</Link></li>
-                    <li>/</li>
-                    <li className="text-zinc-300">주식 토큰</li>
+            <nav aria-label="breadcrumb" className="mb-5 text-[12px] text-[var(--text-muted)]">
+                <ol className="flex items-center gap-1.5">
+                    <li><Link href="/" className="hover:text-[var(--text-secondary)] transition-colors">홈</Link></li>
+                    <li aria-hidden>·</li>
+                    <li className="text-[var(--text-tertiary)]">주식 토큰</li>
                 </ol>
             </nav>
 
             <header>
-                <h1 className="text-3xl font-extrabold tracking-tight leading-snug">
+                <h1 className="text-[26px] font-extrabold tracking-[-0.02em] leading-tight">
                     주식 토큰 실시간 가격
                 </h1>
-                <p className="mt-3 text-zinc-400 leading-relaxed">
+                <p className="mt-3 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
                     바이낸스는 삼성전자·SK하이닉스 같은 개별 주식의 가격을 추종하는 무기한 선물을
                     상장해 두고 있습니다. 증시가 문을 닫아도 24시간 거래되기 때문에,{" "}
-                    <strong className="text-zinc-200">
+                    <strong className="text-[var(--text-primary)]">
                         장 마감 후와 주말에도 가격이 계속 움직입니다.
                     </strong>
                 </p>
@@ -185,17 +186,17 @@ export default async function StocksHubPage() {
                     {[krStatus, usStatus].map((s) => (
                         <div
                             key={s.marketName}
-                            className="rounded-xl bg-zinc-900/60 p-4 ring-1 ring-zinc-800"
+                            className="rounded-2xl bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)]"
                         >
-                            <div className="flex items-center gap-2 text-sm font-bold">
+                            <div className="flex items-center gap-2 text-[13px] font-bold">
                                 <span
                                     className={`w-2 h-2 rounded-full ${
-                                        s.isOpen ? "bg-[#02C076]" : "bg-amber-400"
+                                        s.isOpen ? "bg-[var(--color-accent)]" : "bg-amber-400"
                                     }`}
                                 />
                                 {s.label}
                             </div>
-                            <div className="mt-1 text-xs text-zinc-500">
+                            <div className="mt-1 text-[11px] text-[var(--text-muted)]">
                                 {s.marketName} · {s.hours}
                             </div>
                         </div>
@@ -205,8 +206,8 @@ export default async function StocksHubPage() {
 
             {korean.length > 0 && (
                 <section className="mt-12">
-                    <h2 className="text-xl font-bold tracking-tight">한국 주식 토큰</h2>
-                    <p className="mt-2 text-sm text-zinc-500">
+                    <h2 className="text-lg font-bold tracking-tight">한국 주식 토큰</h2>
+                    <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-tertiary)]">
                         한국거래소 정규장은 {krStatus.hours}입니다. 그 밖의 시간에도 아래 가격은
                         갱신됩니다.
                     </p>
@@ -218,15 +219,15 @@ export default async function StocksHubPage() {
 
             {featured.length > 0 && (
                 <section className="mt-12">
-                    <h2 className="text-xl font-bold tracking-tight">주요 해외 종목</h2>
+                    <h2 className="text-lg font-bold tracking-tight">주요 해외 종목</h2>
                     <CardGrid rows={featured} usdKrw={usdKrw} />
                 </section>
             )}
 
             {rest.length > 0 && (
                 <section className="mt-12">
-                    <h2 className="text-xl font-bold tracking-tight">전체 종목</h2>
-                    <p className="mt-2 text-sm text-zinc-500">
+                    <h2 className="text-lg font-bold tracking-tight">전체 종목</h2>
+                    <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-tertiary)]">
                         거래대금 순 · 총 {rows.length}개 종목
                     </p>
                     <CardGrid rows={rest} usdKrw={usdKrw} />
@@ -234,14 +235,14 @@ export default async function StocksHubPage() {
             )}
 
             <section className="mt-16">
-                <h2 className="text-xl font-bold tracking-tight">주식 토큰이란?</h2>
-                <p className="mt-3 text-zinc-300 leading-relaxed">
+                <h2 className="text-lg font-bold tracking-tight">주식 토큰이란?</h2>
+                <p className="mt-3 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
                     주식 토큰(토큰화 주식)은 실제 주식이 아니라, 주가를 기초자산으로 삼는 USDT 표시
                     무기한 선물입니다. 주식을 직접 보유하는 것이 아니므로 배당과 의결권이 없고,
                     포지션을 유지하는 동안 8시간마다 펀딩비를 주고받습니다. 대신 정규장 시간에
                     묶이지 않아 24시간 거래가 가능합니다.
                 </p>
-                <p className="mt-3 text-zinc-300 leading-relaxed">
+                <p className="mt-3 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
                     그래서 이 페이지의 가격은 해당 종목의 공식 시세나 정규장 종가가 아닙니다.
                     특히 장이 닫힌 시간에는 정규장 종가와 차이가 벌어질 수 있는데, 그 차이 자체가
                     &ldquo;마감 이후 나온 뉴스를 시장이 어떻게 받아들이고 있는가&rdquo;를 보여주는
@@ -249,7 +250,7 @@ export default async function StocksHubPage() {
                 </p>
             </section>
 
-            <p className="mt-14 text-xs leading-relaxed text-zinc-600">
+            <p className="mt-14 text-xs leading-relaxed text-[var(--text-muted)]">
                 본 페이지의 시세는 바이낸스 선물 시장 데이터이며, 각 종목의 공식 주가가 아닙니다.
                 무기한 선물은 레버리지와 청산 위험이 있는 고위험 파생상품이고 국가별로 거래가
                 제한될 수 있습니다. 본 정보는 투자 권유가 아니며 투자 판단과 그 결과에 대한 책임은

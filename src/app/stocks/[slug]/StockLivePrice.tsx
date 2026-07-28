@@ -108,53 +108,57 @@ export function StockLivePrice({ symbol, initialPrice, initialChangePercent, usd
     const krw = price !== null && usdKrw !== null ? price * usdKrw : null;
 
     const flashColor =
-        flash === "up" ? "text-[#02C076]" : flash === "down" ? "text-[#F6465D]" : "text-white";
+        flash === "up" ? "text-[var(--color-up)]" : flash === "down" ? "text-[var(--color-down)]" : "text-[var(--text-primary)]";
 
     return (
         <div>
             {/* 원화를 주가격으로 — 국내 유입의 검색 의도에 맞춘다 */}
-            <div
-                className={`text-[2.25rem] leading-none sm:text-5xl font-extrabold tabular-nums tracking-tight transition-colors duration-300 ${flashColor}`}
-            >
-                {krw !== null
-                    ? formatKrw(krw)
-                    : price !== null
-                      ? `$${price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                      : "—"}
+            <div className="flex items-center gap-2.5">
+                <span
+                    className={`text-[2.5rem] sm:text-[3.25rem] leading-[1.05] font-extrabold tabular-nums tracking-[-0.03em] transition-colors duration-300 ${flashColor}`}
+                >
+                    {krw !== null
+                        ? formatKrw(krw)
+                        : price !== null
+                          ? `$${price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                          : "—"}
+                </span>
+                <span
+                    className={`mt-1 flex shrink-0 items-center gap-1 self-start rounded-full px-2 py-1 text-[10px] font-bold ${
+                        isLive ? "bg-[var(--color-up-muted)] text-[var(--color-up)]" : "bg-[var(--surface-input)] text-[var(--text-tertiary)]"
+                    }`}
+                >
+                    <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                            isLive ? "animate-pulse bg-[var(--color-accent)]" : "bg-[var(--text-disabled)]"
+                        }`}
+                    />
+                    {isLive ? "실시간" : "연결 중"}
+                </span>
             </div>
 
-            <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                 {changePercent !== null && (
                     <span
-                        className={`text-base sm:text-lg font-bold tabular-nums ${
-                            isUp ? "text-[#02C076]" : "text-[#F6465D]"
+                        className={`rounded-lg px-2 py-1 text-[14px] font-bold tabular-nums ${
+                            isUp
+                                ? "bg-[var(--color-up-muted)] text-[var(--color-up)]"
+                                : "bg-[var(--color-down-muted)] text-[var(--color-down)]"
                         }`}
                     >
                         {isUp ? "▲" : "▼"} {Math.abs(changePercent).toFixed(2)}%
                     </span>
                 )}
+                <span className="text-[12px] text-[var(--text-muted)]">24시간 기준</span>
 
                 {krw !== null && price !== null && (
-                    <span className="text-sm text-zinc-500 tabular-nums">
+                    <span className="ml-auto text-[13px] tabular-nums text-[var(--text-tertiary)]">
                         ${price.toLocaleString("en-US", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                         })}
                     </span>
                 )}
-
-                <span
-                    className={`flex items-center gap-1.5 text-[11px] font-bold px-2 py-1 rounded-full ${
-                        isLive ? "text-[#02C076] bg-[#02C076]/10" : "text-zinc-500 bg-zinc-800"
-                    }`}
-                >
-                    <span
-                        className={`w-1.5 h-1.5 rounded-full ${
-                            isLive ? "bg-[#02C076] animate-pulse" : "bg-zinc-600"
-                        }`}
-                    />
-                    {isLive ? "실시간" : "연결 중"}
-                </span>
             </div>
         </div>
     );
