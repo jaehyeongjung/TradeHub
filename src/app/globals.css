@@ -22,11 +22,11 @@ html {
     --surface-active:   #263345;   /* 선택/활성 (neutral-600) */
 
     /* Text - 텍스트 계층 */
-    --text-primary:     #EEF2F7;   /* 제목, 강조 */
-    --text-secondary:   #A8B4C8;   /* 본문 */
-    --text-tertiary:    #7A8BA0;   /* 보조 설명 */
-    --text-muted:       #566475;   /* 힌트, 플레이스홀더 */
-    --text-disabled:    #3A4A5A;   /* 비활성 */
+    --text-primary:     #EEF2F7;   /* 제목, 강조 (contrast 16:1) */
+    --text-secondary:   #A8B4C8;   /* 본문 (contrast 8:1) */
+    --text-tertiary:    #8B9AAE;   /* 보조 설명 (contrast 6:1) */
+    --text-muted:       #78879B;   /* 힌트, 플레이스홀더 (contrast 4.7:1) */
+    --text-disabled:    #5A6878;   /* 비활성 (contrast 3:1) */
 
     /* Border - 구분선 */
     --border-subtle:    #17243A;   /* 가장 연한 구분선 */
@@ -172,6 +172,37 @@ html.light .text-zinc-500 {
 
 html.light .text-neutral-600 {
     color: #B0B8C1 !important;
+}
+
+/* ============================================
+   다크모드 저대비 텍스트 보정 (WCAG AA)
+   Tailwind 기본 회색(neutral/zinc/gray 500~700)은 어두운 배경에서
+   대비가 2~3:1까지 떨어져 사실상 안 보인다. 시맨틱 토큰으로 매핑해
+   text-tertiary(6:1) → text-muted(4.7:1) → text-disabled(3:1) 계단을 유지한다.
+   ============================================ */
+/* 두 가지 이유로 이 형태여야 hover:text-*가 정상 동작한다.
+   1) @layer utilities 안 — 레이어 밖에 두면 레이어드 유틸리티를 무조건 이긴다.
+   2) :where()로 감싸 특이도를 (0,1,0)으로 낮춤 — html:not(.light)를 그대로 쓰면
+      (0,2,1)이 되어 .hover\:text-*:hover(0,2,0)까지 이겨버린다.
+   특이도가 같아지면 소스 순서상 뒤에 오는 이 규칙이 기본 유틸리티만 덮어쓴다. */
+@layer utilities {
+    :where(html:not(.light)) .text-gray-500,
+    :where(html:not(.light)) .text-neutral-500,
+    :where(html:not(.light)) .text-zinc-500 {
+        color: var(--text-tertiary);
+    }
+
+    :where(html:not(.light)) .text-gray-600,
+    :where(html:not(.light)) .text-neutral-600,
+    :where(html:not(.light)) .text-zinc-600 {
+        color: var(--text-muted);
+    }
+
+    :where(html:not(.light)) .text-gray-700,
+    :where(html:not(.light)) .text-neutral-700,
+    :where(html:not(.light)) .text-zinc-700 {
+        color: var(--text-disabled);
+    }
 }
 
 /* ============================================

@@ -103,7 +103,7 @@ export function KimchiWidget({
     const symbolPill = isLight
         ? "bg-neutral-100 text-neutral-500"
         : "bg-surface-input text-text-tertiary";
-    const labelColor = isLight ? "text-neutral-400" : "text-text-muted";
+    const labelColor = isLight ? "text-neutral-400" : "text-text-tertiary";
     const subLabelColor = isLight ? "text-neutral-500" : "text-text-tertiary";
 
     return (

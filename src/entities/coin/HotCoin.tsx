@@ -153,8 +153,8 @@ export function HotSymbolsTicker({ fadeDelay = 0 }: { fadeDelay?: number } = {})
         ? "bg-white border-neutral-200 text-neutral-700 shadow-lg"
         : "bg-surface-elevated border-border-default text-text-secondary shadow-xl";
     const dividerColor = isLight ? "border-neutral-200" : "border-border-subtle";
-    const colLabelColor = isLight ? "text-neutral-500" : "text-neutral-600";
-    const rankColor = isLight ? "text-neutral-500" : "text-neutral-600";
+    const colLabelColor = isLight ? "text-neutral-500" : "text-text-tertiary";
+    const rankColor = isLight ? "text-neutral-500" : "text-text-tertiary";
     const symColor = isLight ? "text-neutral-800" : "text-text-primary";
     const priceColor = isLight ? "text-neutral-600" : "text-text-tertiary";
     const arrowBorder = "border-b-neutral-700";
