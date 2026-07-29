@@ -98,9 +98,12 @@ export function SeoFooter() {
                             <GuideLink href={isEn ? "/en/ranking" : "/ranking"}>{isEn ? "Coin Market Cap Rankings" : "코인 시가총액 순위"}</GuideLink>
                             <GuideLink href={isEn ? "/en/analysis" : "/analysis"}>{isEn ? "Chart Technical Analysis" : "차트 기술 분석"}</GuideLink>
                             {/* 주식 토큰은 한국어 페이지만 있어 EN에서는 노출하지 않는다 */}
+                            {/* 앵커 텍스트가 곧 순위 신호다. 각 페이지가 노리는 검색어를 그대로 쓴다. */}
                             {!isEn && <GuideLink href="/stocks">주식 토큰 실시간 가격</GuideLink>}
-                            {!isEn && <GuideLink href="/stocks/samsung">삼성전자 토큰 시세</GuideLink>}
-                            {!isEn && <GuideLink href="/stocks/sk-hynix">SK하이닉스 토큰 시세</GuideLink>}
+                            {!isEn && <GuideLink href="/stocks/samsung">삼전 실시간 가격</GuideLink>}
+                            {!isEn && <GuideLink href="/stocks/sk-hynix">하이닉스 실시간 가격</GuideLink>}
+                            {!isEn && <GuideLink href="/stocks/tesla">테슬라 실시간 가격</GuideLink>}
+                            {!isEn && <GuideLink href="/stocks/nvidia">엔비디아 실시간 가격</GuideLink>}
                         </div>
                     </article>
 

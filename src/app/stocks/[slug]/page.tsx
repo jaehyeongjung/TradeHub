@@ -5,10 +5,12 @@ import {
     getStockToken,
     getAllStockSlugs,
     getRelatedStockTokens,
+    searchName,
     type StockToken,
 } from "@/shared/lib/stock-tokens";
 import { getStockDetail, type StockDetail } from "@/shared/lib/stock-tokens.server";
 import { getMarketStatus } from "@/shared/lib/market-hours";
+import { fmtPrice, fmtCompactKrw } from "../format";
 
 import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
 import { Chat } from "@/features/chat/Chat";
@@ -25,13 +27,63 @@ export function generateStaticParams() {
     return getAllStockSlugs().map((slug) => ({ slug }));
 }
 
-function pageTitle(token: StockToken) {
-    return `${token.koreanName} 토큰(${token.symbol}) 실시간 가격 — 24시간 시세`;
+/** "7월 29일 11:24" (KST). 검색 결과에 노출되는 신선도 신호로 쓴다. */
+function kstStamp(d: Date): string {
+    const parts = new Intl.DateTimeFormat("ko-KR", {
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Asia/Seoul",
+    }).formatToParts(d);
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+    return `${get("month")}월 ${get("day")}일 ${get("hour")}:${get("minute")}`;
 }
 
-function pageDescription(token: StockToken) {
+function signedPct(pct: number): string {
+    return `${pct >= 0 ? "+" : "−"}${Math.abs(pct).toFixed(2)}%`;
+}
+
+/** "KOSPI 005930" → "005930", "NASDAQ: TSLA" → "TSLA". 비상장은 null. */
+function tickerOf(token: StockToken): string | null {
+    const m = /(?::\s*|\s)([A-Z0-9]{2,6})$/.exec(token.listing);
+    return m ? m[1] : null;
+}
+
+/**
+ * 제목 앞머리에 검색어(줄임말 + "실시간 가격")와 현재가를 함께 넣는다.
+ * 가격이 제목에 있으면 시세 질의에서 클릭률이 오르고, 60초마다 갱신돼 신선도 신호도 된다.
+ */
+function pageTitle(token: StockToken, priceLabel: string | null) {
+    const name = searchName(token);
+    const head = priceLabel
+        ? `${name} 실시간 가격 ${priceLabel}`
+        : `${name} 실시간 가격`;
+    const tail =
+        name === token.koreanName
+            ? `${token.symbol} 토큰 24시간 시세`
+            : `${token.koreanName} 토큰 24시간 시세`;
+    return `${head} — ${tail}`;
+}
+
+function pageDescription(
+    token: StockToken,
+    priceLabel: string | null,
+    changePercent: number | null,
+    stamp: string | null,
+) {
+    const name = searchName(token);
     const where = token.market === "KR" ? "한국 증시" : "미국 증시";
-    return `${token.koreanName}(${token.englishName}) 주식 토큰의 실시간 가격을 원화로 확인하세요. ${where}가 문을 닫은 새벽과 주말에도 바이낸스 무기한 선물로 24시간 거래됩니다. 실시간 시세, 24시간 변동률과 함께 같은 종목 투자자 대화방도 무료로 제공합니다.`;
+
+    const lead =
+        priceLabel !== null
+            ? `${name} 토큰(${token.symbol}USDT) 실시간 가격은 ${priceLabel}${
+                  changePercent !== null ? `, 24시간 ${signedPct(changePercent)}` : ""
+              }입니다.${stamp ? ` ${stamp} 기준.` : ""} `
+            : `${name}(${token.englishName}) 주식 토큰의 실시간 가격을 원화로 확인하세요. `;
+
+    return `${lead}${where}가 문을 닫은 새벽과 주말에도 바이낸스 무기한 선물로 24시간 거래됩니다. 원화 환산 가격, 24시간 고가·저가·거래대금, 정규장 마감 이후 변동률과 함께 같은 종목 투자자 대화방도 무료로 제공합니다.`;
 }
 
 export async function generateMetadata({
@@ -43,23 +95,39 @@ export async function generateMetadata({
     const token = getStockToken(slug);
     if (!token) return {};
 
+    // 페이지 본문과 같은 fetch를 쓴다 — Next가 메모이즈하므로 추가 호출이 아니다
+    const detail = await getStockDetail(token.symbol, token.market);
+    const priceLabel =
+        detail.quote !== null ? fmtPrice(detail.quote.price, detail.usdKrw) : null;
+    const stamp = detail.quote !== null ? kstStamp(new Date()) : null;
+
     const url = `${SITE}/stocks/${token.slug}`;
-    const title = pageTitle(token);
-    const description = pageDescription(token);
+    const title = pageTitle(token, priceLabel);
+    const description = pageDescription(
+        token,
+        priceLabel,
+        detail.quote?.changePercent ?? null,
+        stamp,
+    );
+    const name = searchName(token);
 
     return {
-        title,
+        // 시세가 들어가 제목이 길어졌다. " | TradeHub" 접미사를 빼서 잘리는 부분을 줄인다.
+        title: { absolute: title },
         description,
         keywords: [
             ...token.aliases,
-            `${token.koreanName} 실시간`,
+            `${name} 실시간 가격`,
+            `${name} 지금 얼마`,
             `${token.koreanName} 주식 토큰`,
             `${token.symbol} 가격`,
             `${token.koreanName} 종토방`,
             `${token.koreanName} 토론방`,
+            token.market === "KR" ? `${name} 시간외 가격` : `${name} 프리마켓`,
             "주식 토큰",
             "토큰화 주식",
             "24시간 주식 거래",
+            "장 마감 후 주가",
         ],
         alternates: { canonical: url },
         openGraph: {
@@ -78,8 +146,13 @@ export async function generateMetadata({
 
 function buildFaqs(token: StockToken, status: ReturnType<typeof getMarketStatus>) {
     const isUnlisted = token.category === "비상장";
+    const name = searchName(token);
 
     const faqs: { question: string; answer: string }[] = [
+        {
+            question: `${name} 지금 얼마인가요?`,
+            answer: `이 페이지 상단의 큰 숫자가 ${token.symbol} 토큰의 현재 가격입니다. 바이낸스 시세를 원화로 환산해 실시간으로 갱신하며, ${status.marketName} 정규장(${status.hours})이 닫힌 새벽과 주말에도 멈추지 않습니다. 다만 이 값은 ${token.koreanName}의 공식 주가가 아니라 주가를 추종하는 무기한 선물 가격입니다.`,
+        },
         {
             question: `${token.koreanName} 토큰 가격은 실제 ${token.koreanName} 주가와 같나요?`,
             answer: isUnlisted
@@ -107,6 +180,8 @@ function buildFaqs(token: StockToken, status: ReturnType<typeof getMarketStatus>
         });
     }
 
+    if (token.extraFaqs) faqs.push(...token.extraFaqs);
+
     return faqs;
 }
 
@@ -114,27 +189,55 @@ function buildJsonLd(
     token: StockToken,
     detail: StockDetail,
     faqs: { question: string; answer: string }[],
+    title: string,
+    description: string,
+    now: Date,
 ) {
     const url = `${SITE}/stocks/${token.slug}`;
+    const ticker = tickerOf(token);
 
     const product = {
         "@context": "https://schema.org",
         "@type": "FinancialProduct",
         name: `${token.koreanName} 토큰 (${token.symbol}USDT)`,
-        description: pageDescription(token),
+        description,
         url,
         category: "무기한 선물",
         provider: { "@type": "Organization", name: "Binance" },
+        ...(ticker && token.category === "주식"
+            ? {
+                  // 기초자산이 되는 실제 기업. 검색엔진이 종목 엔티티와 이 페이지를 연결하는 단서다.
+                  about: {
+                      "@type": "Corporation",
+                      name: token.koreanName,
+                      alternateName: token.englishName,
+                      tickerSymbol: ticker,
+                  },
+              }
+            : {}),
         ...(detail.quote
             ? {
                   offers: {
                       "@type": "Offer",
                       price: detail.quote.price,
-                      priceCurrency: "USDT",
+                      // USDT는 ISO 통화 코드가 아니라 달러 표시로 기재한다 (본문에 USDT 체결임을 명시)
+                      priceCurrency: "USD",
                       url,
                   },
               }
             : {}),
+    };
+
+    // 시세 페이지는 "언제 기준 숫자인가"가 곧 품질이다. 갱신 시각을 명시한다.
+    const webPage = {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: title,
+        description,
+        url,
+        inLanguage: "ko-KR",
+        dateModified: now.toISOString(),
+        isPartOf: { "@type": "WebSite", name: "TradeHub", url: SITE },
     };
 
     const faqPage = {
@@ -162,7 +265,7 @@ function buildJsonLd(
         ],
     };
 
-    return [product, faqPage, breadcrumb];
+    return [product, webPage, faqPage, breadcrumb];
 }
 
 
@@ -191,9 +294,26 @@ export default async function StockTokenPage({
     const detail = await getStockDetail(token.symbol, token.market);
     const status = getMarketStatus(token.market);
     const faqs = buildFaqs(token, status);
-    const jsonLdItems = buildJsonLd(token, detail, faqs);
+    const now = new Date();
+    const stamp = kstStamp(now);
+    const priceLabel = detail.quote !== null ? fmtPrice(detail.quote.price, detail.usdKrw) : null;
+    const title = pageTitle(token, priceLabel);
+    const description = pageDescription(
+        token,
+        priceLabel,
+        detail.quote?.changePercent ?? null,
+        detail.quote !== null ? stamp : null,
+    );
+    const jsonLdItems = buildJsonLd(token, detail, faqs, title, description, now);
     const related = getRelatedStockTokens(token);
     const isUnlisted = token.category === "비상장";
+    const name = searchName(token);
+
+    // 정규장 마감 이후 얼마나 움직였나 — 이 페이지만 답할 수 있는 숫자를 문장으로도 남긴다
+    const sinceClosePct =
+        detail.quote !== null && detail.sessionClosePrice !== null && detail.sessionClosePrice > 0
+            ? ((detail.quote.price - detail.sessionClosePrice) / detail.sessionClosePrice) * 100
+            : null;
 
     return (
         <main className="mx-auto max-w-2xl px-4 sm:px-5 pt-16 pb-20 text-[var(--text-primary)]">
@@ -216,17 +336,22 @@ export default async function StockTokenPage({
             {/* ── 히어로: 이 페이지에 온 이유(지금 얼마?)를 첫 화면에서 끝낸다 ── */}
             <section className={`${CARD} overflow-hidden`}>
                 <div className="p-5 sm:p-6">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                         <span className="rounded-full bg-[var(--surface-input)] px-2 py-0.5 text-[11px] font-semibold text-[var(--text-secondary)]">
                             {token.market === "KR" ? "한국" : "해외"} {token.category}
                         </span>
                         <span className="text-[11px] font-medium text-[var(--text-muted)]">
                             {token.symbol}USDT
                         </span>
+                        <span className="text-[11px] font-medium text-[var(--text-muted)]">
+                            · {token.listing}
+                        </span>
                     </div>
 
                     <h1 className="mt-3 text-[17px] font-bold tracking-tight text-[var(--text-secondary)]">
-                        {token.koreanName} 토큰 실시간 가격
+                        {name === token.koreanName
+                            ? `${token.koreanName} 토큰 실시간 가격`
+                            : `${token.koreanName}(${name}) 토큰 실시간 가격`}
                     </h1>
 
                     <div className="mt-4">
@@ -295,19 +420,61 @@ export default async function StockTokenPage({
                 )}
             </section>
 
+            <p className="mt-3 px-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
+                {stamp} 기준 시세로 페이지를 만들었고, 이후 값은 브라우저에서 실시간으로 갱신됩니다.
+                {detail.usdKrw !== null && (
+                    <>
+                        {" "}1달러 ={" "}
+                        {detail.usdKrw.toLocaleString("ko-KR", { maximumFractionDigits: 2 })}원 기준으로
+                        환산했어요. 실제 체결은 USDT로 이루어집니다.
+                    </>
+                )}
+            </p>
 
-            {detail.usdKrw !== null && (
-                <p className="mt-3 px-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
-                    1달러 ={" "}
-                    {detail.usdKrw.toLocaleString("ko-KR", { maximumFractionDigits: 2 })}원 기준으로
-                    환산했어요. 실제 체결은 USDT로 이루어집니다.
-                </p>
+            {/* ── 검색 질의 그대로를 제목으로: "삼전 지금 얼마?" ── */}
+            {detail.quote !== null && (
+                <section className="mt-12">
+                    {/* 제목·본문은 템플릿 문자열로 만들어 한 텍스트 노드가 되게 한다
+                    (JSX에서 표현식과 문자열을 섞으면 사이에 주석 노드가 끼어 문장이 쪼개진다) */}
+                <SectionTitle>{`${name} 지금 얼마인가요?`}</SectionTitle>
+                    <div className="space-y-3.5 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                        <p>
+                            {stamp} 기준 {token.symbol} 토큰 가격은{" "}
+                            <strong className="font-bold text-[var(--text-primary)]">
+                                {priceLabel}
+                            </strong>
+                            , 24시간 변동률은 {signedPct(detail.quote.changePercent)}입니다. 같은
+                            기간 고가는 {fmtPrice(detail.quote.high, detail.usdKrw)}, 저가는{" "}
+                            {fmtPrice(detail.quote.low, detail.usdKrw)}이고 거래대금은{" "}
+                            {fmtCompactKrw(detail.quote.quoteVolume, detail.usdKrw)}입니다.
+                        </p>
+                        {sinceClosePct !== null && !isUnlisted && (
+                            <p>
+                                직전 {status.marketName} 정규장 마감 시점과 비교하면{" "}
+                                <strong className="font-bold text-[var(--text-primary)]">
+                                    {signedPct(sinceClosePct)}
+                                </strong>{" "}
+                                움직였습니다. {status.marketName}가 닫혀 있는 동안 시장이{" "}
+                                {token.koreanName}를 다시 평가한 폭이라고 볼 수 있습니다. 다만 기준값은
+                                마감 시점의 토큰 가격이며 {token.koreanName}의 정규장 종가가 아닙니다.
+                            </p>
+                        )}
+                        <p>
+                            위 숫자는 {token.listing}
+                            {token.category === "비상장"
+                                ? " 기업의 장외 가치평가를 기초자산으로 삼는"
+                                : "을 기초자산으로 삼는"}{" "}
+                            바이낸스 무기한 선물({token.symbol}USDT)의 가격이며, 해당 종목의 공식
+                            시세가 아닙니다.
+                        </p>
+                    </div>
+                </section>
             )}
 
             {/* ── 대화방: 가격 보러 온 사람을 머물게 하는 자리 ── */}
             <section id="chat" className="mt-12 scroll-mt-16">
                 <SectionTitle hint={`${token.koreanName}를 보고 있는 사람들과 지금 바로 이야기해보세요. 롱·숏 투표로 이 방의 분위기도 함께 보입니다.`}>
-                    {token.koreanName} 투자자 대화방
+                    {`${token.koreanName} 투자자 대화방`}
                 </SectionTitle>
                 <div className={`${CARD} h-[72dvh] min-h-[420px] sm:h-[620px] p-3 sm:p-4`}>
                     <Chat roomId={`stock:${token.slug}`} />
@@ -316,12 +483,81 @@ export default async function StockTokenPage({
 
             {/* ── 설명 ── */}
             <section className="mt-14">
-                <SectionTitle>{token.koreanName} 토큰이란?</SectionTitle>
+                <SectionTitle>{`${token.koreanName} 토큰이란?`}</SectionTitle>
                 <div className="space-y-3.5 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
                     <p>{token.summary}</p>
                     <p>{token.angle}</p>
                 </div>
             </section>
+
+            {/* ── 종목별 고유 본문: 이 가격을 움직이는 것들 ── */}
+            <section className="mt-12">
+                <SectionTitle hint={`가격이 크게 움직였다면 아래 중 하나가 원인일 가능성이 높습니다.`}>
+                    {`${token.koreanName} 가격을 움직이는 것들`}
+                </SectionTitle>
+                <div className={`${CARD} overflow-hidden`}>
+                    {token.watchPoints.map((w, i) => (
+                        <div
+                            key={w.title}
+                            className={`px-4 py-4 sm:px-5 ${
+                                i > 0 ? "border-t border-[var(--border-subtle)]" : ""
+                            }`}
+                        >
+                            <h3 className="text-[14px] font-bold text-[var(--text-primary)]">
+                                {w.title}
+                            </h3>
+                            <p className="mt-1.5 text-[13px] leading-[1.75] text-[var(--text-secondary)]">
+                                {w.body}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* ── 시간외·프리마켓 질의를 정면으로 받는 섹션 ── */}
+            {!isUnlisted && (
+                <section className="mt-12">
+                    <SectionTitle>
+                        {token.market === "KR"
+                            ? `${name} 시간외 가격은 어디서 보나요?`
+                            : `${name} 프리마켓·애프터마켓 가격은 어디서 보나요?`}
+                    </SectionTitle>
+                    <div className="space-y-3.5 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                        {token.market === "KR" ? (
+                            <>
+                                <p>
+                                    한국거래소의 시간외 거래는 정규장이 끝난 뒤 장후 시간외 종가매매와
+                                    시간외 단일가매매로 이어지고, 18시가 지나면 그날의 가격은 더 이상
+                                    갱신되지 않습니다. 그래서 밤에 해외 증시가 크게 움직여도 국내
+                                    증권사 앱에는 반영될 자리가 없습니다.
+                                </p>
+                                <p>
+                                    {token.symbol} 토큰은 이 공백을 메우는 용도로 보면 정확합니다.
+                                    시간외 거래가 끝난 뒤부터 다음 날 09시 개장 전까지도 계속 체결되기
+                                    때문에, 새벽에 나온 뉴스에 시장이 어떻게 반응하는지 이 페이지에서
+                                    확인할 수 있습니다. 시간외 단일가와는 참여자도 가격 결정 방식도
+                                    다른, 별개의 시장이라는 점만 기억하면 됩니다.
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <p>
+                                    미국 주식의 프리마켓·애프터마켓은 정해진 시간대에만 열립니다. 그
+                                    시간이 지나면 호가가 멈추고, 한국 시간으로 낮에는 대부분 전일
+                                    종가만 남습니다.
+                                </p>
+                                <p>
+                                    {token.symbol} 토큰은 그 사이 시간과 주말에도 끊기지 않습니다. 한국
+                                    낮 시간에 {name} 가격을 확인하고 싶을 때, 또는 애프터마켓이 닫힌
+                                    뒤 프리마켓이 열리기 전까지의 흐름을 보고 싶을 때 참고할 수 있는
+                                    거의 유일한 실시간 값입니다. 다만 정규장 시세가 아니라 선물
+                                    가격이라 괴리가 생길 수 있습니다.
+                                </p>
+                            </>
+                        )}
+                    </div>
+                </section>
+            )}
 
             <section className="mt-12">
                 <SectionTitle hint={`가장 흔한 오해는 이 가격을 ${token.koreanName}의 정규장 주가로 그대로 받아들이는 것입니다. 주식이 아니라 주가를 추종하는 무기한 선물이에요.`}>
@@ -394,7 +630,7 @@ export default async function StockTokenPage({
             </section>
 
             <section className="mt-12">
-                <SectionTitle>다른 종목도 보기</SectionTitle>
+                <SectionTitle>다른 종목 실시간 가격</SectionTitle>
                 <div className="grid grid-cols-2 gap-2">
                     {related.map((r) => (
                         <Link
@@ -405,8 +641,9 @@ export default async function StockTokenPage({
                             <div className="text-[11px] font-medium text-[var(--text-muted)]">
                                 {r.market === "KR" ? "한국" : "해외"} {r.category}
                             </div>
-                            <div className="mt-1 truncate text-[14px] font-bold text-[var(--text-primary)]">
-                                {r.koreanName}
+                            {/* 앵커 텍스트에 핵심 키워드를 담는다 — 내부 링크가 곧 순위 신호다 */}
+                            <div className="mt-1 text-[14px] font-bold leading-snug text-[var(--text-primary)]">
+                                {searchName(r)} 실시간 가격
                             </div>
                         </Link>
                     ))}
@@ -415,7 +652,7 @@ export default async function StockTokenPage({
                     href="/stocks"
                     className="mt-4 inline-block text-[13px] font-medium text-[var(--text-tertiary)] transition-colors hover:text-[var(--color-up)]"
                 >
-                    주식 토큰 전체 보기 →
+                    주식 토큰 실시간 가격 전체 보기 →
                 </Link>
             </section>
 
