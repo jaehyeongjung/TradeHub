@@ -14,6 +14,7 @@ import { fmtPrice, fmtCompactKrw } from "../format";
 import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
 import { StockRoom } from "@/features/floors/StockRoom";
 import { StockLiveData } from "./StockLiveData";
+import { MarketStatusNote } from "./MarketStatusNote";
 
 // 첫 요청 때 렌더하고 60초간 캐시한다(ISR).
 //
@@ -398,23 +399,13 @@ export default async function StockTokenPage({
                                 {status.label}
                             </span>
                         </div>
-                        <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-secondary)]">
-                            {status.isOpen ? (
-                                <>
-                                    지금은 {status.marketName} 정규장({status.hours})입니다. 토큰
-                                    가격과 실제 주가가 가깝게 움직이는 시간대예요.
-                                </>
-                            ) : (
-                                <>
-                                    {status.marketName}는 닫혔지만{" "}
-                                    <strong className="font-bold text-[var(--text-primary)]">
-                                        토큰은 계속 거래 중
-                                    </strong>
-                                    이에요. 위 가격은 종가가 아니라 마감 이후 매겨진 최신
-                                    가격입니다.
-                                </>
-                            )}
-                        </p>
+                        {/* 새벽엔 "N명이 아직 안 잤습니다"로 바뀐다 */}
+                        <MarketStatusNote
+                            roomId={`stock:${token.slug}`}
+                            isOpen={status.isOpen}
+                            marketName={status.marketName}
+                            hours={status.hours}
+                        />
                     </div>
                 )}
             </section>
@@ -429,6 +420,20 @@ export default async function StockTokenPage({
                     </>
                 )}
             </p>
+
+            {/* ── 층 단면도 + 대화방 ──
+                가격 다음 자리를 서술형 본문이 아니라 방에 준다. 가격만 확인하고 이탈하는
+                흐름을 끊는 게 이 페이지의 목적이고, 서술형 본문은 아래에 그대로 남아 있어
+                크롤러가 읽는 내용은 달라지지 않는다. */}
+            <StockRoom
+                slug={token.slug}
+                symbol={token.symbol}
+                koreanName={token.koreanName}
+                market={token.market}
+                floorUnit={token.floorUnit}
+                usdKrw={detail.usdKrw}
+                initialPrice={detail.quote?.price ?? null}
+            />
 
             {/* ── 검색 질의 그대로를 제목으로: "삼전 지금 얼마?" ── */}
             {detail.quote !== null && (
@@ -469,17 +474,6 @@ export default async function StockTokenPage({
                     </div>
                 </section>
             )}
-
-            {/* ── 층 단면도 + 대화방: 가격 보러 온 사람을 머물게 하는 자리 ── */}
-            <StockRoom
-                slug={token.slug}
-                symbol={token.symbol}
-                koreanName={token.koreanName}
-                market={token.market}
-                floorUnit={token.floorUnit}
-                usdKrw={detail.usdKrw}
-                initialPrice={detail.quote?.price ?? null}
-            />
 
             {/* ── 설명 ── */}
             <section className="mt-14">

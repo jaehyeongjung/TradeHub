@@ -263,7 +263,7 @@ export function ResidentSheet({
                             disabled={!valid || busy}
                             className={`mt-5 w-full rounded-2xl py-4 text-[15px] font-bold transition-all ${
                                 valid && !busy
-                                    ? "bg-[var(--color-accent)] text-black hover:opacity-90 cursor-pointer"
+                                    ? "bg-[var(--color-accent-strong)] text-white hover:opacity-90 cursor-pointer"
                                     : "bg-[var(--surface-input)] text-[var(--text-disabled)] cursor-not-allowed"
                             }`}
                         >

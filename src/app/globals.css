@@ -38,7 +38,11 @@ html {
     --color-up-muted:   rgba(2, 192, 118, 0.12);
     --color-down:       #F75467;   /* 하락 */
     --color-down-muted: rgba(247, 84, 103, 0.10);
-    --color-accent:     #02C076;   /* 브랜드 포인트 */
+    --color-accent:     #02C076;   /* 브랜드 포인트 — 점·링·강조선 */
+    /* 흰 글씨를 얹는 채움 버튼용 짙은 브랜드 그린.
+       --color-accent(#02C076)에 흰 글씨는 명도비가 2.4:1밖에 안 나온다(기준 4.5:1).
+       이 값은 4.55:1로 통과한다. */
+    --color-accent-strong: #00875A;
     --color-info:       #4A9EFF;   /* 중립 정보 — 손익과 무관한 상태(예: 매수 대기) */
 }
 
@@ -77,6 +81,7 @@ html.light {
     --color-down:       #E0294A;
     --color-down-muted: rgba(224, 41, 74, 0.08);
     --color-accent:     #00A676;
+    --color-accent-strong: #00875A;
     --color-info:       #3182F6;
 }
 

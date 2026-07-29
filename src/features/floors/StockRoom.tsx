@@ -4,18 +4,11 @@ import { useCallback, useMemo, useState } from "react";
 import { useAtomValue } from "jotai";
 import { stockPriceAtom } from "@/shared/store/atoms";
 import { useAnonUserId } from "@/shared/hooks/useAnonUserId";
+import { useRoomPresence } from "@/shared/hooks/useRoomPresence";
+import { nicknameFor } from "@/shared/lib/nickname";
 import { Chat, type ChatIdentity } from "@/features/chat/Chat";
-import {
-    buildFloorWindow,
-    currencyOf,
-    floorUnitFor,
-    summarize,
-    type FloorBucket,
-    type StockMarketLike,
-} from "./floor";
-import { nicknameFor } from "./nickname";
+import { currencyOf, floorUnitFor, summarize, type StockMarketLike } from "./floor";
 import { useResidents } from "./useResidents";
-import { FloorBoard } from "./FloorBoard";
 import { FloorChatHeader } from "./FloorChatHeader";
 import { ResidentSheet } from "./ResidentSheet";
 
@@ -44,7 +37,7 @@ function SectionTitle({ children, hint }: { children: React.ReactNode; hint?: st
 }
 
 /**
- * 층 시스템과 대화방을 함께 소유한다.
+ * 종목 대화방. 층은 별도 섹션 없이 이름 옆 배지와 헤더 한 줄로만 드러난다.
  *
  * 가격은 StockLiveData가 여는 WebSocket 하나를 stockPriceAtom으로 받아 쓴다.
  * 소켓을 또 열면 같은 스트림이 두 개가 된다.
@@ -80,32 +73,12 @@ export function StockRoom({
     const unit = floorUnitFor(market, floorUnit, toNative(initialPrice));
 
     const { residents, byUser, me, save, remove } = useResidents(roomId, userId);
+    const viewerCount = useRoomPresence(roomId, userId);
 
-    const elevator = price !== null ? price / unit : 0;
-    const elevatorFloor = Math.floor(elevator);
-    const myFloor = me ? Math.floor(me.price / unit) : null;
+    /** 현재가가 걸쳐 있는 층. 이 위는 물린 사람, 아래는 수익 구간. */
+    const elevatorFloor = price !== null ? Math.floor(price / unit) : 0;
 
-    const buckets = useMemo<FloorBucket[]>(() => {
-        const map = new Map<number, FloorBucket>();
-        for (const r of residents) {
-            const f = Math.floor(r.price / unit);
-            const bucket = map.get(f) ?? { floor: f, holders: 0, watchers: 0 };
-            if (r.kind === "holder") bucket.holders += 1;
-            else bucket.watchers += 1;
-            map.set(f, bucket);
-        }
-        return [...map.values()];
-    }, [residents, unit]);
-
-    const view = useMemo(
-        () => buildFloorWindow(buckets, elevator, myFloor),
-        [buckets, elevator, myFloor],
-    );
-
-    const summary = useMemo(
-        () => summarize(residents, price ?? 0, unit),
-        [residents, price, unit],
-    );
+    const summary = useMemo(() => summarize(residents, price ?? 0, unit), [residents, price, unit]);
 
     const identityFor = useCallback(
         (uid: string): ChatIdentity => {
@@ -129,25 +102,6 @@ export function StockRoom({
 
     return (
         <>
-            {price !== null && (
-                <section id="floors" className="mt-12 scroll-mt-16">
-                    <SectionTitle hint="평단가만 넣으면 층이 정해집니다. 가로선이 현재가고, 선 위에 있으면 물린 거예요.">
-                        {koreanName} 입주민 현황
-                    </SectionTitle>
-                    <FloorBoard
-                        currency={currency}
-                        unit={unit}
-                        price={price}
-                        elevator={elevator}
-                        view={view}
-                        me={me}
-                        myUserId={userId}
-                        summary={summary}
-                        onEdit={openSheet}
-                    />
-                </section>
-            )}
-
             <section id="chat" className="mt-12 scroll-mt-16">
                 <SectionTitle
                     hint={`${koreanName}를 보고 있는 사람들과 지금 바로 이야기해보세요. 이름 옆 층수로 서로가 어디쯤 물려 있는지 보입니다.`}
@@ -169,6 +123,7 @@ export function StockRoom({
                                     averageFloor={summary.averageFloor}
                                     stuckRatio={summary.stuckRatio}
                                     holderCount={summary.holderCount}
+                                    viewerCount={viewerCount}
                                     onEdit={openSheet}
                                 />
                             ) : undefined

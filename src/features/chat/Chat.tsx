@@ -492,29 +492,44 @@ export function Chat({
                                         className="group relative py-[3px] min-w-0"
                                     >
                                         <div className="flex items-baseline gap-1.5">
-                                            {/* 배지 폭을 고정해 층수가 한 자리든 두 자리든 이름이 세로로 정렬된다 */}
-                                            {badge ? (
-                                                <span
-                                                    className="text-[9px] font-bold px-1 py-[1px] rounded shrink-0 leading-none tabular-nums text-center min-w-[26px]"
-                                                    style={{
-                                                        background: tintOf(BADGE_TONE[badge.tone]),
-                                                        color: BADGE_TONE[badge.tone],
-                                                    }}
-                                                >
-                                                    {badge.label}
+                                            {identity ? (
+                                                /* "8층 존버흑두루미" — 층을 닉네임에 붙여 한 덩어리로 읽히게 한다 */
+                                                <span className="text-[11px] font-semibold shrink-0">
+                                                    {badge && (
+                                                        <span
+                                                            className="tabular-nums"
+                                                            style={{ color: BADGE_TONE[badge.tone] }}
+                                                        >
+                                                            {badge.label}{" "}
+                                                        </span>
+                                                    )}
+                                                    <span className={nameColor}>{identity.name}</span>
+                                                    {isMe && (
+                                                        <span className={`font-medium ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
+                                                            {isEn ? " (me)" : " (나)"}
+                                                        </span>
+                                                    )}
                                                 </span>
                                             ) : (
-                                                <span className="w-[26px] shrink-0" />
-                                            )}
-                                            <span className={`text-[11px] font-semibold shrink-0 ${nameColor}`}>
-                                                {identity
-                                                    ? identity.name
-                                                    : isMe ? (isEn ? "Me" : "나") : m.user_id.slice(0, 6)}
-                                            </span>
-                                            {identity && isMe && (
-                                                <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
-                                                    {isEn ? "(me)" : "(나)"}
-                                                </span>
+                                                <>
+                                                    {/* 대시보드는 기존 L/S 배지. 폭을 고정해 이름이 세로로 정렬된다 */}
+                                                    {badge ? (
+                                                        <span
+                                                            className="text-[9px] font-bold px-1 py-[1px] rounded shrink-0 leading-none tabular-nums text-center min-w-[26px]"
+                                                            style={{
+                                                                background: tintOf(BADGE_TONE[badge.tone]),
+                                                                color: BADGE_TONE[badge.tone],
+                                                            }}
+                                                        >
+                                                            {badge.label}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="w-[26px] shrink-0" />
+                                                    )}
+                                                    <span className={`text-[11px] font-semibold shrink-0 ${nameColor}`}>
+                                                        {isMe ? (isEn ? "Me" : "나") : m.user_id.slice(0, 6)}
+                                                    </span>
+                                                </>
                                             )}
                                             <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-300" : "text-text-muted"}`}>·</span>
                                             <span className={`text-[12px] whitespace-pre-wrap break-anywhere flex-1 ${contentColor}`}>

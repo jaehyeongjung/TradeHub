@@ -2,8 +2,9 @@
 
 import { Pencil } from "lucide-react";
 import { tintOf } from "@/shared/lib/color";
+import { LiveViewers } from "@/shared/ui/LiveViewers";
 import { formatSignedPercent, pnlPercent } from "./floor";
-import { nicknameFor } from "./nickname";
+import { nicknameFor } from "@/shared/lib/nickname";
 import type { Resident } from "./useResidents";
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
     averageFloor: number | null;
     stuckRatio: number;
     holderCount: number;
+    viewerCount: number;
     onEdit: () => void;
 };
 
@@ -31,14 +33,18 @@ export function FloorChatHeader({
     averageFloor,
     stuckRatio,
     holderCount,
+    viewerCount,
     onEdit,
 }: Props) {
     if (!me || !myUserId) {
         return (
             <div className="mb-2 flex items-center justify-between gap-3 rounded-2xl bg-[var(--surface-input)] px-3.5 py-2.5">
-                <span className="min-w-0 truncate text-[12px] text-[var(--text-tertiary)]">
-                    층을 등록하면 이름 옆에 층수가 붙어요
-                </span>
+                <div className="flex min-w-0 items-center gap-2">
+                    <LiveViewers count={viewerCount} compact />
+                    <span className="min-w-0 truncate text-[12px] text-[var(--text-tertiary)]">
+                        층을 등록하면 이름 옆에 층수가 붙어요
+                    </span>
+                </div>
                 <button
                     type="button"
                     onClick={onEdit}
@@ -46,7 +52,7 @@ export function FloorChatHeader({
                     className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-colors ${
                         myUserId === null
                             ? "bg-[var(--surface-hover)] text-[var(--text-disabled)] cursor-not-allowed"
-                            : "bg-[var(--color-accent)] text-black hover:opacity-90 cursor-pointer"
+                            : "bg-[var(--color-accent-strong)] text-white hover:opacity-90 cursor-pointer"
                     }`}
                 >
                     등록
@@ -94,6 +100,7 @@ export function FloorChatHeader({
                         평균 {averageFloor.toFixed(1)}층 · {Math.round(stuckRatio * 100)}% 물림
                     </span>
                 )}
+                <LiveViewers count={viewerCount} compact />
                 <button
                     type="button"
                     onClick={onEdit}
