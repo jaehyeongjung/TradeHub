@@ -38,7 +38,7 @@ type TickerMessage = {
     q: string; // 24h 거래대금(USDT)
 };
 
-const CARD = "rounded-3xl bg-[var(--surface-card)] ring-1 ring-[var(--border-subtle)]";
+const CARD = "rounded-card bg-[var(--surface-card)] ring-1 ring-[var(--border-subtle)]";
 const OI_HOSTS = ["https://fapi.binance.com", "https://www.binance.com"];
 
 function num(v: string): number | null {
@@ -49,12 +49,12 @@ function num(v: string): number | null {
 function Cell({ label, value, sub }: { label: string; value: string; sub?: string }) {
     return (
         <div className="px-5 py-4">
-            <div className="text-[11px] font-medium text-[var(--text-tertiary)]">{label}</div>
-            <div className="mt-1 text-[15px] sm:text-base font-bold tabular-nums text-[var(--text-primary)]">
+            <div className="text-caption font-medium text-[var(--text-tertiary)]">{label}</div>
+            <div className="mt-1 text-body sm:text-base font-bold tabular-nums text-[var(--text-primary)]">
                 {value}
             </div>
             {sub && (
-                <div className="mt-0.5 text-[11px] tabular-nums text-[var(--text-muted)]">{sub}</div>
+                <div className="mt-0.5 text-caption tabular-nums text-[var(--text-muted)]">{sub}</div>
             )}
         </div>
     );
@@ -270,9 +270,9 @@ export function StockLiveData({
 
     const flashColor =
         flash === "up"
-            ? "text-[var(--color-up)]"
+            ? "text-[var(--color-up-text)]"
             : flash === "down"
-              ? "text-[var(--color-down)]"
+              ? "text-[var(--color-down-text)]"
               : "text-[var(--text-primary)]";
 
     return (
@@ -288,19 +288,19 @@ export function StockLiveData({
             <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                 {changePercent !== null && (
                     <span
-                        className={`rounded-lg px-2 py-1 text-[14px] font-bold tabular-nums ${
+                        className={`rounded-chip px-2 py-1 text-body font-bold tabular-nums ${
                             isUp
-                                ? "bg-[var(--color-up-muted)] text-[var(--color-up)]"
-                                : "bg-[var(--color-down-muted)] text-[var(--color-down)]"
+                                ? "bg-[var(--color-up-muted)] text-[var(--color-up-text)]"
+                                : "bg-[var(--color-down-muted)] text-[var(--color-down-text)]"
                         }`}
                     >
-                        {isUp ? "▲" : "▼"} {Math.abs(changePercent).toFixed(2)}%
+                        {isUp ? "+" : "−"}{Math.abs(changePercent).toFixed(2)}%
                     </span>
                 )}
-                <span className="text-[12px] text-[var(--text-muted)]">24시간 기준</span>
+                <span className="text-footnote text-[var(--text-muted)]">24시간 기준</span>
 
                 <span
-                    className="flex shrink-0 items-center gap-1 rounded-full bg-[var(--surface-input)] px-2 py-1 text-[10px] font-bold text-[var(--text-tertiary)]"
+                    className="flex shrink-0 items-center gap-1 rounded-full bg-[var(--surface-input)] px-2 py-1 text-caption font-bold text-[var(--text-tertiary)]"
                 >
                     <span
                         className={`h-1.5 w-1.5 rounded-full ${
@@ -313,7 +313,7 @@ export function StockLiveData({
                 </span>
 
                 {krw !== null && price !== null && (
-                    <span className="ml-auto text-[13px] tabular-nums text-[var(--text-tertiary)]">
+                    <span className="ml-auto text-label tabular-nums text-[var(--text-tertiary)]">
                         {fmtUsd(price)}
                     </span>
                 )}
@@ -321,29 +321,29 @@ export function StockLiveData({
 
             {/* 이 페이지만 답할 수 있는 숫자. 정규장이 닫힌 동안 얼마나 움직였나. */}
             {sinceClose !== null && !isUnlisted && !marketIsOpen && (
-                <div className="mt-5 rounded-2xl bg-[var(--surface-input)] px-4 py-3.5">
-                    <div className="text-[11px] font-medium text-[var(--text-tertiary)]">
+                <div className="mt-5 rounded-card bg-[var(--surface-input)] px-4 py-3.5">
+                    <div className="text-caption font-medium text-[var(--text-tertiary)]">
                         {marketName} 마감({closeLabel}) 이후 변화
                     </div>
                     <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
                         <span
-                            className={`text-[22px] font-extrabold tabular-nums tracking-[-0.02em] ${
+                            className={`text-title3 font-extrabold tabular-nums tracking-[-0.02em] ${
                                 sinceClose.pct >= 0
-                                    ? "text-[var(--color-up)]"
-                                    : "text-[var(--color-down)]"
+                                    ? "text-[var(--color-up-text)]"
+                                    : "text-[var(--color-down-text)]"
                             }`}
                         >
                             {sinceClose.pct >= 0 ? "+" : "−"}
                             {Math.abs(sinceClose.pct).toFixed(2)}%
                         </span>
                         {sinceClose.diff !== null && (
-                            <span className="text-[13px] tabular-nums text-[var(--text-secondary)]">
+                            <span className="text-label tabular-nums text-[var(--text-secondary)]">
                                 {sinceClose.diff >= 0 ? "+" : "−"}
                                 {formatKrw(Math.abs(sinceClose.diff))}
                             </span>
                         )}
                     </div>
-                    <div className="mt-1.5 text-[11px] leading-relaxed text-[var(--text-muted)]">
+                    <div className="mt-1.5 text-caption leading-relaxed text-[var(--text-muted)]">
                         마감 시점 토큰 가격 {fmtPrice(sessionClose, usdKrw)} 기준입니다. 해당 종목의
                         정규장 종가가 아닙니다.
                     </div>

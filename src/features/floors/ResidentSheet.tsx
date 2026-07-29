@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
+import { tintOf } from "@/shared/lib/color";
+import { Button } from "@/shared/ui/Button";
 import type { Currency, ResidentKind } from "./floor";
 import { floorOf, formatNative, formatSignedPercent, pnlPercent } from "./floor";
 import type { Resident } from "./useResidents";
@@ -45,6 +47,7 @@ export function ResidentSheet({
     const [raw, setRaw] = useState("");
     const [busy, setBusy] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const sheetRef = useRef<HTMLDivElement>(null);
 
     // 열 때마다 현재 상태를 초기값으로 되돌린다
     useEffect(() => {
@@ -56,12 +59,35 @@ export function ResidentSheet({
         return () => clearTimeout(t);
     }, [open, current]);
 
+    // Escape로 닫고, Tab이 시트 밖(뒤에 깔린 페이지)으로 새지 않게 가둔다.
     useEffect(() => {
         if (!open) return;
         document.body.classList.add("overflow-hidden");
+
         const onKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
+            if (e.key === "Escape") {
+                onClose();
+                return;
+            }
+            if (e.key !== "Tab") return;
+            const sheet = sheetRef.current;
+            if (!sheet) return;
+            const focusables = sheet.querySelectorAll<HTMLElement>(
+                'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+            );
+            if (focusables.length === 0) return;
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            const active = document.activeElement;
+            if (!e.shiftKey && active === last) {
+                e.preventDefault();
+                first.focus();
+            } else if (e.shiftKey && active === first) {
+                e.preventDefault();
+                last.focus();
+            }
         };
+
         window.addEventListener("keydown", onKey);
         return () => {
             document.body.classList.remove("overflow-hidden");
@@ -101,24 +127,34 @@ export function ResidentSheet({
                         onClick={onClose}
                     />
 
+                    {/* max-h + overflow가 없으면 작은 화면에서 키보드가 올라올 때 하단 CTA가
+                        잘려 저장할 방법이 사라진다. 아래로 끌어 닫기는 모바일 시트의 관습. */}
                     <motion.div
+                        ref={sheetRef}
                         role="dialog"
                         aria-modal="true"
                         aria-label={`${koreanName} 층 등록`}
-                        className="relative w-full max-w-[440px] rounded-t-[28px] bg-[var(--surface-card)] px-5 pb-7 pt-3 shadow-2xl sm:rounded-[28px] sm:px-6 sm:pb-6"
-                        initial={{ y: "100%", opacity: 0.6 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: "100%", opacity: 0.6 }}
+                        className="relative max-h-[92dvh] w-full max-w-[440px] overflow-y-auto overscroll-contain rounded-t-card bg-[var(--surface-card)] px-5 pt-3 shadow-2xl sm:max-h-[88dvh] sm:rounded-card sm:px-6"
+                        style={{ paddingBottom: "max(1.75rem, env(safe-area-inset-bottom))" }}
+                        initial={{ y: "100%" }}
+                        animate={{ y: 0 }}
+                        exit={{ y: "100%" }}
                         transition={{ type: "spring", stiffness: 260, damping: 28 }}
+                        drag="y"
+                        dragConstraints={{ top: 0, bottom: 0 }}
+                        dragElastic={{ top: 0, bottom: 0.35 }}
+                        onDragEnd={(_, info) => {
+                            if (info.offset.y > 110 || info.velocity.y > 600) onClose();
+                        }}
                     >
-                        <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-[var(--border-strong)] sm:hidden" />
+                        <div className="mx-auto mb-4 h-1 w-9 shrink-0 rounded-full bg-[var(--border-strong)] sm:hidden" />
 
                         <div className="flex items-start justify-between">
                             <div>
-                                <h2 className="text-[17px] font-bold tracking-tight text-[var(--text-primary)]">
+                                <h2 className="text-headline font-bold tracking-tight text-[var(--text-primary)]">
                                     {current ? "내 층 수정" : `${koreanName} 입주하기`}
                                 </h2>
-                                <p className="mt-1 text-[12px] text-[var(--text-tertiary)]">
+                                <p className="mt-1 text-footnote text-[var(--text-tertiary)]">
                                     수량은 받지 않아요. 가격 하나로 층이 정해집니다.
                                 </p>
                             </div>
@@ -126,7 +162,7 @@ export function ResidentSheet({
                                 type="button"
                                 onClick={onClose}
                                 aria-label="닫기"
-                                className="-mr-2 -mt-1 rounded-xl p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-input)] hover:text-[var(--text-secondary)] cursor-pointer"
+                                className="-mr-2 -mt-1 rounded-control p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-input)] hover:text-[var(--text-secondary)] cursor-pointer"
                             >
                                 <X size={18} strokeWidth={2} />
                             </button>
@@ -147,22 +183,24 @@ export function ResidentSheet({
                                         type="button"
                                         onClick={() => setKind(opt.k)}
                                         aria-pressed={on}
-                                        className={`rounded-2xl px-4 py-3 text-left transition-all cursor-pointer ${
+                                        className={`rounded-card px-4 py-3 text-left transition-all cursor-pointer ${
                                             on
-                                                ? "bg-[var(--surface-input)] ring-2 ring-[var(--color-accent)]"
-                                                : "bg-[var(--surface-input)] ring-1 ring-transparent hover:ring-[var(--border-default)]"
+                                                ? "ring-2 ring-[var(--color-brand)]"
+                                                : "bg-[var(--surface-input)] ring-2 ring-transparent hover:ring-[var(--border-default)]"
                                         }`}
+                                        // 선택/비선택의 배경이 같고 링만 달라 어느 쪽이 켜졌는지 약했다
+                                        style={on ? { background: tintOf("var(--color-brand)", 12) } : undefined}
                                     >
                                         <div
-                                            className={`text-[14px] font-bold ${
+                                            className={`text-body font-bold ${
                                                 on
-                                                    ? "text-[var(--text-primary)]"
+                                                    ? "text-[var(--color-brand)]"
                                                     : "text-[var(--text-tertiary)]"
                                             }`}
                                         >
                                             {opt.title}
                                         </div>
-                                        <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">
+                                        <div className="mt-0.5 text-caption text-[var(--text-muted)]">
                                             {opt.desc}
                                         </div>
                                     </button>
@@ -174,7 +212,7 @@ export function ResidentSheet({
                         <div className="mt-6">
                             <label
                                 htmlFor="resident-price"
-                                className="text-[12px] font-medium text-[var(--text-tertiary)]"
+                                className="text-footnote font-medium text-[var(--text-tertiary)]"
                             >
                                 {priceLabel}
                             </label>
@@ -183,12 +221,12 @@ export function ResidentSheet({
                                     tooFar
                                         ? "border-[var(--color-down)]"
                                         : filled
-                                          ? "border-[var(--color-accent)]"
+                                          ? "border-[var(--color-brand)]"
                                           : "border-[var(--border-default)]"
                                 }`}
                             >
                                 {currency === "USD" && (
-                                    <span className="text-[24px] font-bold text-[var(--text-tertiary)]">
+                                    <span className="text-title2 font-bold text-[var(--text-tertiary)]">
                                         $
                                     </span>
                                 )}
@@ -208,18 +246,18 @@ export function ResidentSheet({
                                     inputMode="decimal"
                                     autoComplete="off"
                                     placeholder="0"
-                                    className="min-w-0 flex-1 bg-transparent text-[28px] font-bold tabular-nums text-[var(--text-primary)] placeholder-[var(--text-disabled)] outline-none"
+                                    className="min-w-0 flex-1 bg-transparent text-title1 font-bold tabular-nums text-[var(--text-primary)] placeholder-[var(--text-disabled)] outline-none"
                                 />
                                 {currency === "KRW" && (
-                                    <span className="text-[18px] font-bold text-[var(--text-tertiary)]">
+                                    <span className="text-headline font-bold text-[var(--text-tertiary)]">
                                         원
                                     </span>
                                 )}
                             </div>
 
-                            <div className="mt-3 min-h-[20px] text-[12px]">
+                            <div className="mt-3 min-h-[20px] text-footnote">
                                 {tooFar ? (
-                                    <span className="text-[var(--color-down)]">
+                                    <span className="text-[var(--color-down-text)]">
                                         현재가 {formatNative(price, currency)}와 차이가 너무 커요.
                                         자릿수를 확인해주세요.
                                     </span>
@@ -236,8 +274,8 @@ export function ResidentSheet({
                                                     style={{
                                                         color:
                                                             pnl >= 0
-                                                                ? "var(--color-up)"
-                                                                : "var(--color-down)",
+                                                                ? "var(--color-up-text)"
+                                                                : "var(--color-down-text)",
                                                     }}
                                                 >
                                                     {formatSignedPercent(pnl)}
@@ -257,33 +295,32 @@ export function ResidentSheet({
                             </div>
                         </div>
 
-                        <button
-                            type="button"
+                        <Button
+                            size="lg"
+                            block
+                            className="mt-5"
                             onClick={submit}
-                            disabled={!valid || busy}
-                            className={`mt-5 w-full rounded-2xl py-4 text-[15px] font-bold transition-all ${
-                                valid && !busy
-                                    ? "bg-[var(--color-accent-strong)] text-white hover:opacity-90 cursor-pointer"
-                                    : "bg-[var(--surface-input)] text-[var(--text-disabled)] cursor-not-allowed"
-                            }`}
+                            disabled={!valid}
+                            loading={busy}
                         >
-                            {busy ? "저장 중" : current ? "수정하기" : kind === "holder" ? "입주하기" : "대기 등록"}
-                        </button>
+                            {current ? "수정하기" : kind === "holder" ? "입주하기" : "대기 등록"}
+                        </Button>
 
                         {current && (
-                            <button
-                                type="button"
+                            <Button
+                                variant="ghost"
+                                block
+                                className="mt-2"
+                                disabled={busy}
                                 onClick={async () => {
-                                    if (busy) return;
                                     setBusy(true);
                                     const ok = await onRemove();
                                     setBusy(false);
                                     if (ok) onClose();
                                 }}
-                                className="mt-3 w-full py-2 text-[13px] font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--text-secondary)] cursor-pointer"
                             >
                                 {current.kind === "holder" ? "팔았어요 (퇴거)" : "대기 취소"}
-                            </button>
+                            </Button>
                         )}
                     </motion.div>
                 </div>

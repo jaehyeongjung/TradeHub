@@ -270,14 +270,14 @@ function buildJsonLd(
 
 
 
-const CARD = "rounded-3xl bg-[var(--surface-card)] ring-1 ring-[var(--border-subtle)]";
+const CARD = "rounded-card bg-[var(--surface-card)] ring-1 ring-[var(--border-subtle)]";
 
 
 function SectionTitle({ children, hint }: { children: React.ReactNode; hint?: string }) {
     return (
         <div className="mb-4">
             <h2 className="text-lg font-bold tracking-tight text-[var(--text-primary)]">{children}</h2>
-            {hint && <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-tertiary)]">{hint}</p>}
+            {hint && <p className="mt-1.5 text-label leading-relaxed text-[var(--text-tertiary)]">{hint}</p>}
         </div>
     );
 }
@@ -325,7 +325,7 @@ export default async function StockTokenPage({
                 />
             ))}
 
-            <nav aria-label="breadcrumb" className="mb-5 text-[12px] text-[var(--text-muted)]">
+            <nav aria-label="breadcrumb" className="mb-5 text-footnote text-[var(--text-muted)]">
                 <ol className="flex items-center gap-1.5">
                     <li><Link href="/" className="hover:text-[var(--text-secondary)] transition-colors">홈</Link></li>
                     <li aria-hidden>·</li>
@@ -337,18 +337,18 @@ export default async function StockTokenPage({
             <section className={`${CARD} overflow-hidden`}>
                 <div className="p-5 sm:p-6">
                     <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-[var(--surface-input)] px-2 py-0.5 text-[11px] font-semibold text-[var(--text-secondary)]">
+                        <span className="rounded-full bg-[var(--surface-input)] px-2 py-0.5 text-caption font-semibold text-[var(--text-secondary)]">
                             {token.market === "KR" ? "한국" : "해외"} {token.category}
                         </span>
-                        <span className="text-[11px] font-medium text-[var(--text-muted)]">
+                        <span className="text-caption font-medium text-[var(--text-muted)]">
                             {token.symbol}USDT
                         </span>
-                        <span className="text-[11px] font-medium text-[var(--text-muted)]">
+                        <span className="text-caption font-medium text-[var(--text-muted)]">
                             · {token.listing}
                         </span>
                     </div>
 
-                    <h1 className="mt-3 text-[17px] font-bold tracking-tight text-[var(--text-secondary)]">
+                    <h1 className="mt-3 text-headline font-bold tracking-tight text-[var(--text-secondary)]">
                         {name === token.koreanName
                             ? `${token.koreanName} 토큰 실시간 가격`
                             : `${token.koreanName}(${name}) 토큰 실시간 가격`}
@@ -395,7 +395,7 @@ export default async function StockTokenPage({
                                     }`}
                                 />
                             </span>
-                            <span className="text-[13px] font-bold text-[var(--text-primary)]">
+                            <span className="text-label font-bold text-[var(--text-primary)]">
                                 {status.label}
                             </span>
                         </div>
@@ -410,7 +410,7 @@ export default async function StockTokenPage({
                 )}
             </section>
 
-            <p className="mt-3 px-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
+            <p className="mt-3 px-1 text-caption leading-relaxed text-[var(--text-muted)]">
                 {stamp} 기준 시세로 페이지를 만들었고, 이후 값은 브라우저에서 실시간으로 갱신됩니다.
                 {detail.usdKrw !== null && (
                     <>
@@ -441,7 +441,7 @@ export default async function StockTokenPage({
                     {/* 제목·본문은 템플릿 문자열로 만들어 한 텍스트 노드가 되게 한다
                     (JSX에서 표현식과 문자열을 섞으면 사이에 주석 노드가 끼어 문장이 쪼개진다) */}
                 <SectionTitle>{`${name} 지금 얼마인가요?`}</SectionTitle>
-                    <div className="space-y-3.5 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                    <div className="space-y-3.5 text-body leading-[1.75] text-[var(--text-secondary)]">
                         <p>
                             {stamp} 기준 {token.symbol} 토큰 가격은{" "}
                             <strong className="font-bold text-[var(--text-primary)]">
@@ -478,7 +478,7 @@ export default async function StockTokenPage({
             {/* ── 설명 ── */}
             <section className="mt-14">
                 <SectionTitle>{`${token.koreanName} 토큰이란?`}</SectionTitle>
-                <div className="space-y-3.5 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                <div className="space-y-3.5 text-body leading-[1.75] text-[var(--text-secondary)]">
                     <p>{token.summary}</p>
                     <p>{token.angle}</p>
                 </div>
@@ -497,10 +497,10 @@ export default async function StockTokenPage({
                                 i > 0 ? "border-t border-[var(--border-subtle)]" : ""
                             }`}
                         >
-                            <h3 className="text-[14px] font-bold text-[var(--text-primary)]">
+                            <h3 className="text-body font-bold text-[var(--text-primary)]">
                                 {w.title}
                             </h3>
-                            <p className="mt-1.5 text-[13px] leading-[1.75] text-[var(--text-secondary)]">
+                            <p className="mt-1.5 text-label leading-[1.75] text-[var(--text-secondary)]">
                                 {w.body}
                             </p>
                         </div>
@@ -516,7 +516,7 @@ export default async function StockTokenPage({
                             ? `${name} 시간외 가격은 어디서 보나요?`
                             : `${name} 프리마켓·애프터마켓 가격은 어디서 보나요?`}
                     </SectionTitle>
-                    <div className="space-y-3.5 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                    <div className="space-y-3.5 text-body leading-[1.75] text-[var(--text-secondary)]">
                         {token.market === "KR" ? (
                             <>
                                 <p>
@@ -568,7 +568,7 @@ export default async function StockTokenPage({
                     ].map(([k, a, b], i) => (
                         <div
                             key={k}
-                            className={`px-4 py-3 text-[13px] sm:grid sm:grid-cols-[6rem_1fr_1fr] sm:gap-2 ${
+                            className={`px-4 py-3 text-label sm:grid sm:grid-cols-[6rem_1fr_1fr] sm:gap-2 ${
                                 i > 0 ? "border-t border-[var(--border-subtle)]" : ""
                             }`}
                         >
@@ -581,7 +581,7 @@ export default async function StockTokenPage({
                         </div>
                     ))}
                 </div>
-                <p className="mt-2.5 px-1 text-[11px] text-[var(--text-muted)]">
+                <p className="mt-2.5 px-1 text-caption text-[var(--text-muted)]">
                     왼쪽이 실제 {token.koreanName} 주식, 오른쪽이 {token.symbol} 토큰입니다.
                 </p>
             </section>
@@ -593,13 +593,13 @@ export default async function StockTokenPage({
                 <div className="space-y-2">
                     {faqs.map((faq) => (
                         <details key={faq.question} className={`${CARD} group overflow-hidden`}>
-                            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 sm:p-5 text-[14px] font-semibold text-[var(--text-primary)] transition-colors hover:text-[var(--text-primary)]">
+                            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 sm:p-5 text-body font-semibold text-[var(--text-primary)] transition-colors hover:text-[var(--text-primary)]">
                                 {faq.question}
                                 <span className="shrink-0 text-[var(--text-muted)] transition-transform duration-200 group-open:rotate-45 text-lg leading-none">
                                     +
                                 </span>
                             </summary>
-                            <p className="px-4 sm:px-5 pb-5 text-[13px] leading-[1.75] text-[var(--text-secondary)]">
+                            <p className="px-4 sm:px-5 pb-5 text-label leading-[1.75] text-[var(--text-secondary)]">
                                 {faq.answer}
                             </p>
                         </details>
@@ -608,14 +608,14 @@ export default async function StockTokenPage({
             </section>
 
             <section className="mt-12">
-                <div className="rounded-3xl bg-gradient-to-br from-[var(--color-accent)]/15 to-transparent p-6 ring-1 ring-[var(--color-accent)]/25">
+                <div className="rounded-card bg-gradient-to-br from-[var(--color-accent)]/15 to-transparent p-6 ring-1 ring-[var(--color-accent)]/25">
                     <h2 className="text-base font-bold text-[var(--text-primary)]">차트로도 보고 싶다면</h2>
-                    <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-secondary)]">
+                    <p className="mt-1.5 text-label leading-relaxed text-[var(--text-secondary)]">
                         TradeHub 대시보드에서 실시간 차트와 청산 데이터를 함께 확인하세요.
                     </p>
                     <Link
                         href="/dashboard"
-                        className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-accent)] px-5 py-3 text-[13px] font-bold text-black transition-colors hover:opacity-90"
+                        className="mt-4 inline-flex items-center gap-1.5 rounded-control bg-[var(--color-accent)] px-5 py-3 text-label font-bold text-black transition-colors hover:opacity-90"
                     >
                         실시간 대시보드 열기
                         <span aria-hidden>→</span>
@@ -632,11 +632,11 @@ export default async function StockTokenPage({
                             href={`/stocks/${r.slug}`}
                             className={`${CARD} p-4 transition-colors hover:ring-[var(--border-strong)]`}
                         >
-                            <div className="text-[11px] font-medium text-[var(--text-muted)]">
+                            <div className="text-caption font-medium text-[var(--text-muted)]">
                                 {r.market === "KR" ? "한국" : "해외"} {r.category}
                             </div>
                             {/* 앵커 텍스트에 핵심 키워드를 담는다 — 내부 링크가 곧 순위 신호다 */}
-                            <div className="mt-1 text-[14px] font-bold leading-snug text-[var(--text-primary)]">
+                            <div className="mt-1 text-body font-bold leading-snug text-[var(--text-primary)]">
                                 {searchName(r)} 실시간 가격
                             </div>
                         </Link>
@@ -644,13 +644,13 @@ export default async function StockTokenPage({
                 </div>
                 <Link
                     href="/stocks"
-                    className="mt-4 inline-block text-[13px] font-medium text-[var(--text-tertiary)] transition-colors hover:text-[var(--color-up)]"
+                    className="mt-4 inline-block text-label font-medium text-[var(--text-tertiary)] transition-colors hover:text-[var(--color-up-text)]"
                 >
                     주식 토큰 실시간 가격 전체 보기 →
                 </Link>
             </section>
 
-            <p className="mt-14 px-1 text-[12px] leading-[1.7] text-[var(--text-muted)]">
+            <p className="mt-14 px-1 text-footnote leading-[1.7] text-[var(--text-muted)]">
                 본 페이지의 시세는 바이낸스 선물 시장 데이터로, {token.koreanName}의 정규장 주가나
                 공식 시세가 아닙니다. 무기한 선물은 레버리지와 청산 위험이 있는 고위험 파생상품이며
                 국가별로 거래가 제한될 수 있습니다. 본 정보는 투자 권유가 아니며 투자 판단과 그

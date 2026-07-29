@@ -74,11 +74,11 @@ export function StocksFallbackGrid({ usdKrw }: { usdKrw: number | null }) {
 
     if (failed) {
         return (
-            <div className="mt-10 rounded-2xl bg-[var(--surface-card)] p-6 text-center ring-1 ring-[var(--border-subtle)]">
-                <p className="text-[14px] font-bold text-[var(--text-primary)]">
+            <div className="mt-10 rounded-card bg-[var(--surface-card)] p-6 text-center ring-1 ring-[var(--border-subtle)]">
+                <p className="text-body font-bold text-[var(--text-primary)]">
                     시세를 불러오지 못했어요
                 </p>
-                <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-tertiary)]">
+                <p className="mt-2 text-label leading-relaxed text-[var(--text-tertiary)]">
                     네트워크 상태를 확인한 뒤 새로고침해 주세요.
                 </p>
             </div>
@@ -92,7 +92,7 @@ export function StocksFallbackGrid({ usdKrw }: { usdKrw: number | null }) {
                 {stockTokens.slice(0, 6).map((t) => (
                     <div
                         key={t.slug}
-                        className="h-[104px] animate-pulse rounded-2xl bg-[var(--surface-card)] ring-1 ring-[var(--border-subtle)]"
+                        className="h-[104px] animate-pulse rounded-card bg-[var(--surface-card)] ring-1 ring-[var(--border-subtle)]"
                     />
                 ))}
             </div>
@@ -133,28 +133,28 @@ function Grid({ rows, usdKrw }: { rows: Row[]; usdKrw: number | null }) {
                     <Link
                         key={r.slug}
                         href={`/stocks/${r.slug}`}
-                        className="block rounded-2xl bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)] transition-colors hover:ring-[var(--border-strong)]"
+                        className="block rounded-card bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)] transition-colors hover:ring-[var(--border-strong)]"
                     >
                         <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
-                                <div className="truncate text-[14px] font-bold text-[var(--text-primary)]">
+                                <div className="truncate text-body font-bold text-[var(--text-primary)]">
                                     {r.koreanName}
                                 </div>
-                                <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">
+                                <div className="mt-0.5 text-caption text-[var(--text-muted)]">
                                     {r.base}
                                 </div>
                             </div>
                             <span
-                                className={`shrink-0 rounded-lg px-1.5 py-0.5 text-[11px] font-bold tabular-nums ${
+                                className={`shrink-0 rounded-chip px-1.5 py-0.5 text-caption font-bold tabular-nums ${
                                     isUp
-                                        ? "bg-[var(--color-up-muted)] text-[var(--color-up)]"
-                                        : "bg-[var(--color-down-muted)] text-[var(--color-down)]"
+                                        ? "bg-[var(--color-up-muted)] text-[var(--color-up-text)]"
+                                        : "bg-[var(--color-down-muted)] text-[var(--color-down-text)]"
                                 }`}
                             >
-                                {isUp ? "▲" : "▼"} {Math.abs(r.changePercent).toFixed(2)}%
+                                {Math.abs(r.changePercent).toFixed(2)}%
                             </span>
                         </div>
-                        <div className="mt-3 text-[19px] font-extrabold tabular-nums tracking-[-0.02em] text-[var(--text-primary)]">
+                        <div className="mt-3 text-title3 font-extrabold tabular-nums tracking-[-0.02em] text-[var(--text-primary)]">
                             {price}
                         </div>
                     </Link>

@@ -27,11 +27,11 @@ export function LiveViewers({
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
             </span>
             {compact ? (
-                <span className="text-[11px] font-semibold text-[var(--text-secondary)]">
+                <span className="text-caption font-semibold text-[var(--text-secondary)]">
                     {count}명
                 </span>
             ) : (
-                <span className="text-[12px] font-semibold text-[var(--text-secondary)]">
+                <span className="text-footnote font-semibold text-[var(--text-secondary)]">
                     {lateNight ? `${count}명이 안 자고 있어요` : `지금 ${count}명 보는 중`}
                 </span>
             )}

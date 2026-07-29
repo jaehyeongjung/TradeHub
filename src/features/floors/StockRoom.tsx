@@ -12,7 +12,7 @@ import { useResidents } from "./useResidents";
 import { FloorChatHeader } from "./FloorChatHeader";
 import { ResidentSheet } from "./ResidentSheet";
 
-const CARD = "rounded-3xl bg-[var(--surface-card)] ring-1 ring-[var(--border-subtle)]";
+const CARD = "rounded-card bg-[var(--surface-card)] ring-1 ring-[var(--border-subtle)]";
 
 type Props = {
     slug: string;
@@ -30,7 +30,7 @@ function SectionTitle({ children, hint }: { children: React.ReactNode; hint?: st
         <div className="mb-4">
             <h2 className="text-lg font-bold tracking-tight text-[var(--text-primary)]">{children}</h2>
             {hint && (
-                <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-tertiary)]">{hint}</p>
+                <p className="mt-1.5 text-label leading-relaxed text-[var(--text-tertiary)]">{hint}</p>
             )}
         </div>
     );

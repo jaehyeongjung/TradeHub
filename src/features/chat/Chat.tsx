@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useTheme } from "@/shared/hooks/useTheme";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { supabase } from "@/shared/lib/supabase-browser";
@@ -9,6 +8,7 @@ import { sanitizeText } from "@/shared/lib/sanitize";
 import { useAnonUserId } from "@/shared/hooks/useAnonUserId";
 import { tintOf } from "@/shared/lib/color";
 import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUp, SmilePlus, X } from "lucide-react";
 
 interface PayloadObject {
     id: string;
@@ -35,12 +35,15 @@ export type ChatIdentity = {
     badge?: { label: string; tone: "up" | "down" | "info" | "neutral" };
 };
 
+// 배지는 전부 작은 글씨라 면용이 아닌 글자용 색을 쓴다 (라이트모드 대비)
 const BADGE_TONE: Record<NonNullable<ChatIdentity["badge"]>["tone"], string> = {
-    up: "var(--color-up)",
-    down: "var(--color-down)",
+    up: "var(--color-up-text)",
+    down: "var(--color-down-text)",
     info: "var(--color-info)",
     neutral: "var(--text-tertiary)",
 };
+
+const REACTION_HINT_KEY = "th-chat-reaction-hint";
 
 const REACTION_EMOJIS = ["👍", "❤️", "🚀", "😂", "🔥"] as const;
 type Position = {
@@ -84,7 +87,7 @@ function linkify(text: string): ReactNode[] {
         const href = stripped.startsWith("http") ? stripped : `https://${stripped}`;
         parts.push(
             <a key={`${start}-${href}`} href={href} target="_blank" rel="noreferrer"
-                className="underline hover:text-emerald-400 break-anywhere">
+                className="underline decoration-[var(--border-strong)] hover:decoration-[var(--color-accent)] hover:text-[var(--color-up-text)] break-anywhere">
                 {stripped}
             </a>
         );
@@ -115,7 +118,6 @@ export function Chat({
     const [mounted, setMounted] = useState(false);
     // 네트워크와 무관하게 반드시 실행된다 — 이 값으로만 표시 여부를 정한다
     useEffect(() => { setMounted(true); }, []);
-    const isLight = useTheme();
     const pathname = usePathname();
     const isEn = pathname.startsWith("/en/");
     const inputRef = useRef<HTMLInputElement>(null);
@@ -259,6 +261,31 @@ export function Chat({
     const [reactions, setReactions] = useState<ReactionsState>({});
     const [pickerOpenId, setPickerOpenId] = useState<string | null>(null);
 
+    // 반응 기능은 아이콘만으로는 여전히 못 보고 지나칠 수 있다.
+    // 한 번 써 보면 아는 기능이라, 처음 한 번만 알려주고 이후로는 다시 띄우지 않는다.
+    const [showReactionHint, setShowReactionHint] = useState(false);
+    useEffect(() => {
+        try {
+            if (!localStorage.getItem(REACTION_HINT_KEY)) setShowReactionHint(true);
+        } catch {
+            // 프라이빗 모드 등에서 localStorage가 막히면 힌트를 띄우지 않는다
+        }
+    }, []);
+
+    const dismissReactionHint = () => {
+        setShowReactionHint(false);
+        try {
+            localStorage.setItem(REACTION_HINT_KEY, "1");
+        } catch {
+            // 저장 실패는 무시 — 다음 방문에 한 번 더 보일 뿐이다
+        }
+    };
+
+    const openPicker = (messageId: string, isOpen: boolean) => {
+        setPickerOpenId(isOpen ? null : messageId);
+        if (showReactionHint) dismissReactionHint();
+    };
+
     useEffect(() => {
         if (!pickerOpenId) return;
         const close = () => setPickerOpenId(null);
@@ -368,14 +395,16 @@ export function Chat({
     const longPct = Math.round(ratio.long_ratio * 100);
     const shortPct = 100 - longPct;
 
-    const headerBg = isLight ? "bg-white border-neutral-200" : "bg-surface-elevated border-border-subtle";
-    const labelColor = isLight ? "text-neutral-500" : "text-text-muted";
-    const pillBg = isLight ? "bg-neutral-100 text-neutral-600" : "bg-surface-input text-text-tertiary";
-    const inputBg = isLight
-        ? "border-neutral-200 bg-neutral-50 text-neutral-800 placeholder-neutral-400 focus:border-emerald-500"
-        : "border-border-default bg-surface-elevated text-text-primary placeholder-neutral-600 focus:border-emerald-500";
-    const msgAreaBg = isLight ? "bg-neutral-50" : "";
-    const emptyTextColor = isLight ? "text-neutral-400" : "text-text-muted";
+    // 색은 전부 시맨틱 토큰으로 통일한다. isLight 분기 + Tailwind neutral 하드코딩 +
+    // globals.css의 !important 오버라이드가 세 겹으로 겹쳐 라이트모드 결과를
+    // 예측할 수 없었고, placeholder는 대비 2.2:1로 사실상 보이지 않았다.
+    const headerBg = "bg-surface-input";
+    const labelColor = "text-text-tertiary";
+    const pillBg = "bg-surface-hover text-text-tertiary";
+    const inputBg =
+        "bg-surface-input text-text-primary placeholder-text-muted ring-1 ring-transparent focus:ring-[var(--color-brand)]";
+    const msgAreaBg = "bg-[var(--surface-sunken)]";
+    const emptyTextColor = "text-text-muted";
 
     return (
         <div
@@ -383,46 +412,55 @@ export function Chat({
             style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
         >
             {!useLongShort ? header : (
-            <div className={`mb-2 rounded-2xl border p-3 2xl:p-4 ${headerBg}`}>
+            <div className={`mb-2 rounded-card p-3 2xl:p-4 ${headerBg}`}>
                 <div className="flex items-center justify-between mb-2.5">
                     <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-medium ${labelColor}`}>{isEn ? "Position" : "포지션"}</span>
+                        <span className={`text-caption font-medium ${labelColor}`}>{isEn ? "Position" : "포지션"}</span>
                         {loadingChoice && userId ? (
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${pillBg}`}>{isEn ? "Loading…" : "로딩 중"}</span>
+                            <span className={`text-caption px-2 py-0.5 rounded-full ${pillBg}`}>{isEn ? "Loading…" : "로딩 중"}</span>
                         ) : myChoice ? (
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                                myChoice === "long"
-                                    ? "bg-emerald-500/15 text-emerald-400"
-                                    : "bg-red-500/15 text-red-400"
-                            }`}>
+                            <span
+                                className="text-caption font-bold px-2 py-0.5 rounded-full flex items-center gap-1"
+                                style={{
+                                    background: tintOf(
+                                        myChoice === "long" ? "var(--color-up)" : "var(--color-down)",
+                                        15,
+                                    ),
+                                    color:
+                                        myChoice === "long"
+                                            ? "var(--color-up-text)"
+                                            : "var(--color-down-text)",
+                                }}
+                            >
                                 {myChoice === "long" ? "LONG" : "SHORT"}
                                 <button
                                     onClick={() => setMyChoice(null)}
-                                    className={`text-[8px] opacity-60 hover:opacity-100 transition-opacity cursor-pointer ml-0.5`}
+                                    aria-label={isEn ? "Clear position" : "포지션 지우기"}
+                                    className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer ml-0.5"
                                 >
-                                    ✕
+                                    <X size={9} strokeWidth={3} />
                                 </button>
                             </span>
                         ) : (
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${pillBg}`}>{isEn ? "Not voted" : "미참여"}</span>
+                            <span className={`text-caption px-2 py-0.5 rounded-full ${pillBg}`}>{isEn ? "Not voted" : "미참여"}</span>
                         )}
                     </div>
-                    <span className={`text-[9px] 2xl:text-[10px] ${labelColor}`}>
+                    <span className={`text-caption 2xl:text-caption ${labelColor}`}>
                         {isEn ? `${ratio.total} participants` : `총 ${ratio.total}명 참여`}
                     </span>
                 </div>
 
-                <div className={`h-1.5 rounded-full overflow-hidden mb-1.5 ${isLight ? "bg-red-100" : "bg-red-500/20"}`}>
+                <div className="h-1.5 rounded-full overflow-hidden mb-1.5 bg-[var(--color-down-muted)]">
                     <motion.div
-                        className="h-full bg-emerald-500 rounded-full"
+                        className="h-full bg-[var(--color-up)] rounded-full"
                         initial={{ width: 0 }}
                         animate={{ width: `${longPct}%` }}
                         transition={{ duration: 0.45, ease: "easeOut" }}
                     />
                 </div>
                 <div className="flex justify-between">
-                    <span className="text-[9px] font-medium text-emerald-400 tabular-nums">Long {longPct}%</span>
-                    <span className="text-[9px] font-medium text-red-400 tabular-nums">Short {shortPct}%</span>
+                    <span className="text-caption font-semibold text-[var(--color-up-text)] tabular-nums">Long {longPct}%</span>
+                    <span className="text-caption font-semibold text-[var(--color-down-text)] tabular-nums">Short {shortPct}%</span>
                 </div>
 
                 {!myChoice && (
@@ -431,9 +469,9 @@ export function Chat({
                             whileHover={{ scale: userId ? 1.02 : 1 }}
                             whileTap={{ scale: userId ? 0.97 : 1 }}
                             disabled={!userId}
-                            className={`flex-1 py-2 rounded-xl text-white text-xs font-bold transition-all ${
+                            className={`flex-1 py-2 rounded-control text-white text-xs font-bold transition-all ${
                                 userId
-                                    ? "bg-emerald-500 hover:bg-emerald-600 cursor-pointer"
+                                    ? "bg-[var(--color-up-text)] hover:opacity-90 cursor-pointer"
                                     : "bg-surface-hover cursor-not-allowed opacity-50"
                             }`}
                             onClick={() => choose("long")}
@@ -444,9 +482,9 @@ export function Chat({
                             whileHover={{ scale: userId ? 1.02 : 1 }}
                             whileTap={{ scale: userId ? 0.97 : 1 }}
                             disabled={!userId}
-                            className={`flex-1 py-2 rounded-xl text-white text-xs font-bold transition-all ${
+                            className={`flex-1 py-2 rounded-control text-white text-xs font-bold transition-all ${
                                 userId
-                                    ? "bg-red-600 hover:bg-red-500 cursor-pointer"
+                                    ? "bg-[var(--color-down-text)] hover:opacity-90 cursor-pointer"
                                     : "bg-surface-hover cursor-not-allowed opacity-50"
                             }`}
                             onClick={() => choose("short")}
@@ -458,7 +496,7 @@ export function Chat({
             </div>
             )}
 
-            <div className={`relative flex-1 min-h-0 rounded-2xl overflow-hidden ${msgAreaBg}`}>
+            <div className={`relative flex-1 min-h-0 rounded-card overflow-hidden ${msgAreaBg}`}>
                 <div
                     ref={listRef}
                     onScroll={handleScroll}
@@ -475,10 +513,10 @@ export function Chat({
                                     ?? (userChoice
                                         ? { label: userChoice === "long" ? "L" : "S", tone: userChoice === "long" ? "up" as const : "down" as const }
                                         : null);
-                                const nameColor = isMe
-                                    ? isLight ? "text-teal-600" : "text-teal-400"
-                                    : isLight ? "text-neutral-500" : "text-neutral-500";
-                                const contentColor = isLight ? "text-neutral-700" : "text-text-secondary";
+                                // 이름에서 색을 빼고 굵기로만 나를 구분한다. 층 배지가 이미
+                                // 색을 쓰고 있어 이름까지 물들이면 둘이 서로 경쟁한다.
+                                const nameColor = isMe ? "text-text-primary" : "text-text-tertiary";
+                                const contentColor = "text-text-secondary";
                                 const msgReactions = reactions[m.id] ?? {};
                                 const hasReactions = Object.values(msgReactions).some((r) => r.count > 0);
                                 const isPickerOpen = pickerOpenId === m.id;
@@ -494,7 +532,7 @@ export function Chat({
                                         <div className="flex items-baseline gap-1.5">
                                             {identity ? (
                                                 /* "8층 존버흑두루미" — 층을 닉네임에 붙여 한 덩어리로 읽히게 한다 */
-                                                <span className="text-[11px] font-semibold shrink-0">
+                                                <span className="text-caption font-semibold shrink-0">
                                                     {badge && (
                                                         <span
                                                             className="tabular-nums"
@@ -505,7 +543,7 @@ export function Chat({
                                                     )}
                                                     <span className={nameColor}>{identity.name}</span>
                                                     {isMe && (
-                                                        <span className={`font-medium ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
+                                                        <span className="font-medium text-text-muted">
                                                             {isEn ? " (me)" : " (나)"}
                                                         </span>
                                                     )}
@@ -515,7 +553,7 @@ export function Chat({
                                                     {/* 대시보드는 기존 L/S 배지. 폭을 고정해 이름이 세로로 정렬된다 */}
                                                     {badge ? (
                                                         <span
-                                                            className="text-[9px] font-bold px-1 py-[1px] rounded shrink-0 leading-none tabular-nums text-center min-w-[26px]"
+                                                            className="text-caption font-bold px-1 py-[1px] rounded shrink-0 leading-none tabular-nums text-center min-w-[26px]"
                                                             style={{
                                                                 background: tintOf(BADGE_TONE[badge.tone]),
                                                                 color: BADGE_TONE[badge.tone],
@@ -526,24 +564,29 @@ export function Chat({
                                                     ) : (
                                                         <span className="w-[26px] shrink-0" />
                                                     )}
-                                                    <span className={`text-[11px] font-semibold shrink-0 ${nameColor}`}>
+                                                    <span className={`text-caption font-semibold shrink-0 ${nameColor}`}>
                                                         {isMe ? (isEn ? "Me" : "나") : m.user_id.slice(0, 6)}
                                                     </span>
                                                 </>
                                             )}
-                                            <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-300" : "text-text-muted"}`}>·</span>
-                                            <span className={`text-[12px] whitespace-pre-wrap break-anywhere flex-1 ${contentColor}`}>
+                                            <span className="text-caption shrink-0 text-[var(--border-strong)]">·</span>
+                                            <span className={`text-footnote whitespace-pre-wrap break-anywhere flex-1 ${contentColor}`}>
                                                 {linkify(m.content)}
                                             </span>
+                                            {/* 예전엔 hover에서만 나타나는 "+"였다. 터치 기기엔 hover가 없어
+                                                기능이 있는지조차 알 수 없었다. 항상 보이게 두고, 아이콘도
+                                                "무언가 추가"가 아니라 "반응"으로 읽히는 것으로 바꿨다. */}
                                             <button
-                                                onClick={() => setPickerOpenId(isPickerOpen ? null : m.id)}
-                                                className={`shrink-0 text-[11px] w-5 h-5 flex items-center justify-center rounded-md transition-all cursor-pointer ${
+                                                onClick={() => openPicker(m.id, isPickerOpen)}
+                                                aria-label={isEn ? "Add reaction" : "반응 남기기"}
+                                                aria-expanded={isPickerOpen}
+                                                className={`shrink-0 w-7 h-7 -my-1 flex items-center justify-center rounded-chip transition-colors cursor-pointer ${
                                                     isPickerOpen
-                                                        ? "opacity-100 bg-surface-hover text-text-primary"
-                                                        : "opacity-0 group-hover:opacity-100 text-text-muted hover:text-text-secondary hover:bg-surface-input"
+                                                        ? "bg-surface-hover text-text-primary"
+                                                        : "text-text-disabled hover:bg-surface-input hover:text-text-secondary"
                                                 }`}
                                             >
-                                                +
+                                                <SmilePlus size={14} strokeWidth={1.9} />
                                             </button>
                                         </div>
 
@@ -554,21 +597,19 @@ export function Chat({
                                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                                     exit={{ opacity: 0, scale: 0.9, y: -4 }}
                                                     transition={{ duration: 0.12 }}
-                                                    className={`absolute right-0 top-full mt-1 z-30 flex items-center gap-0.5 px-2 py-1.5 rounded-2xl border shadow-xl ${
-                                                        isLight
-                                                            ? "bg-white border-neutral-200"
-                                                            : "bg-surface-elevated border-border-default"
-                                                    }`}
+                                                    className="absolute right-0 top-full mt-1 z-30 flex items-center gap-0.5 px-2 py-1.5 rounded-card bg-surface-elevated ring-1 ring-[var(--border-default)] shadow-xl"
                                                 >
                                                     {REACTION_EMOJIS.map((emoji) => (
                                                         <button
                                                             key={emoji}
                                                             onClick={() => toggleReaction(m.id, emoji)}
-                                                            className={`w-8 h-8 flex items-center justify-center rounded-xl text-[16px] transition-all cursor-pointer hover:scale-125 active:scale-110 ${
+                                                            aria-pressed={msgReactions[emoji]?.mine ?? false}
+                                                            className="w-9 h-9 flex items-center justify-center rounded-control text-headline transition-transform cursor-pointer hover:scale-125 active:scale-110 hover:bg-surface-hover"
+                                                            style={
                                                                 msgReactions[emoji]?.mine
-                                                                    ? "bg-amber-500/20"
-                                                                    : "hover:bg-neutral-700/60"
-                                                            }`}
+                                                                    ? { background: tintOf("var(--color-brand)", 18) }
+                                                                    : undefined
+                                                            }
                                                         >
                                                             {emoji}
                                                         </button>
@@ -585,15 +626,19 @@ export function Chat({
                                                         <button
                                                             key={emoji}
                                                             onClick={() => toggleReaction(m.id, emoji)}
-                                                            className={`flex items-center gap-1 px-1.5 py-0.5 rounded-lg border text-[11px] transition-all cursor-pointer active:scale-95 ${
+                                                            aria-pressed={r.mine}
+                                                            className={`flex items-center gap-1 px-2 py-[3px] rounded-chip text-caption ring-1 transition-colors cursor-pointer active:scale-95 ${
                                                                 r.mine
-                                                                    ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
-                                                                    : isLight
-                                                                        ? "bg-neutral-100 border-neutral-200 text-neutral-600 hover:border-neutral-300"
-                                                                        : "bg-surface-input/60 border-border-default/60 text-text-tertiary hover:border-border-default"
+                                                                    ? "ring-[var(--color-brand)]/40 text-[var(--color-brand)]"
+                                                                    : "bg-surface-input ring-transparent text-text-tertiary hover:ring-[var(--border-default)]"
                                                             }`}
+                                                            style={
+                                                                r.mine
+                                                                    ? { background: tintOf("var(--color-brand)", 14) }
+                                                                    : undefined
+                                                            }
                                                         >
-                                                            <span className="text-[12px]">{emoji}</span>
+                                                            <span className="text-footnote">{emoji}</span>
                                                             <span className="font-semibold tabular-nums">{r.count}</span>
                                                         </button>
                                                     );
@@ -606,7 +651,7 @@ export function Chat({
                         </div>
                     ) : (
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <p className={`text-[11px] text-center px-4 leading-relaxed ${emptyTextColor}`}>
+                            <p className={`text-caption text-center px-4 leading-relaxed ${emptyTextColor}`}>
                                 {isEn ? <>No messages yet.<br />Take a position and start the conversation!</> : <>아직 메시지가 없어요.<br />오늘의 첫 포지션을 잡고 이야기해보세요!</>}
                             </p>
                         </div>
@@ -621,7 +666,7 @@ export function Chat({
                             exit={{ opacity: 0, y: 8, scale: 0.92 }}
                             transition={{ duration: 0.18 }}
                             onClick={handleScrollBtnClick}
-                            className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-800/95 border border-border-default text-text-primary text-[11px] font-medium shadow-lg backdrop-blur-sm hover:bg-surface-hover transition-colors cursor-pointer z-20"
+                            className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-elevated ring-1 ring-[var(--border-default)] text-text-primary text-caption font-semibold shadow-lg hover:bg-surface-hover transition-colors cursor-pointer z-20"
                         >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -632,34 +677,52 @@ export function Chat({
                 </AnimatePresence>
             </div>
 
-            <div className={`pt-3 pb-1 px-1 border-t mt-3 ${isLight ? "border-neutral-200" : "border-border-subtle"}`}>
-                <div className="flex gap-2">
-                    {/* 모바일에서 폰트가 16px 미만이면 iOS Safari가 포커스 시 화면을 확대한다.
-                        좁은 화면에서만 16px로 올리고 데스크톱은 기존 12px을 유지한다. */}
+            <div className="pt-3 pb-1 px-1 border-t border-border-subtle mt-3">
+                {showReactionHint && msgs.length > 0 && (
+                    <div className="mb-2 flex items-center gap-2 rounded-control bg-surface-input px-3 py-2">
+                        <SmilePlus size={13} strokeWidth={1.9} className="shrink-0 text-text-muted" />
+                        <span className="min-w-0 flex-1 text-caption leading-snug text-text-tertiary">
+                            {isEn
+                                ? "Tap the icon beside a message to react"
+                                : "메시지 옆 아이콘을 누르면 이모지로 반응할 수 있어요"}
+                        </span>
+                        <button
+                            type="button"
+                            onClick={dismissReactionHint}
+                            aria-label={isEn ? "Dismiss" : "닫기"}
+                            className="shrink-0 rounded-md p-1 text-text-muted hover:bg-surface-hover hover:text-text-secondary transition-colors cursor-pointer"
+                        >
+                            <X size={12} strokeWidth={2.2} />
+                        </button>
+                    </div>
+                )}
+                {/* 입력창은 알약, 전송은 원형 아이콘. "전송"이라는 글자 버튼은
+                    메신저에서 쓰지 않는다 — 입력창 옆 화살표가 곧 보내기다. */}
+                <div className="flex items-center gap-2">
+                    {/* 모바일에서 16px 미만이면 iOS Safari가 포커스 시 화면을 확대한다 */}
                     <input
                         ref={inputRef}
                         onCompositionStart={() => (composingRef.current = true)}
                         onCompositionEnd={() => (composingRef.current = false)}
                         onKeyDown={onKeyDown}
-                        className={`flex-1 border px-3 py-2 rounded-xl text-[16px] sm:text-[12px] focus:outline-none transition-colors ${inputBg}`}
+                        className={`h-11 min-w-0 flex-1 rounded-full px-4 text-[16px] sm:text-label focus:outline-none transition-colors ${inputBg}`}
                         placeholder={isEn ? "Chat anonymously" : "익명으로도 채팅 가능"}
                         maxLength={2000}
                         disabled={!userId}
                     />
-                    <motion.button
-                        whileHover={{ scale: userId ? 1.02 : 1 }}
-                        whileTap={{ scale: userId ? 0.97 : 1 }}
+                    <button
                         type="button"
                         onClick={send}
-                        className={`px-4 py-2 rounded-xl text-[12px] font-semibold transition-all ${
+                        aria-label={isEn ? "Send" : "전송"}
+                        className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-all active:scale-95 ${
                             userId
-                                ? "bg-emerald-500 text-white hover:bg-emerald-600 cursor-pointer"
-                                : "bg-surface-hover text-text-muted cursor-not-allowed"
+                                ? "bg-[var(--color-brand-strong)] text-white hover:opacity-92 cursor-pointer"
+                                : "bg-surface-input text-text-disabled cursor-not-allowed active:scale-100"
                         }`}
                         disabled={!userId}
                     >
-                        {isEn ? "Send" : "전송"}
-                    </motion.button>
+                        <ArrowUp size={19} strokeWidth={2.6} />
+                    </button>
                 </div>
             </div>
         </div>

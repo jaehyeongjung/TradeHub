@@ -105,24 +105,24 @@ function StockCard({ row, usdKrw }: { row: TradfiRow; usdKrw: number | null }) {
         <>
             <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                    <div className="truncate text-[14px] font-bold text-[var(--text-primary)]">{name}</div>
-                    <div className="mt-0.5 text-[11px] text-[var(--text-muted)]">{row.base}</div>
+                    <div className="truncate text-body font-bold text-[var(--text-primary)]">{name}</div>
+                    <div className="mt-0.5 text-caption text-[var(--text-muted)]">{row.base}</div>
                 </div>
                 <span
-                    className={`shrink-0 rounded-lg px-1.5 py-0.5 text-[11px] font-bold tabular-nums ${
+                    className={`shrink-0 rounded-chip px-1.5 py-0.5 text-caption font-bold tabular-nums ${
                         isUp
-                            ? "text-[var(--color-up)] bg-[var(--color-up-muted)]"
-                            : "text-[var(--color-down)] bg-[var(--color-down-muted)]"
+                            ? "text-[var(--color-up-text)] bg-[var(--color-up-muted)]"
+                            : "text-[var(--color-down-text)] bg-[var(--color-down-muted)]"
                     }`}
                 >
-                    {isUp ? "▲" : "▼"} {Math.abs(row.changePercent).toFixed(2)}%
+                    {isUp ? "+" : "−"}{Math.abs(row.changePercent).toFixed(2)}%
                 </span>
             </div>
 
-            <div className="mt-3 text-[19px] font-extrabold tabular-nums tracking-[-0.02em] text-[var(--text-primary)]">
+            <div className="mt-3 text-title3 font-extrabold tabular-nums tracking-[-0.02em] text-[var(--text-primary)]">
                 {price}
             </div>
-            <div className="mt-1 flex items-center justify-between text-[11px] text-[var(--text-muted)]">
+            <div className="mt-1 flex items-center justify-between text-caption text-[var(--text-muted)]">
                 {usdKrw !== null && <span className="tabular-nums">{fmtUsd(row.price)}</span>}
                 <span className="tabular-nums ml-auto">
                     거래 {fmtCompactKrwShared(row.quoteVolume, usdKrw)}
@@ -131,7 +131,7 @@ function StockCard({ row, usdKrw }: { row: TradfiRow; usdKrw: number | null }) {
         </>
     );
 
-    const cls = "block rounded-2xl bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)] transition-colors";
+    const cls = "block rounded-card bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)] transition-colors";
 
     return row.slug ? (
         <Link href={`/stocks/${row.slug}`} className={`${cls} hover:ring-[var(--border-strong)]`}>
@@ -205,7 +205,7 @@ export default async function StocksHubPage() {
                 />
             ))}
 
-            <nav aria-label="breadcrumb" className="mb-5 text-[12px] text-[var(--text-muted)]">
+            <nav aria-label="breadcrumb" className="mb-5 text-footnote text-[var(--text-muted)]">
                 <ol className="flex items-center gap-1.5">
                     <li><Link href="/" className="hover:text-[var(--text-secondary)] transition-colors">홈</Link></li>
                     <li aria-hidden>·</li>
@@ -214,17 +214,17 @@ export default async function StocksHubPage() {
             </nav>
 
             <header>
-                <h1 className="text-[26px] font-extrabold tracking-[-0.02em] leading-tight">
+                <h1 className="text-title1 font-extrabold tracking-[-0.02em] leading-tight">
                     주식 토큰 실시간 가격
                 </h1>
-                <p className="mt-3 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                <p className="mt-3 text-body leading-[1.75] text-[var(--text-secondary)]">
                     바이낸스는 삼성전자·SK하이닉스 같은 개별 주식의 가격을 추종하는 무기한 선물을
                     상장해 두고 있습니다. 증시가 문을 닫아도 24시간 거래되기 때문에,{" "}
                     <strong className="text-[var(--text-primary)]">
                         장 마감 후와 주말에도 가격이 계속 움직입니다.
                     </strong>
                 </p>
-                <p className="mt-2 text-[11px] text-[var(--text-muted)]">
+                <p className="mt-2 text-caption text-[var(--text-muted)]">
                     {stamp} 기준 시세로 페이지를 만들었고, 아래 목록은 60초마다 갱신됩니다.
                 </p>
 
@@ -232,9 +232,9 @@ export default async function StocksHubPage() {
                     {[krStatus, usStatus].map((s) => (
                         <div
                             key={s.marketName}
-                            className="rounded-2xl bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)]"
+                            className="rounded-card bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)]"
                         >
-                            <div className="flex items-center gap-2 text-[13px] font-bold">
+                            <div className="flex items-center gap-2 text-label font-bold">
                                 <span
                                     className={`w-2 h-2 rounded-full ${
                                         s.isOpen ? "bg-[var(--color-accent)]" : "bg-amber-400"
@@ -242,7 +242,7 @@ export default async function StocksHubPage() {
                                 />
                                 {s.label}
                             </div>
-                            <div className="mt-1 text-[11px] text-[var(--text-muted)]">
+                            <div className="mt-1 text-caption text-[var(--text-muted)]">
                                 {s.marketName} · {s.hours}
                             </div>
                         </div>
@@ -256,7 +256,7 @@ export default async function StocksHubPage() {
             {korean.length > 0 && (
                 <section className="mt-12">
                     <h2 className="text-lg font-bold tracking-tight">한국 주식 토큰</h2>
-                    <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-tertiary)]">
+                    <p className="mt-1.5 text-label leading-relaxed text-[var(--text-tertiary)]">
                         한국거래소 정규장은 {krStatus.hours}입니다. 그 밖의 시간에도 아래 가격은
                         갱신됩니다.
                     </p>
@@ -281,11 +281,11 @@ export default async function StocksHubPage() {
                         <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
                             <span>
                                 <span className="text-lg font-bold tracking-tight">전체 종목</span>
-                                <span className="mt-1.5 block text-[13px] leading-relaxed text-[var(--text-tertiary)]">
+                                <span className="mt-1.5 block text-label leading-relaxed text-[var(--text-tertiary)]">
                                     거래대금 순 · 총 {rows.length}개 종목
                                 </span>
                             </span>
-                            <span className="flex h-9 shrink-0 items-center gap-1 rounded-xl bg-[var(--surface-input)] px-3 text-[12px] font-bold text-[var(--text-secondary)]">
+                            <span className="flex h-9 shrink-0 items-center gap-1 rounded-control bg-[var(--surface-input)] px-3 text-footnote font-bold text-[var(--text-secondary)]">
                                 <span className="group-open:hidden">펼치기</span>
                                 <span className="hidden group-open:inline">접기</span>
                                 <span className="transition-transform duration-200 group-open:rotate-180" aria-hidden>
@@ -302,7 +302,7 @@ export default async function StocksHubPage() {
                 "삼전 실시간 가격" 같은 질의로 개별 페이지가 뜨도록 돕는다. */}
             <section className="mt-16">
                 <h2 className="text-lg font-bold tracking-tight">종목별 실시간 가격 바로가기</h2>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-tertiary)]">
+                <p className="mt-1.5 text-label leading-relaxed text-[var(--text-tertiary)]">
                     종목마다 원화 환산 가격, 정규장 마감 이후 변동률, 투자자 대화방이 있는 개별
                     페이지를 제공합니다.
                 </p>
@@ -311,7 +311,7 @@ export default async function StocksHubPage() {
                         <li key={t.slug}>
                             <Link
                                 href={`/stocks/${t.slug}`}
-                                className="inline-block rounded-xl bg-[var(--surface-card)] px-3 py-2 text-[12px] font-medium text-[var(--text-secondary)] ring-1 ring-[var(--border-subtle)] transition-colors hover:text-[var(--text-primary)] hover:ring-[var(--border-strong)]"
+                                className="inline-block rounded-control bg-[var(--surface-card)] px-3 py-2 text-footnote font-medium text-[var(--text-secondary)] ring-1 ring-[var(--border-subtle)] transition-colors hover:text-[var(--text-primary)] hover:ring-[var(--border-strong)]"
                             >
                                 {searchName(t)} 실시간 가격
                             </Link>
@@ -324,23 +324,23 @@ export default async function StocksHubPage() {
                 <h2 className="text-lg font-bold tracking-tight">
                     야간·시간외 주가는 어디서 보나요?
                 </h2>
-                <p className="mt-3 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                <p className="mt-3 text-body leading-[1.75] text-[var(--text-secondary)]">
                     한국 주식은 정규장({krStatus.hours})이 끝나면 시간외 거래로 이어지지만 저녁
                     18시가 지나면 그날의 가격이 멈춥니다. 미국 주식은 프리마켓·애프터마켓이 있어도
                     한국 시간 낮에는 대부분 전일 종가만 남습니다. 정작 큰 뉴스는 그 공백 시간에
                     나옵니다.
                 </p>
-                <p className="mt-3 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                <p className="mt-3 text-body leading-[1.75] text-[var(--text-secondary)]">
                     주식 토큰은 그 공백을 메우는 용도로 쓰입니다. 예를 들어{" "}
-                    <Link href="/stocks/samsung" className="font-medium text-[var(--color-up)] hover:underline">
+                    <Link href="/stocks/samsung" className="font-medium text-[var(--color-up-text)] hover:underline">
                         삼전 실시간 가격
                     </Link>
                     은 KRX가 닫힌 새벽에도 갱신되고,{" "}
-                    <Link href="/stocks/nvidia" className="font-medium text-[var(--color-up)] hover:underline">
+                    <Link href="/stocks/nvidia" className="font-medium text-[var(--color-up-text)] hover:underline">
                         엔비디아 실시간 가격
                     </Link>
                     은 실적 발표가 나오는 한국 새벽 시간대의 반응을 그대로 보여줍니다.{" "}
-                    <Link href="/stocks/tesla" className="font-medium text-[var(--color-up)] hover:underline">
+                    <Link href="/stocks/tesla" className="font-medium text-[var(--color-up-text)] hover:underline">
                         테슬라 실시간 가격
                     </Link>
                     처럼 국내 보유자가 많은 종목은 미국 장이 열리기 전 방향을 가늠하는 데 쓰입니다.
@@ -349,13 +349,13 @@ export default async function StocksHubPage() {
 
             <section className="mt-16">
                 <h2 className="text-lg font-bold tracking-tight">주식 토큰이란?</h2>
-                <p className="mt-3 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                <p className="mt-3 text-body leading-[1.75] text-[var(--text-secondary)]">
                     주식 토큰(토큰화 주식)은 실제 주식이 아니라, 주가를 기초자산으로 삼는 USDT 표시
                     무기한 선물입니다. 주식을 직접 보유하는 것이 아니므로 배당과 의결권이 없고,
                     포지션을 유지하는 동안 8시간마다 펀딩비를 주고받습니다. 대신 정규장 시간에
                     묶이지 않아 24시간 거래가 가능합니다.
                 </p>
-                <p className="mt-3 text-[14px] leading-[1.75] text-[var(--text-secondary)]">
+                <p className="mt-3 text-body leading-[1.75] text-[var(--text-secondary)]">
                     그래서 이 페이지의 가격은 해당 종목의 공식 시세나 정규장 종가가 아닙니다.
                     특히 장이 닫힌 시간에는 정규장 종가와 차이가 벌어질 수 있는데, 그 차이 자체가
                     &ldquo;마감 이후 나온 뉴스를 시장이 어떻게 받아들이고 있는가&rdquo;를 보여주는

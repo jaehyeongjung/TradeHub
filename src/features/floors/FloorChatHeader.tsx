@@ -3,6 +3,7 @@
 import { Pencil } from "lucide-react";
 import { tintOf } from "@/shared/lib/color";
 import { LiveViewers } from "@/shared/ui/LiveViewers";
+import { Button } from "@/shared/ui/Button";
 import { formatSignedPercent, pnlPercent } from "./floor";
 import { nicknameFor } from "@/shared/lib/nickname";
 import type { Resident } from "./useResidents";
@@ -38,25 +39,16 @@ export function FloorChatHeader({
 }: Props) {
     if (!me || !myUserId) {
         return (
-            <div className="mb-2 flex items-center justify-between gap-3 rounded-2xl bg-[var(--surface-input)] px-3.5 py-2.5">
+            <div className="mb-2 flex items-center justify-between gap-3 rounded-card bg-[var(--surface-input)] px-3.5 py-2.5">
                 <div className="flex min-w-0 items-center gap-2">
                     <LiveViewers count={viewerCount} compact />
-                    <span className="min-w-0 truncate text-[12px] text-[var(--text-tertiary)]">
+                    <span className="min-w-0 truncate text-footnote text-[var(--text-tertiary)]">
                         층을 등록하면 이름 옆에 층수가 붙어요
                     </span>
                 </div>
-                <button
-                    type="button"
-                    onClick={onEdit}
-                    disabled={myUserId === null}
-                    className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-colors ${
-                        myUserId === null
-                            ? "bg-[var(--surface-hover)] text-[var(--text-disabled)] cursor-not-allowed"
-                            : "bg-[var(--color-accent-strong)] text-white hover:opacity-90 cursor-pointer"
-                    }`}
-                >
-                    등록
-                </button>
+                <Button size="sm" onClick={onEdit} disabled={myUserId === null}>
+                    층 등록
+                </Button>
             </div>
         );
     }
@@ -67,27 +59,27 @@ export function FloorChatHeader({
     const badgeColor = !isHolder
         ? "var(--color-info)"
         : floor > elevatorFloor
-          ? "var(--color-down)"
+          ? "var(--color-down-text)"
           : floor < elevatorFloor
-            ? "var(--color-up)"
+            ? "var(--color-up-text)"
             : "var(--text-tertiary)";
 
     return (
-        <div className="mb-2 flex items-center justify-between gap-2 rounded-2xl bg-[var(--surface-input)] px-3.5 py-2.5">
+        <div className="mb-2 flex items-center justify-between gap-2 rounded-card bg-[var(--surface-input)] px-3.5 py-2.5">
             <div className="flex min-w-0 items-center gap-1.5">
                 <span
-                    className="shrink-0 rounded-md px-1.5 py-[2px] text-[10px] font-bold leading-tight tabular-nums"
+                    className="shrink-0 rounded-md px-1.5 py-[2px] text-caption font-bold leading-tight tabular-nums"
                     style={{ background: tintOf(badgeColor), color: badgeColor }}
                 >
                     {floor}층
                 </span>
-                <span className="truncate text-[12px] font-semibold text-[var(--text-secondary)]">
+                <span className="truncate text-footnote font-semibold text-[var(--text-secondary)]">
                     {nicknameFor(myUserId)}
                 </span>
                 {isHolder && (
                     <span
-                        className="shrink-0 text-[11px] font-bold tabular-nums"
-                        style={{ color: pnl >= 0 ? "var(--color-up)" : "var(--color-down)" }}
+                        className="shrink-0 text-caption font-bold tabular-nums"
+                        style={{ color: pnl >= 0 ? "var(--color-up-text)" : "var(--color-down-text)" }}
                     >
                         {formatSignedPercent(pnl)}
                     </span>
@@ -96,7 +88,7 @@ export function FloorChatHeader({
 
             <div className="flex shrink-0 items-center gap-2">
                 {holderCount > 1 && averageFloor !== null && (
-                    <span className="hidden text-[11px] tabular-nums text-[var(--text-muted)] sm:inline">
+                    <span className="hidden text-caption tabular-nums text-[var(--text-muted)] sm:inline">
                         평균 {averageFloor.toFixed(1)}층 · {Math.round(stuckRatio * 100)}% 물림
                     </span>
                 )}
@@ -105,7 +97,7 @@ export function FloorChatHeader({
                     type="button"
                     onClick={onEdit}
                     aria-label="내 층 수정"
-                    className="rounded-lg p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--text-secondary)] cursor-pointer"
+                    className="rounded-chip p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--text-secondary)] cursor-pointer"
                 >
                     <Pencil size={13} strokeWidth={2.2} />
                 </button>

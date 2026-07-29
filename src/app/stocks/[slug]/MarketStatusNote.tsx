@@ -31,7 +31,7 @@ export function MarketStatusNote({ roomId, isOpen, marketName, hours }: Props) {
 
     if (lateNight && viewers > 0) {
         return (
-            <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-secondary)]">
+            <p className="mt-2 text-label leading-relaxed text-[var(--text-secondary)]">
                 {isOpen ? (
                     <>
                         지금은 {marketName} 정규장({hours}) 시간이고,{" "}
@@ -53,7 +53,7 @@ export function MarketStatusNote({ roomId, isOpen, marketName, hours }: Props) {
     }
 
     return (
-        <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-secondary)]">
+        <p className="mt-2 text-label leading-relaxed text-[var(--text-secondary)]">
             {isOpen ? (
                 <>
                     지금은 {marketName} 정규장({hours})입니다. 토큰 가격과 실제 주가가 가깝게
