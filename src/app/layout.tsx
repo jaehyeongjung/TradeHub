@@ -86,16 +86,22 @@ export default function RootLayout({
 }) {
     return (
         <html lang="ko" className={`bg-black ${inter.variable}`} suppressHydrationWarning>
+            <head>
+                {/*
+                 * AdSense 로더는 next/script로 넣으면 data-nscript 속성이 붙는데,
+                 * 로더가 이걸 보고 "head tag doesn't support data-nscript" 경고를 내며
+                 * 페이지 단위 광고 설정을 무시한다. 순수 script 태그로 head에 직접 넣는다.
+                 */}
+                <script
+                    async
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4322318127284357"
+                    crossOrigin="anonymous"
+                />
+            </head>
             <body>
                 <JotaiProvider>
                 <HeaderNav />
                 <AuthGate>{children}</AuthGate>
-                <Script
-                    async
-                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4322318127284357"
-                    crossOrigin="anonymous"
-                    strategy="afterInteractive"
-                />
                 <Script
                     async
                     src="https://www.googletagmanager.com/gtag/js?id=G-PHXWQJSM4Z"
