@@ -35,7 +35,7 @@ export function StocksHeader() {
                         type="button"
                         onClick={toggleTheme}
                         aria-label={isDark ? "라이트 모드로 전환" : "다크 모드로 전환"}
-                        className="flex cursor-pointer items-center rounded-lg p-2 text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-primary)]"
+                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-primary)]"
                     >
                         <svg className="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                             <path d={isDark ? THEME_ICON_PATH.sun : THEME_ICON_PATH.moon} />

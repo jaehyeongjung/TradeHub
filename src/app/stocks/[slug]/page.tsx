@@ -188,7 +188,7 @@ export default async function StockTokenPage({
     const token = getStockToken(slug);
     if (!token) notFound();
 
-    const detail = await getStockDetail(token.symbol);
+    const detail = await getStockDetail(token.symbol, token.market);
     const status = getMarketStatus(token.market);
     const faqs = buildFaqs(token, status);
     const jsonLdItems = buildJsonLd(token, detail, faqs);
@@ -240,7 +240,12 @@ export default async function StockTokenPage({
                                 low: detail.quote?.low ?? null,
                                 quoteVolume: detail.quote?.quoteVolume ?? null,
                                 openInterestUsd: detail.openInterestUsd,
+                                sessionClosePrice: detail.sessionClosePrice,
                             }}
+                            sessionCloseAt={detail.sessionCloseAt}
+                            marketIsOpen={status.isOpen}
+                            marketName={status.marketName}
+                            isUnlisted={isUnlisted}
                         />
                     </div>
                 </div>
@@ -249,7 +254,7 @@ export default async function StockTokenPage({
                 {!isUnlisted && (
                     <div
                         className={`border-t border-[var(--border-subtle)] px-5 sm:px-6 py-4 ${
-                            status.isOpen ? "bg-transparent" : "bg-[var(--color-up-muted)]"
+                            status.isOpen ? "bg-transparent" : "bg-[var(--surface-input)]"
                         }`}
                     >
                         <div className="flex items-center gap-2">
@@ -300,11 +305,11 @@ export default async function StockTokenPage({
             )}
 
             {/* ── 대화방: 가격 보러 온 사람을 머물게 하는 자리 ── */}
-            <section id="chat" className="mt-12">
+            <section id="chat" className="mt-12 scroll-mt-16">
                 <SectionTitle hint={`${token.koreanName}를 보고 있는 사람들과 지금 바로 이야기해보세요. 롱·숏 투표로 이 방의 분위기도 함께 보입니다.`}>
                     {token.koreanName} 투자자 대화방
                 </SectionTitle>
-                <div className={`${CARD} h-[560px] sm:h-[620px] p-3 sm:p-4`}>
+                <div className={`${CARD} h-[72dvh] min-h-[420px] sm:h-[620px] p-3 sm:p-4`}>
                     <Chat roomId={`stock:${token.slug}`} />
                 </div>
             </section>
@@ -333,13 +338,16 @@ export default async function StockTokenPage({
                     ].map(([k, a, b], i) => (
                         <div
                             key={k}
-                            className={`grid grid-cols-[5.5rem_1fr_1fr] gap-2 px-4 py-3 text-[13px] ${
+                            className={`px-4 py-3 text-[13px] sm:grid sm:grid-cols-[6rem_1fr_1fr] sm:gap-2 ${
                                 i > 0 ? "border-t border-[var(--border-subtle)]" : ""
                             }`}
                         >
                             <span className="font-semibold text-[var(--text-tertiary)]">{k}</span>
-                            <span className="text-[var(--text-tertiary)]">{a}</span>
-                            <span className="font-medium text-[var(--text-primary)]">{b}</span>
+                            {/* 모바일에선 3열이 너무 좁아 라벨 아래로 값 두 개를 나란히 놓는다 */}
+                            <span className="mt-1.5 grid grid-cols-2 gap-2 sm:mt-0 sm:contents">
+                                <span className="text-[var(--text-tertiary)]">{a}</span>
+                                <span className="font-medium text-[var(--text-primary)]">{b}</span>
+                            </span>
                         </div>
                     ))}
                 </div>
@@ -392,7 +400,7 @@ export default async function StockTokenPage({
                         <Link
                             key={r.slug}
                             href={`/stocks/${r.slug}`}
-                            className={`${CARD} p-4 transition-colors hover:ring-[var(--color-accent)]/40`}
+                            className={`${CARD} p-4 transition-colors hover:ring-[var(--border-strong)]`}
                         >
                             <div className="text-[11px] font-medium text-[var(--text-muted)]">
                                 {r.market === "KR" ? "한국" : "해외"} {r.category}
@@ -411,7 +419,7 @@ export default async function StockTokenPage({
                 </Link>
             </section>
 
-            <p className="mt-14 px-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
+            <p className="mt-14 px-1 text-[12px] leading-[1.7] text-[var(--text-muted)]">
                 본 페이지의 시세는 바이낸스 선물 시장 데이터로, {token.koreanName}의 정규장 주가나
                 공식 시세가 아닙니다. 무기한 선물은 레버리지와 청산 위험이 있는 고위험 파생상품이며
                 국가별로 거래가 제한될 수 있습니다. 본 정보는 투자 권유가 아니며 투자 판단과 그

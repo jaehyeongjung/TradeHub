@@ -84,7 +84,9 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
     const [userId, setUserId] = useState<string | null>(null);
     const [, setIsAnonymous] = useState(false);
     const [msgs, setMsgs] = useState<Msg[]>([]);
-    const [initialLoading, setInitialLoading] = useState(true);
+    const [mounted, setMounted] = useState(false);
+    // 네트워크와 무관하게 반드시 실행된다 — 이 값으로만 표시 여부를 정한다
+    useEffect(() => { setMounted(true); }, []);
     const isLight = useTheme();
     const pathname = usePathname();
     const isEn = pathname.startsWith("/en/");
@@ -141,7 +143,6 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                 requestAnimationFrame(() => { listRef.current?.scrollTo({ top: listRef.current!.scrollHeight }); });
                 fetchReactions(data.map((m) => m.id), userIdRef.current);
             }
-            setInitialLoading(false);
         })();
     }, [roomId]);
 
@@ -369,7 +370,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
 
     return (
         <div
-            className={`h-full flex flex-col w-full transition-[opacity,transform] duration-700 ${initialLoading ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}
+            className={`h-full flex flex-col w-full transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
             style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
         >
             <div className={`mb-2 rounded-2xl border p-3 2xl:p-4 ${headerBg}`}>

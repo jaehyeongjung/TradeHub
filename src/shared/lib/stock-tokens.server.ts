@@ -3,6 +3,8 @@
 
 import { stockTokens } from "./stock-tokens";
 import { getUsdKrw } from "./fx";
+import { getLastSessionCloseMs } from "./market-hours";
+import type { StockMarket } from "./stock-tokens";
 
 // 해외 배포 서버에서 바이낸스가 지역 차단(451)될 수 있어 호스트를 순회한다.
 //
@@ -123,20 +125,35 @@ export async function getAllTradfiRows(): Promise<TradfiRow[]> {
 
 export type StockDetail = {
     quote: StockQuote | null;
+    /** 직전 정규장 마감 시점의 토큰 가격 (KRX 종가가 아니다 — 그 시각 토큰의 값) */
+    sessionClosePrice: number | null;
+    sessionCloseAt: number | null;
     markPrice: number | null;
     openInterestUsd: number | null;
     /** USD/KRW. 못 가져오면 null이고, 그때는 원화 표기를 숨긴다. */
     usdKrw: number | null;
 };
 
-export async function getStockDetail(symbol: string): Promise<StockDetail> {
-    const pair = `${symbol}USDT`;
+/** 직전 장 마감 시각의 15분봉 시가 = 그 순간의 토큰 가격 */
+async function getSessionClosePrice(symbol: string, market: StockMarket, closeAt: number) {
+    const k = await fapi<unknown[][]>(
+        `/klines?symbol=${symbol}USDT&interval=15m&startTime=${closeAt}&limit=1`,
+    );
+    const open = k?.[0]?.[1];
+    const n = Number(open);
+    return Number.isFinite(n) ? n : null;
+}
 
-    const [ticker, premium, oi, usdKrw] = await Promise.all([
+export async function getStockDetail(symbol: string, market: StockMarket): Promise<StockDetail> {
+    const pair = `${symbol}USDT`;
+    const closeAt = getLastSessionCloseMs(market);
+
+    const [ticker, premium, oi, usdKrw, sessionClosePrice] = await Promise.all([
         fapi<RawTicker>(`/ticker/24hr?symbol=${pair}`),
         fapi<{ markPrice: string }>(`/premiumIndex?symbol=${pair}`),
         fapi<{ openInterest: string }>(`/openInterest?symbol=${pair}`),
         getUsdKrw(),
+        getSessionClosePrice(symbol, market, closeAt),
     ]);
 
     const quote = ticker && ticker.symbol ? toQuote(ticker) : null;
@@ -144,6 +161,8 @@ export async function getStockDetail(symbol: string): Promise<StockDetail> {
 
     return {
         quote,
+        sessionClosePrice,
+        sessionCloseAt: closeAt,
         markPrice,
         openInterestUsd: oi && markPrice ? Number(oi.openInterest) * markPrice : null,
         usdKrw,

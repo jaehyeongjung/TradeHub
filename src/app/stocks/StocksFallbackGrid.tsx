@@ -133,7 +133,7 @@ function Grid({ rows, usdKrw }: { rows: Row[]; usdKrw: number | null }) {
                     <Link
                         key={r.slug}
                         href={`/stocks/${r.slug}`}
-                        className="block rounded-2xl bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)] transition-colors hover:ring-[var(--color-accent)]/40"
+                        className="block rounded-2xl bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)] transition-colors hover:ring-[var(--border-strong)]"
                     >
                         <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">

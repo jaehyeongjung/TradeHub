@@ -91,7 +91,7 @@ function StockCard({ row, usdKrw }: { row: TradfiRow; usdKrw: number | null }) {
     const cls = "block rounded-2xl bg-[var(--surface-card)] p-4 ring-1 ring-[var(--border-subtle)] transition-colors";
 
     return row.slug ? (
-        <Link href={`/stocks/${row.slug}`} className={`${cls} hover:ring-[var(--color-accent)]/40`}>
+        <Link href={`/stocks/${row.slug}`} className={`${cls} hover:ring-[var(--border-strong)]`}>
             {inner}
         </Link>
     ) : (
@@ -216,11 +216,26 @@ export default async function StocksHubPage() {
 
             {rest.length > 0 && (
                 <section className="mt-12">
-                    <h2 className="text-lg font-bold tracking-tight">전체 종목</h2>
-                    <p className="mt-1.5 text-[13px] leading-relaxed text-[var(--text-tertiary)]">
-                        거래대금 순 · 총 {rows.length}개 종목
-                    </p>
-                    <CardGrid rows={rest} usdKrw={usdKrw} />
+                    {/* 100개 넘는 카드를 한 번에 펼치면 모바일에서 스크롤이 끝나지 않는다.
+                        details를 쓰면 JS 없이 접히고, 내용은 HTML에 남아 크롤러도 읽는다. */}
+                    <details className="group">
+                        <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
+                            <span>
+                                <span className="text-lg font-bold tracking-tight">전체 종목</span>
+                                <span className="mt-1.5 block text-[13px] leading-relaxed text-[var(--text-tertiary)]">
+                                    거래대금 순 · 총 {rows.length}개 종목
+                                </span>
+                            </span>
+                            <span className="flex h-9 shrink-0 items-center gap-1 rounded-xl bg-[var(--surface-input)] px-3 text-[12px] font-bold text-[var(--text-secondary)]">
+                                <span className="group-open:hidden">펼치기</span>
+                                <span className="hidden group-open:inline">접기</span>
+                                <span className="transition-transform duration-200 group-open:rotate-180" aria-hidden>
+                                    ▾
+                                </span>
+                            </span>
+                        </summary>
+                        <CardGrid rows={rest} usdKrw={usdKrw} />
+                    </details>
                 </section>
             )}
 

@@ -81,3 +81,38 @@ export function getMarketStatus(market: StockMarket, now: Date = new Date()): Ma
         timezone: cfg.timezone,
     };
 }
+
+/** 해당 시각의 타임존 오프셋(분). 한국은 고정 +540이지만 미국은 DST가 있어 계산이 필요하다. */
+function zoneOffsetMinutes(date: Date, timeZone: string): number {
+    const name = new Intl.DateTimeFormat("en-US", { timeZone, timeZoneName: "longOffset" })
+        .formatToParts(date)
+        .find((p) => p.type === "timeZoneName")?.value ?? "GMT+00:00";
+    const m = /GMT([+-])(\d{2}):(\d{2})/.exec(name);
+    if (!m) return 0;
+    return (m[1] === "-" ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3]));
+}
+
+/**
+ * 직전 정규장 마감 시각(UTC ms). 주말이면 금요일 마감으로 되돌린다.
+ *
+ * "장 마감 이후 얼마나 움직였나"의 기준점이다. 공휴일은 반영하지 않으므로
+ * 연휴에는 기준이 실제 마감보다 뒤일 수 있다 — 표기도 시각을 함께 보여준다.
+ */
+export function getLastSessionCloseMs(market: StockMarket, now: Date = new Date()): number {
+    const cfg = CONFIG[market];
+    const offset = zoneOffsetMinutes(now, cfg.timezone);
+
+    // now를 현지 벽시계로 옮기면 UTC 필드가 곧 현지 시각이 된다
+    const zoned = new Date(now.getTime() + offset * 60_000);
+    const nowMinutes = zoned.getUTCHours() * 60 + zoned.getUTCMinutes();
+
+    const close = new Date(zoned);
+    close.setUTCHours(0, 0, 0, 0);
+    close.setUTCMinutes(cfg.closeMinutes);
+    if (nowMinutes < cfg.closeMinutes) close.setUTCDate(close.getUTCDate() - 1);
+    while (close.getUTCDay() === 0 || close.getUTCDay() === 6) {
+        close.setUTCDate(close.getUTCDate() - 1);
+    }
+
+    return close.getTime() - offset * 60_000;
+}

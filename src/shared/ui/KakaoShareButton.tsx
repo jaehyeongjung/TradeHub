@@ -110,7 +110,7 @@ export function KakaoShareButton({ className = "" }: { className?: string }) {
             type="button"
             onClick={handleClick}
             aria-label="카카오톡으로 공유하기"
-            className={`flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#FEE500] px-2.5 py-1.5 text-[12px] font-bold text-[#191919] transition-opacity hover:opacity-85 active:opacity-70 ${className}`}
+            className={`flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#FEE500] px-3 py-2.5 text-[12px] font-bold text-[#191919] transition-opacity hover:opacity-85 active:opacity-70 ${className}`}
         >
             <svg className="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 3C6.477 3 2 6.463 2 10.734c0 2.743 1.82 5.152 4.556 6.532-.2.75-.724 2.72-.83 3.142-.13.523.192.516.404.376.166-.11 2.64-1.794 3.71-2.522.71.105 1.44.16 2.16.16 5.523 0 10-3.463 10-7.688C22 6.463 17.523 3 12 3z" />

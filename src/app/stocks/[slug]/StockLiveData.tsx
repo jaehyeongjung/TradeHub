@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { fmtUsd, fmtPrice, fmtCompactKrw, formatKrw } from "../format";
+import { RollingNumber } from "../RollingNumber";
 
 export type InitialStats = {
     price: number | null;
@@ -10,6 +11,8 @@ export type InitialStats = {
     low: number | null;
     quoteVolume: number | null;
     openInterestUsd: number | null;
+    /** 직전 정규장 마감 시점의 토큰 가격 */
+    sessionClosePrice: number | null;
 };
 
 type Props = {
@@ -17,6 +20,11 @@ type Props = {
     /** null이면 원화 표기를 숨기고 달러만 보여준다 */
     usdKrw: number | null;
     initial: InitialStats;
+    sessionCloseAt: number | null;
+    marketIsOpen: boolean;
+    marketName: string;
+    /** 비상장(SPCX)은 정규장이 없어 "마감 이후" 개념이 성립하지 않는다 */
+    isUnlisted: boolean;
 };
 
 type TickerMessage = {
@@ -58,13 +66,22 @@ function Cell({ label, value, sub }: { label: string; value: string; sub?: strin
  * 그래서 WebSocket을 한 개만 열고 가격 블록과 통계 카드를 같이 렌더한다.
  * (미결제약정만 스트림에 없어 REST로 따로 가져온다)
  */
-export function StockLiveData({ symbol, usdKrw, initial }: Props) {
+export function StockLiveData({
+    symbol,
+    usdKrw,
+    initial,
+    sessionCloseAt,
+    marketIsOpen,
+    marketName,
+    isUnlisted,
+}: Props) {
     const [price, setPrice] = useState(initial.price);
     const [changePercent, setChangePercent] = useState(initial.changePercent);
     const [high, setHigh] = useState(initial.high);
     const [low, setLow] = useState(initial.low);
     const [quoteVolume, setQuoteVolume] = useState(initial.quoteVolume);
     const [openInterestUsd, setOpenInterestUsd] = useState(initial.openInterestUsd);
+    const [sessionClose, setSessionClose] = useState(initial.sessionClosePrice);
     const [isLive, setIsLive] = useState(false);
     const [flash, setFlash] = useState<"up" | "down" | null>(null);
     const prevPriceRef = useRef<number | null>(initial.price);
@@ -182,8 +199,64 @@ export function StockLiveData({ symbol, usdKrw, initial }: Props) {
         };
     }, [symbol, initial.openInterestUsd]);
 
+    // 장 마감 기준가도 서버가 못 가져왔으면 브라우저에서 채운다
+    useEffect(() => {
+        if (initial.sessionClosePrice !== null || sessionCloseAt === null) return;
+        let cancelled = false;
+
+        async function load() {
+            for (const host of OI_HOSTS) {
+                try {
+                    const res = await fetch(
+                        `${host}/fapi/v1/klines?symbol=${symbol}USDT&interval=15m&startTime=${sessionCloseAt}&limit=1`,
+                    );
+                    if (!res.ok) continue;
+                    const k = (await res.json()) as unknown[][];
+                    const n = Number(k?.[0]?.[1]);
+                    if (cancelled) return;
+                    if (Number.isFinite(n)) {
+                        setSessionClose(n);
+                        return;
+                    }
+                } catch {
+                    // 다음 호스트로 폴백
+                }
+            }
+        }
+
+        load();
+        return () => {
+            cancelled = true;
+        };
+    }, [symbol, sessionCloseAt, initial.sessionClosePrice]);
+
     const isUp = (changePercent ?? 0) >= 0;
     const krw = price !== null && usdKrw !== null ? price * usdKrw : null;
+
+    const sinceClose =
+        price !== null && sessionClose !== null && sessionClose > 0
+            ? {
+                  pct: ((price - sessionClose) / sessionClose) * 100,
+                  diff: usdKrw !== null ? (price - sessionClose) * usdKrw : null,
+              }
+            : null;
+
+    const closeLabel =
+        sessionCloseAt === null
+            ? ""
+            : (() => {
+                  // "7. 28. 오후 03:30" 같은 기본 포맷이 지저분해 직접 조립한다
+                  const p = new Intl.DateTimeFormat("ko-KR", {
+                      month: "numeric",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                      timeZone: "Asia/Seoul",
+                  }).formatToParts(new Date(sessionCloseAt));
+                  const get = (t: string) => p.find((x) => x.type === t)?.value ?? "";
+                  return `${get("month")}월 ${get("day")}일 ${get("hour")}:${get("minute")}`;
+              })();
 
     const flashColor =
         flash === "up"
@@ -195,27 +268,12 @@ export function StockLiveData({ symbol, usdKrw, initial }: Props) {
     return (
         <>
             {/* 원화를 주가격으로 — 국내 유입의 검색 의도에 맞춘다 */}
-            <div className="flex items-center gap-2.5">
-                <span
-                    className={`text-[2.5rem] sm:text-[3.25rem] leading-[1.05] font-extrabold tabular-nums tracking-[-0.03em] transition-colors duration-300 ${flashColor}`}
-                >
-                    {krw !== null ? formatKrw(krw) : fmtUsd(price)}
-                </span>
-                <span
-                    className={`mt-1 flex shrink-0 items-center gap-1 self-start rounded-full px-2 py-1 text-[10px] font-bold ${
-                        isLive
-                            ? "bg-[var(--color-up-muted)] text-[var(--color-up)]"
-                            : "bg-[var(--surface-input)] text-[var(--text-tertiary)]"
-                    }`}
-                >
-                    <span
-                        className={`h-1.5 w-1.5 rounded-full ${
-                            isLive ? "animate-pulse bg-[var(--color-accent)]" : "bg-[var(--text-disabled)]"
-                        }`}
-                    />
-                    {isLive ? "실시간" : "연결 중"}
-                </span>
-            </div>
+            {/* 긴 원화 표기(예: 1,532,831원 10자)가 좁은 화면에서 잘리지 않게 폭을 독점시킨다.
+                LIVE 배지는 아래 메타 행으로 내렸다. */}
+            <RollingNumber
+                value={krw !== null ? formatKrw(krw) : fmtUsd(price)}
+                className={`block text-[2rem] min-[380px]:text-[2.5rem] sm:text-[3.25rem] font-extrabold tabular-nums tracking-[-0.03em] transition-colors duration-300 ${flashColor}`}
+            />
 
             <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
                 {changePercent !== null && (
@@ -231,12 +289,56 @@ export function StockLiveData({ symbol, usdKrw, initial }: Props) {
                 )}
                 <span className="text-[12px] text-[var(--text-muted)]">24시간 기준</span>
 
+                <span
+                    className="flex shrink-0 items-center gap-1 rounded-full bg-[var(--surface-input)] px-2 py-1 text-[10px] font-bold text-[var(--text-tertiary)]"
+                >
+                    <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                            isLive
+                                ? "animate-pulse bg-[var(--color-accent)]"
+                                : "bg-[var(--text-disabled)]"
+                        }`}
+                    />
+                    {isLive ? "실시간" : "연결 중"}
+                </span>
+
                 {krw !== null && price !== null && (
                     <span className="ml-auto text-[13px] tabular-nums text-[var(--text-tertiary)]">
                         {fmtUsd(price)}
                     </span>
                 )}
             </div>
+
+            {/* 이 페이지만 답할 수 있는 숫자. 정규장이 닫힌 동안 얼마나 움직였나. */}
+            {sinceClose !== null && !isUnlisted && !marketIsOpen && (
+                <div className="mt-5 rounded-2xl bg-[var(--surface-input)] px-4 py-3.5">
+                    <div className="text-[11px] font-medium text-[var(--text-tertiary)]">
+                        {marketName} 마감({closeLabel}) 이후 변화
+                    </div>
+                    <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                        <span
+                            className={`text-[22px] font-extrabold tabular-nums tracking-[-0.02em] ${
+                                sinceClose.pct >= 0
+                                    ? "text-[var(--color-up)]"
+                                    : "text-[var(--color-down)]"
+                            }`}
+                        >
+                            {sinceClose.pct >= 0 ? "+" : "−"}
+                            {Math.abs(sinceClose.pct).toFixed(2)}%
+                        </span>
+                        {sinceClose.diff !== null && (
+                            <span className="text-[13px] tabular-nums text-[var(--text-secondary)]">
+                                {sinceClose.diff >= 0 ? "+" : "−"}
+                                {formatKrw(Math.abs(sinceClose.diff))}
+                            </span>
+                        )}
+                    </div>
+                    <div className="mt-1.5 text-[11px] leading-relaxed text-[var(--text-muted)]">
+                        마감 시점 토큰 가격 {fmtPrice(sessionClose, usdKrw)} 기준입니다. 해당 종목의
+                        정규장 종가가 아닙니다.
+                    </div>
+                </div>
+            )}
 
             {/* 통계도 같은 스트림에서 나온다 — 서버가 막혀도 함께 채워진다 */}
             <div className={`${CARD} mt-6 overflow-hidden`}>
