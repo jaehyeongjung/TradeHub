@@ -44,7 +44,10 @@ create policy holdings_delete_own on public.holdings
 
 -- updated_at만 갱신한다. created_at은 "존버 D+238" 카운터의 근거라 절대 건드리지 않는다.
 -- (물타기로 평단가를 내려도 입주일은 유지된다)
-create or replace function public.touch_updated_at()
+--
+-- 함수 이름에 테이블명을 박아둔다. touch_updated_at 같은 일반적인 이름으로 두면
+-- 다른 테이블이 이미 쓰고 있는 동명 함수를 create or replace가 덮어쓴다.
+create or replace function public.holdings_touch_updated_at()
 returns trigger language plpgsql as $$
 begin
     new.updated_at = now();
@@ -54,7 +57,19 @@ end $$;
 
 drop trigger if exists holdings_touch on public.holdings;
 create trigger holdings_touch before update on public.holdings
-    for each row execute function public.touch_updated_at();
+    for each row execute function public.holdings_touch_updated_at();
 
--- 층 분포 실시간 반영
-alter publication supabase_realtime add table public.holdings;
+-- 층 분포 실시간 반영.
+-- 이미 등록돼 있으면 alter publication이 에러를 내고, SQL Editor는 스크립트 전체를
+-- 한 트랜잭션으로 돌리기 때문에 위 작업까지 같이 롤백된다. 그래서 존재 여부를 먼저 본다.
+do $$
+begin
+    if not exists (
+        select 1 from pg_publication_tables
+        where pubname = 'supabase_realtime'
+          and schemaname = 'public'
+          and tablename = 'holdings'
+    ) then
+        alter publication supabase_realtime add table public.holdings;
+    end if;
+end $$;

@@ -12,7 +12,7 @@ import { getMarketStatus } from "@/shared/lib/market-hours";
 import { fmtPrice, fmtCompactKrw } from "../format";
 
 import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
-import { Chat } from "@/features/chat/Chat";
+import { StockRoom } from "@/features/floors/StockRoom";
 import { StockLiveData } from "./StockLiveData";
 
 // 첫 요청 때 렌더하고 60초간 캐시한다(ISR).
@@ -470,15 +470,16 @@ export default async function StockTokenPage({
                 </section>
             )}
 
-            {/* ── 대화방: 가격 보러 온 사람을 머물게 하는 자리 ── */}
-            <section id="chat" className="mt-12 scroll-mt-16">
-                <SectionTitle hint={`${token.koreanName}를 보고 있는 사람들과 지금 바로 이야기해보세요. 롱·숏 투표로 이 방의 분위기도 함께 보입니다.`}>
-                    {`${token.koreanName} 투자자 대화방`}
-                </SectionTitle>
-                <div className={`${CARD} h-[72dvh] min-h-[420px] sm:h-[620px] p-3 sm:p-4`}>
-                    <Chat roomId={`stock:${token.slug}`} />
-                </div>
-            </section>
+            {/* ── 층 단면도 + 대화방: 가격 보러 온 사람을 머물게 하는 자리 ── */}
+            <StockRoom
+                slug={token.slug}
+                symbol={token.symbol}
+                koreanName={token.koreanName}
+                market={token.market}
+                floorUnit={token.floorUnit}
+                usdKrw={detail.usdKrw}
+                initialPrice={detail.quote?.price ?? null}
+            />
 
             {/* ── 설명 ── */}
             <section className="mt-14">

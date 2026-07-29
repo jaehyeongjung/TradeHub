@@ -6,6 +6,8 @@ import type { ReactNode } from "react";
 import { supabase } from "@/shared/lib/supabase-browser";
 import type { PostgrestSingleResponse } from "@supabase/supabase-js";
 import { sanitizeText } from "@/shared/lib/sanitize";
+import { useAnonUserId } from "@/shared/hooks/useAnonUserId";
+import { tintOf } from "@/shared/lib/color";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface PayloadObject {
@@ -26,6 +28,19 @@ type Msg = {
 };
 type Reaction = { count: number; mine: boolean };
 type ReactionsState = Record<string, Record<string, Reaction>>;
+
+/** 메시지 작성자를 어떻게 보여줄지. 방마다 다른 규칙을 주입할 수 있게 뺐다. */
+export type ChatIdentity = {
+    name: string;
+    badge?: { label: string; tone: "up" | "down" | "info" | "neutral" };
+};
+
+const BADGE_TONE: Record<NonNullable<ChatIdentity["badge"]>["tone"], string> = {
+    up: "var(--color-up)",
+    down: "var(--color-down)",
+    info: "var(--color-info)",
+    neutral: "var(--text-tertiary)",
+};
 
 const REACTION_EMOJIS = ["👍", "❤️", "🚀", "😂", "🔥"] as const;
 type Position = {
@@ -80,9 +95,22 @@ function linkify(text: string): ReactNode[] {
     return parts;
 }
 
-export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fadeDelay?: number }) {
-    const [userId, setUserId] = useState<string | null>(null);
-    const [, setIsAnonymous] = useState(false);
+export function Chat({
+    roomId = "lobby",
+    fadeDelay = 0,
+    header,
+    identityFor,
+}: {
+    roomId?: string;
+    fadeDelay?: number;
+    /** 넘기면 기본 롱·숏 패널을 대체한다 (관련 쿼리와 구독도 함께 끈다) */
+    header?: ReactNode;
+    /** 넘기면 user_id 앞 6자리 대신 이 규칙으로 이름·배지를 그린다 */
+    identityFor?: (userId: string) => ChatIdentity;
+}) {
+    // 롱·숏 패널은 기본값일 때만 돈다. 주식 방은 층 패널이 그 자리를 쓴다.
+    const useLongShort = header === undefined;
+    const userId = useAnonUserId();
     const [msgs, setMsgs] = useState<Msg[]>([]);
     const [mounted, setMounted] = useState(false);
     // 네트워크와 무관하게 반드시 실행된다 — 이 값으로만 표시 여부를 정한다
@@ -104,31 +132,6 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
             listRef.current?.scrollTo({ top: listRef.current!.scrollHeight, behavior: "smooth" });
         });
     };
-
-    useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, s) => {
-            if (s?.user) {
-                setUserId(s.user.id);
-                setIsAnonymous(s.user.is_anonymous ?? false);
-            } else {
-                const { data: anonData } = await supabase.auth.signInAnonymously();
-                setUserId(anonData?.user?.id ?? null);
-                setIsAnonymous(true);
-            }
-        });
-        (async () => {
-            const { data } = await supabase.auth.getSession();
-            if (data.session) {
-                setUserId(data.session.user.id);
-                setIsAnonymous(data.session.user.is_anonymous ?? false);
-            } else {
-                const { data: anonData } = await supabase.auth.signInAnonymously();
-                setUserId(anonData?.user?.id ?? null);
-                setIsAnonymous(true);
-            }
-        })();
-        return () => subscription.unsubscribe();
-    }, []);
 
     useEffect(() => {
         (async () => {
@@ -278,9 +281,13 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
 
     const handleScrollBtnClick = () => { scrollToBottom(); setUnreadCount(0); };
 
-    useEffect(() => { fetchRatio(roomId).then(setRatio).catch(() => {}); }, [roomId]);
+    useEffect(() => {
+        if (!useLongShort) return;
+        fetchRatio(roomId).then(setRatio).catch(() => {});
+    }, [roomId, useLongShort]);
 
     useEffect(() => {
+        if (!useLongShort) return;
         if (!userId) { setMyChoice(null); setLoadingChoice(false); return; }
         (async () => {
             const response = (await supabase.from("positions").select("choice")
@@ -289,9 +296,10 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
             if (response.data) setMyChoice(response.data.choice);
             setLoadingChoice(false);
         })();
-    }, [userId, roomId]);
+    }, [userId, roomId, useLongShort]);
 
     useEffect(() => {
+        if (!useLongShort) return;
         (async () => {
             const { data, error } = await supabase.from("positions").select("user_id, choice")
                 .eq("room_id", roomId).eq("day", todayKstDateStr());
@@ -301,7 +309,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                 setPositionsMap(map);
             }
         })();
-    }, [roomId]);
+    }, [roomId, useLongShort]);
 
     useEffect(() => {
         const ch = supabase.channel(`reactions:${roomId}`)
@@ -328,6 +336,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
     }, [roomId]);
 
     useEffect(() => {
+        if (!useLongShort) return;
         const ch = supabase.channel(`positions:${roomId}`)
             .on("postgres_changes", { event: "*", schema: "public", table: "positions", filter: `room_id=eq.${roomId}` },
                 async (payload) => {
@@ -343,7 +352,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                 })
             .subscribe();
         return () => { supabase.removeChannel(ch); };
-    }, [roomId]);
+    }, [roomId, useLongShort]);
 
     const choose = async (choice: "long" | "short") => {
         if (!userId) return;
@@ -373,6 +382,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
             className={`h-full flex flex-col w-full transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
             style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
         >
+            {!useLongShort ? header : (
             <div className={`mb-2 rounded-2xl border p-3 2xl:p-4 ${headerBg}`}>
                 <div className="flex items-center justify-between mb-2.5">
                     <div className="flex items-center gap-2">
@@ -446,6 +456,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                     </div>
                 )}
             </div>
+            )}
 
             <div className={`relative flex-1 min-h-0 rounded-2xl overflow-hidden ${msgAreaBg}`}>
                 <div
@@ -458,6 +469,12 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                             {msgs.map((m) => {
                                 const userChoice = positionsMap[m.user_id];
                                 const isMe = m.user_id === userId;
+                                const identity = identityFor?.(m.user_id);
+                                // 주식 방은 층 배지, 대시보드는 기존 L/S 배지
+                                const badge = identity?.badge
+                                    ?? (userChoice
+                                        ? { label: userChoice === "long" ? "L" : "S", tone: userChoice === "long" ? "up" as const : "down" as const }
+                                        : null);
                                 const nameColor = isMe
                                     ? isLight ? "text-teal-600" : "text-teal-400"
                                     : isLight ? "text-neutral-500" : "text-neutral-500";
@@ -475,20 +492,30 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                                         className="group relative py-[3px] min-w-0"
                                     >
                                         <div className="flex items-baseline gap-1.5">
-                                            {userChoice ? (
-                                                <span className={`text-[8px] font-bold px-1 py-[1px] rounded shrink-0 leading-none ${
-                                                    userChoice === "long"
-                                                        ? "bg-emerald-500/15 text-emerald-400"
-                                                        : "bg-red-500/15 text-red-400"
-                                                }`}>
-                                                    {userChoice === "long" ? "L" : "S"}
+                                            {/* 배지 폭을 고정해 층수가 한 자리든 두 자리든 이름이 세로로 정렬된다 */}
+                                            {badge ? (
+                                                <span
+                                                    className="text-[9px] font-bold px-1 py-[1px] rounded shrink-0 leading-none tabular-nums text-center min-w-[26px]"
+                                                    style={{
+                                                        background: tintOf(BADGE_TONE[badge.tone]),
+                                                        color: BADGE_TONE[badge.tone],
+                                                    }}
+                                                >
+                                                    {badge.label}
                                                 </span>
                                             ) : (
-                                                <span className="w-[14px] shrink-0" />
+                                                <span className="w-[26px] shrink-0" />
                                             )}
                                             <span className={`text-[11px] font-semibold shrink-0 ${nameColor}`}>
-                                                {isMe ? (isEn ? "Me" : "나") : m.user_id.slice(0, 6)}
+                                                {identity
+                                                    ? identity.name
+                                                    : isMe ? (isEn ? "Me" : "나") : m.user_id.slice(0, 6)}
                                             </span>
+                                            {identity && isMe && (
+                                                <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
+                                                    {isEn ? "(me)" : "(나)"}
+                                                </span>
+                                            )}
                                             <span className={`text-[10px] shrink-0 ${isLight ? "text-neutral-300" : "text-text-muted"}`}>·</span>
                                             <span className={`text-[12px] whitespace-pre-wrap break-anywhere flex-1 ${contentColor}`}>
                                                 {linkify(m.content)}
@@ -536,7 +563,7 @@ export function Chat({ roomId = "lobby", fadeDelay = 0 }: { roomId?: string; fad
                                         </AnimatePresence>
 
                                         {hasReactions && (
-                                            <div className="flex flex-wrap gap-1 mt-1 pl-[22px]">
+                                            <div className="flex flex-wrap gap-1 mt-1 pl-[32px]">
                                                 {REACTION_EMOJIS.filter((e) => (msgReactions[e]?.count ?? 0) > 0).map((emoji) => {
                                                     const r = msgReactions[emoji];
                                                     return (

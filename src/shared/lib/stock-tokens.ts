@@ -35,6 +35,12 @@ export type StockToken = {
     watchPoints: { title: string; body: string }[];
     /** 종목별 추가 FAQ. 공통 FAQ 뒤에 붙는다. */
     extraFaqs?: { question: string; answer: string }[];
+    /**
+     * "층" 하나의 크기 (표시 통화 기준). 생략하면 한국 종목은 10,000원,
+     * 해외 종목은 층수가 두 자리로 떨어지는 단위를 가격에서 자동으로 고른다.
+     * 자동 규칙이 어색한 종목만 여기서 덮어쓴다. → features/floors/floor.ts
+     */
+    floorUnit?: number;
 };
 
 /** 한국 거래소(KRX) 정규장 — Asia/Seoul 09:00~15:30 */

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSetAtom } from "jotai";
+import { stockPriceAtom } from "@/shared/store/atoms";
 import { fmtUsd, fmtPrice, fmtCompactKrw, formatKrw } from "../format";
 import { RollingNumber } from "../RollingNumber";
 
@@ -85,6 +87,13 @@ export function StockLiveData({
     const [isLive, setIsLive] = useState(false);
     const [flash, setFlash] = useState<"up" | "down" | null>(null);
     const prevPriceRef = useRef<number | null>(initial.price);
+    // 같은 페이지의 층 단면도가 이 값을 읽는다 (소켓을 또 열지 않도록)
+    const publishPrice = useSetAtom(stockPriceAtom);
+
+    useEffect(() => {
+        if (initial.price === null) return;
+        publishPrice((prev) => ({ ...prev, [symbol]: initial.price! }));
+    }, [symbol, initial.price, publishPrice]);
 
     useEffect(() => {
         let destroyed = false;
@@ -120,6 +129,7 @@ export function StockLiveData({
                         }
                         prevPriceRef.current = next;
                         setPrice(next);
+                        publishPrice((prev) => (prev[symbol] === next ? prev : { ...prev, [symbol]: next }));
                     }
                     setChangePercent(num(data.P));
                     setHigh(num(data.h));
@@ -162,7 +172,7 @@ export function StockLiveData({
                 try { ws.close(); } catch { /* noop */ }
             }
         };
-    }, [symbol]);
+    }, [symbol, publishPrice]);
 
     // 미결제약정은 스트림에 없다. 서버가 못 가져왔을 때만 브라우저에서 채운다.
     useEffect(() => {
