@@ -33,3 +33,19 @@ export function nicknameFor(userId: string): string {
     // 같은 해시의 다른 비트 구간을 써서 두 단어가 같이 움직이지 않게 한다
     return MODIFIERS[h % MODIFIERS.length] + CREATURES[(h >>> 11) % CREATURES.length];
 }
+
+/**
+ * 아바타. 색은 user_id에서 결정되고 글자는 닉네임 첫 자다.
+ * 색만으로 사람을 구분하게 두지 않고 이름도 같이 붙는 자리에서만 쓴다.
+ */
+const AVATAR_HUES = [
+    "#3182F6", "#00A676", "#8B5CF6", "#F59E0B", "#F75467", "#14B8A6",
+] as const;
+
+export function avatarOf(userId: string): { hue: string; initial: string } {
+    const h = hash32(userId);
+    return {
+        hue: AVATAR_HUES[(h >>> 19) % AVATAR_HUES.length],
+        initial: nicknameFor(userId).slice(0, 1),
+    };
+}

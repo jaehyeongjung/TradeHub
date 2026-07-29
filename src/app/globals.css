@@ -48,6 +48,13 @@ html {
        그래서 버튼·선택·포커스는 파랑, 등락은 초록/빨강으로 나눈다. */
     --color-brand:        #4A9EFF;  /* 면·아이콘·포커스 링 */
     --color-brand-strong: #2B72DE;  /* 흰 글씨를 얹는 채움 버튼 (4.6:1) */
+    /* 채움 버튼 위의 글자색.
+       text-white를 쓰면 안 된다 — globals.css의
+       `html.light .text-white { color:#191F28 !important }` 규칙이
+       예외 목록(bg-emerald-500 등)에 없는 배경에서 글자를 검정으로 바꿔버린다. */
+    --text-on-fill:       #FFFFFF;
+    /* 브랜드 초록을 글자로 쓸 때 (라이브 표시 등) */
+    --color-accent-text:  #02C076;
     /* 흰 글씨를 얹는 채움 버튼용 짙은 브랜드 그린.
        --color-accent(#02C076)에 흰 글씨는 명도비가 2.4:1밖에 안 나온다(기준 4.5:1).
        이 값은 4.55:1로 통과한다. */
@@ -99,6 +106,8 @@ html.light {
     --color-accent-strong: #00875A;
     --color-brand:        #3182F6;
     --color-brand-strong: #1B64DA;  /* 흰 글씨 5.4:1 */
+    --text-on-fill:       #FFFFFF;
+    --color-accent-text:  #00875A;  /* #00A676은 흰 배경에서 3.1:1 */
     /* 흰 배경에서 #3182F6은 3.7:1, #00A676은 3.4:1로 작은 글씨 기준(4.5:1) 미달.
        면에 쓰는 값은 그대로 두고 글자용만 한 단계 진하게 내린다. */
     --color-info:       #1B64DA;
@@ -725,6 +734,7 @@ html.light .landing-freedom:hover h3 {
     --radius-card:    20px;
     --radius-control: 14px;
     --radius-chip:    10px;
+    --radius-tail:    6px;   /* 말풍선 꼬리 쪽 모서리 */
 
     /* ============================================
        시맨틱 Tailwind 유틸리티 토큰
@@ -759,6 +769,8 @@ html.light .landing-freedom:hover h3 {
     --color-accent-strong: var(--color-accent-strong);
     --color-brand:        var(--color-brand);
     --color-brand-strong: var(--color-brand-strong);
+    --color-accent-text:  var(--color-accent-text);
+    --color-text-on-fill: var(--text-on-fill);
     --color-info:       var(--color-info);
 
     /* ============================================

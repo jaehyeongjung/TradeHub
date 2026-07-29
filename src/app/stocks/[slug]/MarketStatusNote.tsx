@@ -22,6 +22,19 @@ type Props = {
  * 여기서 채널을 또 열면 같은 방을 두 번 구독하게 된다.
  * 시간·접속자 판단은 마운트 뒤에만 해서 서버 렌더 HTML과 어긋나지 않게 한다.
  */
+/** 실시간 값이라는 걸 숫자 자체로 알리는 표시. 색 + 깜빡이는 점 두 겹. */
+function LiveCount({ n }: { n: number }) {
+    return (
+        <strong className="inline-flex items-baseline gap-1 font-bold tabular-nums text-[var(--color-accent-text)]">
+            <span className="relative inline-flex h-1.5 w-1.5 self-center">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-accent)] opacity-70" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
+            </span>
+            {n}
+        </strong>
+    );
+}
+
 export function MarketStatusNote({ roomId, isOpen, marketName, hours }: Props) {
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
@@ -35,16 +48,19 @@ export function MarketStatusNote({ roomId, isOpen, marketName, hours }: Props) {
                 {isOpen ? (
                     <>
                         지금은 {marketName} 정규장({hours}) 시간이고,{" "}
-                        <strong className="font-bold text-[var(--text-primary)]">
-                            {viewers}명이 같이 보고 있습니다.
-                        </strong>{" "}
+                        <LiveCount n={viewers} />
+                        {"명이 같이 보고 있습니다. "}
                         토큰 가격과 실제 주가가 가깝게 움직이는 시간대예요.
                     </>
                 ) : (
                     <>
                         <strong className="font-bold text-[var(--text-primary)]">
-                            {marketName}는 닫혔지만 {viewers}명이 아직 안 자고 있습니다.
-                        </strong>{" "}
+                            {marketName}는 닫혔지만{" "}
+                        </strong>
+                        <LiveCount n={viewers} />
+                        <strong className="font-bold text-[var(--text-primary)]">
+                            {"명이 아직 안 자고 있습니다. "}
+                        </strong>
                         위 가격은 종가가 아니라 마감 이후 매겨진 최신 가격이에요.
                     </>
                 )}

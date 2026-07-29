@@ -22,13 +22,13 @@ const SIZE: Record<Size, string> = {
 
 const VARIANT: Record<Variant, string> = {
     primary:
-        "bg-[var(--color-brand-strong)] text-white hover:opacity-92 active:opacity-85",
+        "bg-[var(--color-brand-strong)] text-[var(--text-on-fill)] hover:opacity-92 active:opacity-85",
     secondary:
         "bg-[var(--surface-input)] text-[var(--text-primary)] hover:bg-[var(--surface-hover)]",
     ghost:
         "bg-transparent text-[var(--text-tertiary)] hover:bg-[var(--surface-input)] hover:text-[var(--text-primary)]",
     danger:
-        "bg-[var(--color-down-text)] text-white hover:opacity-92 active:opacity-85",
+        "bg-[var(--color-down-text)] text-[var(--text-on-fill)] hover:opacity-92 active:opacity-85",
 };
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { supabase } from "@/shared/lib/supabase-browser";
@@ -7,8 +7,10 @@ import type { PostgrestSingleResponse } from "@supabase/supabase-js";
 import { sanitizeText } from "@/shared/lib/sanitize";
 import { useAnonUserId } from "@/shared/hooks/useAnonUserId";
 import { tintOf } from "@/shared/lib/color";
+import { avatarOf } from "@/shared/lib/nickname";
+import { kstDateStr } from "@/shared/lib/kst";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUp, SmilePlus, X } from "lucide-react";
+import { ArrowUp, MessageSquare, SmilePlus, X } from "lucide-react";
 
 interface PayloadObject {
     id: string;
@@ -46,6 +48,41 @@ const BADGE_TONE: Record<NonNullable<ChatIdentity["badge"]>["tone"], string> = {
 const REACTION_HINT_KEY = "th-chat-reaction-hint";
 
 const REACTION_EMOJIS = ["👍", "❤️", "🚀", "😂", "🔥"] as const;
+
+/** 같은 사람이 5분 안에 연달아 보낸 말은 한 묶음으로 본다 */
+const GROUP_WINDOW_MS = 5 * 60 * 1000;
+
+const TIME_FMT = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+});
+
+function timeOf(iso: string): string {
+    const d = new Date(iso);
+    return Number.isFinite(d.getTime()) ? TIME_FMT.format(d) : "";
+}
+
+const DATE_FMT = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    month: "long",
+    day: "numeric",
+});
+
+/** 색만으로 사람을 구분하지 않게, 아바타는 항상 이름과 나란히 놓는다 */
+function Avatar({ userId }: { userId: string }) {
+    const { hue, initial } = avatarOf(userId);
+    return (
+        <span
+            aria-hidden
+            className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full text-caption font-bold text-[var(--text-secondary)]"
+            style={{ background: tintOf(hue, 24) }}
+        >
+            {initial}
+        </span>
+    );
+}
 type Position = {
     user_id: string;
     choice: "long" | "short";
@@ -87,7 +124,7 @@ function linkify(text: string): ReactNode[] {
         const href = stripped.startsWith("http") ? stripped : `https://${stripped}`;
         parts.push(
             <a key={`${start}-${href}`} href={href} target="_blank" rel="noreferrer"
-                className="underline decoration-[var(--border-strong)] hover:decoration-[var(--color-accent)] hover:text-[var(--color-up-text)] break-anywhere">
+                className="underline decoration-current/40 underline-offset-2 hover:decoration-current break-anywhere">
                 {stripped}
             </a>
         );
@@ -303,6 +340,28 @@ export function Chat({
     const [unreadCount, setUnreadCount] = useState(0);
     const [positionsMap, setPositionsMap] = useState<Record<string, "long" | "short">>({});
 
+    // 날짜 구분선과 말풍선 묶음은 앞 메시지와 비교해야 나온다
+    const rows = useMemo(() => {
+        const today = kstDateStr();
+        return msgs.map((m, i) => {
+            const prev = i > 0 ? msgs[i - 1] : null;
+            const day = kstDateStr(new Date(m.created_at));
+            const prevDay = prev ? kstDateStr(new Date(prev.created_at)) : null;
+            const showDate = day !== prevDay;
+            const gap = prev
+                ? new Date(m.created_at).getTime() - new Date(prev.created_at).getTime()
+                : Infinity;
+            return {
+                m,
+                showDate,
+                dateLabel: day === today
+                    ? (isEn ? "Today" : "오늘")
+                    : DATE_FMT.format(new Date(m.created_at)),
+                grouped: !showDate && prev?.user_id === m.user_id && gap < GROUP_WINDOW_MS,
+            };
+        });
+    }, [msgs, isEn]);
+
     const handleScroll = () => {
         if (!listRef.current) return;
         const { scrollTop, scrollHeight, clientHeight } = listRef.current;
@@ -405,9 +464,14 @@ export function Chat({
     const labelColor = "text-text-tertiary";
     const pillBg = "bg-surface-hover text-text-tertiary";
     const inputBg =
-        "bg-surface-input text-text-primary placeholder-text-muted ring-1 ring-transparent focus:ring-[var(--color-brand)]";
+        [
+        "bg-[var(--surface-input)] text-[var(--text-primary)] placeholder-[var(--text-muted)]",
+        "caret-[var(--color-brand)] ring-1 ring-transparent",
+        "hover:ring-[var(--border-default)]",
+        "focus:ring-2 focus:ring-[var(--color-brand)] focus:hover:ring-[var(--color-brand)]",
+        "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:ring-transparent",
+    ].join(" ");
     const msgAreaBg = "bg-[var(--surface-sunken)]";
-    const emptyTextColor = "text-text-muted";
 
     return (
         <div
@@ -472,7 +536,7 @@ export function Chat({
                             whileHover={{ scale: userId ? 1.02 : 1 }}
                             whileTap={{ scale: userId ? 0.97 : 1 }}
                             disabled={!userId}
-                            className={`flex-1 py-2 rounded-control text-white text-xs font-bold transition-all ${
+                            className={`flex-1 py-2 rounded-control text-[var(--text-on-fill)] text-xs font-bold transition-all ${
                                 userId
                                     ? "bg-[var(--color-up-text)] hover:opacity-90 cursor-pointer"
                                     : "bg-surface-hover cursor-not-allowed opacity-50"
@@ -485,7 +549,7 @@ export function Chat({
                             whileHover={{ scale: userId ? 1.02 : 1 }}
                             whileTap={{ scale: userId ? 0.97 : 1 }}
                             disabled={!userId}
-                            className={`flex-1 py-2 rounded-control text-white text-xs font-bold transition-all ${
+                            className={`flex-1 py-2 rounded-control text-[var(--text-on-fill)] text-xs font-bold transition-all ${
                                 userId
                                     ? "bg-[var(--color-down-text)] hover:opacity-90 cursor-pointer"
                                     : "bg-surface-hover cursor-not-allowed opacity-50"
@@ -505,9 +569,9 @@ export function Chat({
                     onScroll={handleScroll}
                     className="absolute inset-0 overflow-y-auto px-3 py-2 scrollbar-hide"
                 >
-                    {msgs.length > 0 ? (
-                        <div className="space-y-0.5">
-                            {msgs.map((m) => {
+                    {rows.length > 0 ? (
+                        <div className="pb-1">
+                            {rows.map(({ m, showDate, dateLabel, grouped }) => {
                                 const userChoice = positionsMap[m.user_id];
                                 const isMe = m.user_id === userId;
                                 const identity = identityFor?.(m.user_id);
@@ -516,98 +580,50 @@ export function Chat({
                                     ?? (userChoice
                                         ? { label: userChoice === "long" ? "L" : "S", tone: userChoice === "long" ? "up" as const : "down" as const }
                                         : null);
-                                // 이름에서 색을 빼고 굵기로만 나를 구분한다. 층 배지가 이미
-                                // 색을 쓰고 있어 이름까지 물들이면 둘이 서로 경쟁한다.
-                                const nameColor = isMe ? "text-text-primary" : "text-text-tertiary";
-                                const contentColor = "text-text-secondary";
+                                const name = identity?.name ?? m.user_id.slice(0, 6);
                                 const msgReactions = reactions[m.id] ?? {};
                                 const hasReactions = Object.values(msgReactions).some((r) => r.count > 0);
                                 const isPickerOpen = pickerOpenId === m.id;
 
-                                return (
-                                    <motion.div
-                                        key={m.id}
-                                        initial={{ opacity: 0, y: 6 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="group relative py-[3px] min-w-0"
-                                    >
-                                        <div className="flex items-baseline gap-1.5">
-                                            {identity ? (
-                                                /* "8층 존버흑두루미" — 층을 닉네임에 붙여 한 덩어리로 읽히게 한다 */
-                                                <span className="text-caption font-semibold shrink-0">
-                                                    {badge && (
-                                                        <span
-                                                            className="tabular-nums"
-                                                            style={{ color: BADGE_TONE[badge.tone] }}
-                                                        >
-                                                            {badge.label}{" "}
-                                                        </span>
-                                                    )}
-                                                    <span className={nameColor}>{identity.name}</span>
-                                                    {isMe && (
-                                                        <span className="font-medium text-text-muted">
-                                                            {isEn ? " (me)" : " (나)"}
-                                                        </span>
-                                                    )}
-                                                </span>
-                                            ) : (
-                                                <>
-                                                    {/* 대시보드는 기존 L/S 배지. 폭을 고정해 이름이 세로로 정렬된다 */}
-                                                    {badge ? (
-                                                        <span
-                                                            className="text-caption font-bold px-1 py-[1px] rounded shrink-0 leading-none tabular-nums text-center min-w-[26px]"
-                                                            style={{
-                                                                background: tintOf(BADGE_TONE[badge.tone]),
-                                                                color: BADGE_TONE[badge.tone],
-                                                            }}
-                                                        >
-                                                            {badge.label}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="w-[26px] shrink-0" />
-                                                    )}
-                                                    <span className={`text-caption font-semibold shrink-0 ${nameColor}`}>
-                                                        {isMe ? (isEn ? "Me" : "나") : m.user_id.slice(0, 6)}
-                                                    </span>
-                                                </>
-                                            )}
-                                            <span className="text-caption shrink-0 text-[var(--border-strong)]">·</span>
-                                            <span className={`text-footnote whitespace-pre-wrap break-anywhere flex-1 ${contentColor}`}>
-                                                {linkify(m.content)}
-                                            </span>
-                                            {/* 예전엔 hover에서만 나타나는 "+"였다. 터치 기기엔 hover가 없어
-                                                기능이 있는지조차 알 수 없었다. 항상 보이게 두고, 아이콘도
-                                                "무언가 추가"가 아니라 "반응"으로 읽히는 것으로 바꿨다. */}
-                                            <button
-                                                onClick={() => openPicker(m.id, isPickerOpen)}
-                                                aria-label={isEn ? "Add reaction" : "반응 남기기"}
-                                                aria-expanded={isPickerOpen}
-                                                className={`shrink-0 w-7 h-7 -my-1 flex items-center justify-center rounded-chip transition-colors cursor-pointer ${
-                                                    isPickerOpen
-                                                        ? "bg-surface-hover text-text-primary"
-                                                        : "text-text-disabled hover:bg-surface-input hover:text-text-secondary"
-                                                }`}
-                                            >
-                                                <SmilePlus size={14} strokeWidth={1.9} />
-                                            </button>
-                                        </div>
+                                // 꼬리는 말풍선 묶음의 첫 장에만 — 카톡·당근이 쓰는 규칙
+                                const bubble = isMe
+                                    ? `bg-[var(--color-brand-strong)] text-[var(--text-on-fill)] ${grouped ? "rounded-card" : "rounded-card rounded-tr-tail"}`
+                                    : `bg-[var(--surface-input)] text-[var(--text-primary)] ${grouped ? "rounded-card" : "rounded-card rounded-tl-tail"}`;
 
+                                const reactionButton = (
+                                    <span className="relative shrink-0">
+                                        <button
+                                            onClick={() => openPicker(m.id, isPickerOpen)}
+                                            aria-label={isEn ? "Add reaction" : "반응 남기기"}
+                                            aria-expanded={isPickerOpen}
+                                            className={`grid h-7 w-7 place-items-center rounded-full transition-colors cursor-pointer ${
+                                                isPickerOpen
+                                                    ? "bg-[var(--surface-hover)] text-[var(--text-primary)]"
+                                                    : "text-[var(--text-disabled)] hover:bg-[var(--surface-input)] hover:text-[var(--text-secondary)]"
+                                            }`}
+                                        >
+                                            <SmilePlus size={14} strokeWidth={1.9} />
+                                        </button>
+
+                                        {/* 위로 열린다 — 최신 메시지는 스크롤 영역 맨 아래에 있어
+                                            아래로 열면 잘린다 */}
                                         <AnimatePresence>
                                             {isPickerOpen && (
                                                 <motion.div
-                                                    initial={{ opacity: 0, scale: 0.9, y: -4 }}
+                                                    initial={{ opacity: 0, scale: 0.92, y: 4 }}
                                                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                    exit={{ opacity: 0, scale: 0.9, y: -4 }}
+                                                    exit={{ opacity: 0, scale: 0.92, y: 4 }}
                                                     transition={{ duration: 0.12 }}
-                                                    className="absolute right-0 top-full mt-1 z-30 flex items-center gap-0.5 px-2 py-1.5 rounded-card bg-surface-elevated ring-1 ring-[var(--border-default)] shadow-xl"
+                                                    className={`absolute bottom-full z-30 mb-1.5 flex items-center gap-0.5 rounded-card bg-[var(--surface-elevated)] px-2 py-1.5 ring-1 ring-[var(--border-default)] shadow-xl ${
+                                                        isMe ? "left-0" : "right-0"
+                                                    }`}
                                                 >
                                                     {REACTION_EMOJIS.map((emoji) => (
                                                         <button
                                                             key={emoji}
                                                             onClick={() => toggleReaction(m.id, emoji)}
                                                             aria-pressed={msgReactions[emoji]?.mine ?? false}
-                                                            className="w-9 h-9 flex items-center justify-center rounded-control text-headline transition-transform cursor-pointer hover:scale-125 active:scale-110 hover:bg-surface-hover"
+                                                            className="grid h-9 w-9 place-items-center rounded-control text-[17px] transition-transform cursor-pointer hover:scale-125 active:scale-110 hover:bg-[var(--surface-hover)]"
                                                             style={
                                                                 msgReactions[emoji]?.mine
                                                                     ? { background: tintOf("var(--color-brand)", 18) }
@@ -620,42 +636,118 @@ export function Chat({
                                                 </motion.div>
                                             )}
                                         </AnimatePresence>
+                                    </span>
+                                );
 
-                                        {hasReactions && (
-                                            <div className="flex flex-wrap gap-1 mt-1 pl-[32px]">
-                                                {REACTION_EMOJIS.filter((e) => (msgReactions[e]?.count ?? 0) > 0).map((emoji) => {
-                                                    const r = msgReactions[emoji];
-                                                    return (
-                                                        <button
-                                                            key={emoji}
-                                                            onClick={() => toggleReaction(m.id, emoji)}
-                                                            aria-pressed={r.mine}
-                                                            className={`flex items-center gap-1 px-2 py-[3px] rounded-chip text-caption ring-1 transition-colors cursor-pointer active:scale-95 ${
-                                                                r.mine
-                                                                    ? "ring-[var(--color-brand)]/40 text-[var(--color-brand)]"
-                                                                    : "bg-surface-input ring-transparent text-text-tertiary hover:ring-[var(--border-default)]"
-                                                            }`}
-                                                            style={
-                                                                r.mine
-                                                                    ? { background: tintOf("var(--color-brand)", 14) }
-                                                                    : undefined
-                                                            }
-                                                        >
-                                                            <span className="text-footnote">{emoji}</span>
-                                                            <span className="font-semibold tabular-nums">{r.count}</span>
-                                                        </button>
-                                                    );
-                                                })}
+                                const reactionPills = hasReactions && (
+                                    <div className={`mt-1 flex flex-wrap gap-1 ${isMe ? "justify-end" : ""}`}>
+                                        {REACTION_EMOJIS.filter((e) => (msgReactions[e]?.count ?? 0) > 0).map((emoji) => {
+                                            const r = msgReactions[emoji];
+                                            return (
+                                                <button
+                                                    key={emoji}
+                                                    onClick={() => toggleReaction(m.id, emoji)}
+                                                    aria-pressed={r.mine}
+                                                    className={`flex items-center gap-1 rounded-chip px-2 py-[3px] text-caption ring-1 transition-colors cursor-pointer active:scale-95 ${
+                                                        r.mine
+                                                            ? "ring-[var(--color-brand)]/40 text-[var(--color-brand)]"
+                                                            : "bg-[var(--surface-input)] ring-transparent text-[var(--text-tertiary)] hover:ring-[var(--border-default)]"
+                                                    }`}
+                                                    style={r.mine ? { background: tintOf("var(--color-brand)", 14) } : undefined}
+                                                >
+                                                    <span className="text-footnote">{emoji}</span>
+                                                    <span className="font-bold tabular-nums">{r.count}</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                );
+
+                                const time = (
+                                    <span className="shrink-0 pb-0.5 text-caption tabular-nums text-[var(--text-muted)]">
+                                        {timeOf(m.created_at)}
+                                    </span>
+                                );
+
+                                return (
+                                    <div key={m.id}>
+                                        {showDate && (
+                                            <div className="flex items-center justify-center py-3">
+                                                <span className="rounded-full bg-[var(--surface-input)] px-2.5 py-1 text-caption font-medium text-[var(--text-muted)]">
+                                                    {dateLabel}
+                                                </span>
                                             </div>
                                         )}
-                                    </motion.div>
+
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 6 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            className={grouped ? "mt-0.5" : "mt-3 first:mt-0"}
+                                        >
+                                            {isMe ? (
+                                                <div className="flex justify-end pl-9">
+                                                    <div className="flex max-w-[88%] flex-col items-end">
+                                                        <div className="flex items-end gap-1">
+                                                            {reactionButton}
+                                                            {time}
+                                                            <div className={`min-w-0 px-3 py-2 text-body break-anywhere whitespace-pre-wrap ${bubble}`}>
+                                                                {linkify(m.content)}
+                                                            </div>
+                                                        </div>
+                                                        {reactionPills}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex gap-2">
+                                                    {grouped ? (
+                                                        <span className="w-7 shrink-0" />
+                                                    ) : (
+                                                        <Avatar userId={m.user_id} />
+                                                    )}
+                                                    <div className="min-w-0 flex-1">
+                                                        {!grouped && (
+                                                            <div className="mb-1 flex items-center gap-1.5">
+                                                                {badge && (
+                                                                    <span
+                                                                        className="text-caption font-bold tabular-nums"
+                                                                        style={{ color: BADGE_TONE[badge.tone] }}
+                                                                    >
+                                                                        {badge.label}
+                                                                    </span>
+                                                                )}
+                                                                <span className="truncate text-caption font-semibold text-[var(--text-tertiary)]">
+                                                                    {name}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        <div className="flex items-end gap-1">
+                                                            <div className={`min-w-0 max-w-[88%] px-3 py-2 text-body break-anywhere whitespace-pre-wrap ${bubble}`}>
+                                                                {linkify(m.content)}
+                                                            </div>
+                                                            {time}
+                                                            {reactionButton}
+                                                        </div>
+                                                        {reactionPills}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    </div>
                                 );
                             })}
                         </div>
                     ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <p className={`text-caption text-center px-4 leading-relaxed ${emptyTextColor}`}>
-                                {isEn ? <>No messages yet.<br />Take a position and start the conversation!</> : <>아직 메시지가 없어요.<br />오늘의 첫 포지션을 잡고 이야기해보세요!</>}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6">
+                            <span className="grid h-12 w-12 place-items-center rounded-full bg-[var(--surface-input)] text-[var(--text-disabled)]">
+                                <MessageSquare size={20} strokeWidth={1.8} />
+                            </span>
+                            <p className="text-center text-footnote leading-relaxed text-[var(--text-muted)]">
+                                {isEn ? (
+                                    <>No messages yet.<br />Be the first to say something.</>
+                                ) : (
+                                    <>아직 아무도 말을 걸지 않았어요.<br />첫 마디를 남겨보세요.</>
+                                )}
                             </p>
                         </div>
                     )}
@@ -712,7 +804,7 @@ export function Chat({
                             setHasText((prev) => (prev === filled ? prev : filled));
                         }}
                         onKeyDown={onKeyDown}
-                        className={`h-11 min-w-0 flex-1 rounded-full px-4 text-[16px] sm:text-label focus:outline-none transition-colors ${inputBg}`}
+                        className={`h-11 min-w-0 flex-1 rounded-full px-4 text-[16px] sm:text-label focus:outline-none transition-all duration-150 ${inputBg}`}
                         placeholder={isEn ? "Chat anonymously" : "익명으로도 채팅 가능"}
                         maxLength={2000}
                         disabled={!userId}
@@ -725,7 +817,7 @@ export function Chat({
                         aria-label={isEn ? "Send" : "전송"}
                         className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-all active:scale-95 ${
                             userId && hasText
-                                ? "bg-[var(--color-brand-strong)] text-white hover:opacity-92 cursor-pointer"
+                                ? "bg-[var(--color-brand-strong)] text-[var(--text-on-fill)] hover:opacity-92 cursor-pointer"
                                 : "bg-[var(--surface-hover)] text-[var(--text-muted)] ring-1 ring-[var(--border-default)] cursor-not-allowed active:scale-100"
                         }`}
                         disabled={!userId || !hasText}
