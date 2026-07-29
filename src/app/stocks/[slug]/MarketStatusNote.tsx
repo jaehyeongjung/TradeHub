@@ -59,9 +59,8 @@ export function MarketStatusNote({ roomId, isOpen, marketName, hours }: Props) {
                         </strong>
                         <LiveCount n={viewers} />
                         <strong className="font-bold text-[var(--text-primary)]">
-                            {"명이 아직 안 자고 있습니다. "}
+                            명이 아직 안 자고 있습니다.
                         </strong>
-                        위 가격은 종가가 아니라 마감 이후 매겨진 최신 가격이에요.
                     </>
                 )}
             </p>
@@ -81,7 +80,7 @@ export function MarketStatusNote({ roomId, isOpen, marketName, hours }: Props) {
                     <strong className="font-bold text-[var(--text-primary)]">
                         토큰은 계속 거래 중
                     </strong>
-                    이에요. 위 가격은 종가가 아니라 마감 이후 매겨진 최신 가격입니다.
+                    이에요.
                 </>
             )}
         </p>
