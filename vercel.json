@@ -1,3 +1,4 @@
 {
+    "regions": ["icn1"],
     "crons": [{ "path": "/api/news/collect", "schedule": "0 3 * * *" }]
 }

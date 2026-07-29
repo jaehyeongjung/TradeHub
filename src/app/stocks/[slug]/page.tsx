@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
     getStockToken,
-    getAllStockSlugs,
     getRelatedStockTokens,
     searchName,
     type StockToken,
@@ -16,16 +15,16 @@ import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
 import { Chat } from "@/features/chat/Chat";
 import { StockLiveData } from "./StockLiveData";
 
-// 가격이 HTML에 박혀야 하므로 정적 생성 + 60초 재검증
+// 첫 요청 때 렌더하고 60초간 캐시한다(ISR).
+//
+// generateStaticParams로 빌드 때 미리 만들면 안 된다 — 빌드는 미국 빌드 머신에서 돌고
+// 바이낸스는 그 IP를 451로 차단하므로, 가격이 빈 HTML이 그대로 굳는다. 트래픽이 없는
+// 종목은 구글봇이 첫 방문자가 되어 그 빈 HTML을 색인해 간다.
+// 서울 리전(vercel.json regions)에서 요청 시점에 렌더하면 시세가 HTML에 박힌다.
 export const revalidate = 60;
-// 바이낸스는 미국 IP를 지역 차단한다. 서울 리전에서 실행해 시세 fetch가 막히지 않게 한다.
 export const preferredRegion = "icn1";
 
 const SITE = "https://www.tradehub.kr";
-
-export function generateStaticParams() {
-    return getAllStockSlugs().map((slug) => ({ slug }));
-}
 
 /** "7월 29일 11:24" (KST). 검색 결과에 노출되는 신선도 신호로 쓴다. */
 function kstStamp(d: Date): string {
