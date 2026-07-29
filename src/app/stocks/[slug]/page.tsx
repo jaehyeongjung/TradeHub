@@ -11,7 +11,9 @@ import { getStockDetail, type StockDetail } from "@/shared/lib/stock-tokens.serv
 import { getMarketStatus } from "@/shared/lib/market-hours";
 import { fmtPrice, fmtCompactKrw } from "../format";
 
+import { ArrowRight } from "lucide-react";
 import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
+import { buttonClasses } from "@/shared/ui/button-styles";
 import { StockRoom } from "@/features/floors/StockRoom";
 import { StockLiveData } from "./StockLiveData";
 import { MarketStatusNote } from "./MarketStatusNote";
@@ -603,17 +605,22 @@ export default async function StockTokenPage({
             </section>
 
             <section className="mt-12">
-                <div className="rounded-card bg-gradient-to-br from-[var(--color-accent)]/15 to-transparent p-6 ring-1 ring-[var(--color-accent)]/25">
-                    <h2 className="text-base font-bold text-[var(--text-primary)]">차트로도 보고 싶다면</h2>
-                    <p className="mt-1.5 text-label leading-relaxed text-[var(--text-secondary)]">
+                {/* 그라데이션 + 초록 링을 걷어내고 다른 카드와 같은 규격으로 맞췄다.
+                    색은 버튼 하나만 쓴다 — 카드까지 물들이면 CTA가 묻힌다. */}
+                <div className={`${CARD} p-6`}>
+                    <h2 className="text-headline font-bold text-[var(--text-primary)]">
+                        차트로도 보고 싶다면
+                    </h2>
+                    <p className="mt-2 text-label leading-relaxed text-[var(--text-secondary)]">
                         TradeHub 대시보드에서 실시간 차트와 청산 데이터를 함께 확인하세요.
                     </p>
+                    {/* 모바일에선 폭을 꽉 채운다 — 엄지가 닿는 자리가 넓어야 한다 */}
                     <Link
                         href="/dashboard"
-                        className="mt-4 inline-flex items-center gap-1.5 rounded-control bg-[var(--color-accent)] px-5 py-3 text-label font-bold text-black transition-colors hover:opacity-90"
+                        className={`${buttonClasses({ size: "lg" })} mt-5 w-full sm:w-auto`}
                     >
                         실시간 대시보드 열기
-                        <span aria-hidden>→</span>
+                        <ArrowRight size={17} strokeWidth={2.4} aria-hidden />
                     </Link>
                 </div>
             </section>
@@ -639,9 +646,10 @@ export default async function StockTokenPage({
                 </div>
                 <Link
                     href="/stocks"
-                    className="mt-4 inline-block text-label font-medium text-[var(--text-tertiary)] transition-colors hover:text-[var(--color-up-text)]"
+                    className="mt-4 inline-flex items-center gap-1 text-label font-semibold text-[var(--text-tertiary)] transition-colors hover:text-[var(--color-brand)]"
                 >
-                    주식 토큰 실시간 가격 전체 보기 →
+                    주식 토큰 실시간 가격 전체 보기
+                    <ArrowRight size={14} strokeWidth={2.4} aria-hidden />
                 </Link>
             </section>
 

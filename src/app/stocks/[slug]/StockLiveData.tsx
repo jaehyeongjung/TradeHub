@@ -343,9 +343,16 @@ export function StockLiveData({
                             </span>
                         )}
                     </div>
-                    <div className="mt-1.5 text-caption leading-relaxed text-[var(--text-muted)]">
-                        마감 시점 토큰 가격 {fmtPrice(sessionClose, usdKrw)} 기준입니다. 해당 종목의
-                        정규장 종가가 아닙니다.
+                    {/* 위의 % 를 읽으려면 기준가를 알아야 한다. 문장 전체가 11px 흐린 글씨였을 땐
+                        정작 그 숫자가 안 보였다. 색을 얹으면 위의 등락 색과 경쟁하니
+                        밝기로만 끌어올린다 — text-primary는 다크에서 밝고 라이트에서 진하다. */}
+                    <div className="mt-2 text-footnote leading-relaxed text-[var(--text-muted)]">
+                        마감 시점 토큰 가격{" "}
+                        <strong className="font-bold tabular-nums text-[var(--text-primary)]">
+                            {fmtPrice(sessionClose, usdKrw)}
+                        </strong>{" "}
+                        기준입니다.
+                        <span className="text-caption"> 해당 종목의 정규장 종가가 아닙니다.</span>
                     </div>
                 </div>
             )}
