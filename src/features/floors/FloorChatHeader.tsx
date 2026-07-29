@@ -46,7 +46,9 @@ export function FloorChatHeader({
                         층을 등록하면 이름 옆에 층수가 붙어요
                     </span>
                 </div>
-                <Button size="sm" onClick={onEdit} disabled={myUserId === null}>
+                {/* 익명 로그인이 끝날 때까지 disabled로 두면 죽은 버튼처럼 보인다.
+                    색을 유지한 채 스피너만 돌려서 "곧 됩니다"로 읽히게 한다. */}
+                <Button size="sm" onClick={onEdit} loading={myUserId === null}>
                     층 등록
                 </Button>
             </div>

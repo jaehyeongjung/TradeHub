@@ -51,13 +51,11 @@ export function Button({
     children,
     ...rest
 }: Props) {
-    const isOff = disabled || loading;
-
     return (
         <button
             {...rest}
-            disabled={isOff}
-            data-loading={loading || undefined}
+            disabled={disabled || loading}
+            aria-busy={loading || undefined}
             className={[
                 "inline-flex shrink-0 items-center justify-center font-bold tracking-[-0.01em]",
                 "transition-[opacity,background-color,transform] duration-150",
@@ -65,9 +63,14 @@ export function Button({
                 "active:scale-[0.985]",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]",
                 SIZE[size],
-                isOff
-                    ? "bg-[var(--surface-input)] text-[var(--text-disabled)] cursor-not-allowed active:scale-100"
-                    : `${VARIANT[variant]} cursor-pointer`,
+                // loading은 "잠깐 기다려"라서 색을 유지한다. 색까지 빼면 고장난 버튼으로 읽힌다.
+                loading
+                    ? `${VARIANT[variant]} cursor-wait active:scale-100`
+                    : disabled
+                      // disabled 면을 surface-input으로 두면, 같은 색 바 위에 놓였을 때
+                      // 윤곽이 1.00:1로 사라진다. 한 단계 진한 면 + 테두리로 형태를 남긴다.
+                      ? "bg-[var(--surface-hover)] text-[var(--text-muted)] ring-1 ring-[var(--border-default)] cursor-not-allowed active:scale-100"
+                      : `${VARIANT[variant]} cursor-pointer`,
                 block ? "w-full" : "",
                 className,
             ].join(" ")}

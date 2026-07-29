@@ -128,6 +128,8 @@ export function Chat({
 
     const composingRef = useRef(false);
     const sendingRef = useRef(false);
+    // 보낼 게 있는지만 본다. 값을 state로 올리면 한 글자마다 리렌더된다.
+    const [hasText, setHasText] = useState(false);
 
     const scrollToBottom = () => {
         requestAnimationFrame(() => {
@@ -247,6 +249,7 @@ export function Chat({
                 });
             }
             if (inputRef.current) inputRef.current.value = "";
+            setHasText(false);
         } finally {
             setTimeout(() => (sendingRef.current = false), 0);
         }
@@ -704,22 +707,28 @@ export function Chat({
                         ref={inputRef}
                         onCompositionStart={() => (composingRef.current = true)}
                         onCompositionEnd={() => (composingRef.current = false)}
+                        onChange={(e) => {
+                            const filled = e.target.value.trim().length > 0;
+                            setHasText((prev) => (prev === filled ? prev : filled));
+                        }}
                         onKeyDown={onKeyDown}
                         className={`h-11 min-w-0 flex-1 rounded-full px-4 text-[16px] sm:text-label focus:outline-none transition-colors ${inputBg}`}
                         placeholder={isEn ? "Chat anonymously" : "익명으로도 채팅 가능"}
                         maxLength={2000}
                         disabled={!userId}
                     />
+                    {/* 메신저의 관습: 보낼 내용이 있을 때만 버튼에 색이 든다.
+                        비활성일 때도 면과 테두리를 남겨 버튼이 사라지지 않게 한다. */}
                     <button
                         type="button"
                         onClick={send}
                         aria-label={isEn ? "Send" : "전송"}
                         className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-all active:scale-95 ${
-                            userId
+                            userId && hasText
                                 ? "bg-[var(--color-brand-strong)] text-white hover:opacity-92 cursor-pointer"
-                                : "bg-surface-input text-text-disabled cursor-not-allowed active:scale-100"
+                                : "bg-[var(--surface-hover)] text-[var(--text-muted)] ring-1 ring-[var(--border-default)] cursor-not-allowed active:scale-100"
                         }`}
-                        disabled={!userId}
+                        disabled={!userId || !hasText}
                     >
                         <ArrowUp size={19} strokeWidth={2.6} />
                     </button>

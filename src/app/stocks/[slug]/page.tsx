@@ -410,16 +410,11 @@ export default async function StockTokenPage({
                 )}
             </section>
 
-            <p className="mt-3 px-1 text-caption leading-relaxed text-[var(--text-muted)]">
-                {stamp} 기준 시세로 페이지를 만들었고, 이후 값은 브라우저에서 실시간으로 갱신됩니다.
-                {detail.usdKrw !== null && (
-                    <>
-                        {" "}1달러 ={" "}
-                        {detail.usdKrw.toLocaleString("ko-KR", { maximumFractionDigits: 2 })}원 기준으로
-                        환산했어요. 실제 체결은 USDT로 이루어집니다.
-                    </>
-                )}
-            </p>
+            {detail.usdKrw !== null && (
+                <p className="mt-3 px-1 text-caption leading-relaxed text-[var(--text-muted)]">
+                    {`1달러 = ${detail.usdKrw.toLocaleString("ko-KR", { maximumFractionDigits: 2 })}원 기준으로 환산했어요. 실제 체결은 USDT로 이루어집니다.`}
+                </p>
+            )}
 
             {/* ── 층 단면도 + 대화방 ──
                 가격 다음 자리를 서술형 본문이 아니라 방에 준다. 가격만 확인하고 이탈하는

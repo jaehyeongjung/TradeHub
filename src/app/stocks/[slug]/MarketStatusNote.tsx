@@ -43,7 +43,7 @@ export function MarketStatusNote({ roomId, isOpen, marketName, hours }: Props) {
                 ) : (
                     <>
                         <strong className="font-bold text-[var(--text-primary)]">
-                            {marketName}는 닫혔지만 {viewers}명이 아직 안 잤습니다.
+                            {marketName}는 닫혔지만 {viewers}명이 아직 안 자고 있습니다.
                         </strong>{" "}
                         위 가격은 종가가 아니라 마감 이후 매겨진 최신 가격이에요.
                     </>
