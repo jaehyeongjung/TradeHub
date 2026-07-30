@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { activePageAtom } from "@/shared/store/atoms";
 import dynamic from "next/dynamic";
-import { ForceTabReturnReload } from "@/widgets/shared-modals/ForceTabReturnReload";
 
 function SimTradingSkeleton() {
     return (
@@ -112,7 +111,6 @@ export default function TradingClient() {
             <div className="pt-12 pb-5 px-5 bg-black min-w-[310px]">
                 <SimTradingPage />
             </div>
-            <ForceTabReturnReload />
         </>
     );
 }

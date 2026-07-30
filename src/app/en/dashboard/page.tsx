@@ -4,7 +4,6 @@ import { RealTimeSection } from "@/widgets/dashboard/RealTimeSection";
 import { DashBoard } from "@/widgets/dashboard/DashBoard";
 import { MobileSuggestModal } from "@/widgets/shared-modals/MobileSuggestModal";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
-import { ForceTabReturnReload } from "@/widgets/shared-modals/ForceTabReturnReload";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -49,7 +48,6 @@ export default function Page() {
             </main>
             <SeoFooter />
             <MobileSuggestModal />
-            <ForceTabReturnReload />
         </>
     );
 }
