@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
 import Image from "next/image";
+import Link from "next/link";
 
 const FEATURES_KO = [
     {
@@ -103,9 +104,9 @@ function MobilePageInner() {
                     </h1>
                     <p className={`text-[15px] leading-relaxed ${isLight ? "text-neutral-500" : "text-neutral-500"}`}>
                         {isEn ? (
-                            <>TradeHub is optimized for desktop.<br />Copy the link and open it on your PC.</>
+                            <>TradeHub is optimized for desktop.<br />Copy the link and open it on your PC —<br />or check <span className="text-emerald-500 font-semibold">stock token prices</span> right here.</>
                         ) : (
-                            <>TradeHub는 PC 환경에 최적화되어 있어요.<br />아래 주소를 복사해서 PC 브라우저에서 접속해보세요.</>
+                            <>TradeHub는 PC 환경에 최적화되어 있어요.<br />아래 주소를 복사해서 PC에서 접속하시고,<br /><span className="text-emerald-500 font-semibold">주식 토큰 시세</span>는 모바일에서도 바로 볼 수 있어요.</>
                         )}
                     </p>
                 </section>
@@ -136,9 +137,43 @@ function MobilePageInner() {
                     </div>
                 </div>
 
+                {/* 모바일에서 막지 않는 유일한 페이지. 여기서 길을 터주지 않으면 그냥 이탈한다. */}
+                <section className="mt-8">
+                    <p className={`text-[11px] font-bold uppercase tracking-widest mb-3 ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>
+                        {isEn ? "Available on mobile" : "모바일에서 바로 보기"}
+                    </p>
+                    <Link
+                        href="/stocks"
+                        className={`block border rounded-2xl p-5 transition-all duration-200 active:scale-[0.98] ${
+                            isLight
+                                ? "bg-white border-emerald-500/30 hover:border-emerald-500/50"
+                                : "bg-emerald-500/[0.06] border-emerald-500/25 hover:border-emerald-500/45"
+                        }`}
+                    >
+                        <div className="flex items-center gap-3.5">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-400">
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 3v18h18M7 15l4-4 3 3 5-6" />
+                                </svg>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className={`text-[14px] font-bold leading-tight ${isLight ? "text-neutral-900" : "text-white"}`}>
+                                    {isEn ? "Tokenized stock prices" : "주식 토큰 실시간 시세"}
+                                </p>
+                                <p className="text-[12px] text-neutral-500 mt-0.5">
+                                    {isEn ? "Samsung · SK Hynix · Tesla — 24h, mobile ready" : "삼성전자 · 하이닉스 · 테슬라 24시간 시세"}
+                                </p>
+                            </div>
+                            <svg className="w-4 h-4 shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </div>
+                    </Link>
+                </section>
+
                 <section className="mt-10">
                     <p className={`text-[11px] font-bold uppercase tracking-widest mb-4 ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>
-                        {isEn ? "Features" : "주요 기능"}
+                        {isEn ? "PC only" : "PC에서만 이용 가능"}
                     </p>
                     <div className="space-y-3">
                         {FEATURES.map((f) => (
