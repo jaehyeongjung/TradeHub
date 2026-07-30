@@ -154,26 +154,33 @@ export const CoinPriceBox = ({ boxId, defaultSymbol = "btcusdt", fadeDelay = 0 }
     };
 
     useEffect(() => {
-        const { data: sub } = supabase.auth.onAuthStateChange(
-            async (_e, session) => {
-                const uid = session?.user?.id ?? null;
-                setUserId(uid);
+        // 이 콜백은 supabase-js가 auth 락을 쥔 채로 실행한다.
+        // 여기서 supabase 쿼리를 await 하면, 그 쿼리가 토큰을 얻으려고 같은 락을
+        // 다시 요청하면서 자기가 쥔 락을 자기가 기다리게 된다. 락이 영영 안 풀리고
+        // 이후의 모든 supabase 호출(게시판·뉴스·채팅·접속자 수)이 조용히 멈춘다.
+        // 그래서 콜백은 동기로 끝내고, 쿼리는 다음 태스크로 빼낸다.
+        const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+            const uid = session?.user?.id ?? null;
+            setUserId(uid);
 
-                if (uid) {
-                    const { data: row } = await supabase
-                        .from("user_symbol_prefs")
-                        .select("symbol")
-                        .eq("user_id", uid)
-                        .eq("box_id", boxId)
-                        .maybeSingle();
-                    if (row?.symbol) setSymbol(row.symbol.toLowerCase());
-                    else setSymbol(initialSymbol);
-                } else {
-                    const loc = localStorage.getItem(`coin_box:${boxId}`);
-                    setSymbol(loc ?? initialSymbol);
-                }
-            },
-        );
+            if (!uid) {
+                const loc = localStorage.getItem(`coin_box:${boxId}`);
+                setSymbol(loc ?? initialSymbol);
+                return;
+            }
+
+            setTimeout(() => {
+                void supabase
+                    .from("user_symbol_prefs")
+                    .select("symbol")
+                    .eq("user_id", uid)
+                    .eq("box_id", boxId)
+                    .maybeSingle()
+                    .then(({ data: row }) => {
+                        setSymbol(row?.symbol ? row.symbol.toLowerCase() : initialSymbol);
+                    });
+            }, 0);
+        });
 
         (async () => {
             const { data } = await supabase.auth.getSession();
