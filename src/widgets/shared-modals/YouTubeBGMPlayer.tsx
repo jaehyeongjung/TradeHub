@@ -48,7 +48,7 @@ export type BGMTrack = {
 
 // 재생 가능한 BGM 트랙 목록 — 드롭다운으로 선택
 const DEFAULT_TRACKS: BGMTrack[] = [
-    { id: "jN9o-se_LpE", title: "Protoss Theme 2", titleEn: "Protoss Theme 2" },
+    { id: "jN9o-se_LpE", title: "Protoss Theme", titleEn: "Protoss Theme" },
     { id: "j23SO29LNWE", title: "Interstellar", titleEn: "Interstellar" },
 ];
 
@@ -68,6 +68,7 @@ export function YouTubeBGMPlayer({
     const isLight = useTheme();
     const playerRef = useRef<YTPlayer | null>(null);
     const rootRef = useRef<HTMLDivElement>(null);
+    const playerHostRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
     const isEn = pathname.startsWith("/en/");
 
@@ -76,15 +77,23 @@ export function YouTubeBGMPlayer({
 
     useEffect(() => {
         if (typeof window === "undefined") return;
+        let cancelled = false;
 
-        if (!window.YT || typeof window.YT.Player === "undefined") {
-            const tag = document.createElement("script");
-            tag.src = "https://www.youtube.com/iframe_api";
-            document.head.appendChild(tag);
-        }
+        const host = playerHostRef.current;
+        if (!host) return;
 
-        window.onYouTubeIframeAPIReady = () => {
-            new window.YT.Player("youtube-player-container", {
+        // YT.Player는 넘겨준 요소를 iframe으로 "교체"한다.
+        // React가 렌더한 노드를 주면 React가 기억하는 DOM이 사라져 재마운트가 깨지고,
+        // StrictMode처럼 effect가 두 번 도는 상황에서는 두 인스턴스가 같은 노드를 놓고
+        // 다투다 서로의 iframe을 destroy해버린다(그래서 iframe이 0개가 됐다).
+        // 그래서 effect마다 React가 모르는 전용 노드를 만들어 넘긴다.
+        const mount = document.createElement("div");
+        host.appendChild(mount);
+
+        const createPlayer = () => {
+            if (cancelled || playerRef.current) return;
+
+            new window.YT.Player(mount, {
                 videoId: tracks[0].id,
                 playerVars: {
                     autoplay: 1,
@@ -99,6 +108,10 @@ export function YouTubeBGMPlayer({
                 },
                 events: {
                     onReady: (event: { target: YTPlayer }) => {
+                        if (cancelled) {
+                            event.target.destroy();
+                            return;
+                        }
                         playerRef.current = event.target;
                         playerRef.current.setVolume(initialVolume);
                         setIsReady(true);
@@ -117,13 +130,38 @@ export function YouTubeBGMPlayer({
             });
         };
 
-        return () => {
-            if (playerRef.current) {
-                playerRef.current.destroy();
-                playerRef.current = null;
+        // onYouTubeIframeAPIReady는 스크립트가 처음 로드될 때 딱 한 번만 불린다.
+        // 재마운트 때는 window.YT가 이미 있어 스크립트를 다시 안 받고, 그래서 콜백도
+        // 다시 안 불린다. 여기서 콜백만 기다리면 플레이어가 영영 안 만들어져
+        // isReady가 false로 굳고 버튼이 전부 비활성으로 남는다.
+        if (window.YT && typeof window.YT.Player !== "undefined") {
+            createPlayer();
+        } else {
+            // 스크립트가 이미 오는 중이면 또 넣지 않는다
+            if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+                const tag = document.createElement("script");
+                tag.src = "https://www.youtube.com/iframe_api";
+                document.head.appendChild(tag);
             }
+            const prev = window.onYouTubeIframeAPIReady;
+            window.onYouTubeIframeAPIReady = () => {
+                prev?.();
+                createPlayer();
+            };
+        }
+
+        return () => {
+            cancelled = true;
+            setIsReady(false);
+            try {
+                playerRef.current?.destroy();
+            } catch {
+                // 이미 사라진 iframe이면 무시
+            }
+            playerRef.current = null;
+            mount.remove(); // 내가 만든 노드만 치운다
         };
-        // 플레이어는 최초 1회만 생성 — 트랙 전환은 loadVideoById로 처리
+        // 트랙 전환은 loadVideoById로 처리하므로 재생성하지 않는다
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -169,8 +207,10 @@ export function YouTubeBGMPlayer({
 
     return (
         <div ref={rootRef} className="relative w-full">
+            {/* 이 껍데기만 React가 소유한다. 실제 플레이어 노드는 effect가 안에 만든다. */}
             <div
-                id="youtube-player-container"
+                ref={playerHostRef}
+                id="youtube-player-host"
                 style={{ position: "fixed", top: "-1000px", left: "-1000px", width: "1px", height: "1px", zIndex: 0 }}
             />
 
