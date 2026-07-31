@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { stockTokens, searchName } from "@/shared/lib/stock-tokens";
+import { stockTokens } from "@/shared/lib/stock-tokens";
 import { getAllTradfiRows, type TradfiRow } from "@/shared/lib/stock-tokens.server";
 import { getUsdKrw } from "@/shared/lib/fx";
 import { fmtUsd, formatKrw, fmtPrice, fmtCompactKrw as fmtCompactKrwShared } from "./format";
@@ -14,7 +14,7 @@ export const preferredRegion = "icn1";
 
 const SITE = "https://www.tradehub.kr";
 
-const TITLE = "주식 토큰 실시간 가격 — 삼전·하이닉스·테슬라 24시간 야간 시세";
+const TITLE = "삼전·하이닉스·현대차 24시간 실시간 가격 — 장 마감 후 야간 시세";
 
 /** "7월 29일 11:24" (KST). 시세 페이지의 신선도 신호. */
 function kstStamp(d: Date): string {
@@ -31,14 +31,14 @@ function kstStamp(d: Date): string {
 }
 
 const KEYWORDS = [
-    "주식 토큰",
-    "토큰화 주식",
     "삼전 실시간주가",
     "삼전 실시간 가격",
     "삼성전자 토큰",
     "하이닉스 실시간가격",
-    "테슬라 실시간",
-    "엔비디아 실시간",
+    "SK하이닉스 야간",
+    "현대차 실시간가격",
+    "주식 토큰",
+    "토큰화 주식",
     "24시간 주식 거래",
     "야간 주가",
     "시간외 주가",
@@ -52,11 +52,11 @@ export async function generateMetadata(): Promise<Metadata> {
     const bySymbol = new Map(rows.map((r) => [r.base, r]));
 
     // 검색 결과에 실제 숫자가 보이면 시세 질의에서 클릭률이 크게 오른다
-    const highlights = ["SAMSUNG", "SKHYNIX", "TSLA"]
+    const highlights = ["SAMSUNG", "SKHYNIX", "HYUNDAI"]
         .map((sym) => {
             const row = bySymbol.get(sym);
             if (!row) return null;
-            const label = { SAMSUNG: "삼성전자", SKHYNIX: "SK하이닉스", TSLA: "테슬라" }[sym];
+            const label = { SAMSUNG: "삼성전자", SKHYNIX: "SK하이닉스", HYUNDAI: "현대차" }[sym];
             return `${label} ${fmtPrice(row.price, usdKrw)}`;
         })
         .filter((v): v is string => v !== null);
@@ -65,7 +65,7 @@ export async function generateMetadata(): Promise<Metadata> {
         highlights.length > 0
             ? `${kstStamp(new Date())} 기준 ${highlights.join(", ")}.`
             : null,
-        "바이낸스 주식 토큰(토큰화 주식) 전 종목의 실시간 가격을 원화로 한눈에. 삼성전자·SK하이닉스·현대차부터 테슬라·엔비디아까지, 한국과 미국 증시가 문을 닫은 새벽과 주말에도 24시간 움직이는 시세를 무료로 확인하세요.",
+        "삼성전자·SK하이닉스·현대차의 24시간 실시간 가격을 원화로 확인하세요. KRX 정규장이 끝난 저녁과 새벽, 주말에도 가격이 계속 움직입니다. 미국 반도체 섹터가 움직이는 밤 시간대의 흐름을 다음 날 시초가 전에 미리 볼 수 있습니다.",
     ]
         .filter(Boolean)
         .join(" ");
@@ -159,9 +159,10 @@ export default async function StocksHubPage() {
     const now = new Date();
     const stamp = kstStamp(now);
 
+    // 한국 3종만 다룬다. 해외 종목은 개별 페이지도 목록도 두지 않는다 —
+    // 이름만 바뀐 템플릿 페이지가 24개 쌓여 애드센스 "가치가 별로 없는 콘텐츠"
+    // 지적을 받았고, 실제 방문도 한국 종목에만 몰려 있었다.
     const korean = rows.filter((r) => r.isKorean);
-    const featured = rows.filter((r) => r.slug && !r.isKorean);
-    const rest = rows.filter((r) => !r.slug && !r.isKorean);
 
     // 시세 페이지는 "언제 기준 숫자인가"가 곧 품질이다
     const webPage = {
@@ -266,59 +267,6 @@ export default async function StocksHubPage() {
 
             <AdSenseUnit slot="7318540125" className="my-10" />
 
-            {featured.length > 0 && (
-                <section className="mt-12">
-                    <h2 className="text-lg font-bold tracking-tight">주요 해외 종목</h2>
-                    <CardGrid rows={featured} usdKrw={usdKrw} />
-                </section>
-            )}
-
-            {rest.length > 0 && (
-                <section className="mt-12">
-                    {/* 100개 넘는 카드를 한 번에 펼치면 모바일에서 스크롤이 끝나지 않는다.
-                        details를 쓰면 JS 없이 접히고, 내용은 HTML에 남아 크롤러도 읽는다. */}
-                    <details className="group">
-                        <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-                            <span>
-                                <span className="text-lg font-bold tracking-tight">전체 종목</span>
-                                <span className="mt-1.5 block text-label leading-relaxed text-[var(--text-tertiary)]">
-                                    거래대금 순 · 총 {rows.length}개 종목
-                                </span>
-                            </span>
-                            <span className="flex h-9 shrink-0 items-center gap-1 rounded-control bg-[var(--surface-input)] px-3 text-footnote font-bold text-[var(--text-secondary)]">
-                                <span className="group-open:hidden">펼치기</span>
-                                <span className="hidden group-open:inline">접기</span>
-                                <span className="transition-transform duration-200 group-open:rotate-180" aria-hidden>
-                                    ▾
-                                </span>
-                            </span>
-                        </summary>
-                        <CardGrid rows={rest} usdKrw={usdKrw} />
-                    </details>
-                </section>
-            )}
-
-            {/* 앵커 텍스트에 키워드를 담은 내부 링크. 크롤러에게 각 페이지의 주제를 알려주고
-                "삼전 실시간 가격" 같은 질의로 개별 페이지가 뜨도록 돕는다. */}
-            <section className="mt-16">
-                <h2 className="text-lg font-bold tracking-tight">종목별 실시간 가격 바로가기</h2>
-                <p className="mt-1.5 text-label leading-relaxed text-[var(--text-tertiary)]">
-                    종목마다 원화 환산 가격, 정규장 마감 이후 변동률, 투자자 대화방이 있는 개별
-                    페이지를 제공합니다.
-                </p>
-                <ul className="mt-4 flex flex-wrap gap-2">
-                    {stockTokens.map((t) => (
-                        <li key={t.slug}>
-                            <Link
-                                href={`/stocks/${t.slug}`}
-                                className="inline-block rounded-control bg-[var(--surface-card)] px-3 py-2 text-footnote font-medium text-[var(--text-secondary)] ring-1 ring-[var(--border-subtle)] transition-colors hover:text-[var(--text-primary)] hover:ring-[var(--border-strong)]"
-                            >
-                                {searchName(t)} 실시간 가격
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </section>
 
             <section className="mt-16">
                 <h2 className="text-lg font-bold tracking-tight">
@@ -335,15 +283,16 @@ export default async function StocksHubPage() {
                     <Link href="/stocks/samsung" className="font-medium text-[var(--color-up-text)] hover:underline">
                         삼전 실시간 가격
                     </Link>
-                    은 KRX가 닫힌 새벽에도 갱신되고,{" "}
-                    <Link href="/stocks/nvidia" className="font-medium text-[var(--color-up-text)] hover:underline">
-                        엔비디아 실시간 가격
+                    은 KRX가 닫힌 새벽에도 갱신되고, 엔비디아·마이크론 실적이 나오는 한국 새벽
+                    시간대의 반응은{" "}
+                    <Link href="/stocks/sk-hynix" className="font-medium text-[var(--color-up-text)] hover:underline">
+                        하이닉스 실시간 가격
                     </Link>
-                    은 실적 발표가 나오는 한국 새벽 시간대의 반응을 그대로 보여줍니다.{" "}
-                    <Link href="/stocks/tesla" className="font-medium text-[var(--color-up-text)] hover:underline">
-                        테슬라 실시간 가격
+                    에 가장 먼저 드러납니다. 관세·환율 뉴스에 민감한{" "}
+                    <Link href="/stocks/hyundai" className="font-medium text-[var(--color-up-text)] hover:underline">
+                        현대차 실시간 가격
                     </Link>
-                    처럼 국내 보유자가 많은 종목은 미국 장이 열리기 전 방향을 가늠하는 데 쓰입니다.
+                    도 워싱턴발 발표가 나오는 새벽에 먼저 움직입니다.
                 </p>
             </section>
 

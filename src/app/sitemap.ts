@@ -1,6 +1,4 @@
 import type { MetadataRoute } from "next";
-import { getAllNewsIds } from "@/shared/lib/news";
-import { getAllPostIds } from "@/shared/lib/posts";
 import { guides } from "@/shared/lib/guides";
 import { guidesEn } from "@/shared/lib/guides-en";
 import { stockTokens } from "@/shared/lib/stock-tokens";
@@ -8,21 +6,10 @@ import { stockTokens } from "@/shared/lib/stock-tokens";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const base = "https://www.tradehub.kr";
 
-    const newsItems = await getAllNewsIds(500);
-    const newsSitemap: MetadataRoute.Sitemap = newsItems.map((news) => ({
-        url: `${base}/news/${news.id}`,
-        lastModified: new Date(news.published_at),
-        changeFrequency: "daily",
-        priority: 0.7,
-    }));
-
-    const postItems = await getAllPostIds(1000);
-    const postsSitemap: MetadataRoute.Sitemap = postItems.map((post) => ({
-        url: `${base}/posts/${post.id}`,
-        lastModified: new Date(post.created_at),
-        changeFrequency: "weekly",
-        priority: 0.6,
-    }));
+    // /news/[id]와 /posts/[id]는 제거했다. 둘 다 사이트 안에서 도달할 경로가 없는
+    // 고아 페이지였는데(뉴스는 원문 링크만, 게시글은 모달로 보여준다) 사이트맵으로만
+    // 각각 500·1,000개가 색인돼 애드센스 "가치가 별로 없는 콘텐츠" 판정을 받았다.
+    // 되살릴 거면 페이지에 실제 읽을거리를 채운 뒤에 사이트맵에 다시 넣는다.
 
     const guideSitemap: MetadataRoute.Sitemap = guides.map((guide) => ({
         url: `${base}/guide/${guide.slug}`,
@@ -124,8 +111,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...guideSitemap,
         ...enGuideSitemap,
         ...legalSitemap,
-        ...newsSitemap,
-        ...postsSitemap,
     ];
 }
 

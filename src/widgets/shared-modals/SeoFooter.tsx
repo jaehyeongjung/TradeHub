@@ -102,8 +102,7 @@ export function SeoFooter() {
                             {!isEn && <GuideLink href="/stocks">주식 토큰 실시간 가격</GuideLink>}
                             {!isEn && <GuideLink href="/stocks/samsung">삼전 실시간 가격</GuideLink>}
                             {!isEn && <GuideLink href="/stocks/sk-hynix">하이닉스 실시간 가격</GuideLink>}
-                            {!isEn && <GuideLink href="/stocks/tesla">테슬라 실시간 가격</GuideLink>}
-                            {!isEn && <GuideLink href="/stocks/nvidia">엔비디아 실시간 가격</GuideLink>}
+                            {!isEn && <GuideLink href="/stocks/hyundai">현대차 실시간 가격</GuideLink>}
                         </div>
                     </article>
 

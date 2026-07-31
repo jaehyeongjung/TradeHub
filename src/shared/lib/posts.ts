@@ -45,24 +45,7 @@ export async function deletePost(id: string) {
     return await supabase.from("posts").delete().eq("id", id);
 }
 
-export async function getPostById(id: string): Promise<Post | null> {
-    const { data, error } = await supabaseAdmin
-        .from("posts")
-        .select("id, title, body, user_id, created_at")
-        .eq("id", id)
-        .single();
-
-    if (error || !data) return null;
-    return data as Post;
-}
-
-export async function getAllPostIds(limit = 1000) {
-    const { data, error } = await supabaseAdmin
-        .from("posts")
-        .select("id, created_at")
-        .order("created_at", { ascending: false })
-        .limit(limit);
-
-    if (error) return [];
-    return data || [];
-}
+// getPostById / getAllPostIds는 제거했다. 게시글 상세 페이지(/posts/[id])와
+// 사이트맵 등록만을 위한 함수였는데, 그 페이지는 사이트 안에서 도달할 경로가 없는
+// 고아였다(게시판 위젯은 모달로 본문을 띄운다). 최대 1,000개가 색인되면서
+// 애드센스 "가치가 별로 없는 콘텐츠" 판정에 얹혔다.
