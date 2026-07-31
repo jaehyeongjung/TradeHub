@@ -3,6 +3,7 @@ import Script from "next/script";
 import RankingClient from "./RankingClient";
 import { fetchRankingData } from "@/shared/lib/fetchRanking";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
+import { PageExplainer } from "@/widgets/shared-modals/PageExplainer";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -105,6 +106,29 @@ const itemListJsonLd = {
             <main className="pt-12">
                 <RankingClient initialData={coins ?? []} />
             </main>
+            <PageExplainer
+                heading="시가총액 순위, 어떻게 보나요?"
+                lead="코인을 시가총액 순으로 줄 세운 표입니다. 가격이 비싼 순서가 아니라 '전체 규모'가 큰 순서라, 코인 하나의 가격만 보고 비싸다·싸다를 판단할 수 없는 이유가 여기 있습니다."
+                items={[
+                    {
+                        term: "시가총액",
+                        body: "현재가 × 유통량입니다. 1,000원짜리 코인이 100억 개 돌아다니면, 1억 원짜리 코인이 100개 있는 것보다 시장에서 훨씬 큽니다. 가격표가 아니라 규모를 보는 숫자입니다.",
+                    },
+                    {
+                        term: "거래량과 시가총액의 관계",
+                        body: "시가총액에 비해 거래량이 유난히 크면 지금 그 코인에 관심이 몰려 있다는 뜻입니다. 반대로 시가총액은 큰데 거래량이 적으면 사고팔기가 어려워 원하는 가격에 정리하기 힘들 수 있습니다.",
+                    },
+                    {
+                        term: "비트코인 도미넌스",
+                        body: "전체 암호화폐 시가총액에서 비트코인이 차지하는 비중입니다. 이 값이 오르면 자금이 비트코인으로 모이는 국면, 내려가면 알트코인으로 퍼지는 국면으로 해석하는 경우가 많습니다.",
+                    },
+                    {
+                        term: "유통량과 총발행량",
+                        body: "지금 시장에 풀린 물량과 앞으로 풀릴 전체 물량은 다릅니다. 아직 잠겨 있는 물량이 많으면 나중에 풀리면서 가격에 부담이 될 수 있어, 순위만 보고 판단하기 전에 함께 확인할 항목입니다.",
+                    },
+                ]}
+                closing="순위가 높다고 안전한 자산이라는 뜻은 아닙니다. 여기 표시되는 수치는 정보 제공이 목적이며 투자 권유가 아닙니다."
+            />
             <SeoFooter />
         </>
     );

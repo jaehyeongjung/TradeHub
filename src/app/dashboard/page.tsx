@@ -5,6 +5,7 @@ import { DashBoard } from "@/widgets/dashboard/DashBoard";
 import { MobileSuggestModal } from "@/widgets/shared-modals/MobileSuggestModal";
 import Script from "next/script";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
+import { PageExplainer } from "@/widgets/shared-modals/PageExplainer";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -217,6 +218,38 @@ export default function Home() {
                     <DashBoard />
                 </Suspense>
             </main>
+            <PageExplainer
+                heading="이 화면의 지표들, 어떻게 읽나요?"
+                lead="대시보드는 흩어져 있는 시장 지표를 한 화면에 모아둔 곳입니다. 각각 다른 것을 말해주기 때문에, 무엇을 보는 숫자인지 알고 봐야 쓸모가 있습니다."
+                items={[
+                    {
+                        term: "실시간 청산",
+                        body: "레버리지를 쓴 포지션이 증거금을 다 잃고 강제로 종료된 기록입니다. 한쪽 방향 청산이 몰리면 그 방향에 베팅한 사람들이 한꺼번에 정리됐다는 뜻이고, 그 물량 자체가 가격을 더 밀어내면서 연쇄 청산으로 이어지기도 합니다. 급등락 직후에 특히 몰립니다.",
+                        guide: "crypto-liquidation",
+                    },
+                    {
+                        term: "고래 거래",
+                        body: "한 번에 큰 금액이 체결된 주문입니다. 개인 투자자가 내기 어려운 규모라 기관이나 대형 투자자의 움직임으로 봅니다. 다만 거래소 간 이동이나 헤지 목적일 수도 있어, 방향을 그대로 따라가는 신호로 쓰기에는 위험합니다.",
+                        guide: "crypto-whale",
+                    },
+                    {
+                        term: "거래량 트리맵",
+                        body: "코인마다 사각형 크기로 규모를, 색으로 등락을 표시합니다. 목록을 위에서 아래로 훑지 않아도 지금 시장이 전반적으로 오르는지 내리는지, 특정 섹터만 움직이는지를 한눈에 알 수 있습니다.",
+                        guide: "crypto-treemap",
+                    },
+                    {
+                        term: "김치프리미엄",
+                        body: "국내 거래소 가격이 해외보다 얼마나 비싼지를 백분율로 나타낸 값입니다. 국내 수요가 몰리면 올라가고, 심리가 식으면 마이너스(역프)로 내려갑니다. 환율이 움직여도 값이 바뀌기 때문에 환율과 함께 봐야 합니다.",
+                        guide: "kimchi-premium",
+                    },
+                    {
+                        term: "공포탐욕지수",
+                        body: "변동성·거래량·소셜 언급량 등을 종합해 0에서 100 사이로 시장 심리를 나타냅니다. 낮으면 공포, 높으면 탐욕입니다. 가격을 예측하는 지표가 아니라 지금 분위기가 한쪽으로 쏠려 있는지를 확인하는 용도입니다.",
+                        guide: "fear-greed-index",
+                    },
+                ]}
+                closing="여기 표시되는 모든 수치는 정보 제공이 목적이며 투자 권유가 아닙니다. 투자 판단과 그 결과에 대한 책임은 이용자 본인에게 있습니다."
+            />
             <SeoFooter />
             <MobileSuggestModal />
         </>

@@ -34,6 +34,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     const legalSitemap: MetadataRoute.Sitemap = [
+        // 운영자·데이터 출처·수익 모델을 밝히는 페이지. 애드센스 심사에서 자주 요구된다.
+        { url: `${base}/about`,    lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
         { url: `${base}/terms`,    lastModified: new Date("2025-06-01"), changeFrequency: "yearly", priority: 0.4 },
         { url: `${base}/privacy`,  lastModified: new Date("2025-06-01"), changeFrequency: "yearly", priority: 0.4 },
         { url: `${base}/en/terms`, lastModified: new Date("2025-06-01"), changeFrequency: "yearly", priority: 0.4 },

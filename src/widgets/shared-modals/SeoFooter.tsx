@@ -169,6 +169,15 @@ export function SeoFooter() {
                         )}
                     </p>
                     <div className={`flex items-center gap-3 shrink-0 md:ml-4 text-[11px] ${taglineColor}`}>
+                        {/* 소개 페이지는 한국어만 있다 — 운영자·데이터 출처·문의처를 밝히는 곳 */}
+                        {!isEn && (
+                            <>
+                                <Link href="/about" className="hover:text-zinc-300 transition-colors whitespace-nowrap">
+                                    소개·문의
+                                </Link>
+                                <span>·</span>
+                            </>
+                        )}
                         <Link href={isEn ? "/en/privacy" : "/privacy"} className="hover:text-zinc-300 transition-colors whitespace-nowrap">
                             {isEn ? "Privacy Policy" : "개인정보처리방침"}
                         </Link>

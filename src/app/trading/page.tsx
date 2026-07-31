@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import TradingClient from "./TradingClient";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
+import { PageExplainer } from "@/widgets/shared-modals/PageExplainer";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -136,6 +137,36 @@ export default function TradingPage() {
                 {JSON.stringify(BREADCRUMB_JSONLD)}
             </Script>
             <TradingClient />
+            <PageExplainer
+                heading="모의투자, 무엇을 연습하는 건가요?"
+                lead="가상의 잔고로 바이낸스 실시간 시세를 보며 선물 거래를 연습하는 기능입니다. 실제 주문이 나가지 않고 돈도 오가지 않습니다. 선물 거래는 청산을 한 번 겪어보기 전에는 감이 잡히지 않는데, 그걸 실제 돈으로 배우면 대가가 너무 큽니다."
+                items={[
+                    {
+                        term: "레버리지",
+                        body: "가진 돈보다 큰 금액을 굴리는 배율입니다. 10배면 가격이 1% 움직일 때 내 손익은 10% 움직입니다. 수익만 커지는 게 아니라 손실도 같은 배로 커지고, 청산가가 진입가에 그만큼 가까워집니다.",
+                        guide: "leverage-trading",
+                    },
+                    {
+                        term: "청산",
+                        body: "가격이 반대로 움직여 증거금이 유지 수준을 밑돌면 포지션이 강제로 종료되고 증거금을 잃습니다. 레버리지가 높을수록 청산가가 가까워서, 잠깐의 변동에도 정리될 수 있습니다.",
+                        guide: "crypto-liquidation",
+                    },
+                    {
+                        term: "지정가·시장가·스탑 주문",
+                        body: "시장가는 지금 가격에 바로 체결되고, 지정가는 원하는 가격을 미리 걸어둡니다. 스탑은 특정 가격을 지나갈 때 발동합니다. 원하는 가격을 잡느냐, 확실한 체결을 택하느냐의 차이입니다.",
+                    },
+                    {
+                        term: "TP·SL (익절·손절)",
+                        body: "목표가에 닿으면 자동으로 이익을 실현하고(TP), 손실이 정한 선을 넘으면 자동으로 정리합니다(SL). 화면을 계속 보고 있을 수 없기 때문에, 진입할 때 함께 걸어두는 것이 기본입니다.",
+                    },
+                    {
+                        term: "교차 마진과 격리 마진",
+                        body: "격리는 그 포지션에 넣은 증거금만 위험하고, 교차는 계좌 잔고 전체가 증거금이 됩니다. 교차는 청산가가 멀어지는 대신 잘못되면 잔고 전체를 잃을 수 있습니다.",
+                        guide: "cross-isolated-margin",
+                    },
+                ]}
+                closing="모의투자 결과가 실제 거래의 성과를 보장하지 않습니다. 실제 시장에서는 체결 지연, 슬리피지, 수수료, 그리고 무엇보다 자기 돈이 걸렸을 때의 심리가 더해집니다."
+            />
             <SeoFooter />
         </>
     );
