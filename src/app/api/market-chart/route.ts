@@ -12,8 +12,11 @@ export type OhlcvBar = {
     volume: number;
 };
 
+/* range를 짧게 잡으면 장 초반에 봉이 몇 개 안 나온다. "1d"는 오늘 정규장
+   개장 이후만 주기 때문에, 개장 30분 뒤에 1분봉을 열면 봉이 15개뿐이었다.
+   야후 제약: 1m은 최대 7d, 2~15m은 60d, 60m은 730d까지 준다. */
 const INTERVAL_MAP: Record<string, { yahooInterval: string; range: string }> = {
-    "1m":  { yahooInterval: "2m",  range: "1d"  },
+    "1m":  { yahooInterval: "1m",  range: "5d"  },
     "5m":  { yahooInterval: "5m",  range: "5d"  },
     "15m": { yahooInterval: "15m", range: "1mo" },
     "1h":  { yahooInterval: "60m", range: "3mo" },

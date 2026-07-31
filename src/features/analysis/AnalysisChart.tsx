@@ -11,6 +11,7 @@ import {
     type LineStyle,
 } from "lightweight-charts";
 import type { Candle, AnalysisResult } from "@/shared/lib/technical-analysis/types";
+import { appFontStack } from "@/shared/lib/font";
 import type { Locale } from "@/shared/types/locale.types";
 
 type Props = {
@@ -40,7 +41,8 @@ export function AnalysisChart({ candles, overlay, isLight, locale = "ko" }: Prop
         const downColor   = isLight ? "#E0294A"  : "#F75467";
 
         const chart = createChart(el, {
-            layout: { background: { color: bg }, textColor, fontSize: 11 },
+            // fontFamily를 빼면 축 라벨이 맥 SF Pro / 윈도우 Trebuchet MS로 갈라진다
+            layout: { background: { color: bg }, textColor, fontSize: 11, fontFamily: appFontStack() },
             grid: {
                 vertLines: { color: gridColor },
                 horzLines: { color: gridColor },

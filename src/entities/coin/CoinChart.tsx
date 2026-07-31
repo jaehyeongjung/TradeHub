@@ -15,6 +15,7 @@ import {
     type LineWidth,
 } from "lightweight-charts";
 import { toKstUtcTimestamp } from "@/shared/lib/time";
+import { appFontStack } from "@/shared/lib/font";
 import { getBinanceRestBase, getBinanceWsBase } from "@/shared/lib/binance";
 import type { KlineRow, KlineMessage, Interval } from "@/shared/types/binance.types";
 import type { SimPosition } from "@/shared/types/sim-trading.types";
@@ -518,6 +519,8 @@ export function CoinChart({
                 textColor: isLight ? "#333333" : "#A8B4C8" ,
                 // 컴팩트(대시보드) 차트는 하단 x축 시간 라벨을 더 작게
                 fontSize: enableIndicators ? 11 : 9,
+                // 지정 안 하면 축 라벨이 맥 SF Pro / 윈도우 Trebuchet MS로 갈라진다
+                fontFamily: appFontStack(),
             },
             grid: {
                 vertLines: { color: isLight ? "#e0e0e0" : "#17243A" },
