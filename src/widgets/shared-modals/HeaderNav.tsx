@@ -61,6 +61,16 @@ function HeaderNavInner() {
                     </svg>
                     <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Chart Analysis" : "차트분석"}</span>
                 </Link>
+                {/* 탭 모양은 그대로 두고 색만 갈라놓는다 — /stocks는 코인 대시보드와
+                    다른 공간이라 누르기 전에 알아야 한다. 색은 .nav-stocks에 있다.
+                    /en 버전이 없어서 영어에서도 같은 경로로 보낸다.
+                    active 분기가 없는 건 /stocks에서 이 헤더가 null을 반환하기 때문이다. */}
+                <Link href="/stocks" className="nav-stocks flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+                    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Stocks" : "주식"}</span>
+                </Link>
             </nav>
 
             <div className="ml-auto flex items-center gap-2 flex-shrink-0">

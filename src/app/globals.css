@@ -61,6 +61,7 @@ html {
        그래서 버튼·선택·포커스는 파랑, 등락은 초록/빨강으로 나눈다. */
     --color-brand:        #4A9EFF;  /* 면·아이콘·포커스 링 */
     --color-brand-strong: #2B72DE;  /* 흰 글씨를 얹는 채움 버튼 (4.6:1) */
+    --color-brand-text:   #4A9EFF;  /* 파랑을 글자로 쓸 때. 다크는 원색이 이미 충분하다 */
     /* 채움 버튼 위의 글자색.
        text-white를 쓰면 안 된다 — globals.css의
        `html.light .text-white { color:#191F28 !important }` 규칙이
@@ -119,6 +120,7 @@ html.light {
     --color-accent-strong: #00875A;
     --color-brand:        #3182F6;
     --color-brand-strong: #1B64DA;  /* 흰 글씨 5.4:1 */
+    --color-brand-text:   #1B64DA;  /* #3182F6은 흰 배경에서 3.7:1이라 작은 글씨에 못 쓴다 */
     --text-on-fill:       #FFFFFF;
     --color-accent-text:  #00875A;  /* #00A676은 흰 배경에서 3.1:1 */
     /* 흰 배경에서 #3182F6은 3.7:1, #00A676은 3.4:1로 작은 글씨 기준(4.5:1) 미달.
@@ -789,6 +791,7 @@ html.light .landing-freedom:hover h3 {
     --color-accent-strong: var(--color-accent-strong);
     --color-brand:        var(--color-brand);
     --color-brand-strong: var(--color-brand-strong);
+    --color-brand-text:   var(--color-brand-text);
     --color-accent-text:  var(--color-accent-text);
     --color-text-on-fill: var(--text-on-fill);
     --color-info:       var(--color-info);
@@ -830,6 +833,20 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.01em;
+}
+
+/* 헤더의 /stocks 탭.
+   /stocks는 코인 대시보드와 목적이 다른 별도 공간이라(전용 헤더를 쓰고,
+   HeaderNav는 거기서 null을 반환한다) 누르기 전에 "여기서 나간다"는 게
+   보여야 한다. 나머지 탭이 전부 무채색이라 파랑 하나로 충분히 갈린다.
+   호버까지 CSS로 잡으려고 클래스로 뺐다 — 인라인 style로는 :hover를 못 건다. */
+.nav-stocks {
+    color: var(--color-brand-text);
+    background: color-mix(in srgb, var(--color-brand) 10%, transparent);
+}
+
+.nav-stocks:hover {
+    background: color-mix(in srgb, var(--color-brand) 18%, transparent);
 }
 
 /* Tailwind v4에는 break-anywhere가 없다. 채팅 본문의 긴 URL이 레이아웃을 밀어내지
