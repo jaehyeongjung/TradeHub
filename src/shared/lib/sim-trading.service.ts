@@ -8,8 +8,8 @@ import type {
     PositionSide,
     MarginMode,
 } from "@/shared/types/sim-trading.types";
+import { TAKER_FEE } from "@/shared/constants/sim-trading.constants";
 
-const TAKER_FEE = 0.0004;
 const MAINTENANCE_MARGIN_RATE = 0.004;
 const DEFAULT_BALANCE = 10000;
 

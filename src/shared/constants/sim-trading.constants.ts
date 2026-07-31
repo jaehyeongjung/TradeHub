@@ -36,3 +36,23 @@ export const SYMBOL_NAMES: Record<string, string> = {
 };
 
 export const LEVERAGE_PRESETS = [1, 2, 5, 10, 20, 50, 75, 100, 125] as const;
+
+/** 시장가 수수료율. 주문 명목가(notional) 기준으로 뗀다. */
+export const TAKER_FEE = 0.0004;
+
+/**
+ * 잔고에서 쓸 수 있는 최대 주문 명목가(notional).
+ *
+ * 주문 하나가 잡아먹는 돈은 증거금만이 아니라 `증거금 + 수수료`다:
+ *   비용 = N/leverage + N*TAKER_FEE  ≤  balance
+ *   →  N ≤ balance * leverage / (1 + leverage * TAKER_FEE)
+ *
+ * 예전엔 `balance * leverage`를 그대로 넣어서 증거금이 잔고 전액이 되고
+ * 수수료 낼 돈이 안 남아, "최대"를 누르면 항상 잔고 부족으로 튕겼다.
+ * 내림으로 자르는 건 반올림이 위로 튀면 다시 1원 초과가 나기 때문이다.
+ */
+export function maxNotional(balance: number, leverage: number, pct = 1): number {
+    if (balance <= 0 || leverage <= 0) return 0;
+    const n = (balance * pct * leverage) / (1 + leverage * TAKER_FEE);
+    return Math.floor(n * 100) / 100;
+}

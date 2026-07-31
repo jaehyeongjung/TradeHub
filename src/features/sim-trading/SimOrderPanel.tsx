@@ -8,7 +8,7 @@ import { simSymbolAtom, simPricesAtom, simMarginModeAtom } from "@/shared/store/
 import { calcLiqPrice, calcLiqPriceCross } from "@/shared/lib/sim-trading";
 import { AnimatedNumber } from "@/shared/ui/AnimatedNumber";
 import { useTheme } from "@/shared/hooks/useTheme";
-import { LEVERAGE_PRESETS } from "@/shared/constants/sim-trading.constants";
+import { LEVERAGE_PRESETS, TAKER_FEE, maxNotional } from "@/shared/constants/sim-trading.constants";
 import type { SimAccount, OpenPositionInput, PositionSide, OrderType, MarginMode } from "@/shared/types/sim-trading.types";
 
 interface Props {
@@ -108,17 +108,19 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
     const price = orderType === "MARKET" ? currentPrice : parseFloat(limitPrice) || 0;
     const amount = parseFloat(amountUsdt) || 0;
     const margin = leverage > 0 ? amount / leverage : 0;
+    const fee = amount * TAKER_FEE;
     const coinQty = price > 0 ? amount / price : 0;
     const estLiqPrice = (() => {
         if (price <= 0 || leverage <= 0) return 0;
         if (marginMode === "CROSS") {
-            const availBal = Math.max(0, balance - margin - amount * 0.0004);
+            const availBal = Math.max(0, balance - margin - fee);
             return calcLiqPriceCross(side, price, coinQty, margin, availBal);
         }
         return calcLiqPrice(side, price, leverage);
     })();
 
-    const handlePercentage = (pct: number) => { setAmountUsdt((balance * leverage * pct).toFixed(2)); setAmountError(false); };
+    // 증거금 + 수수료가 잔고를 넘지 않는 선까지만 채운다 (maxNotional 주석 참고)
+    const handlePercentage = (pct: number) => { setAmountUsdt(maxNotional(balance, leverage, pct).toFixed(2)); setAmountError(false); };
 
     const handleSubmit = async () => {
         setError("");
@@ -130,7 +132,8 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
             return;
         }
         if (orderType !== "MARKET" && (!limitPrice || parseFloat(limitPrice) <= 0)) { setError(isEn ? "Enter limit price" : "지정가를 입력하세요"); return; }
-        if (margin > balance) { setError(isEn ? "Insufficient balance" : "잔고가 부족합니다"); return; }
+        // 서버는 margin + fee로 검사한다. 여기서도 같이 봐야 통과시켜놓고 서버에서 튕기지 않는다.
+        if (margin + fee > balance) { setError(isEn ? "Insufficient balance" : "잔고가 부족합니다"); return; }
         const tp = tpPrice ? parseFloat(tpPrice) : null;
         const sl = slPrice ? parseFloat(slPrice) : null;
         if (side === "LONG") {
@@ -440,7 +443,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                             { label: isEn ? "Required Margin" : "필요 증거금", value: `${margin.toFixed(2)} USDT`, color: textSecondary },
                             { label: isEn ? "Quantity" : "거래 수량", value: `${coinQty.toFixed(6)} ${simSymbol.replace("USDT", "")}`, color: textTertiary },
                             { label: isEn ? "Est. Liq. Price" : "예상 청산가", value: estLiqPrice > 0 ? `$${estLiqPrice.toFixed(2)}` : "—", color: "text-orange-500" },
-                            { label: isEn ? "Trading Fee" : "거래 수수료", value: `${(amount * 0.0004).toFixed(3)} USDT`, color: textTertiary },
+                            { label: isEn ? "Trading Fee" : "거래 수수료", value: `${fee.toFixed(3)} USDT`, color: textTertiary },
                         ].map(({ label, value, color }) => (
                             <div key={label} className="flex items-center justify-between">
                                 <span className={`text-[10px] ${textTertiary}`}>{label}</span>
