@@ -1,0 +1,33 @@
+{
+  "name": "TradeHub 주식 - 삼전·하이닉스 24시간 시세",
+  "short_name": "TradeHub 주식",
+  "description": "삼성전자·SK하이닉스·현대차의 24시간 실시간 가격. KRX가 닫힌 저녁과 새벽, 주말에도 가격이 계속 움직입니다.",
+  "start_url": "/stocks",
+  "scope": "/stocks/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "lang": "ko",
+  "categories": ["finance"],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
