@@ -44,6 +44,18 @@ function isIos(): boolean {
     return ua.includes("Macintosh") && window.navigator.maxTouchPoints > 1;
 }
 
+/**
+ * 카카오톡·네이버 같은 인앱 브라우저는 홈 화면 추가를 지원하지 않는다.
+ * 국내 유입은 링크 공유를 타고 오는 경우가 많아 이 비율이 무시할 수 없다.
+ * 설치 안내 대신 "기본 브라우저로 열기"를 알려주는 게 맞다.
+ */
+function isInAppBrowser(): boolean {
+    if (typeof window === "undefined") return false;
+    return /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp/i.test(
+        window.navigator.userAgent,
+    );
+}
+
 function recentlyDismissed(): boolean {
     try {
         const at = Number(localStorage.getItem(DISMISS_KEY));
@@ -56,7 +68,7 @@ function recentlyDismissed(): boolean {
 
 export function InstallPrompt() {
     const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
-    const [showIosGuide, setShowIosGuide] = useState(false);
+    const [mode, setMode] = useState<"none" | "ios" | "inapp">("none");
     const [visible, setVisible] = useState(false);
 
     // 서비스 워커 등록 — scope를 /stocks/로 좁힌다.
@@ -79,7 +91,8 @@ export function InstallPrompt() {
         window.addEventListener("beforeinstallprompt", onBeforeInstall);
 
         const timer = setTimeout(() => {
-            if (isIos()) setShowIosGuide(true);
+            if (isInAppBrowser()) setMode("inapp");
+            else if (isIos()) setMode("ios");
             setVisible(true);
         }, SHOW_AFTER_MS);
 
@@ -106,10 +119,17 @@ export function InstallPrompt() {
         dismiss();
     };
 
-    // 안드로이드는 설치 이벤트가 잡혔을 때만, iOS는 안내만 띄운다.
-    // 둘 다 아니면(데스크톱 등) 아무것도 보여주지 않는다.
-    const canShow = visible && (deferred !== null || showIosGuide);
+    // 안드로이드는 설치 이벤트가 잡혔을 때만, iOS·인앱은 안내만 띄운다.
+    // 셋 다 아니면(데스크톱 등) 아무것도 보여주지 않는다.
+    const canShow = visible && (deferred !== null || mode !== "none");
     if (!canShow) return null;
+
+    const title =
+        mode === "inapp" ? "브라우저에서 열어주세요" : "홈 화면에 추가하기";
+    const lead =
+        mode === "inapp"
+            ? "지금 보시는 화면은 앱 안의 브라우저라 홈 화면에 추가할 수 없어요. 사파리나 크롬으로 열면 추가할 수 있습니다."
+            : "장 마감 후에도 삼전·하이닉스 가격이 궁금할 때, 검색하지 않고 바로 열 수 있어요.";
 
     return (
         <div className="fixed inset-x-0 bottom-0 z-50 px-3 pb-3 pointer-events-none">
@@ -124,12 +144,9 @@ export function InstallPrompt() {
                         className="h-10 w-10 shrink-0 rounded-[10px]"
                     />
                     <div className="min-w-0 flex-1">
-                        <p className="text-body font-bold text-[var(--text-primary)]">
-                            홈 화면에 추가하기
-                        </p>
+                        <p className="text-body font-bold text-[var(--text-primary)]">{title}</p>
                         <p className="mt-1 text-caption leading-relaxed text-[var(--text-tertiary)]">
-                            장 마감 후에도 삼전·하이닉스 가격이 궁금할 때, 검색하지 않고 바로
-                            열 수 있어요.
+                            {lead}
                         </p>
                     </div>
                     <button
@@ -149,26 +166,42 @@ export function InstallPrompt() {
                     </button>
                 </div>
 
-                {showIosGuide ? (
-                    <ol className="mt-3 space-y-1.5 border-t border-[var(--border-subtle)] pt-3 text-caption text-[var(--text-secondary)]">
-                        <li className="flex gap-2">
-                            <span className="text-[var(--text-muted)]">1.</span>
-                            <span>
-                                아래 <strong className="text-[var(--text-primary)]">공유</strong>{" "}
-                                버튼을 누르세요 (□에 화살표가 있는 아이콘)
-                            </span>
-                        </li>
-                        <li className="flex gap-2">
-                            <span className="text-[var(--text-muted)]">2.</span>
-                            <span>
-                                목록을 내려{" "}
-                                <strong className="text-[var(--text-primary)]">
-                                    홈 화면에 추가
-                                </strong>
-                                를 누르세요
-                            </span>
-                        </li>
-                    </ol>
+                {mode === "inapp" ? (
+                    <p className="mt-3 border-t border-[var(--border-subtle)] pt-3 text-caption leading-relaxed text-[var(--text-secondary)]">
+                        오른쪽 위(또는 아래)의{" "}
+                        <strong className="text-[var(--text-primary)]">⋯</strong> 버튼 →{" "}
+                        <strong className="text-[var(--text-primary)]">
+                            다른 브라우저로 열기
+                        </strong>
+                        를 누르면 됩니다.
+                    </p>
+                ) : mode === "ios" ? (
+                    <>
+                        <p className="mt-3 border-t border-[var(--border-subtle)] pt-3 text-caption text-[var(--text-tertiary)]">
+                            아이폰은 직접 눌러 추가해야 해요. 두 단계면 끝납니다.
+                        </p>
+                        <ol className="mt-2 space-y-1.5 text-caption text-[var(--text-secondary)]">
+                            <li className="flex gap-2">
+                                <span className="text-[var(--text-muted)]">1.</span>
+                                <span>
+                                    화면 아래{" "}
+                                    <strong className="text-[var(--text-primary)]">공유</strong>{" "}
+                                    버튼 (□ 위로 화살표가 나온 아이콘)
+                                </span>
+                            </li>
+                            <li className="flex gap-2">
+                                <span className="text-[var(--text-muted)]">2.</span>
+                                <span>
+                                    목록을 아래로 내려{" "}
+                                    <strong className="text-[var(--text-primary)]">
+                                        홈 화면에 추가
+                                    </strong>{" "}
+                                    → 우측 상단{" "}
+                                    <strong className="text-[var(--text-primary)]">추가</strong>
+                                </span>
+                            </li>
+                        </ol>
+                    </>
                 ) : (
                     <button
                         type="button"
