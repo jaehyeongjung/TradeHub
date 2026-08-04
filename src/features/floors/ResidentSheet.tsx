@@ -134,7 +134,9 @@ export function ResidentSheet({
                         role="dialog"
                         aria-modal="true"
                         aria-label={`${koreanName} 층 등록`}
-                        className="relative max-h-[92dvh] w-full max-w-[440px] overflow-y-auto overscroll-contain rounded-t-card bg-[var(--surface-card)] px-5 pt-3 shadow-2xl sm:max-h-[88dvh] sm:rounded-card sm:px-6"
+                        /* 데스크톱은 손잡이 바가 숨겨져(sm:hidden) 제목이 상단 모서리에
+                           바로 붙는다. 모바일은 손잡이가 여백 노릇을 하므로 pt가 갈린다. */
+                        className="relative max-h-[92dvh] w-full max-w-[440px] overflow-y-auto overscroll-contain rounded-t-card bg-[var(--surface-card)] px-5 pt-3 shadow-2xl sm:max-h-[88dvh] sm:rounded-card sm:px-6 sm:pt-7"
                         style={{ paddingBottom: "max(1.75rem, env(safe-area-inset-bottom))" }}
                         initial={{ y: "100%" }}
                         animate={{ y: 0 }}
@@ -147,7 +149,7 @@ export function ResidentSheet({
                             if (info.offset.y > 110 || info.velocity.y > 600) onClose();
                         }}
                     >
-                        <div className="mx-auto mb-4 h-1 w-9 shrink-0 rounded-full bg-[var(--border-strong)] sm:hidden" />
+                        <div className="mx-auto mb-5 h-1 w-9 shrink-0 rounded-full bg-[var(--border-strong)] sm:hidden" />
 
                         <div className="flex items-start justify-between">
                             <div>

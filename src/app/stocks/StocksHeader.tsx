@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useThemeToggle, THEME_ICON_PATH } from "@/shared/hooks/useThemeToggle";
-import { KakaoShareButton } from "@/shared/ui/KakaoShareButton";
+import { ShareButton } from "@/shared/ui/ShareButton";
 
 /**
  * /stocks 전용 헤더. 코인 대시보드용 네비게이션(트리맵·모의투자·랭킹 등)은
@@ -28,8 +28,9 @@ export function StocksHeader() {
                 </Link>
 
                 <div className="flex items-center gap-1">
-                    {/* 카카오 옐로우라 헤더에서 유일한 유색 요소 — 자연히 시선이 간다 */}
-                    <KakaoShareButton />
+                    {/* 무채색이다. 이 화면의 주인공은 가격이라, 헤더가 색으로 시선을 뺏으면 안 된다.
+                        카카오 노랑은 공유 시트 안 아이콘에만 남겼다. */}
+                    <ShareButton />
 
                     <button
                         type="button"
