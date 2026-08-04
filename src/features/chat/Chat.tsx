@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { supabase } from "@/shared/lib/supabase-browser";
@@ -47,7 +48,44 @@ const BADGE_TONE: Record<NonNullable<ChatIdentity["badge"]>["tone"], string> = {
 
 const REACTION_HINT_KEY = "th-chat-reaction-hint";
 
-const REACTION_EMOJIS = ["👍", "❤️", "🚀", "😂", "🔥"] as const;
+/** 채팅 반응 이모지.
+    앞 5개는 순서를 바꾸거나 빼면 안 된다 — DB(message_reactions)에 이미 이 값으로
+    반응이 쌓여 있는데, 아래 반응 칩이 이 목록을 filter해서 그리기 때문에
+    목록에서 빠진 이모지는 카운트가 남아 있어도 화면에서 사라진다. 추가는 뒤에만.
+    뒤 7개는 코인·주식 밈이라 이모지만 봐선 뜻을 모른다. 라벨을 같이 들고
+    다니면서 title/aria-label로 붙인다 (🦢가 흑두루미인 걸 알 방법이 없다). */
+const REACTIONS = [
+    { emoji: "👍", ko: "좋아요", en: "Like" },
+    { emoji: "❤️", ko: "하트", en: "Love" },
+    { emoji: "🚀", ko: "떡상", en: "To the moon" },
+    { emoji: "😂", ko: "웃김", en: "Funny" },
+    { emoji: "🔥", ko: "불장", en: "Fire" },
+    { emoji: "🐮", ko: "흑우", en: "Bagholder" },
+    { emoji: "🦢", ko: "흑두루미", en: "Mega bagholder" },
+    { emoji: "🐋", ko: "고래", en: "Whale" },
+    { emoji: "💎", ko: "다이아손", en: "Diamond hands" },
+    { emoji: "🤡", ko: "광대", en: "Clown" },
+    { emoji: "📉", ko: "떡락", en: "Dump" },
+    { emoji: "🫡", ko: "존버", en: "HODL" },
+] as const;
+
+const REACTION_EMOJIS: readonly string[] = REACTIONS.map((r) => r.emoji);
+
+/* 피커 실측 크기(6칸 × 2줄 + 이름 바). 내용이 고정이라 상수로 둔다 —
+   열기 전에 좌표를 정해야 깜빡임 없이 한 번에 그려진다.
+   REACTIONS 개수나 칸 크기를 바꾸면 여기도 같이 고쳐야 한다. */
+const PICKER_W = 242;
+const PICKER_H = 114;
+const PICKER_GAP = 6;
+const VIEWPORT_PAD = 8;
+
+const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), Math.max(min, max));
+
+/** 이모지 → 라벨. 키를 string으로 넓혀둔다 — DB에서 올라온 이모지는
+    REACTIONS의 리터럴 유니언이 아니라 그냥 string이다. */
+const REACTION_BY_EMOJI: ReadonlyMap<string, { ko: string; en: string }> = new Map(
+    REACTIONS.map((r) => [r.emoji as string, { ko: r.ko, en: r.en }]),
+);
 
 /** 같은 사람이 5분 안에 연달아 보낸 말은 한 묶음으로 본다 */
 const GROUP_WINDOW_MS = 5 * 60 * 1000;
@@ -321,8 +359,36 @@ export function Chat({
         }
     };
 
-    const openPicker = (messageId: string, isOpen: boolean) => {
-        setPickerOpenId(isOpen ? null : messageId);
+    /* 피커 하단 미리보기 바에 띄울 이모지. 피커는 한 번에 하나만 열리니까
+       메시지별로 들 필요 없이 하나로 충분하다. */
+    const [hoverEmoji, setHoverEmoji] = useState<string | null>(null);
+    /* 뷰포트 기준 좌표(position: fixed). 열 때 한 번 계산한다. */
+    const [pickerPos, setPickerPos] = useState<{ left: number; top: number } | null>(null);
+
+    const openPicker = (messageId: string, isOpen: boolean, anchor: HTMLElement) => {
+        if (isOpen) {
+            setPickerOpenId(null);
+            return;
+        }
+
+        /* 기본은 버튼 위. 위가 모자라면 아래로 뒤집고, 그래도 모자라면
+           (채팅 영역 자체가 피커보다 낮은 경우) 뷰포트 안으로 밀어넣는다.
+           세 단계를 다 거쳐야 "채팅이 위쪽에 있거나 짧을 때"가 전부 덮인다. */
+        const btn = anchor.getBoundingClientRect();
+        const roomAbove = btn.top - VIEWPORT_PAD;
+        const openUp = roomAbove >= PICKER_H + PICKER_GAP;
+
+        let top = openUp ? btn.top - PICKER_H - PICKER_GAP : btn.bottom + PICKER_GAP;
+        top = clamp(top, VIEWPORT_PAD, window.innerHeight - PICKER_H - VIEWPORT_PAD);
+
+        /* 가로도 같은 이유로 잘린다 — 오른쪽 끝 메시지에서 열면 화면 밖으로 나간다.
+           버튼 중앙에 맞춘 뒤 양끝을 잘라낸다. */
+        let left = btn.left + btn.width / 2 - PICKER_W / 2;
+        left = clamp(left, VIEWPORT_PAD, window.innerWidth - PICKER_W - VIEWPORT_PAD);
+
+        setPickerPos({ left, top });
+        setPickerOpenId(messageId);
+        setHoverEmoji(null);
         if (showReactionHint) dismissReactionHint();
     };
 
@@ -330,7 +396,16 @@ export function Chat({
         if (!pickerOpenId) return;
         const close = () => setPickerOpenId(null);
         document.addEventListener("click", close, { capture: true });
-        return () => document.removeEventListener("click", close, { capture: true });
+        /* fixed 좌표는 열 때 한 번만 잡으니까, 그 뒤에 스크롤·리사이즈가 나면
+           피커만 제자리에 남아 붕 뜬다. 그럴 땐 닫는다. */
+        const list = listRef.current;
+        window.addEventListener("resize", close);
+        list?.addEventListener("scroll", close);
+        return () => {
+            document.removeEventListener("click", close, { capture: true });
+            window.removeEventListener("resize", close);
+            list?.removeEventListener("scroll", close);
+        };
     }, [pickerOpenId]);
 
     const [myChoice, setMyChoice] = useState<"long" | "short" | null>(null);
@@ -473,6 +548,81 @@ export function Chat({
     ].join(" ");
     const msgAreaBg = "bg-[var(--surface-sunken)]";
 
+    /* 피커는 메시지 목록 안이 아니라 body 포털에 하나만 그린다.
+       목록은 overflow-y-auto라 그 안에서 띄우면 위로 열든 아래로 열든
+       컨테이너를 벗어나는 순간 잘리고, 목록 높이가 피커보다 낮으면
+       (방금 만든 방, 메시지 한두 개) 어느 방향으로도 답이 없다.
+       포털로 빼면 잘릴 상자 자체가 없어지고 뷰포트만 신경 쓰면 된다.
+       한 번에 하나만 열리므로 메시지마다 그릴 필요도 없다. */
+    const openMsgReactions = (pickerOpenId ? reactions[pickerOpenId] : undefined) ?? {};
+    /* mounted 게이트는 SSR 때문이다. 서버엔 document가 없어 포털을 못 만드는데,
+       typeof document로만 갈라두면 서버는 null·클라이언트는 포털을 그려서
+       하이드레이션이 어긋난다. 첫 페인트 뒤에 붙인다. */
+    const reactionPicker = !mounted
+        ? null
+        : createPortal(
+                  <AnimatePresence>
+                      {pickerOpenId && pickerPos && (
+                          <motion.div
+                              initial={{ opacity: 0, scale: 0.92, y: 4 }}
+                              animate={{ opacity: 1, scale: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.92, y: 4 }}
+                              transition={{ duration: 0.12 }}
+                              onMouseLeave={() => setHoverEmoji(null)}
+                              style={{ left: pickerPos.left, top: pickerPos.top, width: PICKER_W }}
+                              className="fixed z-[300] rounded-card bg-[var(--surface-elevated)] px-2 py-1.5 ring-1 ring-[var(--border-default)] shadow-xl"
+                          >
+                              {/* 한 줄로 늘어놓으면 채팅 폭을 넘는다. 6칸씩 끊는다 */}
+                              <div className="grid grid-cols-6 gap-0.5">
+                                  {REACTIONS.map(({ emoji, ko, en }) => {
+                                      const label = isEn ? en : ko;
+                                      return (
+                                          <button
+                                              key={emoji}
+                                              onClick={() => toggleReaction(pickerOpenId, emoji)}
+                                              onMouseEnter={() => setHoverEmoji(emoji)}
+                                              onFocus={() => setHoverEmoji(emoji)}
+                                              aria-pressed={openMsgReactions[emoji]?.mine ?? false}
+                                              aria-label={label}
+                                              className="grid h-9 w-9 place-items-center rounded-control text-[17px] transition-transform cursor-pointer hover:scale-125 active:scale-110 hover:bg-[var(--surface-hover)]"
+                                              style={
+                                                  openMsgReactions[emoji]?.mine
+                                                      ? { background: tintOf("var(--color-brand)", 18) }
+                                                      : undefined
+                                              }
+                                          >
+                                              {emoji}
+                                          </button>
+                                      );
+                                  })}
+                              </div>
+
+                              {/* 이름 바. 밈 이모지는 그림만 봐선 뜻을 모른다(🦢가 흑두루미인 걸
+                                  알 방법이 없다). title 툴팁은 1초쯤 기다려야 뜨고 OS가 그리는
+                                  회색 상자라, 슬랙처럼 피커 안에 직접 붙였다.
+                                  비었을 때도 같은 높이를 차지해야 피커가 안 흔들린다. */}
+                              <div className="mt-1 flex h-6 items-center gap-1.5 border-t border-[var(--border-subtle)] px-1 pt-1">
+                                  {hoverEmoji ? (
+                                      <>
+                                          <span className="text-[13px] leading-none">{hoverEmoji}</span>
+                                          <span className="truncate text-caption font-medium text-[var(--text-secondary)]">
+                                              {isEn
+                                                  ? REACTION_BY_EMOJI.get(hoverEmoji)?.en
+                                                  : REACTION_BY_EMOJI.get(hoverEmoji)?.ko}
+                                          </span>
+                                      </>
+                                  ) : (
+                                      <span className="text-caption text-[var(--text-disabled)]">
+                                          {isEn ? "Pick a reaction" : "반응 고르기"}
+                                      </span>
+                                  )}
+                              </div>
+                          </motion.div>
+                      )}
+                  </AnimatePresence>,
+                  document.body,
+              );
+
     return (
         <div
             className={`h-full flex flex-col w-full transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
@@ -590,10 +740,14 @@ export function Chat({
                                     ? `bg-[var(--color-brand-strong)] text-[var(--text-on-fill)] ${grouped ? "rounded-card" : "rounded-card rounded-tr-tail"}`
                                     : `bg-[var(--surface-input)] text-[var(--text-primary)] ${grouped ? "rounded-card" : "rounded-card rounded-tl-tail"}`;
 
+                                /* 피커 자체는 여기서 그리지 않는다. 이 자리는 스크롤 컨테이너
+                                   (overflow-y-auto) 안이라, 안에서 띄우면 방향을 어떻게 뒤집든
+                                   컨테이너 밖으로 나가는 순간 잘린다. 컴포넌트 맨 아래에서
+                                   body 포털로 하나만 띄우고, 여기선 위치만 넘긴다. */
                                 const reactionButton = (
-                                    <span className="relative shrink-0">
+                                    <span className="shrink-0">
                                         <button
-                                            onClick={() => openPicker(m.id, isPickerOpen)}
+                                            onClick={(e) => openPicker(m.id, isPickerOpen, e.currentTarget)}
                                             aria-label={isEn ? "Add reaction" : "반응 남기기"}
                                             aria-expanded={isPickerOpen}
                                             className={`grid h-7 w-7 place-items-center rounded-full transition-colors cursor-pointer ${
@@ -604,38 +758,6 @@ export function Chat({
                                         >
                                             <SmilePlus size={14} strokeWidth={1.9} />
                                         </button>
-
-                                        {/* 위로 열린다 — 최신 메시지는 스크롤 영역 맨 아래에 있어
-                                            아래로 열면 잘린다 */}
-                                        <AnimatePresence>
-                                            {isPickerOpen && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, scale: 0.92, y: 4 }}
-                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                    exit={{ opacity: 0, scale: 0.92, y: 4 }}
-                                                    transition={{ duration: 0.12 }}
-                                                    className={`absolute bottom-full z-30 mb-1.5 flex items-center gap-0.5 rounded-card bg-[var(--surface-elevated)] px-2 py-1.5 ring-1 ring-[var(--border-default)] shadow-xl ${
-                                                        isMe ? "left-0" : "right-0"
-                                                    }`}
-                                                >
-                                                    {REACTION_EMOJIS.map((emoji) => (
-                                                        <button
-                                                            key={emoji}
-                                                            onClick={() => toggleReaction(m.id, emoji)}
-                                                            aria-pressed={msgReactions[emoji]?.mine ?? false}
-                                                            className="grid h-9 w-9 place-items-center rounded-control text-[17px] transition-transform cursor-pointer hover:scale-125 active:scale-110 hover:bg-[var(--surface-hover)]"
-                                                            style={
-                                                                msgReactions[emoji]?.mine
-                                                                    ? { background: tintOf("var(--color-brand)", 18) }
-                                                                    : undefined
-                                                            }
-                                                        >
-                                                            {emoji}
-                                                        </button>
-                                                    ))}
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
                                     </span>
                                 );
 
@@ -656,6 +778,9 @@ export function Chat({
                                                     style={r.mine ? { background: tintOf("var(--color-brand)", 14) } : undefined}
                                                 >
                                                     <span className="text-footnote">{emoji}</span>
+                                                    {/* 칩에도 이름을 단다. 피커를 열어본 사람만 뜻을 아는 건
+                                                        의미가 없다 — 남의 반응을 보는 쪽이 훨씬 많다. */}
+                                                    <span>{isEn ? REACTION_BY_EMOJI.get(emoji)?.en : REACTION_BY_EMOJI.get(emoji)?.ko}</span>
                                                     <span className="font-bold tabular-nums">{r.count}</span>
                                                 </button>
                                             );
@@ -670,7 +795,14 @@ export function Chat({
                                 );
 
                                 return (
-                                    <div key={m.id}>
+                                    /* 간격은 이 바깥 div가 가진다. 예전엔 안쪽 motion.div가
+                                       `mt-3 first:mt-0`을 들고 있었는데, 메시지마다 이 래퍼가
+                                       하나씩 생기니 motion.div는 거의 항상 자기 래퍼의
+                                       :first-child였다 — 그래서 first:mt-0이 사실상 전부에 걸려
+                                       margin이 0으로 죽고, 말풍선이 붙어 보였다. 날짜 구분선이
+                                       있는 메시지만 예외적으로 간격이 있었던 게 그 증거다.
+                                       래퍼는 목록의 진짜 직계 자식이라 여기선 :first-child가 맞다. */
+                                    <div key={m.id} className={grouped ? "mt-1 first:mt-0" : "mt-4 first:mt-0"}>
                                         {showDate && (
                                             <div className="flex items-center justify-center py-3">
                                                 <span className="rounded-full bg-[var(--surface-input)] px-2.5 py-1 text-caption font-medium text-[var(--text-muted)]">
@@ -683,7 +815,6 @@ export function Chat({
                                             initial={{ opacity: 0, y: 6 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ duration: 0.2 }}
-                                            className={grouped ? "mt-0.5" : "mt-3 first:mt-0"}
                                         >
                                             {isMe ? (
                                                 <div className="flex justify-end pl-9">
@@ -826,6 +957,8 @@ export function Chat({
                     </button>
                 </div>
             </div>
+
+            {reactionPicker}
         </div>
     );
 }
