@@ -1324,10 +1324,30 @@ html.light .hero-no-text {
 }
 
 /* ============================================
-   AdSense 미충전 슬롯 숨기기
+   AdSense 슬롯
+
    광고가 채워지지 않으면 AdSense가 ins에 data-ad-status="unfilled"를 붙인다.
    이때 요소를 남겨두면 다크 테마 위에 큰 흰색 박스로 보이므로 접어준다.
+
+   주의: 채워지기 전에 display:none으로 감추면 안 된다. 크기가 0인 슬롯은
+   구글이 아예 채우지 않아서 광고가 영영 안 나온다. 그래서 자리는 그대로 두고,
+   "아직 광고가 아닌 상태"의 iframe만 감춰서 흰 깜빡임을 없앤다.
    ============================================ */
+ins.adsbygoogle {
+    /* iframe이 뜨기 전 잠깐 보이는 바탕. 흰색 대신 카드색으로 둔다. */
+    background-color: var(--surface-card);
+}
+
+/* 광고가 실제로 들어오기 전까지 iframe의 흰 바탕이 다크 테마 위로 튄다.
+   visibility만 끄면 자리와 크기는 유지돼 슬롯 충전에는 영향이 없다. */
+ins.adsbygoogle:not([data-ad-status="filled"]) > iframe {
+    visibility: hidden;
+}
+
+ins.adsbygoogle[data-ad-status="filled"] {
+    background-color: transparent;
+}
+
 ins.adsbygoogle[data-ad-status="unfilled"] {
     display: none !important;
 }
