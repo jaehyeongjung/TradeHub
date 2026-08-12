@@ -8,6 +8,16 @@ const BOT_UA = /Googlebot|bingbot|Baiduspider|YandexBot|DuckDuckBot|Slurp|facebo
 export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
+    // 삭제한 뉴스·게시글 상세(각 500·1,000개). 404로 두면 구글이 "일시적일 수도 있다"고 보고
+    // 몇 달씩 색인에 남겨 두므로, 영구 삭제를 뜻하는 410으로 알린다.
+    // robots.txt로 막으면 안 된다 — 크롤이 막히면 410을 읽지 못해 색인이 오히려 그대로 굳는다.
+    if (pathname.startsWith("/news") || pathname.startsWith("/posts")) {
+        return new NextResponse(
+            `<!doctype html><meta charset="utf-8"><title>삭제된 페이지</title><p>삭제된 페이지입니다. <a href="/">TradeHub 홈으로</a></p>`,
+            { status: 410, headers: { "content-type": "text/html; charset=utf-8" } },
+        );
+    }
+
     if (
         pathname.startsWith("/mobile") ||
         pathname.startsWith("/guide") ||
