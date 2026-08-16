@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { stockTokens } from "@/shared/lib/stock-tokens";
+import { stockTokens, stockTokensBySymbol } from "@/shared/lib/stock-tokens";
 import { getAllTradfiRows, type TradfiRow } from "@/shared/lib/stock-tokens.server";
 import { getUsdKrw } from "@/shared/lib/fx";
 import { fmtUsd, formatKrw, fmtPrice, fmtCompactKrw as fmtCompactKrwShared } from "./format";
@@ -37,6 +37,11 @@ const KEYWORDS = [
     "하이닉스 실시간가격",
     "SK하이닉스 야간",
     "현대차 실시간가격",
+    "삼성전기 실시간가격",
+    "한미반도체 실시간가격",
+    "LG전자 실시간가격",
+    "네이버 주가 실시간",
+    "코스피200 야간",
     "주식 토큰",
     "토큰화 주식",
     "24시간 주식 거래",
@@ -51,12 +56,13 @@ export async function generateMetadata(): Promise<Metadata> {
     const [rows, usdKrw] = await Promise.all([getAllTradfiRows(), getUsdKrw()]);
     const bySymbol = new Map(rows.map((r) => [r.base, r]));
 
-    // 검색 결과에 실제 숫자가 보이면 시세 질의에서 클릭률이 크게 오른다
+    // 검색 결과에 실제 숫자가 보이면 시세 질의에서 클릭률이 크게 오른다.
+    // 설명 길이 제한이 있어 대표 3종만 넣는다 — 늘리면 뒤가 잘린다.
     const highlights = ["SAMSUNG", "SKHYNIX", "HYUNDAI"]
         .map((sym) => {
             const row = bySymbol.get(sym);
             if (!row) return null;
-            const label = { SAMSUNG: "삼성전자", SKHYNIX: "SK하이닉스", HYUNDAI: "현대차" }[sym];
+            const label = stockTokensBySymbol.get(sym)?.koreanName ?? sym;
             return `${label} ${fmtPrice(row.price, usdKrw)}`;
         })
         .filter((v): v is string => v !== null);
@@ -65,7 +71,7 @@ export async function generateMetadata(): Promise<Metadata> {
         highlights.length > 0
             ? `${kstStamp(new Date())} 기준 ${highlights.join(", ")}.`
             : null,
-        "삼성전자·SK하이닉스·현대차의 24시간 실시간 가격을 원화로 확인하세요. KRX 정규장이 끝난 저녁과 새벽, 주말에도 가격이 계속 움직입니다. 미국 반도체 섹터가 움직이는 밤 시간대의 흐름을 다음 날 시초가 전에 미리 볼 수 있습니다.",
+        "삼성전자·SK하이닉스·현대차·삼성전기·한미반도체·LG전자·NAVER·KODEX 200의 24시간 실시간 가격을 원화로 확인하세요. KRX 정규장이 끝난 저녁과 새벽, 주말에도 가격이 계속 움직입니다. 미국 반도체 섹터가 움직이는 밤 시간대의 흐름을 다음 날 시초가 전에 미리 볼 수 있습니다.",
     ]
         .filter(Boolean)
         .join(" ");
