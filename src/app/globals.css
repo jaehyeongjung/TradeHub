@@ -1371,8 +1371,10 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
    있어서 스트리밍 SSR 중에는 React의 임시 컨테이너(div#S:n) 안에 들어가고,
    그동안은 body의 직계 자식이 아니다. 위치와 무관하게 잡고,
    MobileHeader만 표식으로 제외한다. */
-body:has([data-mobile-shell]) header:not([data-mobile-header]) {
-    display: none;
+@media (max-width: 1279.98px) {
+    body:has([data-mobile-shell], [data-mobile-chrome]) header:not([data-mobile-header]) {
+        display: none;
+    }
 }
 
 /* template.tsx의 페이지 전환 래퍼(.overflow-hidden)가 스크롤 컨테이너를 만들어
@@ -1380,6 +1382,8 @@ body:has([data-mobile-shell]) header:not([data-mobile-header]) {
    헤더가 같이 밀려 올라간다. overflow:clip은 잘라내기는 하되 스크롤 컨테이너를
    만들지 않아서 sticky가 살아난다.
    모바일 셸이 마운트된 동안에만 적용되므로 데스크톱 전환 애니메이션은 그대로다. */
-.overflow-hidden:has([data-mobile-shell]) {
-    overflow: clip;
+@media (max-width: 1279.98px) {
+    .overflow-hidden:has([data-mobile-shell], [data-mobile-chrome]) {
+        overflow: clip;
+    }
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import RankingClient from "@/app/ranking/RankingClient";
 import { fetchRankingData } from "@/shared/lib/fetchRanking";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
+import { MobileNav } from "@/widgets/mobile/MobileNav";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -39,7 +40,8 @@ export default async function Page() {
     const coins = await fetchRankingData();
     return (
         <>
-            <main className="pt-12">
+            <MobileNav />
+            <main className="xl:pt-12">
                 <RankingClient initialData={coins ?? []} />
             </main>
             <SeoFooter />

@@ -13,7 +13,37 @@ function getCoinLogoUrl(symbol: string) {
     return `https://bin.bnbstatic.com/static/assets/logos/${base}.png`;
 }
 
-interface DropdownPos { top: number; left: number; }
+interface DropdownPos { top: number; left: number; width: number; maxHeight: number }
+
+const DROPDOWN_W = 300;
+const EDGE = 8;
+
+/**
+ * 트리거 밑에 붙이되 화면 밖으로 나가지 않게 자른다.
+ *
+ * 폭 300 · left = 트리거 왼쪽을 그대로 쓰면 좁은 화면에서 오른쪽이 잘리고,
+ * 아래 공간이 모자라면 목록이 화면 밖으로 흐른다. 그래서 폭은 뷰포트에 맞춰
+ * 줄이고, 아래가 좁으면 위로 띄운다.
+ */
+function measure(rect: DOMRect): DropdownPos {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const width = Math.min(DROPDOWN_W, vw - EDGE * 2);
+    const left = Math.min(Math.max(EDGE, rect.left), vw - width - EDGE);
+
+    const below = vh - rect.bottom - EDGE * 2;
+    const above = rect.top - EDGE * 2;
+    // 위가 확실히 넉넉할 때만 뒤집는다 — 평소에는 아래로 여는 쪽이 자연스럽다.
+    const flip = below < 260 && above > below;
+
+    return {
+        top: flip ? Math.max(EDGE, rect.top - Math.min(above, 420) - EDGE) : rect.bottom + EDGE,
+        left,
+        width,
+        // 검색창(약 62px)을 뺀 목록 높이. 원래 340을 상한으로 둔다.
+        maxHeight: Math.max(140, Math.min(340, (flip ? above : below) - 62)),
+    };
+}
 
 export interface SymbolSelectorProps {
     value: string;
@@ -36,7 +66,7 @@ export function SymbolSelector({
     isLight = false,
 }: SymbolSelectorProps) {
     const [open, setOpen] = useState(false);
-    const [pos, setPos] = useState<DropdownPos>({ top: 0, left: 0 });
+    const [pos, setPos] = useState<DropdownPos>({ top: 0, left: 0, width: DROPDOWN_W, maxHeight: 340 });
     const [query, setQuery] = useState("");
     const buttonRef = useRef<HTMLButtonElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -46,10 +76,23 @@ export function SymbolSelector({
 
     const openDropdown = () => {
         if (!buttonRef.current) return;
-        const rect = buttonRef.current.getBoundingClientRect();
-        setPos({ top: rect.bottom + 8, left: rect.left });
+        setPos(measure(buttonRef.current.getBoundingClientRect()));
         setOpen(true);
     };
+
+    // position:fixed라 스크롤·회전이 일어나면 트리거와 어긋난다. 열려 있는 동안만 따라간다.
+    useEffect(() => {
+        if (!open) return;
+        const reposition = () => {
+            if (buttonRef.current) setPos(measure(buttonRef.current.getBoundingClientRect()));
+        };
+        window.addEventListener("resize", reposition);
+        window.addEventListener("scroll", reposition, true);
+        return () => {
+            window.removeEventListener("resize", reposition);
+            window.removeEventListener("scroll", reposition, true);
+        };
+    }, [open]);
 
     useEffect(() => {
         if (open) {
@@ -106,7 +149,7 @@ export function SymbolSelector({
     const dropdown = open ? (
         <div
             ref={dropdownRef}
-            style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 9999, width: 300 }}
+            style={{ position: "fixed", top: pos.top, left: pos.left, zIndex: 9999, width: pos.width }}
             className={`border rounded-2xl overflow-hidden ${dropdownBg}`}
         >
             <div className={`p-3 border-b ${isLight ? "border-neutral-100" : "border-zinc-800/60"}`}>
@@ -131,7 +174,7 @@ export function SymbolSelector({
                 </div>
             </div>
 
-            <div className="max-h-[340px] overflow-y-auto py-1.5 scrollbar-hide">
+            <div className="overflow-y-auto py-1.5 scrollbar-hide" style={{ maxHeight: pos.maxHeight }}>
                 {filtered.length === 0 ? (
                     <div className="text-center text-[11px] text-neutral-600 py-8">{isEn ? "No results found" : "검색 결과가 없습니다"}</div>
                 ) : (

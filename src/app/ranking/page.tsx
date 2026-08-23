@@ -4,6 +4,7 @@ import RankingClient from "./RankingClient";
 import { fetchRankingData } from "@/shared/lib/fetchRanking";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 import { PageExplainer } from "@/widgets/shared-modals/PageExplainer";
+import { MobileNav } from "@/widgets/mobile/MobileNav";
 
 const SITE = "https://www.tradehub.kr";
 
@@ -103,7 +104,8 @@ const itemListJsonLd = {
             <Script id="ld-ranking-page" type="application/ld+json" strategy="afterInteractive">
                 {JSON.stringify(webPageJsonLd)}
             </Script>
-            <main className="pt-12">
+            <MobileNav />
+            <main className="xl:pt-12">
                 <RankingClient initialData={coins ?? []} />
             </main>
             <PageExplainer

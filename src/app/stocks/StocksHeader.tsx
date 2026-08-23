@@ -1,15 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useThemeToggle, THEME_ICON_PATH } from "@/shared/hooks/useThemeToggle";
 import { ShareButton } from "@/shared/ui/ShareButton";
+import { NavSheet } from "@/widgets/mobile/NavSheet";
 
 /**
- * /stocks 전용 헤더. 코인 대시보드용 네비게이션(트리맵·모의투자·랭킹 등)은
- * 검색으로 유입된 주식 토큰 방문자에게 불필요한 선택지라 로고와 테마 전환만 남긴다.
+ * /stocks 전용 헤더. 코인 대시보드용 네비게이션(트리맵·모의투자·랭킹 등)을
+ * 가로로 늘어놓지 않는다 — 검색으로 유입된 주식 토큰 방문자에게는 불필요한
+ * 선택지라 헤더 표면에는 로고·공유·테마만 남긴다.
+ *
+ * 대신 메뉴 버튼 하나를 둔다. 전역 HeaderNav가 /stocks에서 null을 반환해서
+ * 이게 없으면 주식 화면에 들어온 뒤로는 코인 쪽으로 돌아갈 링크가 없다.
+ * 시트 내용은 모바일 헤더와 같은 NavSheet를 쓴다.
  */
 export function StocksHeader() {
     const { isDark, toggleTheme } = useThemeToggle();
+    const [menuOpen, setMenuOpen] = useState(false);
 
     return (
         <header
@@ -42,8 +50,23 @@ export function StocksHeader() {
                             <path d={isDark ? THEME_ICON_PATH.sun : THEME_ICON_PATH.moon} />
                         </svg>
                     </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setMenuOpen(true)}
+                        aria-label="메뉴 열기"
+                        aria-haspopup="dialog"
+                        aria-expanded={menuOpen}
+                        className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-chip text-[var(--text-tertiary)] transition-colors hover:text-[var(--text-primary)]"
+                    >
+                        <svg className="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+                            <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
+                        </svg>
+                    </button>
                 </div>
             </div>
+
+            <NavSheet open={menuOpen} onClose={() => setMenuOpen(false)} />
         </header>
     );
 }

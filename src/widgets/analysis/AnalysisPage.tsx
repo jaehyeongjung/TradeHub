@@ -358,11 +358,12 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
     const chartLegend = CHART_LEGEND[locale];
 
     return (
-        <div className="h-screen overflow-hidden flex flex-col bg-black px-5 pt-12 pb-3 2xl:pb-4">
-            <div className="flex flex-col gap-3 flex-1 min-h-0 mt-3">
+        <div className={`flex flex-col xl:h-screen xl:overflow-hidden px-3 sm:px-5 pt-0 xl:pt-12 pb-3 2xl:pb-4 ${isLight ? "bg-neutral-50" : "bg-black"}`}>
+            <div className="flex flex-col gap-2 sm:gap-3 flex-1 min-h-0 mt-2 sm:mt-3">
 
                 {/* 컨트롤 바 */}
-                <div className={`flex-shrink-0 rounded-xl ${cardBg} flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5`}>
+                <div className={`flex-shrink-0 rounded-xl ${cardBg} flex flex-wrap items-center gap-x-2 gap-y-2 md:gap-x-3 px-3 md:px-4 py-2 md:py-2.5`}>
+                    <div className="order-1 flex-shrink-0">
                     <SymbolSelector
                         value={symbol}
                         onChange={handleSymbolChange}
@@ -370,8 +371,12 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                         symbolNames={SYMBOL_NAMES}
                         isLight={isLight}
                     />
+                    </div>
 
-                    <div className={`inline-flex items-center rounded-xl p-1 gap-0.5 ${tabWrap}`}>
+                    {/* 배율 · 인터벌 · 뷰 탭. 모바일에서는 w-full로 둘째 줄을 차지하고
+                        넘치면 가로로 스크롤된다 — 줄바꿈으로 세 줄이 되는 것보다 낫다. */}
+                    <div className="order-3 md:order-2 flex w-full items-center gap-2 overflow-x-auto scrollbar-hide md:w-auto md:gap-3 md:overflow-visible">
+                    <div className={`inline-flex flex-shrink-0 items-center rounded-xl p-1 gap-0.5 ${tabWrap}`}>
                         {TIER_ORDER.map(t => {
                             const cfg = TIER_CONFIG[t];
                             const isActive = tier === t;
@@ -396,7 +401,7 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                     </div>
 
                     {/* 현재 인터벌 배지 */}
-                    <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium ${
+                    <div className={`hidden sm:flex flex-shrink-0 items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium ${
                         isLight ? "bg-neutral-100 text-neutral-500" : "bg-neutral-800/60 text-neutral-500"
                     }`}>
                         <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${currentTier.dot}`} />
@@ -404,7 +409,7 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                     </div>
 
                     {/* 모바일 차트/분석 탭 토글 */}
-                    <div className={`inline-flex items-center rounded-xl p-1 gap-0.5 xl:hidden ${tabWrap}`}>
+                    <div className={`inline-flex flex-shrink-0 items-center rounded-xl p-1 gap-0.5 xl:hidden ${tabWrap}`}>
                         {(["chart", "analysis"] as ViewTab[]).map(tab => (
                             <button
                                 key={tab}
@@ -418,12 +423,13 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                             </button>
                         ))}
                     </div>
+                    </div>
 
                     <button
                         type="button"
                         onClick={() => run(symbol, currentTier.interval, locale)}
                         disabled={anyLoading}
-                        className="ml-auto flex items-center gap-2 px-5 py-1.5 rounded-lg text-xs font-semibold active:scale-[0.97] disabled:cursor-not-allowed transition-all hover:opacity-90"
+                        className="order-2 md:order-3 ml-auto flex flex-shrink-0 items-center gap-2 px-4 md:px-5 py-1.5 rounded-lg text-xs font-semibold active:scale-[0.97] disabled:cursor-not-allowed transition-all hover:opacity-90"
                         style={{ background: "linear-gradient(90deg, #f7a600 0%, #e09500 100%)", color: "#000" }}
                     >
                         {loading ? (
@@ -450,7 +456,7 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
 
                         {/* 차트 */}
                         <div
-                            className={`h-full min-h-0 rounded-xl ${cardBg} overflow-hidden relative ${
+                            className={`h-[46vh] min-h-[260px] max-h-[420px] xl:h-full xl:min-h-0 xl:max-h-none rounded-xl ${cardBg} overflow-hidden relative ${
                                 activeTab === "analysis" ? "hidden xl:block" : ""
                             }`}
                         >
@@ -528,7 +534,7 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
                             <div
                                 ref={panelRef}
                                 onScroll={checkScroll}
-                                className="overflow-y-auto scrollbar-hide h-full"
+                                className="xl:overflow-y-auto scrollbar-hide xl:h-full"
                             >
                                 {loading && progress ? (
                                     /* 분석 진행 중 - 단계별 체크리스트 */
@@ -724,9 +730,9 @@ export function AnalysisPage({ locale = "ko" }: { locale?: Locale }) {
 
                     </div>
                 ) : candlesLoading ? (
-                    <div className={`flex-1 min-h-[400px] rounded-xl ${cardBg} overflow-hidden animate-pulse`} />
+                    <div className={`flex-1 min-h-[260px] xl:min-h-[400px] rounded-xl ${cardBg} overflow-hidden animate-pulse`} />
                 ) : (
-                    <div className={`flex-1 min-h-[400px] rounded-xl ${cardBg} px-6 flex flex-col items-center justify-center text-center`}>
+                    <div className={`flex-1 min-h-[260px] xl:min-h-[400px] rounded-xl ${cardBg} px-6 flex flex-col items-center justify-center text-center`}>
                         <p className="text-sm font-medium text-text-primary">{t.selectSymbol}</p>
                         <p className="mt-1 text-xs text-text-muted">{t.selectHint}</p>
                     </div>

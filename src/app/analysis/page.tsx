@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AnalysisPage } from "@/widgets/analysis/AnalysisPage";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 import { PageExplainer } from "@/widgets/shared-modals/PageExplainer";
+import { MobileNav } from "@/widgets/mobile/MobileNav";
 
 export const metadata: Metadata = {
     title: "코인 선물 차트 분석 · 손절가·진입가·손익비 자동계산 | TradeHub",
@@ -45,6 +46,7 @@ export const metadata: Metadata = {
 export default function Page() {
     return (
         <>
+            <MobileNav />
             <main>
                 <AnalysisPage />
             </main>

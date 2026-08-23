@@ -226,49 +226,6 @@ function TopMoversCard({ coins, isLight, isEn }: { coins: RankingCoin[]; isLight
     );
 }
 
-function MobileStatsStrip({ coins, isLight, isEn }: { coins: RankingCoin[]; isLight: boolean; isEn: boolean }) {
-    const stats = useMemo(() => {
-        if (!coins.length) return null;
-        const totalMcap = coins.reduce((s, c) => s + (c.market_cap || 0), 0);
-        const totalVol  = coins.reduce((s, c) => s + (c.total_volume || 0), 0);
-        const btc = coins.find((c) => c.id === "bitcoin");
-        const btcDom = btc && totalMcap ? (btc.market_cap / totalMcap) * 100 : 0;
-        const gainers = coins.filter((c) => (c.price_change_percentage_24h ?? 0) > 0).length;
-        return { totalMcap, totalVol, btcDom, gainers, losers: coins.length - gainers };
-    }, [coins]);
-
-    if (!stats) return null;
-
-    const bg  = isLight ? "bg-white border-neutral-200" : "bg-surface-card border-border-subtle";
-    const lbl = isLight ? "text-neutral-400"             : "text-text-muted";
-    const val = isLight ? "text-neutral-700"             : "text-text-secondary";
-
-    const items = [
-        { label: isEn ? "Mkt Cap" : "시가총액",     value: fmtLarge(stats.totalMcap) },
-        { label: isEn ? "24h Vol" : "24h 거래대금", value: fmtLarge(stats.totalVol) },
-        { label: isEn ? "BTC Dom" : "BTC 비중",     value: `${stats.btcDom.toFixed(1)}%` },
-        { label: isEn ? "Up/Down" : "상승/하락",     value: null, gainers: stats.gainers, losers: stats.losers },
-    ];
-
-    return (
-        <div className={`lg:hidden flex gap-3 mb-4 overflow-x-auto pb-1 scrollbar-hide`}>
-            {items.map((item, i) => (
-                <div key={i} className={`flex-none flex flex-col gap-0.5 px-3 py-2 rounded-xl border ${bg}`}>
-                    <span className={`text-[10px] whitespace-nowrap ${lbl}`}>{item.label}</span>
-                    {item.value ? (
-                        <span className={`text-sm font-bold tabular-nums whitespace-nowrap ${val}`}>{item.value}</span>
-                    ) : (
-                        <div className="flex items-center gap-1.5 text-xs font-bold tabular-nums">
-                            <span className="text-emerald-500">▲{item.gainers}</span>
-                            <span className="text-red-500">▼{item.losers}</span>
-                        </div>
-                    )}
-                </div>
-            ))}
-        </div>
-    );
-}
-
 function SimCtaCard({ isLight, isEn }: { isLight: boolean; isEn: boolean }) {
     return (
         <Link
@@ -397,9 +354,6 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                     </div>
                 </div>
 
-                {/* Mobile stats strip */}
-                {!loading && <MobileStatsStrip coins={coins} isLight={isLight} isEn={isEn} />}
-
                 {/* Two-column layout */}
                 <div className="lg:grid lg:grid-cols-[1fr_272px] lg:gap-6 lg:items-start">
 
@@ -467,11 +421,18 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                                                         <div className={`text-[11px] uppercase ${isLight ? "text-neutral-400" : "text-text-muted"}`}>{coin.symbol}</div>
                                                     </div>
                                                 </div>
-                                                <div className={`w-28 text-sm font-mono tabular-nums text-right shrink-0 ${isLight ? "text-neutral-800" : "text-text-primary"}`}>
-                                                    {fmtPrice(coin.current_price)}
-                                                </div>
-                                                <div className={`w-16 text-sm font-semibold text-right shrink-0 tabular-nums ${pctColor}`}>
-                                                    {isUp ? "+" : ""}{pct.toFixed(2)}%
+                                                {/* 좁은 화면에서는 현재가와 24h를 오른쪽에 위아래로 쌓는다.
+                                                    가로로 늘어놓으면 w-28 + w-16 = 176px가 고정으로 빠져나가
+                                                    390px 화면에서 코인 이름에 50px밖에 남지 않아 대부분
+                                                    "..."로 잘렸다. md부터는 contents로 래퍼를 지워 예전처럼
+                                                    행의 직계 자식이 되고, 컬럼 헤더와 다시 맞물린다. */}
+                                                <div className="flex flex-col items-end gap-0.5 shrink-0 md:contents">
+                                                    <div className={`text-sm font-mono tabular-nums text-right md:w-28 md:shrink-0 ${isLight ? "text-neutral-800" : "text-text-primary"}`}>
+                                                        {fmtPrice(coin.current_price)}
+                                                    </div>
+                                                    <div className={`text-xs md:text-sm font-semibold text-right tabular-nums md:w-16 md:shrink-0 ${pctColor}`}>
+                                                        {isUp ? "+" : ""}{pct.toFixed(2)}%
+                                                    </div>
                                                 </div>
                                                 <div className={`text-right shrink-0 hidden md:flex md:justify-end ${sortMode === "ath_drop" ? "w-28" : "w-24"}`}>
                                                     {secondaryNode}
