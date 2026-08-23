@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { RealTimeSection } from "@/widgets/dashboard/RealTimeSection";
 import { DashBoard } from "@/widgets/dashboard/DashBoard";
-import { MobileSuggestModal } from "@/widgets/shared-modals/MobileSuggestModal";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 
 const SITE = "https://www.tradehub.kr";
@@ -47,7 +46,6 @@ export default function Page() {
                 </Suspense>
             </main>
             <SeoFooter />
-            <MobileSuggestModal />
         </>
     );
 }

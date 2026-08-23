@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { RealTimeSection } from "@/widgets/dashboard/RealTimeSection";
 import { DashBoard } from "@/widgets/dashboard/DashBoard";
-import { MobileSuggestModal } from "@/widgets/shared-modals/MobileSuggestModal";
 import Script from "next/script";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 import { PageExplainer } from "@/widgets/shared-modals/PageExplainer";
@@ -251,7 +250,6 @@ export default function Home() {
                 closing="여기 표시되는 모든 수치는 정보 제공이 목적이며 투자 권유가 아닙니다. 투자 판단과 그 결과에 대한 책임은 이용자 본인에게 있습니다."
             />
             <SeoFooter />
-            <MobileSuggestModal />
         </>
     );
 }
