@@ -1115,7 +1115,7 @@ export function CoinChart({
                                         setInterval(opt.value);
                                         localStorage.setItem(`chart:${boxId}:interval`, opt.value);
                                     }}
-                                    className={`px-1.5 py-0.5 text-[10px] 2xl:text-xs rounded-md transition-all cursor-pointer ${interval === opt.value ? "bg-amber-500/20 text-amber-300 font-medium" : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/50"}`}
+                                    className={`px-1.5 py-0.5 text-[10px] 2xl:text-xs rounded-md transition-all cursor-pointer ${interval === opt.value ? "bg-[var(--color-accent-muted)] text-[var(--color-accent-text)] font-medium" : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/50"}`}
                                 >
                                     {locale === "en" ? opt.labelEn : opt.label}
                                 </button>
@@ -1127,7 +1127,7 @@ export function CoinChart({
                                 <button
                                     title="커서"
                                     onClick={() => setDrawTool("cursor")}
-                                    className={`p-1 rounded-md transition-all cursor-pointer ${drawTool === "cursor" ? "bg-amber-500/20 text-amber-300" : "text-neutral-500 hover:text-neutral-200 hover:bg-neutral-700/50"}`}
+                                    className={`p-1 rounded-md transition-all cursor-pointer ${drawTool === "cursor" ? "bg-[var(--color-accent-muted)] text-[var(--color-accent-text)]" : "text-neutral-500 hover:text-neutral-200 hover:bg-neutral-700/50"}`}
                                 >
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
@@ -1136,7 +1136,7 @@ export function CoinChart({
                                 <button
                                     title="수평선 (지지/저항)"
                                     onClick={() => setDrawTool("hline")}
-                                    className={`p-1 rounded-md transition-all cursor-pointer ${drawTool === "hline" ? "bg-amber-500/20 text-amber-300" : "text-neutral-500 hover:text-neutral-200 hover:bg-neutral-700/50"}`}
+                                    className={`p-1 rounded-md transition-all cursor-pointer ${drawTool === "hline" ? "bg-[var(--color-accent-muted)] text-[var(--color-accent-text)]" : "text-neutral-500 hover:text-neutral-200 hover:bg-neutral-700/50"}`}
                                 >
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12h16" />
@@ -1145,7 +1145,7 @@ export function CoinChart({
                                 <button
                                     title="지우개"
                                     onClick={() => setDrawTool("eraser")}
-                                    className={`p-1 rounded-md transition-all cursor-pointer ${drawTool === "eraser" ? "bg-amber-500/20 text-amber-300" : "text-neutral-500 hover:text-neutral-200 hover:bg-neutral-700/50"}`}
+                                    className={`p-1 rounded-md transition-all cursor-pointer ${drawTool === "eraser" ? "bg-[var(--color-accent-muted)] text-[var(--color-accent-text)]" : "text-neutral-500 hover:text-neutral-200 hover:bg-neutral-700/50"}`}
                                 >
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1168,14 +1168,14 @@ export function CoinChart({
                         {enableIndicators && <div className="relative">
                             <button
                                 onClick={() => { setIndicatorPanelOpen((v) => !v); setAddForm(null); }}
-                                className={`flex items-center gap-1 px-2 py-1 text-[10px] 2xl:text-xs rounded-lg border transition-all cursor-pointer backdrop-blur-sm ${indicatorPanelOpen ? "bg-amber-500/20 text-amber-300 border-amber-500/50" : "bg-neutral-900/80 text-neutral-400 border-neutral-700/50 hover:text-neutral-200"}`}
+                                className={`flex items-center gap-1 px-2 py-1 text-[10px] 2xl:text-xs rounded-lg border transition-all cursor-pointer backdrop-blur-sm ${indicatorPanelOpen ? "bg-[var(--color-accent-muted)] text-[var(--color-accent-text)] border-[var(--color-accent)]/50" : "bg-neutral-900/80 text-neutral-400 border-neutral-700/50 hover:text-neutral-200"}`}
                             >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                 </svg>
                                 {locale === "en" ? "Indicators" : "지표"}
                                 {activeIndicators.filter((i) => i.enabled).length > 0 && (
-                                    <span className="bg-amber-500 text-neutral-900 text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                                    <span className="bg-[var(--color-accent-strong)] text-[var(--text-on-fill)] text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                                         {activeIndicators.filter((i) => i.enabled).length}
                                     </span>
                                 )}
@@ -1211,7 +1211,7 @@ export function CoinChart({
                                                     <span className="flex-1 text-[11px] text-neutral-300">{indicatorLabel(ind)}</span>
                                                     <button
                                                         onClick={() => toggleIndicator(ind.id)}
-                                                        className={`w-7 h-4 rounded-full transition-colors cursor-pointer flex-shrink-0 relative ${ind.enabled ? "bg-amber-500" : "bg-neutral-700"}`}
+                                                        className={`w-7 h-4 rounded-full transition-colors cursor-pointer flex-shrink-0 relative ${ind.enabled ? "bg-[var(--color-accent)]" : "bg-neutral-700"}`}
                                                     >
                                                         <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${ind.enabled ? "left-3.5" : "left-0.5"}`} />
                                                     </button>
@@ -1309,7 +1309,7 @@ export function CoinChart({
                                                 <div className="flex gap-2 pt-1">
                                                     <button
                                                         onClick={addIndicator}
-                                                        className="flex-1 py-1.5 text-[11px] font-medium bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 transition-colors cursor-pointer"
+                                                        className="flex-1 py-1.5 text-[11px] font-medium bg-[var(--color-accent-muted)] text-[var(--color-accent-text)] border border-[var(--color-accent)]/40 rounded-lg hover:bg-[var(--color-accent-muted)] transition-colors cursor-pointer"
                                                     >
                                                         {locale === "en" ? "Add" : "추가"}
                                                     </button>
@@ -1325,7 +1325,7 @@ export function CoinChart({
                                             <div className="border-t border-neutral-800 p-2">
                                                 <button
                                                     onClick={() => setAddForm(defaultAddForm("MA"))}
-                                                    className="w-full py-1.5 text-[11px] text-neutral-400 hover:text-amber-300 hover:bg-amber-500/10 border border-neutral-700 hover:border-amber-500/30 rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1"
+                                                    className="w-full py-1.5 text-[11px] text-neutral-400 hover:text-[var(--color-accent-text)] hover:bg-[var(--color-accent-muted)] border border-neutral-700 hover:border-[var(--color-accent)]/30 rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1"
                                                 >
                                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1343,7 +1343,7 @@ export function CoinChart({
                     {!hideControls && (
                         <button
                             onClick={() => setOpen(true)}
-                            className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-neutral-900/80 backdrop-blur-sm rounded-lg border border-neutral-700/50 z-20 text-[10px] 2xl:text-xs text-neutral-400 hover:text-amber-300 hover:border-amber-500/50 transition-all cursor-pointer"
+                            className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-neutral-900/80 backdrop-blur-sm rounded-lg border border-neutral-700/50 z-20 text-[10px] 2xl:text-xs text-neutral-400 hover:text-[var(--color-accent-text)] hover:border-[var(--color-accent)]/50 transition-all cursor-pointer"
                         >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -1362,7 +1362,7 @@ export function CoinChart({
                             transition={{ duration: 0.18 }}
                             className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+16px)] z-50 w-[295px] text-[11px] bg-neutral-900 border border-neutral-700 text-neutral-300 rounded-lg py-4 px-5 shadow-lg pointer-events-none"
                         >
-                            <div className="font-semibold text-amber-300 mb-1">{locale === "en" ? "Chart Guide" : "차트 사용 안내"}</div>
+                            <div className="font-semibold text-[var(--color-accent-text)] mb-1">{locale === "en" ? "Chart Guide" : "차트 사용 안내"}</div>
                             <p className="leading-snug whitespace-nowrap">
                                 {locale === "en" ? (
                                     <>

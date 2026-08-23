@@ -217,7 +217,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                     <div className="grid grid-cols-3 gap-1.5">
                         {[
                             { label: isEn ? "Available" : "가용잔고", value: balance.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: textPrimary },
-                            { label: isEn ? "Margin Used" : "사용증거금", value: totalPositionMargin.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: isLight ? "text-amber-600" : "text-amber-400" },
+                            { label: isEn ? "Margin Used" : "사용증거금", value: totalPositionMargin.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: "text-[var(--color-accent-text)]" },
                             { label: isEn ? "Unreal. PnL" : "미실현 PnL", value: `${totalUnrealizedPnl >= 0 ? "+" : ""}${totalUnrealizedPnl.toFixed(1)}`, color: totalUnrealizedPnl >= 0 ? "text-emerald-500" : "text-red-500" },
                         ].map(({ label, value, color }) => (
                             <div key={label} className={`${cardBg} rounded-xl px-2.5 py-2 border ${border}`}>
@@ -278,7 +278,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                     lockedMarginMode ? "cursor-not-allowed opacity-35" : "cursor-pointer"
                                 } ${
                                     marginMode === mode
-                                        ? `bg-amber-500/10 ${isLight ? "text-amber-600" : "text-amber-400"}`
+                                        ? "bg-[var(--color-accent-muted)] text-[var(--color-accent-text)]"
                                         : pillInactive
                                 }`}
                             >
@@ -318,7 +318,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                         <div className="absolute top-1/2 -translate-y-1/2 inset-x-0 h-[3px] rounded-full overflow-hidden" style={{ background: isLight ? "#e5e7eb" : "#262626" }}>
                             <div
                                 className={`h-full rounded-full transition-all duration-75 ${
-                                    leverage >= 50 ? "bg-red-500" : leverage >= 20 ? "bg-amber-400" : "bg-amber-300"
+                                    leverage >= 50 ? "bg-red-500" : leverage >= 20 ? "bg-amber-400" : "bg-[var(--color-accent)]"
                                 }`}
                                 style={{ width: `${leveragePct}%` }}
                             />
@@ -412,7 +412,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                             {isEn ? "Take Profit / Stop Loss (TP/SL)" : "익절 / 손절 (TP/SL)"}
                         </span>
                         {(tpPrice || slPrice) && !showTpSl && (
-                            <span className={`text-[9px] px-2 py-0.5 bg-amber-500/10 rounded-full font-medium ${isLight ? "text-amber-600" : "text-amber-400"}`}>{isEn ? "Set" : "설정됨"}</span>
+                            <span className="text-[9px] px-2 py-0.5 bg-[var(--color-accent-muted)] rounded-full font-medium text-[var(--color-accent-text)]">{isEn ? "Set" : "설정됨"}</span>
                         )}
                     </button>
 

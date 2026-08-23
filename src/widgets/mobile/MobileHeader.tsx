@@ -41,7 +41,7 @@ export function MobileHeader() {
 
     return (
         <>
-            <header className="sticky top-0 z-40 flex h-14 items-center gap-2 border-b border-border-subtle bg-surface-card/85 px-4 backdrop-blur-xl">
+            <header data-mobile-header className="sticky top-0 z-40 flex h-14 items-center gap-2 border-b border-border-subtle bg-surface-card/85 px-4 backdrop-blur-xl">
                 <Link
                     href={isEn ? "/en/dashboard" : "/dashboard"}
                     className="flex items-center gap-1.5"
