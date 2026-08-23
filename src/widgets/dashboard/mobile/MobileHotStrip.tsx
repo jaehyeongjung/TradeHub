@@ -1,9 +1,9 @@
 "use client";
 
 import { useHotCoins } from "@/shared/hooks/useMarketData";
-import { useMobileCopy } from "./copy";
-import { CoinIcon } from "./CoinIcon";
-import { Skeleton } from "./MobileSection";
+import { useMobileCopy } from "@/widgets/mobile/copy";
+import { CoinIcon } from "@/widgets/mobile/CoinIcon";
+import { Skeleton } from "@/widgets/mobile/MobileSection";
 
 function fmtPct(pct: number) {
     return `${pct >= 0 ? "+" : ""}${pct.toFixed(2)}%`;

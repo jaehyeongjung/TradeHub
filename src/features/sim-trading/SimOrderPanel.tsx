@@ -24,16 +24,19 @@ interface Props {
     positionCount?: number;
     orderCount?: number;
     isEn?: boolean;
+    /** 진입 방향 초기값. 모바일은 하단 롱/숏 버튼으로 시트를 열기 때문에
+        어느 쪽을 눌렀는지가 패널에 그대로 반영돼야 한다. 기본값은 기존과 같은 LONG. */
+    defaultSide?: PositionSide;
 }
 
-export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode, positionCount = 0, orderCount = 0, isEn = false }: Props) {
+export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode, positionCount = 0, orderCount = 0, isEn = false, defaultSide = "LONG" }: Props) {
     const isLight = useTheme();
     const simSymbol = useAtomValue(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);
     const [marginMode, setMarginMode] = useAtom(simMarginModeAtom);
     const currentPrice = prices[simSymbol] ?? 0;
 
-    const [side, setSide] = useState<PositionSide>("LONG");
+    const [side, setSide] = useState<PositionSide>(defaultSide);
     const [orderType, setOrderType] = useState<OrderType>("MARKET");
     const [leverage, setLeverage] = useState(10);
     const [amountUsdt, setAmountUsdt] = useState("");

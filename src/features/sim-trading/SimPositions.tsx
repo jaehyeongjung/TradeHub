@@ -15,9 +15,13 @@ interface Props {
     onUpdateTpSl?: (positionId: string, tp: number | null, sl: number | null) => Promise<void>;
     isEn?: boolean;
     compact?: boolean;
+    /** 모바일 전용 카드 레이아웃. compact는 세로 900px 이하 데스크톱용 간이뷰라
+        가로는 여전히 1320px를 전제하고, 한 줄에 7요소를 넣어 390px에서 겹친다.
+        기본값 false — 데스크톱 경로는 그대로. */
+    mobile?: boolean;
 }
 
-export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, compact = false }: Props) {
+export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, compact = false, mobile = false }: Props) {
     const isLight = useTheme();
     const prices = useAtomValue(simPricesAtom);
     const [tpSlPos, setTpSlPos] = useState<SimPosition | null>(null);
@@ -56,7 +60,7 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, c
         : "bg-neutral-600 border-neutral-500 text-white hover:bg-neutral-500 hover:border-neutral-400";
 
     // ── 간이뷰 ────────────────────────────────────────────────────────────────
-    if (compact) {
+    if (compact || mobile) {
         const noPos = positions.length === 0;
         return (
             <>
@@ -77,7 +81,7 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, c
                                     {isEn ? "No open positions" : "포지션 없음"}
                                 </p>
                                 <p className={`text-[11px] mt-0.5 ${isLight ? "text-neutral-400" : "text-neutral-500"}`}>
-                                    {isEn ? "Place a Long or Short order to get started" : "우측 패널에서 롱 / 숏 주문으로 시작해보세요"}
+                                    {isEn ? "Place a Long or Short order to get started" : mobile ? "아래 롱 / 숏 버튼으로 시작해보세요" : "우측 패널에서 롱 / 숏 주문으로 시작해보세요"}
                                 </p>
                             </div>
                         </div>
@@ -87,6 +91,74 @@ export function SimPositions({ positions, onClose, onUpdateTpSl, isEn = false, c
                         const roe = calcRoe(pnl, pos.margin);
                         const isLong = pos.side === "LONG";
                         const isProfit = pnl >= 0;
+                        if (mobile) {
+                            const num = (n: number, d = 2) => n.toLocaleString(undefined, { maximumFractionDigits: d });
+                            return (
+                                <div key={pos.id} className="rounded-card border border-border-subtle bg-surface-card p-3">
+                                    <div className="flex items-center gap-2">
+                                        <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-chip text-caption font-black ${
+                                            isLong
+                                                ? "bg-[var(--color-up-muted)] text-[var(--color-up-text)]"
+                                                : "bg-[var(--color-down-muted)] text-[var(--color-down-text)]"
+                                        }`}>
+                                            {isLong ? "L" : "S"}
+                                        </span>
+                                        <span className="text-label font-bold text-text-primary">
+                                            {pos.symbol.replace("USDT", "")}
+                                        </span>
+                                        <span className="text-caption text-text-muted">{Number(pos.leverage).toFixed(0)}x</span>
+
+                                        <div className="ml-auto text-right">
+                                            <p className={`font-mono text-label font-bold tabular-nums ${
+                                                isProfit ? "text-[var(--color-up-text)]" : "text-[var(--color-down-text)]"
+                                            }`}>
+                                                {isProfit ? "+" : ""}{pnl.toFixed(2)}
+                                            </p>
+                                            <p className={`font-mono text-caption tabular-nums ${
+                                                isProfit ? "text-[var(--color-up-text)]/70" : "text-[var(--color-down-text)]/70"
+                                            }`}>
+                                                {isProfit ? "+" : ""}{roe.toFixed(1)}%
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <dl className="mt-2.5 grid grid-cols-2 gap-x-4 gap-y-1 text-caption">
+                                        <div className="flex justify-between gap-2">
+                                            <dt className="text-text-muted">{isEn ? "Entry" : "진입"}</dt>
+                                            <dd className="font-mono tabular-nums text-text-secondary">{num(pos.entry_price)}</dd>
+                                        </div>
+                                        <div className="flex justify-between gap-2">
+                                            <dt className="text-text-muted">{isEn ? "Mark" : "현재"}</dt>
+                                            <dd className="font-mono tabular-nums text-text-secondary">{num(cp)}</dd>
+                                        </div>
+                                        <div className="flex justify-between gap-2">
+                                            <dt className="text-text-muted">{isEn ? "Liq." : "청산가"}</dt>
+                                            <dd className="font-mono tabular-nums text-orange-400">{num(pos.liq_price, 1)}</dd>
+                                        </div>
+                                        <div className="flex justify-between gap-2">
+                                            <dt className="text-text-muted">{isEn ? "Margin" : "증거금"}</dt>
+                                            <dd className="font-mono tabular-nums text-text-secondary">{num(pos.margin)}</dd>
+                                        </div>
+                                    </dl>
+
+                                    <div className="mt-3 flex gap-2">
+                                        <button
+                                            onClick={() => { setTpSlPos(pos); setEditTp(pos.tp_price ? String(pos.tp_price) : ""); setEditSl(pos.sl_price ? String(pos.sl_price) : ""); setTpSlError(""); }}
+                                            className={`flex-1 rounded-control border py-2.5 text-footnote font-bold transition-transform active:scale-[0.97] ${btnTpSl}`}
+                                        >
+                                            TP/SL
+                                        </button>
+                                        <button
+                                            onClick={() => setClosePos({ pos, cp })}
+                                            className={`flex-1 rounded-control border py-2.5 text-footnote font-bold transition-transform active:scale-[0.97] ${btnClose}`}
+                                        >
+                                            {isEn ? "Close" : "청산"}
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        }
+
                         return (
                             <div key={pos.id} className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border ${
                                 isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-zinc-800/60"

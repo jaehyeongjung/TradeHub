@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useSetAtom } from "jotai";
 import { activePageAtom } from "@/shared/store/atoms";
 import dynamic from "next/dynamic";
+import { TradingSwitch } from "@/widgets/sim-trading/mobile/TradingSwitch";
 
 function SimTradingSkeleton() {
     return (
@@ -107,10 +108,12 @@ export default function TradingClient() {
     }, [setActivePage]);
 
     return (
-        <>
-            <div className="pt-12 pb-5 px-5 bg-black min-w-[310px]">
+        <TradingSwitch>
+            {/* max-[1279.98px]:hidden — 수화 직전 한 프레임 동안 데스크톱 트리가
+                비치지 않게 하는 가드. 1280px 이상에서는 적용되지 않는다. */}
+            <div className="pt-12 pb-5 px-5 bg-black min-w-[310px] max-[1279.98px]:hidden">
                 <SimTradingPage />
             </div>
-        </>
+        </TradingSwitch>
     );
 }

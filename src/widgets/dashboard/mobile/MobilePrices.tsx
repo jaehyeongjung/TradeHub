@@ -1,9 +1,9 @@
 "use client";
 
 import { useLiveTickers } from "@/shared/hooks/useLiveTickers";
-import { CoinIcon } from "./CoinIcon";
-import { MobileSection, Skeleton } from "./MobileSection";
-import { useMobileCopy } from "./copy";
+import { CoinIcon } from "@/widgets/mobile/CoinIcon";
+import { MobileSection, Skeleton } from "@/widgets/mobile/MobileSection";
+import { useMobileCopy } from "@/widgets/mobile/copy";
 
 const CORE = [
     { symbol: "btcusdt", base: "BTC", ko: "비트코인", en: "Bitcoin" },

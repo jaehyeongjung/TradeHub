@@ -49,6 +49,21 @@ const KO = {
     buy: "매수",
     sell: "매도",
 
+    // 모의투자
+    orderBook: "호가",
+    positions: "포지션",
+    openOrders: "미체결",
+    tradeHistory: "거래내역",
+    ranking: "랭킹",
+    balance: "잔고",
+    unrealizedPnl: "미실현 손익",
+    long: "롱",
+    short: "숏",
+    longOrder: "롱 주문",
+    shortOrder: "숏 주문",
+    closeSheet: "닫기",
+    chart: "차트",
+
     justNow: "방금",
     minsAgo: (n: number) => `${n}분 전`,
     hoursAgo: (n: number) => `${n}시간 전`,
@@ -99,6 +114,21 @@ const EN: MobileCopy = {
     shortLiq: "Short liq.",
     buy: "Buy",
     sell: "Sell",
+
+    // 모의투자
+    orderBook: "Order Book",
+    positions: "Positions",
+    openOrders: "Open Orders",
+    tradeHistory: "History",
+    ranking: "Rankings",
+    balance: "Balance",
+    unrealizedPnl: "Unrealized PnL",
+    long: "Long",
+    short: "Short",
+    longOrder: "Long Order",
+    shortOrder: "Short Order",
+    closeSheet: "Close",
+    chart: "Chart",
 
     justNow: "now",
     minsAgo: (n: number) => `${n}m ago`,

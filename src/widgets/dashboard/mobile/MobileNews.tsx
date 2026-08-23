@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useCryptoNews } from "@/shared/hooks/useMarketData";
-import { MobileSection, Skeleton } from "./MobileSection";
-import { useMobileCopy, type MobileCopy } from "./copy";
+import { MobileSection, Skeleton } from "@/widgets/mobile/MobileSection";
+import { useMobileCopy, type MobileCopy } from "@/widgets/mobile/copy";
 
 const COLLAPSED_COUNT = 6;
 

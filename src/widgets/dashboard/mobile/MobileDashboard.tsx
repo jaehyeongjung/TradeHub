@@ -1,6 +1,6 @@
 "use client";
 
-import { MobileHeader } from "./MobileHeader";
+import { MobileHeader } from "@/widgets/mobile/MobileHeader";
 import { MobileHotStrip } from "./MobileHotStrip";
 import { MobileNews } from "./MobileNews";
 import { MobilePrices } from "./MobilePrices";

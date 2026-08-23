@@ -28,7 +28,20 @@ interface LongShortRatio {
     shortAccount: number;
 }
 
-export function SimMarketData() {
+export type MarketField = "change" | "high" | "low" | "volume" | "funding" | "oi" | "ls";
+
+const ALL_FIELDS: MarketField[] = ["change", "high", "low", "volume", "funding", "oi", "ls"];
+
+/**
+ * @param fields 보여줄 항목. 생략하면 전부 — 데스크톱은 지금까지와 같다.
+ *   모바일은 폭이 좁아 핵심만 남기는데, 미결제약정·롱숏은 각각 별도 API라
+ *   화면에 안 쓰면 요청도 건너뛴다.
+ */
+export function SimMarketData({ fields = ALL_FIELDS }: { fields?: MarketField[] } = {}) {
+    const show = (f: MarketField) => fields.includes(f);
+    // 호출부가 인라인 배열을 넘겨도 안전하도록 값 기반 키로 의존한다.
+    // 배열 참조를 그대로 deps에 두면 렌더마다 fetchAll이 새로 생겨 폴링이 재시작된다.
+    const fieldsKey = fields.join(",");
     const simSymbol = useAtomValue(simSymbolAtom);
     const activePage = useAtomValue(activePageAtom);
     const prices = useAtomValue(simPricesAtom);
@@ -47,11 +60,13 @@ export function SimMarketData() {
         if (activePage !== "sim") return;
         const sym = simSymbol;
         try {
+            const needOi = fieldsKey.includes("oi");
+            const needLs = fieldsKey.includes("ls");
             const [fundingRes, tickerRes, oiRes, lsRes] = await Promise.all([
                 fetch(`https://fapi.binance.com/fapi/v1/premiumIndex?symbol=${sym}`),
                 fetch(`https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=${sym}`),
-                fetch(`https://fapi.binance.com/fapi/v1/openInterest?symbol=${sym}`),
-                fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${sym}&period=5m&limit=1`),
+                needOi ? fetch(`https://fapi.binance.com/fapi/v1/openInterest?symbol=${sym}`) : null,
+                needLs ? fetch(`https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=${sym}&period=5m&limit=1`) : null,
             ]);
 
             const fundingData = await fundingRes.json();
@@ -71,17 +86,21 @@ export function SimMarketData() {
                 });
             }
 
-            const oiData = await oiRes.json();
-            if (oiData?.openInterest) {
-                setOi({ openInterest: parseFloat(oiData.openInterest) });
+            if (oiRes) {
+                const oiData = await oiRes.json();
+                if (oiData?.openInterest) {
+                    setOi({ openInterest: parseFloat(oiData.openInterest) });
+                }
             }
 
-            const lsData = await lsRes.json();
-            if (Array.isArray(lsData) && lsData[0]) {
-                setLsRatio({ longAccount: parseFloat(lsData[0].longAccount), shortAccount: parseFloat(lsData[0].shortAccount) });
+            if (lsRes) {
+                const lsData = await lsRes.json();
+                if (Array.isArray(lsData) && lsData[0]) {
+                    setLsRatio({ longAccount: parseFloat(lsData[0].longAccount), shortAccount: parseFloat(lsData[0].shortAccount) });
+                }
             }
         } catch (e) { console.error("[SimMarketData] fetchAll error:", e); }
-    }, [simSymbol, activePage]);
+    }, [simSymbol, activePage, fieldsKey]);
 
     useEffect(() => {
         if (activePage !== "sim") return;
@@ -134,25 +153,25 @@ export function SimMarketData() {
         <div className="flex flex-1 items-center min-w-0">
             <div className="w-px h-6 bg-gradient-to-b from-transparent via-zinc-600/70 to-transparent flex-shrink-0 mx-3" />
 
-            <Item label={isEn ? "24h Change" : "24h 변동"}>
+            {show("change") && <Item label={isEn ? "24h Change" : "24h 변동"}>
                 <span className={`text-[12.5px] font-bold font-mono tabular-nums ${isPosPct ? "text-emerald-400" : "text-red-400"}`}>
                     {ticker ? `${isPosPct ? "+" : ""}${pct.toFixed(2)}%` : "—"}
                 </span>
-            </Item>
+            </Item>}
 
-            <Item label={isEn ? "24h High" : "24h 고가"}>
+            {show("high") && <Item label={isEn ? "24h High" : "24h 고가"}>
                 {val(ticker ? ticker.high.toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—")}
-            </Item>
+            </Item>}
 
-            <Item label={isEn ? "24h Low" : "24h 저가"}>
+            {show("low") && <Item label={isEn ? "24h Low" : "24h 저가"}>
                 {val(ticker ? ticker.low.toLocaleString(undefined, { maximumFractionDigits: 1 }) : "—")}
-            </Item>
+            </Item>}
 
-            <Item label={isEn ? "24h Volume" : "24h 거래대금"}>
+            {show("volume") && <Item label={isEn ? "24h Volume" : "24h 거래대금"}>
                 {val(ticker ? formatVolume(ticker.quoteVolume) : "—")}
-            </Item>
+            </Item>}
 
-            <Item label={
+            {show("funding") && <Item label={
                 <span className="flex items-center gap-1">
                     {isEn ? "Funding" : "펀딩비"}
                     {countdown && <span className="text-[9px] text-neutral-400 font-mono">{countdown}</span>}
@@ -161,13 +180,13 @@ export function SimMarketData() {
                 <span className={`text-[12.5px] font-bold font-mono tabular-nums ${isFundPos ? "text-emerald-400" : "text-red-400"}`}>
                     {funding ? `${isFundPos ? "+" : ""}${funding.fundingRate.toFixed(4)}%` : "—"}
                 </span>
-            </Item>
+            </Item>}
 
-            <Item label={isEn ? "Open Interest" : "미결제약정"}>
+            {show("oi") && <Item label={isEn ? "Open Interest" : "미결제약정"}>
                 {val(oi ? formatVolume(oi.openInterest * currentPrice) : "—")}
-            </Item>
+            </Item>}
 
-            <Item label={isEn ? "Long/Short" : "롱/숏 비율"}>
+            {show("ls") && <Item label={isEn ? "Long/Short" : "롱/숏 비율"}>
                 <div className="flex items-center gap-1.5">
                     <span className="text-[11.5px] font-mono font-semibold text-emerald-400">{longPct}%</span>
                     <div className="flex gap-[2px] h-1.5 w-16 items-center">
@@ -176,7 +195,7 @@ export function SimMarketData() {
                     </div>
                     <span className="text-[11.5px] font-mono font-semibold text-red-400">{shortPct}%</span>
                 </div>
-            </Item>
+            </Item>}
         </div>
     );
 }

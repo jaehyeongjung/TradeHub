@@ -238,6 +238,8 @@ export default function Home() {
                         term: "거래량 트리맵",
                         body: "코인마다 사각형 크기로 규모를, 색으로 등락을 표시합니다. 목록을 위에서 아래로 훑지 않아도 지금 시장이 전반적으로 오르는지 내리는지, 특정 섹터만 움직이는지를 한눈에 알 수 있습니다.",
                         guide: "crypto-treemap",
+                        // 모바일 헤더에는 트리맵 버튼이 없어 열 방법이 없다.
+                        desktopOnly: true,
                     },
                     {
                         term: "김치프리미엄",

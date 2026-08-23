@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLiquidations, useWhaleTrades, MIN_USD_LABEL } from "@/shared/hooks/useLiveFeeds";
 import { fmtUsdCompact } from "@/shared/lib/formatting";
-import { CoinIcon } from "./CoinIcon";
-import { LiveDot, Skeleton } from "./MobileSection";
-import { useMobileCopy, type MobileCopy } from "./copy";
+import { CoinIcon } from "@/widgets/mobile/CoinIcon";
+import { LiveDot, Skeleton } from "@/widgets/mobile/MobileSection";
+import { useMobileCopy, type MobileCopy } from "@/widgets/mobile/copy";
 
 type Tab = "liq" | "whale";
 

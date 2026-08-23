@@ -1,8 +1,8 @@
 "use client";
 
 import { useFearGreed, useKimchi } from "@/shared/hooks/useMarketData";
-import { Skeleton } from "./MobileSection";
-import { useMobileCopy, type MobileCopy } from "./copy";
+import { Skeleton } from "@/widgets/mobile/MobileSection";
+import { useMobileCopy, type MobileCopy } from "@/widgets/mobile/copy";
 
 /* ─────────────────────────── 공포탐욕지수 ─────────────────────────── */
 
