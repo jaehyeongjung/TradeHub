@@ -318,7 +318,7 @@ export default async function StockTokenPage({
             : null;
 
     return (
-        <main className="mx-auto max-w-2xl px-4 sm:px-5 pt-16 pb-20 text-[var(--text-primary)]">
+        <main className="mx-auto max-w-2xl px-4 sm:px-5 pt-4 pb-20 text-[var(--text-primary)]">
             {jsonLdItems.map((item, i) => (
                 <script
                     key={i}

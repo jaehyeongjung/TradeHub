@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { StocksHeader } from "./StocksHeader";
+import { MobileHeader } from "@/widgets/mobile/MobileHeader";
 import { InstallPrompt } from "./InstallPrompt";
 
 /**
@@ -21,7 +21,9 @@ export const metadata: Metadata = {
     },
 };
 
-// HeaderNav는 /stocks에서 스스로 null을 반환하고, 대신 이 심플 헤더가 걸린다.
+// HeaderNav는 /stocks에서 스스로 null을 반환하고, 대신 코인 쪽 모바일 화면과
+// 같은 MobileHeader가 걸린다. 본문이 max-w-2xl 좁은 컬럼이라 헤더 안쪽도 같은
+// 폭으로 묶어야 로고가 본문 왼쪽 끝과 세로로 선다.
 //
 // break-keep = word-break: keep-all.
 // 한국어는 기본값(normal)에서 단어 중간이 잘려 "거래됩니 / 다"처럼 읽힌다.
@@ -29,7 +31,7 @@ export const metadata: Metadata = {
 export default function StocksLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen break-keep bg-[var(--surface-page)]">
-            <StocksHeader />
+            <MobileHeader logoHref="/stocks" innerClassName="max-w-2xl px-4 sm:px-5" />
             {children}
             <InstallPrompt />
         </div>

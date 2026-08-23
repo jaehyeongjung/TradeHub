@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link2, Share, Share2, X } from "lucide-react";
 import { useToast } from "@/shared/ui/Toast";
@@ -44,8 +45,38 @@ const SDK_INTEGRITY = "sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0
 const KAKAO_PATH =
     "M12 3C6.477 3 2 6.463 2 10.734c0 2.743 1.82 5.152 4.556 6.532-.2.75-.724 2.72-.83 3.142-.13.523.192.516.404.376.166-.11 2.64-1.794 3.71-2.522.71.105 1.44.16 2.16.16 5.523 0 10-3.463 10-7.688C22 6.463 17.523 3 12 3z";
 
-export function ShareButton({ className = "" }: { className?: string }) {
+/* /stocks 전용이던 때는 한국어만 있어도 됐지만, 이제 /en 헤더에서도 뜬다.
+   문구를 컴포넌트에 박아두면 영어 화면에 한글이 새어 나간다. */
+const COPY = {
+    ko: {
+        share: "공유하기", close: "닫기",
+        kakao: "카카오톡으로 보내기", copy: "링크 복사", more: "다른 앱으로",
+        copied: "링크를 복사했어요",
+        copyFailed: "링크 복사에 실패했어요",
+        kakaoFailed: "카카오톡 공유에 실패했어요. 링크를 복사해 보내주세요.",
+    },
+    en: {
+        share: "Share", close: "Close",
+        kakao: "Send via KakaoTalk", copy: "Copy link", more: "More options",
+        copied: "Link copied",
+        copyFailed: "Couldn't copy the link",
+        kakaoFailed: "KakaoTalk sharing failed. Copy the link and send it instead.",
+    },
+} as const;
+
+const DEFAULT_TRIGGER =
+    "flex h-11 w-11 cursor-pointer items-center justify-center rounded-chip text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-input)] hover:text-[var(--text-primary)]";
+
+/**
+ * className을 주면 트리거 클래스를 통째로 갈아끼운다 (덧붙이지 않는다).
+ * 헤더마다 아이콘 버튼 규격이 달라서, 덧붙이면 h-11/h-10·rounded-chip/rounded-lg처럼
+ * 같은 속성이 겹치고 Tailwind에서는 어느 쪽이 이길지 클래스 순서로 정해지지 않는다.
+ * label을 주면 아이콘 옆에 sm 이상에서만 글자가 붙는다 (HeaderNav의 다른 버튼과 같은 규칙).
+ */
+export function ShareButton({ className, label, iconSize = 17 }: { className?: string; label?: string; iconSize?: number }) {
     const { showToast } = useToast();
+    const isEn = (usePathname() ?? "").startsWith("/en");
+    const c = isEn ? COPY.en : COPY.ko;
     const [kakaoReady, setKakaoReady] = useState(false);
     const [canWebShare, setCanWebShare] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -143,16 +174,16 @@ export function ShareButton({ className = "" }: { className?: string }) {
         try {
             window.Kakao?.Share.sendScrap({ requestUrl: window.location.href });
         } catch {
-            showToast("카카오톡 공유에 실패했어요. 링크를 복사해 보내주세요.", "error");
+            showToast(c.kakaoFailed, "error");
         }
     };
 
     const copyLink = async () => {
         try {
             await navigator.clipboard.writeText(window.location.href);
-            showToast("링크를 복사했어요", "success");
+            showToast(c.copied, "success");
         } catch {
-            showToast("링크 복사에 실패했어요", "error");
+            showToast(c.copyFailed, "error");
         }
     };
 
@@ -167,9 +198,9 @@ export function ShareButton({ className = "" }: { className?: string }) {
     };
 
     const actions = [
-        kakaoReady && { key: "kakao", label: "카카오톡으로 보내기", run: sendToKakao },
-        { key: "copy", label: "링크 복사", run: copyLink },
-        canWebShare && { key: "web", label: "다른 앱으로", run: openWebShare },
+        kakaoReady && { key: "kakao", label: c.kakao, run: sendToKakao },
+        { key: "copy", label: c.copy, run: copyLink },
+        canWebShare && { key: "web", label: c.more, run: openWebShare },
     ].filter(Boolean) as { key: string; label: string; run: () => void | Promise<void> }[];
 
     const handleTrigger = () => {
@@ -232,7 +263,7 @@ export function ShareButton({ className = "" }: { className?: string }) {
                               <button
                                   type="button"
                                   onClick={() => setOpen(false)}
-                                  aria-label="닫기"
+                                  aria-label={c.close}
                                   className="absolute right-3 top-3 hidden h-9 w-9 cursor-pointer place-items-center rounded-full text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)] sm:grid"
                               >
                                   <X size={17} strokeWidth={2.2} />
@@ -242,7 +273,7 @@ export function ShareButton({ className = "" }: { className?: string }) {
                                   id="share-sheet-title"
                                   className="text-title3 font-bold tracking-tight text-[var(--text-primary)]"
                               >
-                                  공유하기
+                                  {c.share}
                               </h2>
                               {/* 무엇을 보내는지 보여준다. 링크만 복사해놓고 뭘 복사했는지
                                   모르는 상태로 두지 않는다. */}
@@ -306,12 +337,13 @@ export function ShareButton({ className = "" }: { className?: string }) {
             <button
                 type="button"
                 onClick={handleTrigger}
-                aria-label="공유하기"
+                aria-label={c.share}
                 aria-haspopup="dialog"
                 aria-expanded={open}
-                className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-chip text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-input)] hover:text-[var(--text-primary)] ${className}`}
+                className={className ?? DEFAULT_TRIGGER}
             >
-                <Share size={17} strokeWidth={2} />
+                <Share size={iconSize} strokeWidth={2} className="flex-shrink-0" />
+                {label && <span className="hidden sm:inline whitespace-nowrap">{label}</span>}
             </button>
             {sheet}
         </>

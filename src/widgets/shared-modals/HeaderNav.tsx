@@ -7,6 +7,7 @@ import { useAtom, useSetAtom } from "jotai";
 import { treemapOpenAtom, loginDrawerOpenAtom } from "@/shared/store/atoms";
 import { FlagKR, FlagUS } from "@/shared/ui/FlagIcons";
 import { useThemeToggle } from "@/shared/hooks/useThemeToggle";
+import { ShareButton } from "@/shared/ui/ShareButton";
 
 function HeaderNavInner() {
     const pathname = usePathname();
@@ -15,7 +16,7 @@ function HeaderNavInner() {
     const { isDark, toggleTheme } = useThemeToggle();
 
     if (pathname === "/" || pathname === "/en" || pathname.startsWith("/mobile")) return null;
-    // /stocks는 전용 심플 헤더(StocksHeader)를 쓴다
+    // /stocks는 폭과 무관하게 MobileHeader를 쓴다 (stocks/layout.tsx)
     if (pathname.startsWith("/stocks")) return null;
 
     const isEn = pathname.startsWith("/en/");
@@ -97,6 +98,10 @@ function HeaderNavInner() {
             </div>
 
             <div className="flex items-center gap-1 ml-3">
+                {/* 공유 대상은 클릭 시점의 location.href다 — /stocks가 아니라
+                    지금 보고 있는 코인 페이지(/ranking, /analysis …)가 그대로 나간다. */}
+                <ShareButton className={iconBtnClass} label={isEn ? "Share" : "공유"} iconSize={14} />
+
                 <button type="button" onClick={() => setTreemapOpen(true)} aria-label={isEn ? "Open Heatmap" : "트리맵 보기"} className={iconBtnClass}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M3 3h8v8H3V3zm0 10h8v8H3v-8zm10-10h8v8h-8V3zm0 10h8v8h-8v-8z" />

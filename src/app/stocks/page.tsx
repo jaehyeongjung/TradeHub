@@ -203,7 +203,7 @@ export default async function StocksHubPage() {
     };
 
     return (
-        <main className="mx-auto max-w-2xl px-4 sm:px-5 pt-16 pb-20 text-[var(--text-primary)]">
+        <main className="mx-auto max-w-2xl px-4 sm:px-5 pt-4 pb-20 text-[var(--text-primary)]">
             {[webPage, itemList, breadcrumb].map((item, i) => (
                 <script
                     key={i}

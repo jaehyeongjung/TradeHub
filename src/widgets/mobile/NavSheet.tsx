@@ -15,11 +15,10 @@ const NAV: { href: string; key: keyof MobileCopy }[] = [
 ];
 
 /**
- * 하단에서 올라오는 메뉴 시트. MobileHeader와 StocksHeader가 같이 쓴다.
+ * 하단에서 올라오는 메뉴 시트. MobileHeader가 쓴다.
  *
- * /stocks는 전용 헤더(StocksHeader)를 쓰는 데다 전역 HeaderNav가 거기서
- * null을 반환하므로, 시트가 없으면 주식 화면에서 코인 쪽으로 돌아갈 길이 없다.
- * 그래서 시트만 떼어 공유한다 — 헤더 껍데기는 화면마다 다르지만 메뉴 항목은 같다.
+ * 전역 HeaderNav가 /stocks에서 null을 반환하므로, 이 시트가 없으면 주식 화면에
+ * 들어간 뒤로는 코인 쪽으로 돌아갈 길이 없다. 그래서 /stocks도 같은 항목을 본다.
  */
 export function NavSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
     const pathname = usePathname() ?? "/dashboard";
@@ -103,12 +102,18 @@ export function NavSheet({ open, onClose }: { open: boolean; onClose: () => void
                                 );
                             })}
 
-                            {/* /stocks는 코인 대시보드와 다른 공간이고 영어판이 없어 로케일을 붙이지 않는다. */}
+                            {/* 주식은 코인 대시보드와 다른 공간이라 선으로 끊어준다.
+                                선을 링크에 border-t로 걸면 rounded-control이 양 끝을 말아
+                                올려서 구분선이 아니라 그 항목의 윗변처럼 보인다. 그래서
+                                독립된 1px 요소로 둔다. */}
+                            <div className="my-1.5 h-px bg-border-subtle" aria-hidden="true" />
+
+                            {/* /stocks는 영어판이 없어 로케일을 붙이지 않는다. */}
                             <Link
                                 href="/stocks"
                                 onClick={onClose}
                                 aria-current={isStocks ? "page" : undefined}
-                                className={`mt-1 flex items-center justify-between rounded-control border-t border-border-subtle px-4 py-3.5 text-body transition-colors active:bg-surface-hover ${
+                                className={`flex items-center justify-between rounded-control px-4 py-3.5 text-body transition-colors active:bg-surface-hover ${
                                     isStocks ? "font-bold text-text-primary" : "text-text-secondary"
                                 }`}
                             >

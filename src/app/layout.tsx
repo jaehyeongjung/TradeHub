@@ -100,8 +100,13 @@ export default function RootLayout({
             </head>
             <body>
                 <JotaiProvider>
-                <HeaderNav />
-                <AuthGate>{children}</AuthGate>
+                {/* HeaderNav가 AuthGate 안으로 들어간 이유: ToastProvider가 AuthGate에
+                    들어 있어서, 밖에 두면 헤더의 ShareButton이 useToast에서 던진다.
+                    AuthGate는 children을 가로막지 않으므로 DOM 순서와 SSR 출력은 그대로다. */}
+                <AuthGate>
+                    <HeaderNav />
+                    {children}
+                </AuthGate>
                 <Script
                     async
                     src="https://www.googletagmanager.com/gtag/js?id=G-PHXWQJSM4Z"
