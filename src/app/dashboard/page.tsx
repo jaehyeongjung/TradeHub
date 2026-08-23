@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { RealTimeSection } from "@/widgets/dashboard/RealTimeSection";
 import { DashBoard } from "@/widgets/dashboard/DashBoard";
+import { DashboardSwitch } from "@/widgets/dashboard/mobile/DashboardSwitch";
 import Script from "next/script";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 import { PageExplainer } from "@/widgets/shared-modals/PageExplainer";
@@ -211,12 +212,14 @@ export default function Home() {
                 {JSON.stringify(SOFTWARE_JSONLD)}
             </Script>
 
-            <main className="h-screen overflow-hidden flex flex-col px-5 bg-black min-w-310 pt-12 pb-3 2xl:pb-4">
-                <RealTimeSection />
-                <Suspense fallback={null}>
-                    <DashBoard />
-                </Suspense>
-            </main>
+            <DashboardSwitch>
+                <main className="h-screen overflow-hidden flex flex-col px-5 bg-black min-w-310 pt-12 pb-3 2xl:pb-4 max-[1279.98px]:hidden">
+                    <RealTimeSection />
+                    <Suspense fallback={null}>
+                        <DashBoard />
+                    </Suspense>
+                </main>
+            </DashboardSwitch>
             <PageExplainer
                 heading="이 화면의 지표들, 어떻게 읽나요?"
                 lead="대시보드는 흩어져 있는 시장 지표를 한 화면에 모아둔 곳입니다. 각각 다른 것을 말해주기 때문에, 무엇을 보는 숫자인지 알고 봐야 쓸모가 있습니다."

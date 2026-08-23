@@ -66,7 +66,10 @@ export function SeoFooter() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+                {/* 좁은 화면에서 2단으로 두면 카드 폭이 224px까지 눌려 문장이 "파악하세/요."처럼
+                    끊기고, 카드 높이(352·178·132)가 제각각이라 빈칸이 크게 남는다.
+                    640px 미만만 1단으로 내린다 — sm·md 구간은 그대로다. */}
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-5">
 
                     <article className={`rounded-2xl p-5 transition-all duration-200 ${cardBg} ${cardHover}`}>
                         <div className={`text-[9px] font-semibold uppercase tracking-widest mb-3 ${labelColor}`}>

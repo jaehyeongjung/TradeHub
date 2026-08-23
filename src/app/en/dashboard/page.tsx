@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { RealTimeSection } from "@/widgets/dashboard/RealTimeSection";
 import { DashBoard } from "@/widgets/dashboard/DashBoard";
+import { DashboardSwitch } from "@/widgets/dashboard/mobile/DashboardSwitch";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 
 const SITE = "https://www.tradehub.kr";
@@ -39,12 +40,14 @@ export const metadata: Metadata = {
 export default function Page() {
     return (
         <>
-            <main className="h-screen overflow-hidden flex flex-col px-5 bg-black min-w-310 pt-12 pb-3 2xl:pb-4">
-                <RealTimeSection />
-                <Suspense fallback={null}>
-                    <DashBoard />
-                </Suspense>
-            </main>
+            <DashboardSwitch>
+                <main className="h-screen overflow-hidden flex flex-col px-5 bg-black min-w-310 pt-12 pb-3 2xl:pb-4 max-[1279.98px]:hidden">
+                    <RealTimeSection />
+                    <Suspense fallback={null}>
+                        <DashBoard />
+                    </Suspense>
+                </main>
+            </DashboardSwitch>
             <SeoFooter />
         </>
     );

@@ -1351,3 +1351,25 @@ ins.adsbygoogle[data-ad-status="filled"] {
 ins.adsbygoogle[data-ad-status="unfilled"] {
     display: none !important;
 }
+
+/* ============================================
+   모바일 전용 대시보드
+   ============================================ */
+
+/* 모바일 뷰가 마운트되면 전역 HeaderNav를 감춘다. HeaderNav는 메뉴·제휴 배너를
+   가로로 늘어놓는 데스크톱 전용 배치라 좁은 화면에서 무너진다. 모바일은
+   MobileHeader가 대신 뜬다.
+   HeaderNav가 layout.tsx에서 body 바로 아래에 있어 페이지 쪽에서 손댈 수 없으므로
+   :has()로 잡는다. 자식 결합자(>)라서 MobileHeader의 <header>는 걸리지 않는다. */
+body:has([data-mobile-shell]) > header {
+    display: none;
+}
+
+/* template.tsx의 페이지 전환 래퍼(.overflow-hidden)가 스크롤 컨테이너를 만들어
+   MobileHeader의 sticky가 body가 아닌 그 래퍼에 붙는다. 래퍼째로 스크롤되니
+   헤더가 같이 밀려 올라간다. overflow:clip은 잘라내기는 하되 스크롤 컨테이너를
+   만들지 않아서 sticky가 살아난다.
+   모바일 셸이 마운트된 동안에만 적용되므로 데스크톱 전환 애니메이션은 그대로다. */
+.overflow-hidden:has([data-mobile-shell]) {
+    overflow: clip;
+}
