@@ -5,7 +5,7 @@
 import { getFuturesTickers } from "@/shared/lib/market-snapshot.server";
 import { SUPPORTED_SYMBOLS, SYMBOL_NAMES } from "@/shared/constants/sim-trading.constants";
 import {
-    SnapshotSection, ScrollTable, Change, thClass, tdClass, usd,
+    SnapshotSection, ScrollTable, Change, SymbolCell, thClass, tdClass, colSecondary, usd,
 } from "@/widgets/shared-modals/SnapshotSection";
 
 const SHOWN = 12;
@@ -50,8 +50,8 @@ export async function AnalysisSnapshot() {
                     <tr className="border-b border-border-subtle">
                         <th scope="col" className={thClass}>종목</th>
                         <th scope="col" className={thClass}>현재가</th>
-                        <th scope="col" className={thClass}>24h 저가</th>
-                        <th scope="col" className={thClass}>24h 고가</th>
+                        <th scope="col" className={`${thClass} ${colSecondary}`}>24h 저가</th>
+                        <th scope="col" className={`${thClass} ${colSecondary}`}>24h 고가</th>
                         <th scope="col" className={thClass}>레인지 내 위치</th>
                         <th scope="col" className={thClass}>변동폭</th>
                     </tr>
@@ -61,15 +61,10 @@ export async function AnalysisSnapshot() {
                         const pos = rangePos(t.last, t.high, t.low);
                         return (
                             <tr key={t.symbol} className="border-b border-border-subtle last:border-0">
-                                <th scope="row" className="px-3 py-2.5 text-left font-bold text-text-primary">
-                                    {SYMBOL_NAMES[t.symbol] ?? t.symbol}
-                                    <span className="ml-1.5 font-normal text-text-tertiary">
-                                        {t.symbol.replace("USDT", "")}
-                                    </span>
-                                </th>
+                                <SymbolCell name={SYMBOL_NAMES[t.symbol] ?? t.symbol} symbol={t.symbol} />
                                 <td className={tdClass}>{usd(t.last)}</td>
-                                <td className={tdClass}>{usd(t.low)}</td>
-                                <td className={tdClass}>{usd(t.high)}</td>
+                                <td className={`${tdClass} ${colSecondary}`}>{usd(t.low)}</td>
+                                <td className={`${tdClass} ${colSecondary}`}>{usd(t.high)}</td>
                                 <td className={tdClass}>{pos == null ? "—" : `${pos.toFixed(0)}%`}</td>
                                 <td className={`${tdClass} font-bold`}><Change pct={t.changePct} /></td>
                             </tr>

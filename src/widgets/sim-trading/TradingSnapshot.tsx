@@ -5,7 +5,8 @@
 import { getFuturesTickers } from "@/shared/lib/market-snapshot.server";
 import { SUPPORTED_SYMBOLS, SYMBOL_NAMES, LEVERAGE_PRESETS } from "@/shared/constants/sim-trading.constants";
 import {
-    SnapshotSection, ScrollTable, Change, thClass, tdClass, usd, compactUsd,
+    SnapshotSection, ScrollTable, Change, SymbolCell, thClass, tdClass, colSecondary,
+    usd, compactUsd,
 } from "@/widgets/shared-modals/SnapshotSection";
 
 /** 표에 넣을 종목 수. 56개를 전부 늘어놓으면 표가 페이지를 잡아먹는다. */
@@ -45,22 +46,17 @@ export async function TradingSnapshot() {
                         <th scope="col" className={thClass}>종목</th>
                         <th scope="col" className={thClass}>현재가</th>
                         <th scope="col" className={thClass}>24h 등락</th>
-                        <th scope="col" className={thClass}>거래대금</th>
+                        <th scope="col" className={`${thClass} ${colSecondary}`}>거래대금</th>
                         <th scope="col" className={thClass}>10배 청산 거리</th>
                     </tr>
                 </thead>
                 <tbody>
                     {top.map((t) => (
                         <tr key={t.symbol} className="border-b border-border-subtle last:border-0">
-                            <th scope="row" className="px-3 py-2.5 text-left font-bold text-text-primary">
-                                {SYMBOL_NAMES[t.symbol] ?? t.symbol}
-                                <span className="ml-1.5 font-normal text-text-tertiary">
-                                    {t.symbol.replace("USDT", "")}
-                                </span>
-                            </th>
+                            <SymbolCell name={SYMBOL_NAMES[t.symbol] ?? t.symbol} symbol={t.symbol} />
                             <td className={tdClass}>{usd(t.last)}</td>
                             <td className={`${tdClass} font-bold`}><Change pct={t.changePct} /></td>
-                            <td className={tdClass}>{compactUsd(t.quoteVolume)}</td>
+                            <td className={`${tdClass} ${colSecondary}`}>{compactUsd(t.quoteVolume)}</td>
                             {/* 10배면 약 10% 반대로 밀릴 때 증거금이 사라진다. 그 지점을 가격으로 보여준다 */}
                             <td className={tdClass}>{usd(t.last * 0.9)}</td>
                         </tr>

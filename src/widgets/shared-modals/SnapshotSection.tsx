@@ -35,21 +35,49 @@ export function Change({ pct }: { pct: number }) {
 }
 
 /**
- * 표는 좁은 화면에서 가로로 넘친다. 페이지 body가 통째로 흔들리지 않게
- * 자기 컨테이너 안에서만 스크롤시킨다.
+ * 좁은 화면에서도 표 전체가 한 화면에 들어오게 한다.
+ *
+ * 전에는 min-w-[30rem](480px)을 걸어두어 390px 기기에서 무조건 가로 스크롤이 생겼다.
+ * 표가 잘린 채로 뜨니 오른쪽에 무엇이 있는지 모르고 지나치게 된다.
+ * 지금은 최소 폭을 두지 않고, 부차적인 열을 sm 미만에서 접는다(colSecondary).
+ * overflow-x-auto는 그래도 넘칠 때를 위한 안전망으로 남겨둔다.
  */
 export function ScrollTable({ children }: { children: ReactNode }) {
     return (
         <div className="overflow-x-auto rounded-card border border-border-subtle bg-surface-card">
-            <table className="w-full min-w-[30rem] border-collapse text-label">
+            <table className="w-full border-collapse text-label">
                 {children}
             </table>
         </div>
     );
 }
 
-export const thClass = "px-3 py-2.5 text-left font-bold text-text-tertiary";
-export const tdClass = "px-3 py-2.5 tabular-nums text-text-secondary";
+/* 헤더가 두 줄로 갈라지면("24h 등락" → "24h" / "등락") 행 높이가 들쭉날쭉해진다.
+   좁은 화면에서는 좌우 여백도 줄여 열 하나라도 더 들어가게 한다. */
+export const thClass =
+    "whitespace-nowrap px-2 py-2.5 text-left font-bold text-text-tertiary sm:px-3";
+export const tdClass =
+    "whitespace-nowrap px-2 py-2.5 tabular-nums text-text-secondary sm:px-3";
+
+/** 좁은 화면에서 접는 열. 핵심 3~4개만 남기고 나머지를 숨긴다. */
+export const colSecondary = "hidden sm:table-cell";
+
+/**
+ * 종목 이름 칸. 모바일은 티커만("BTC"), sm 이상에서 정식 이름을 앞에 붙인다.
+ * "Bitcoin Cash BCH"를 그대로 두면 이 칸 하나가 표 폭의 절반을 먹는다.
+ */
+export function SymbolCell({ name, symbol }: { name: string; symbol: string }) {
+    const ticker = symbol.replace("USDT", "");
+    return (
+        <th
+            scope="row"
+            className="whitespace-nowrap px-2 py-2.5 text-left font-bold text-text-primary sm:px-3"
+        >
+            <span className="hidden sm:inline">{name}</span>
+            <span className="sm:ml-1.5 sm:font-normal sm:text-text-tertiary">{ticker}</span>
+        </th>
+    );
+}
 
 /** $79,914.60 처럼. 1달러 미만 코인은 유효숫자를 더 준다. */
 export function usd(n: number): string {

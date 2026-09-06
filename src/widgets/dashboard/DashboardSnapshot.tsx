@@ -7,7 +7,8 @@ import {
 } from "@/shared/lib/market-snapshot.server";
 import { SYMBOL_NAMES } from "@/shared/constants/sim-trading.constants";
 import {
-    SnapshotSection, ScrollTable, Change, thClass, tdClass, usd, compactUsd, krw,
+    SnapshotSection, ScrollTable, Change, SymbolCell, thClass, tdClass, colSecondary,
+    usd, compactUsd, krw,
 } from "@/widgets/shared-modals/SnapshotSection";
 
 const MAJORS = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT", "DOGEUSDT"];
@@ -53,22 +54,17 @@ export async function DashboardSnapshot() {
                         <th scope="col" className={thClass}>코인</th>
                         <th scope="col" className={thClass}>현재가</th>
                         <th scope="col" className={thClass}>24h 등락</th>
-                        <th scope="col" className={thClass}>24h 고가 / 저가</th>
+                        <th scope="col" className={`${thClass} ${colSecondary}`}>24h 고가 / 저가</th>
                         <th scope="col" className={thClass}>거래대금</th>
                     </tr>
                 </thead>
                 <tbody>
                     {rows.map((t) => (
                         <tr key={t.symbol} className="border-b border-border-subtle last:border-0">
-                            <th scope="row" className="px-3 py-2.5 text-left font-bold text-text-primary">
-                                {SYMBOL_NAMES[t.symbol] ?? t.symbol}
-                                <span className="ml-1.5 font-normal text-text-tertiary">
-                                    {t.symbol.replace("USDT", "")}
-                                </span>
-                            </th>
+                            <SymbolCell name={SYMBOL_NAMES[t.symbol] ?? t.symbol} symbol={t.symbol} />
                             <td className={tdClass}>{usd(t.last)}</td>
                             <td className={`${tdClass} font-bold`}><Change pct={t.changePct} /></td>
-                            <td className={tdClass}>{usd(t.high)} / {usd(t.low)}</td>
+                            <td className={`${tdClass} ${colSecondary}`}>{usd(t.high)} / {usd(t.low)}</td>
                             <td className={tdClass}>{compactUsd(t.quoteVolume)}</td>
                         </tr>
                     ))}
