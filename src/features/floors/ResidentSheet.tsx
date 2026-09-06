@@ -269,9 +269,7 @@ export function ResidentSheet({
                                             {floor}층
                                         </strong>
                                         {kind === "holder" ? (
-                                            <>
-                                                {" · 평가손익 "}
-                                                <strong
+                                            <> · 평가손익 <strong
                                                     className="font-bold"
                                                     style={{
                                                         color:

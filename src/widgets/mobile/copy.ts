@@ -1,11 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-
-/**
- * 모바일 뷰 문구. /dashboard와 /en/dashboard가 같은 컴포넌트를 쓰므로
- * 문자열을 컴포넌트 안에 박아두면 영어 화면에 한글이 새어 나간다.
- */
+/** 모바일 뷰 문구. 컴포넌트에 흩어두지 않고 한곳에 모아둔다. */
 const KO = {
     menu: "메뉴",
     openMenu: "메뉴 열기",
@@ -72,71 +67,6 @@ const KO = {
 
 export type MobileCopy = typeof KO;
 
-const EN: MobileCopy = {
-    menu: "Menu",
-    openMenu: "Open menu",
-    mainMenu: "Main Menu",
-    toLight: "Switch to light mode",
-    toDark: "Switch to dark mode",
-    navDashboard: "Dashboard",
-    navTrading: "Sim Trading",
-    navRanking: "Rankings",
-    navAnalysis: "Chart Analysis",
-    navStocks: "Stocks",
-    navStocksHint: "24h quotes",
-
-    hotCoins: "Hot Coins",
-    news: "Crypto News",
-    newsEmpty: "No news to show",
-    newsMore: (n: number) => `Show ${n} more`,
-    newsCollapse: "Show less",
-
-    corePrices: "Prices",
-    marketGauges: "Market indicators",
-    fearGreed: "Fear & Greed",
-    fearGreedAria: (v: number, label: string) => `Fear and Greed Index ${v}, ${label}`,
-    fgExtremeFear: "Extreme Fear",
-    fgFear: "Fear",
-    fgNeutral: "Neutral",
-    fgGreed: "Greed",
-    fgExtremeGreed: "Extreme Greed",
-
-    kimchi: "Kimchi Premium",
-    upbit: "Upbit",
-    global: "Global",
-    fx: "USD/KRW",
-
-    liveTrades: "Live trades",
-    waitingFeed: "Waiting for trades",
-    liquidations: "Liquidations",
-    whales: "Whale Trades",
-    longLiq: "Long liq.",
-    shortLiq: "Short liq.",
-    buy: "Buy",
-    sell: "Sell",
-
-    // 모의투자
-    orderBook: "Order Book",
-    positions: "Positions",
-    openOrders: "Open Orders",
-    tradeHistory: "History",
-    ranking: "Rankings",
-    balance: "Balance",
-    unrealizedPnl: "Unrealized PnL",
-    long: "Long",
-    short: "Short",
-    longOrder: "Long Order",
-    shortOrder: "Short Order",
-    closeSheet: "Close",
-    chart: "Chart",
-
-    justNow: "now",
-    minsAgo: (n: number) => `${n}m ago`,
-    hoursAgo: (n: number) => `${n}h ago`,
-    daysAgo: (n: number) => `${n}d ago`,
-};
-
-export function useMobileCopy(): { t: MobileCopy; isEn: boolean } {
-    const isEn = (usePathname() ?? "").startsWith("/en");
-    return { t: isEn ? EN : KO, isEn };
+export function useMobileCopy(): { t: MobileCopy } {
+    return { t: KO };
 }

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link2, Share, Share2, X } from "lucide-react";
 import { useToast } from "@/shared/ui/Toast";
@@ -75,8 +74,7 @@ const DEFAULT_TRIGGER =
  */
 export function ShareButton({ className, label, iconSize = 17 }: { className?: string; label?: string; iconSize?: number }) {
     const { showToast } = useToast();
-    const isEn = (usePathname() ?? "").startsWith("/en");
-    const c = isEn ? COPY.en : COPY.ko;
+    const c = COPY.ko;
     const [kakaoReady, setKakaoReady] = useState(false);
     const [canWebShare, setCanWebShare] = useState(false);
     const [mounted, setMounted] = useState(false);

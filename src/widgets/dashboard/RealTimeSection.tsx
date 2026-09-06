@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { usePathname } from "next/navigation";
 import { CoinPriceBox } from "@/entities/coin/CoinPriceBox";
 import { LiquidationFeed } from "@/entities/whale/LiquidationFeed";
 import { WhaleTrades } from "@/entities/whale/WhaleTrades";
@@ -14,8 +13,6 @@ const CoinChart = dynamic(() => import("@/entities/coin/CoinChart").then(m => ({
 });
 
 export const RealTimeSection = () => {
-    const pathname = usePathname();
-    const isEn = pathname.startsWith("/en/");
 
     return (
         <section
@@ -30,7 +27,7 @@ export const RealTimeSection = () => {
             </div>
 
             <div className="flex-[2] min-w-0">
-                <CoinChart fadeDelay={300} locale={isEn ? "en" : "ko"} showStockIndices symbol="^IXIC" />
+                <CoinChart fadeDelay={300} locale="ko" showStockIndices symbol="^IXIC" />
             </div>
 
             <div className="flex gap-2 2xl:gap-4 flex-[2] min-w-0">

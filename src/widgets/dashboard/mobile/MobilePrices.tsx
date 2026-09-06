@@ -26,7 +26,7 @@ function fmtUsd(n: number) {
  */
 export function MobilePrices() {
     const tickers = useLiveTickers(SYMBOLS);
-    const { t, isEn } = useMobileCopy();
+    const { t } = useMobileCopy();
 
     return (
         <MobileSection title={t.corePrices} live>
@@ -45,7 +45,7 @@ export function MobilePrices() {
 
                             <div className="min-w-0">
                                 <p className="text-body font-bold leading-tight text-text-primary">{c.base}</p>
-                                <p className="text-caption text-text-muted">{isEn ? c.en : c.ko}</p>
+                                <p className="text-caption text-text-muted">{c.ko}</p>
                             </div>
 
                             <div className="ml-auto text-right">

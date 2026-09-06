@@ -3,7 +3,6 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useAtomValue } from "jotai";
-import { usePathname } from "next/navigation";
 import { simSymbolAtom } from "@/shared/store/atoms";
 import { useSimPriceStream } from "@/features/sim-trading/useSimPriceStream";
 import { useSimAccount } from "@/features/sim-trading/useSimAccount";
@@ -30,8 +29,6 @@ const CoinChart = dynamic(
  * 항상 한 번에 닿아야 하는 유일한 동작이라서다.
  */
 export function MobileTrading() {
-    const pathname = usePathname() ?? "/trading";
-    const isEn = pathname.startsWith("/en");
     const simSymbol = useAtomValue(simSymbolAtom);
 
     const [tab, setTab] = useState<TradingTab>("book");
@@ -63,7 +60,7 @@ export function MobileTrading() {
             <MobileTradingTicker />
 
             <div className="flex flex-1 flex-col gap-5 py-4">
-                <section className="px-4" aria-label={isEn ? "Chart" : "차트"}>
+                <section className="px-4" aria-label="차트">
                     <div className="h-[300px] overflow-hidden rounded-card border border-border-subtle bg-surface-card">
                         <CoinChart
                             boxId="sim-chart-mobile"
@@ -73,7 +70,7 @@ export function MobileTrading() {
                             hideControls
                             positions={positions}
                             onUpdateTpSl={updateTpSl}
-                            locale={isEn ? "en" : "ko"}
+                            locale="ko"
                         />
                     </div>
                 </section>
@@ -85,7 +82,6 @@ export function MobileTrading() {
                     orders={orders}
                     trades={trades}
                     userId={userId}
-                    isEn={isEn}
                     onClosePosition={closePosition}
                     onUpdateTpSl={updateTpSl}
                     onCancelOrder={cancelOrder}
@@ -104,7 +100,6 @@ export function MobileTrading() {
                 lockedMarginMode={lockedMarginMode}
                 positionCount={positions.length}
                 orderCount={orders.length}
-                isEn={isEn}
                 openSide={orderSide}
                 onOpenChange={setOrderSide}
             />

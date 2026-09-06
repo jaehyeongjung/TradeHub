@@ -18,10 +18,6 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "https://www.tradehub.kr/guide",
-    languages: {
-      "ko": "https://www.tradehub.kr/guide",
-      "en": "https://www.tradehub.kr/en/guide",
-    },
   },
   openGraph: {
     title: "코인 투자 가이드 — 선물거래·지표·용어 쉽게 배우기 | TradeHub",

@@ -29,11 +29,11 @@ export function MobileHeader({
     logoHref?: string;
     innerClassName?: string;
 } = {}) {
-    const { t, isEn } = useMobileCopy();
+    const { t } = useMobileCopy();
     const { isDark, toggleTheme } = useThemeToggle();
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const home = logoHref ?? (isEn ? "/en/dashboard" : "/dashboard");
+    const home = logoHref ?? ("/dashboard");
 
     return (
         <>

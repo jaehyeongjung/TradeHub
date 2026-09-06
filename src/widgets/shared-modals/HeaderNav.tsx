@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { Suspense } from "react";
 import { useAtom, useSetAtom } from "jotai";
 import { treemapOpenAtom, loginDrawerOpenAtom } from "@/shared/store/atoms";
-import { FlagKR, FlagUS } from "@/shared/ui/FlagIcons";
 import { useThemeToggle } from "@/shared/hooks/useThemeToggle";
 import { ShareButton } from "@/shared/ui/ShareButton";
 
@@ -15,16 +14,14 @@ function HeaderNavInner() {
     const [loginOpen, setLoginOpen] = useAtom(loginDrawerOpenAtom);
     const { isDark, toggleTheme } = useThemeToggle();
 
-    if (pathname === "/" || pathname === "/en" || pathname.startsWith("/mobile")) return null;
+    if (pathname === "/" || pathname.startsWith("/mobile")) return null;
     // /stocks는 폭과 무관하게 MobileHeader를 쓴다 (stocks/layout.tsx)
     if (pathname.startsWith("/stocks")) return null;
 
-    const isEn = pathname.startsWith("/en/");
-
-    const isDashboard = pathname === "/dashboard" || pathname === "/en/dashboard";
-    const isSim       = pathname === "/trading"   || pathname === "/en/trading";
-    const isRanking   = pathname === "/ranking"   || pathname === "/en/ranking";
-    const isAnalysis  = pathname === "/analysis"  || pathname === "/en/analysis";
+    const isDashboard = pathname === "/dashboard";
+    const isSim       = pathname === "/trading";
+    const isRanking   = pathname === "/ranking";
+    const isAnalysis  = pathname === "/analysis";
 
     const activeClass   = "text-text-primary font-semibold";
     const inactiveClass = "text-text-muted hover:text-text-secondary transition-colors";
@@ -32,35 +29,35 @@ function HeaderNavInner() {
 
     return (
         <header suppressHydrationWarning className="fixed top-0 left-0 right-0 z-50 h-12 w-full bg-[var(--surface-card)] border-b border-[var(--border-subtle)] flex items-center px-4">
-            <Link href={isEn ? "/en/dashboard" : "/dashboard"} className="flex items-center gap-1.5 mr-6 flex-shrink-0">
+            <Link href="/dashboard" className="flex items-center gap-1.5 mr-6 flex-shrink-0">
                 <span className="font-black tracking-[-0.08em] text-sm text-text-primary select-none">TradeHub</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" aria-hidden="true" />
             </Link>
 
-            <nav className="flex items-center gap-1" aria-label={isEn ? "Main Menu" : "주요 메뉴"}>
-                <Link href={isEn ? "/en/dashboard" : "/dashboard"} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isDashboard ? activeClass : inactiveClass}`} aria-current={isDashboard ? "page" : undefined}>
+            <nav className="flex items-center gap-1" aria-label="주요 메뉴">
+                <Link href="/dashboard" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isDashboard ? activeClass : inactiveClass}`} aria-current={isDashboard ? "page" : undefined}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
-                    <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Dashboard" : "대시보드"}</span>
+                    <span className="hidden sm:inline whitespace-nowrap">대시보드</span>
                 </Link>
-                <Link href={isEn ? "/en/trading" : "/trading?tab=sim"} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isSim ? activeClass : inactiveClass}`} aria-current={isSim ? "page" : undefined}>
+                <Link href="/trading?tab=sim" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isSim ? activeClass : inactiveClass}`} aria-current={isSim ? "page" : undefined}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Sim Trading" : "모의투자"}</span>
+                    <span className="hidden sm:inline whitespace-nowrap">모의투자</span>
                 </Link>
-                <Link href={isEn ? "/en/ranking" : "/ranking"} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isRanking ? activeClass : inactiveClass}`} aria-current={isRanking ? "page" : undefined}>
+                <Link href="/ranking" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isRanking ? activeClass : inactiveClass}`} aria-current={isRanking ? "page" : undefined}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
                     </svg>
-                    <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Rankings" : "코인랭킹"}</span>
+                    <span className="hidden sm:inline whitespace-nowrap">코인랭킹</span>
                 </Link>
-                <Link href={isEn ? "/en/analysis" : "/analysis"} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isAnalysis ? activeClass : inactiveClass}`} aria-current={isAnalysis ? "page" : undefined}>
+                <Link href="/analysis" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${isAnalysis ? activeClass : inactiveClass}`} aria-current={isAnalysis ? "page" : undefined}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 2v3m0 10v3M6 5h4v10H6V5zm10-1v4m0 6v4m-2-9h4v9h-4v-9z" />
                     </svg>
-                    <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Chart Analysis" : "차트분석"}</span>
+                    <span className="hidden sm:inline whitespace-nowrap">차트분석</span>
                 </Link>
                 {/* 탭 모양은 그대로 두고 색만 갈라놓는다 — /stocks는 코인 대시보드와
                     다른 공간이라 누르기 전에 알아야 한다. 색은 .nav-stocks에 있다.
@@ -70,43 +67,47 @@ function HeaderNavInner() {
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
-                    <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Stocks" : "주식"}</span>
+                    <span className="hidden sm:inline whitespace-nowrap">주식</span>
                 </Link>
             </nav>
 
             <div className="ml-auto flex items-center gap-2 flex-shrink-0">
-                <LangSwitcher pathname={pathname} isEn={isEn} />
-
+                {/* 제휴 링크. 금색 그라데이션 채움 버튼으로 두면 모든 페이지에서 헤더의
+                    가장 눈에 띄는 요소가 제휴 CTA가 된다 — 본문이 얇은 도구 페이지에서는
+                    "사이트가 제휴 유입을 위해 존재한다"는 신호로 읽힌다. 다른 헤더 항목과
+                    같은 무게로 낮추고, 광고임을 글자로 밝힌다(rel=sponsored만으로는
+                    사람에게 보이지 않는다). */}
                 <a
-                href="https://www.bybit.com/invite?ref=ADYNPO"
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-90 active:scale-[0.97] cursor-pointer flex-shrink-0"
-                style={{ background: "linear-gradient(90deg, #f7a600 0%, #e09500 100%)", color: "#000" }}
-                aria-label="Bybit partner link"
-            >
-                <svg width="12" height="12" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                    <path d="M4 8h14l-4 5H4V8z" fill="currentColor" />
-                    <path d="M4 14h12l4 5H4v-5z" fill="currentColor" opacity="0.7" />
-                    <path d="M4 20h10l4 5H4v-5z" fill="currentColor" opacity="0.4" />
-                    <path d="M20 8l8 4-8 4V8z" fill="currentColor" />
-                </svg>
-                <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Join Bybit — Get $20" : "Bybit 가입 시 $20 지급"}</span>
-                <span className="sm:hidden">Bybit $20</span>
-            </a>
-
+                    href="https://www.bybit.com/invite?ref=ADYNPO"
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-text-secondary hover:text-text-primary transition-colors cursor-pointer flex-shrink-0"
+                    aria-label="Bybit 가입 혜택 — 제휴 광고 링크 (새 창)"
+                >
+                    <svg width="12" height="12" viewBox="0 0 32 32" fill="none" aria-hidden="true" className="text-[#f7a600]">
+                        <path d="M4 8h14l-4 5H4V8z" fill="currentColor" />
+                        <path d="M4 14h12l4 5H4v-5z" fill="currentColor" opacity="0.7" />
+                        <path d="M4 20h10l4 5H4v-5z" fill="currentColor" opacity="0.4" />
+                        <path d="M20 8l8 4-8 4V8z" fill="currentColor" />
+                    </svg>
+                    <span className="hidden sm:inline whitespace-nowrap">Bybit 가입 혜택</span>
+                    <span className="sm:hidden">Bybit</span>
+                    <span className="rounded border border-border-subtle px-1 text-[10px] leading-[1.4] text-text-tertiary">
+                        광고
+                    </span>
+                </a>
             </div>
 
             <div className="flex items-center gap-1 ml-3">
                 {/* 공유 대상은 클릭 시점의 location.href다 — /stocks가 아니라
                     지금 보고 있는 코인 페이지(/ranking, /analysis …)가 그대로 나간다. */}
-                <ShareButton className={iconBtnClass} label={isEn ? "Share" : "공유"} iconSize={14} />
+                <ShareButton className={iconBtnClass} label="공유" iconSize={14} />
 
-                <button type="button" onClick={() => setTreemapOpen(true)} aria-label={isEn ? "Open Heatmap" : "트리맵 보기"} className={iconBtnClass}>
+                <button type="button" onClick={() => setTreemapOpen(true)} aria-label="트리맵 보기" className={iconBtnClass}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M3 3h8v8H3V3zm0 10h8v8H3v-8zm10-10h8v8h-8V3zm0 10h8v8h-8v-8z" />
                     </svg>
-                    <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Heatmap" : "트리맵"}</span>
+                    <span className="hidden sm:inline whitespace-nowrap">트리맵</span>
                 </button>
 
                 <button type="button" onClick={toggleTheme} aria-label={isDark ? "Switch to Light" : "Switch to Dark"} className={iconBtnClass}>
@@ -119,14 +120,14 @@ function HeaderNavInner() {
                             <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26a5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z" />
                         </svg>
                     )}
-                    <span className="hidden sm:inline whitespace-nowrap">{isDark ? (isEn ? "Light" : "라이트") : (isEn ? "Dark" : "다크")}</span>
+                    <span className="hidden sm:inline whitespace-nowrap">{isDark ? ("라이트") : ("다크")}</span>
                 </button>
 
                 <button type="button" onClick={() => setLoginOpen(true)} aria-haspopup="dialog" aria-expanded={loginOpen} aria-controls="login-drawer" className={iconBtnClass}>
                     <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2a5 5 0 1 1 0 10a5 5 0 0 1 0-10m0 12c5.33 0 8 2.67 8 6v2H4v-2c0-3.33 2.67-6 8-6" />
                     </svg>
-                    <span className="hidden sm:inline whitespace-nowrap">{isEn ? "Login" : "로그인"}</span>
+                    <span className="hidden sm:inline whitespace-nowrap">로그인</span>
                 </button>
             </div>
         </header>
@@ -141,19 +142,3 @@ export function HeaderNav() {
     );
 }
 
-function LangSwitcher({ pathname, isEn }: { pathname: string; isEn: boolean }) {
-    const targetPath = isEn
-        ? pathname === "/en" ? "/" : pathname.replace(/^\/en/, "")
-        : pathname === "/" ? "/en" : "/en" + pathname;
-
-    return (
-        <Link
-            href={targetPath}
-            className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-[var(--border-subtle)] hover:border-[var(--border-default)] transition-all hover:scale-105 active:scale-95"
-            aria-label={isEn ? "한국어로 전환" : "Switch to English"}
-            title={isEn ? "한국어" : "English"}
-        >
-            {isEn ? <FlagKR size={20} /> : <FlagUS size={20} />}
-        </Link>
-    );
-}

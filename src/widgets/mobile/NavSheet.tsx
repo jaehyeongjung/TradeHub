@@ -22,7 +22,7 @@ const NAV: { href: string; key: keyof MobileCopy }[] = [
  */
 export function NavSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
     const pathname = usePathname() ?? "/dashboard";
-    const { t, isEn } = useMobileCopy();
+    const { t } = useMobileCopy();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => { setMounted(true); }, []);
@@ -45,7 +45,7 @@ export function NavSheet({ open, onClose }: { open: boolean; onClose: () => void
 
     if (!mounted) return null;
 
-    const withLocale = (href: string) => (isEn ? `/en${href.split("?")[0]}` : href);
+    const withLocale = (href: string) => (href);
     const isStocks = pathname.startsWith("/stocks");
 
     return createPortal(

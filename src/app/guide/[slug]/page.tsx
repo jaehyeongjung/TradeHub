@@ -24,10 +24,6 @@ export async function generateMetadata({
     keywords: guide.keywords,
     alternates: {
       canonical: `https://www.tradehub.kr/guide/${guide.slug}`,
-      languages: {
-        "ko": `https://www.tradehub.kr/guide/${guide.slug}`,
-        "en": `https://www.tradehub.kr/en/guide/${guide.slug}`,
-      },
     },
     openGraph: {
       title: `${guide.title} | TradeHub`,

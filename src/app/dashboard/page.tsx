@@ -6,8 +6,13 @@ import { DashboardSwitch } from "@/widgets/dashboard/mobile/DashboardSwitch";
 import Script from "next/script";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 import { PageExplainer } from "@/widgets/shared-modals/PageExplainer";
+import { DashboardSnapshot } from "@/widgets/dashboard/DashboardSnapshot";
 
 const SITE = "https://www.tradehub.kr";
+
+// 스냅샷 표를 5분마다 새로 만든다. 위젯은 어차피 접속 후 실시간으로 갱신되므로
+// 더 짧게 잡아도 사람에게 보이는 값은 달라지지 않고, 상단 API 호출만 늘어난다.
+export const revalidate = 300;
 
 export const metadata: Metadata = {
     title: "실시간 코인 대시보드 — 청산 · 고래 · 트리맵 · 김프",
@@ -22,10 +27,6 @@ export const metadata: Metadata = {
     ],
     alternates: {
         canonical: "https://www.tradehub.kr/dashboard",
-        languages: {
-            "ko": "https://www.tradehub.kr/dashboard",
-            "en": "https://www.tradehub.kr/en/dashboard",
-        },
     },
     openGraph: {
         title: "실시간 코인 대시보드 — 청산 · 고래 · 트리맵 · 김프 | TradeHub",
@@ -220,6 +221,7 @@ export default function Home() {
                     </Suspense>
                 </main>
             </DashboardSwitch>
+            <DashboardSnapshot />
             <PageExplainer
                 heading="이 화면의 지표들, 어떻게 읽나요?"
                 lead="대시보드는 흩어져 있는 시장 지표를 한 화면에 모아둔 곳입니다. 각각 다른 것을 말해주기 때문에, 무엇을 보는 숫자인지 알고 봐야 쓸모가 있습니다."

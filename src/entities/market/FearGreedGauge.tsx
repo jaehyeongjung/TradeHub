@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
-import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { SlotNumber } from "@/shared/ui/AnimatedNumber";
 
@@ -24,8 +23,6 @@ export function FearGreedGauge({
     const v = Math.max(0, Math.min(100, value));
     const [isHovered, setIsHovered] = useState(false);
     const isLight = useTheme();
-    const pathname = usePathname();
-    const isEn = pathname.startsWith("/en/");
     const [slotValue, setSlotValue] = useState(0);
 
     useEffect(() => {
@@ -33,15 +30,15 @@ export function FearGreedGauge({
     }, [isLoading, v]);
 
     const getStateInfo = (val: number) => {
-        if (val < 25) return { text: isEn ? "Extreme Fear" : "극도의 공포", color: "text-red-400", barColor: "bg-red-500", bgLight: isLight ? "bg-red-50 text-red-600" : "bg-red-500/10 text-red-400" };
-        if (val < 45) return { text: isEn ? "Fear" : "공포", color: "text-orange-400", barColor: "bg-orange-500", bgLight: isLight ? "bg-orange-50 text-orange-600" : "bg-orange-500/10 text-orange-400" };
-        if (val < 55) return { text: isEn ? "Neutral" : "중립", color: "text-yellow-400", barColor: "bg-yellow-500", bgLight: isLight ? "bg-yellow-50 text-yellow-600" : "bg-yellow-500/10 text-yellow-400" };
-        if (val < 75) return { text: isEn ? "Greed" : "탐욕", color: "text-lime-400", barColor: "bg-lime-500", bgLight: isLight ? "bg-lime-50 text-lime-600" : "bg-lime-500/10 text-lime-400" };
-        return { text: isEn ? "Extreme Greed" : "극도의 탐욕", color: "text-emerald-400", barColor: "bg-emerald-500", bgLight: isLight ? "bg-emerald-50 text-emerald-600" : "bg-emerald-500/10 text-emerald-400" };
+        if (val < 25) return { text: "극도의 공포", color: "text-red-400", barColor: "bg-red-500", bgLight: isLight ? "bg-red-50 text-red-600" : "bg-red-500/10 text-red-400" };
+        if (val < 45) return { text: "공포", color: "text-orange-400", barColor: "bg-orange-500", bgLight: isLight ? "bg-orange-50 text-orange-600" : "bg-orange-500/10 text-orange-400" };
+        if (val < 55) return { text: "중립", color: "text-yellow-400", barColor: "bg-yellow-500", bgLight: isLight ? "bg-yellow-50 text-yellow-600" : "bg-yellow-500/10 text-yellow-400" };
+        if (val < 75) return { text: "탐욕", color: "text-lime-400", barColor: "bg-lime-500", bgLight: isLight ? "bg-lime-50 text-lime-600" : "bg-lime-500/10 text-lime-400" };
+        return { text: "극도의 탐욕", color: "text-emerald-400", barColor: "bg-emerald-500", bgLight: isLight ? "bg-emerald-50 text-emerald-600" : "bg-emerald-500/10 text-emerald-400" };
     };
 
     const state = getStateInfo(v);
-    const resolvedTitle = title ?? (isEn ? "Fear & Greed Index" : "공포 & 탐욕 지수");
+    const resolvedTitle = title ?? ("공포 & 탐욕 지수");
     const displayLabel = subLabel ?? state.text;
 
     const cardClass = isLight
@@ -104,8 +101,8 @@ export function FearGreedGauge({
                     </div>
 
                     <div className={`flex justify-between ${edgeLabelClass}`}>
-                        <span>{isEn ? "Fear" : "공포"}</span>
-                        <span>{isEn ? "Greed" : "탐욕"}</span>
+                        <span>공포</span>
+                        <span>탐욕</span>
                     </div>
                 </div>
             </div>
@@ -119,11 +116,7 @@ export function FearGreedGauge({
                         transition={{ duration: 0.18 }}
                         className={tooltipClass}
                     >
-                        <p className="leading-relaxed">
-                            {isEn
-                                ? "A composite score (0–100) based on price volatility, volume, and social trends to measure market sentiment."
-                                : "가격 변동성, 거래량, 소셜 트렌드 등을 종합해 시장 심리를 0~100으로 표현합니다."}
-                        </p>
+                        <p className="leading-relaxed">가격 변동성, 거래량, 소셜 트렌드 등을 종합해 시장 심리를 0~100으로 표현합니다.</p>
                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[6px] w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-neutral-700" />
                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[4px] w-0 h-0 border-l-[5px] border-r-[5px] border-t-[5px] border-transparent border-t-neutral-900" />
                     </motion.div>

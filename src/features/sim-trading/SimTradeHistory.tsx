@@ -4,19 +4,16 @@ import type { SimTrade } from "@/shared/types/sim-trading.types";
 
 interface Props {
     trades: SimTrade[];
-    isEn?: boolean;
     /** 모바일 전용 2줄 레이아웃. 데스크톱 6열 그리드는 390px에서 열당 50px밖에
         안 나와 "진입"·"청산" 배지가 잘린다. 기본값 false — 데스크톱은 그대로. */
     mobile?: boolean;
 }
 
-export function SimTradeHistory({ trades, isEn = false, mobile = false }: Props) {
+export function SimTradeHistory({ trades, mobile = false }: Props) {
     if (trades.length === 0) {
         return (
             <div className="bg-neutral-950 rounded-2xl border border-zinc-800 p-5 min-h-[214px] flex flex-col justify-center">
-                <div className="text-[11px] text-neutral-500 text-center">
-                    {isEn ? "No trade history" : "거래 이력이 없습니다"}
-                </div>
+                <div className="text-[11px] text-neutral-500 text-center">거래 이력이 없습니다</div>
             </div>
         );
     }
@@ -62,7 +59,7 @@ export function SimTradeHistory({ trades, isEn = false, mobile = false }: Props)
                                                 ? "bg-blue-500/10 text-blue-400"
                                                 : "bg-surface-input text-text-tertiary"
                                     }`}>
-                                        {isLiq ? (isEn ? "Liq." : "청산") : isOpen ? (isEn ? "Open" : "진입") : (isEn ? "Close" : "종료")}
+                                        {isLiq ? ("청산") : isOpen ? ("진입") : ("종료")}
                                     </span>
                                 </div>
                                 <p className="mt-0.5 truncate font-mono text-caption text-text-muted">
@@ -94,12 +91,12 @@ export function SimTradeHistory({ trades, isEn = false, mobile = false }: Props)
     return (
         <div className="bg-neutral-950 rounded-2xl border border-zinc-800 overflow-hidden min-h-[214px]">
             <div className="grid grid-cols-[1fr_0.8fr_1fr_1fr_1fr_0.8fr] gap-2 px-5 py-2 text-[10px] text-neutral-500 border-b border-zinc-800/40">
-                <div>{isEn ? "Symbol" : "심볼"}</div>
-                <div className="text-right">{isEn ? "Type" : "유형"}</div>
-                <div className="text-right">{isEn ? "Price" : "가격"}</div>
-                <div className="text-right">{isEn ? "Notional" : "규모"}</div>
-                <div className="text-right">{isEn ? "PnL" : "손익"}</div>
-                <div className="text-right">{isEn ? "Time" : "시간"}</div>
+                <div>심볼</div>
+                <div className="text-right">유형</div>
+                <div className="text-right">가격</div>
+                <div className="text-right">규모</div>
+                <div className="text-right">손익</div>
+                <div className="text-right">시간</div>
             </div>
 
             <div className="divide-y divide-zinc-800/30 max-h-60 overflow-y-auto">
@@ -143,7 +140,7 @@ export function SimTradeHistory({ trades, isEn = false, mobile = false }: Props)
                                           ? "bg-blue-500/10 text-blue-400"
                                           : "bg-neutral-800 text-neutral-400"
                                 }`}>
-                                    {isLiq ? (isEn ? "Liq." : "청산") : isOpen ? (isEn ? "Open" : "진입") : (isEn ? "Close" : "종료")}
+                                    {isLiq ? ("청산") : isOpen ? ("진입") : ("종료")}
                                 </span>
                             </div>
 

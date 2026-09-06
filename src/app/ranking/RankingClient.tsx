@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import type { RankingCoin } from "@/app/api/ranking/route";
 import { useVirtualList } from "@/shared/hooks/useVirtualList";
@@ -18,14 +17,6 @@ const TABS_KO: { key: SortMode; label: string; desc: string }[] = [
     { key: "gainers",    label: "급등",      desc: "24시간 가장 많이 오른 코인" },
     { key: "losers",     label: "급락",      desc: "24시간 가장 많이 내린 코인" },
     { key: "ath_drop",   label: "고점낙폭",  desc: "역대 고점에서 가장 많이 내려온 코인" },
-];
-
-const TABS_EN: { key: SortMode; label: string; desc: string }[] = [
-    { key: "market_cap", label: "Market Cap",  desc: "Top 100 coins by market cap" },
-    { key: "volume",     label: "Volume",      desc: "Highest 24h trading volume" },
-    { key: "gainers",    label: "Gainers",     desc: "Top 24h price gainers" },
-    { key: "losers",     label: "Losers",      desc: "Top 24h price losers" },
-    { key: "ath_drop",   label: "ATH Drop",    desc: "Furthest from all-time high" },
 ];
 
 function Sparkline({ prices, isUp, w = 64, h = 32 }: { prices: number[]; isUp: boolean; w?: number; h?: number }) {
@@ -81,7 +72,7 @@ function SkeletonRow({ isLight }: { isLight: boolean }) {
     );
 }
 
-function MarketOverviewCard({ coins, isLight, isEn }: { coins: RankingCoin[]; isLight: boolean; isEn: boolean }) {
+function MarketOverviewCard({ coins, isLight }: { coins: RankingCoin[]; isLight: boolean }) {
     const stats = useMemo(() => {
         if (!coins.length) return null;
         const totalMcap = coins.reduce((s, c) => s + (c.market_cap || 0), 0);
@@ -106,29 +97,27 @@ function MarketOverviewCard({ coins, isLight, isEn }: { coins: RankingCoin[]; is
     return (
         <div className={`rounded-2xl border overflow-hidden ${card}`}>
             <div className={`px-4 py-3 border-b ${divider}`}>
-                <span className={`text-[11px] font-semibold uppercase tracking-wide ${lbl}`}>
-                    {isEn ? "Market Overview" : "시장 현황"}
-                </span>
+                <span className={`text-[11px] font-semibold uppercase tracking-wide ${lbl}`}>시장 현황</span>
             </div>
             <div className="px-4 py-3 flex flex-col gap-3">
                 <div>
-                    <div className={`text-[10px] ${lbl}`}>{isEn ? "Total Market Cap" : "총 시가총액"}</div>
+                    <div className={`text-[10px] ${lbl}`}>총 시가총액</div>
                     <div className={`text-[17px] font-bold tabular-nums mt-0.5 ${val}`}>{fmtLarge(stats.totalMcap)}</div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                     <div>
-                        <div className={`text-[10px] ${lbl}`}>{isEn ? "24h Volume" : "24h 거래대금"}</div>
+                        <div className={`text-[10px] ${lbl}`}>24h 거래대금</div>
                         <div className={`text-sm font-semibold tabular-nums mt-0.5 ${val}`}>{fmtLarge(stats.totalVol)}</div>
                     </div>
                     <div>
-                        <div className={`text-[10px] ${lbl}`}>{isEn ? "BTC Dom." : "BTC 비중"}</div>
+                        <div className={`text-[10px] ${lbl}`}>BTC 비중</div>
                         <div className={`text-sm font-semibold tabular-nums mt-0.5 ${val}`}>{stats.btcDom.toFixed(1)}%</div>
                     </div>
                 </div>
                 <div>
                     <div className="flex justify-between text-[10px] mb-1.5">
-                        <span className="text-emerald-500 font-semibold">▲ {stats.gainers} {isEn ? "up" : "상승"}</span>
-                        <span className="text-red-500 font-semibold">{stats.losers} {isEn ? "down" : "하락"} ▼</span>
+                        <span className="text-emerald-500 font-semibold">▲ {stats.gainers} {"상승"}</span>
+                        <span className="text-red-500 font-semibold">{stats.losers} {"하락"} ▼</span>
                     </div>
                     <div className={`w-full h-1.5 rounded-full overflow-hidden ${isLight ? "bg-red-100" : "bg-red-950/30"}`}>
                         <div
@@ -142,7 +131,7 @@ function MarketOverviewCard({ coins, isLight, isEn }: { coins: RankingCoin[]; is
     );
 }
 
-function TopMoversCard({ coins, isLight, isEn }: { coins: RankingCoin[]; isLight: boolean; isEn: boolean }) {
+function TopMoversCard({ coins, isLight }: { coins: RankingCoin[]; isLight: boolean }) {
     const [mode, setMode] = useState<"gainers" | "losers">("gainers");
 
     const movers = useMemo(() => {
@@ -174,9 +163,7 @@ function TopMoversCard({ coins, isLight, isEn }: { coins: RankingCoin[]; isLight
                             ? "text-emerald-500 bg-emerald-500/5"
                             : `${lbl} hover:text-emerald-500`
                     }`}
-                >
-                    {isEn ? "Top Gainers" : "급등 TOP 5"}
-                </button>
+                >급등 TOP 5</button>
                 <button
                     onClick={() => setMode("losers")}
                     className={`flex-1 py-2.5 text-[11px] font-semibold transition-colors cursor-pointer ${
@@ -184,9 +171,7 @@ function TopMoversCard({ coins, isLight, isEn }: { coins: RankingCoin[]; isLight
                             ? "text-red-500 bg-red-500/5"
                             : `${lbl} hover:text-red-500`
                     }`}
-                >
-                    {isEn ? "Top Losers" : "급락 TOP 5"}
-                </button>
+                >급락 TOP 5</button>
             </div>
             <AnimatePresence mode="wait">
                 <motion.div
@@ -226,10 +211,10 @@ function TopMoversCard({ coins, isLight, isEn }: { coins: RankingCoin[]; isLight
     );
 }
 
-function SimCtaCard({ isLight, isEn }: { isLight: boolean; isEn: boolean }) {
+function SimCtaCard({ isLight }: { isLight: boolean }) {
     return (
         <Link
-            href={isEn ? "/en/trading" : "/trading?tab=sim"}
+            href="/trading?tab=sim"
             className={`flex items-center justify-between px-4 py-4 rounded-2xl border transition-all hover:scale-[1.004] active:scale-[0.998] group ${
                 isLight
                     ? "bg-emerald-50 border-emerald-200 hover:border-emerald-300"
@@ -237,16 +222,10 @@ function SimCtaCard({ isLight, isEn }: { isLight: boolean; isEn: boolean }) {
             }`}
         >
             <div>
-                <div className={`text-sm font-semibold ${isLight ? "text-emerald-800" : "text-emerald-400"}`}>
-                    {isEn ? "Practice trading" : "모의투자로 연습"}
-                </div>
-                <div className={`text-[11px] mt-0.5 ${isLight ? "text-emerald-600" : "text-emerald-600/70"}`}>
-                    {isEn ? "Real prices · 10,000 USDT virtual" : "실시간 가격 · 가상 10,000 USDT"}
-                </div>
+                <div className={`text-sm font-semibold ${isLight ? "text-emerald-800" : "text-emerald-400"}`}>모의투자로 연습</div>
+                <div className={`text-[11px] mt-0.5 ${isLight ? "text-emerald-600" : "text-emerald-600/70"}`}>실시간 가격 · 가상 10,000 USDT</div>
             </div>
-            <div className={`flex items-center gap-1 text-xs font-medium shrink-0 ml-3 transition-transform group-hover:translate-x-0.5 ${isLight ? "text-emerald-700" : "text-emerald-500"}`}>
-                {isEn ? "Start" : "시작"}
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={`flex items-center gap-1 text-xs font-medium shrink-0 ml-3 transition-transform group-hover:translate-x-0.5 ${isLight ? "text-emerald-700" : "text-emerald-500"}`}>시작<svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
             </div>
@@ -261,11 +240,8 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
     const [direction, setDirection] = useState(0);
     const prevTabRef                = useRef<SortMode>("market_cap");
     const isLight                   = useTheme();
-    const pathname                  = usePathname();
-    const isEn                      = pathname.startsWith("/en/");
     const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
-    const TABS = isEn ? TABS_EN : TABS_KO;
 
     const tabOrder: Record<SortMode, number> = { market_cap: 0, volume: 1, gainers: 2, losers: 3, ath_drop: 4 };
 
@@ -309,10 +285,8 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
     const tabWrap   = isLight ? "bg-neutral-100 border border-neutral-200" : "bg-surface-input/60 border border-border-subtle";
     const colHead   = isLight ? "text-neutral-400 border-neutral-100 bg-neutral-50/80" : "text-text-muted border-border-subtle bg-surface-elevated/30";
 
-    const activeTab = TABS.find((t) => t.key === sortMode)!;
-    const secondaryLabel = isEn
-        ? (sortMode === "volume" ? "Volume" : sortMode === "ath_drop" ? "vs ATH" : "Mkt Cap")
-        : (sortMode === "volume" ? "거래대금" : sortMode === "ath_drop" ? "고점 대비" : "시가총액");
+    const activeTab = TABS_KO.find((t) => t.key === sortMode)!;
+    const secondaryLabel = (sortMode === "volume" ? "거래대금" : sortMode === "ath_drop" ? "고점 대비" : "시가총액");
 
     return (
         <div className={`min-h-screen ${bg}`}>
@@ -321,18 +295,14 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                 {/* Header */}
                 <div className="mb-5 flex items-end justify-between">
                     <div>
-                        <h1 className={`text-xl font-bold tracking-tight ${isLight ? "text-neutral-900" : "text-text-primary"}`}>
-                            {isEn ? "Crypto Rankings" : "코인 랭킹"}
-                        </h1>
+                        <h1 className={`text-xl font-bold tracking-tight ${isLight ? "text-neutral-900" : "text-text-primary"}`}>코인 랭킹</h1>
                         <p className={`text-xs mt-0.5 ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
                             {activeTab.desc}
                         </p>
                     </div>
                     {updatedAt && (
                         <span className={`text-[11px] ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
-                            {isEn
-                                ? `Updated ${updatedAt.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}`
-                                : `${updatedAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 업데이트`}
+                            {`${updatedAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 업데이트`}
                         </span>
                     )}
                 </div>
@@ -340,7 +310,7 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                 {/* Tabs */}
                 <div className="mb-4 overflow-x-auto pb-0.5">
                     <div className={`inline-flex items-center rounded-xl p-1 gap-0.5 ${tabWrap}`}>
-                        {TABS.map((tab) => (
+                        {TABS_KO.map((tab) => (
                             <button
                                 key={tab.key}
                                 onClick={() => switchTab(tab.key)}
@@ -363,13 +333,13 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                             {/* Column headers */}
                             <div className={`hidden md:flex items-center gap-3 px-4 py-2 text-[11px] font-medium border-b ${colHead} relative z-10`}>
                                 <span className="w-5 text-right shrink-0">#</span>
-                                <span className="flex-1">{isEn ? "Coin" : "코인"}</span>
-                                <span className="w-28 text-right shrink-0">{isEn ? "Price" : "현재가"}</span>
+                                <span className="flex-1">코인</span>
+                                <span className="w-28 text-right shrink-0">현재가</span>
                                 <span className="w-16 text-right shrink-0">24h</span>
                                 <span className={`text-right shrink-0 hidden md:block ${sortMode === "ath_drop" ? "w-28" : "w-24"}`}>
                                     {secondaryLabel}
                                 </span>
-                                <span className="w-24 text-right shrink-0 hidden xl:block">{isEn ? "7D Chart" : "7일 차트"}</span>
+                                <span className="w-24 text-right shrink-0 hidden xl:block">7일 차트</span>
                             </div>
 
                             {loading && Array.from({ length: 12 }).map((_, i) => <SkeletonRow key={i} isLight={isLight} />)}
@@ -461,16 +431,16 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                         {/* Mobile sim trading CTA */}
                         {!loading && !hasMore && sorted.length > 0 && (
                             <div className="lg:hidden mt-5">
-                                <SimCtaCard isLight={isLight} isEn={isEn} />
+                                <SimCtaCard isLight={isLight} />
                             </div>
                         )}
                     </div>
 
                     {/* Sidebar — desktop only */}
                     <div className="hidden lg:flex flex-col gap-4 sticky top-20">
-                        <MarketOverviewCard coins={coins} isLight={isLight} isEn={isEn} />
-                        <TopMoversCard coins={coins} isLight={isLight} isEn={isEn} />
-                        <SimCtaCard isLight={isLight} isEn={isEn} />
+                        <MarketOverviewCard coins={coins} isLight={isLight} />
+                        <TopMoversCard coins={coins} isLight={isLight} />
+                        <SimCtaCard isLight={isLight} />
                     </div>
                 </div>
             </div>

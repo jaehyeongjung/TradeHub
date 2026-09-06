@@ -4,31 +4,46 @@ import { useEffect, useRef } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { activePageAtom, simPricesAtom, simChangesAtom, simSymbolAtom } from "@/shared/store/atoms";
 import { SUPPORTED_SYMBOLS } from "@/shared/constants/sim-trading.constants";
+import { FUTURES_ONLY, getBinanceCombinedStreamUrl } from "@/shared/lib/binance";
+
+/**
+ * 현물에 없는 심볼은 현물 combined stream이 조용히 버린다 — 소켓은 멀쩡히 열리고
+ * 나머지 심볼은 정상으로 오는데 그 심볼만 영영 안 온다. HYPE가 그랬다.
+ * 그래서 거래소별로 소켓을 나눠 연다.
+ */
+const SPOT_SYMBOLS    = SUPPORTED_SYMBOLS.filter((s) => !FUTURES_ONLY.has(s));
+const FUTURES_SYMBOLS = SUPPORTED_SYMBOLS.filter((s) =>  FUTURES_ONLY.has(s));
 
 export function useSimPriceStream() {
     const activePage = useAtomValue(activePageAtom);
     const [prices, setPrices] = useAtom(simPricesAtom);
     const [, setChanges] = useAtom(simChangesAtom);
     const simSymbol = useAtomValue(simSymbolAtom);
-    const wsRef = useRef<WebSocket | null>(null);
-    const reconnectRef = useRef<number | null>(null);
+    const socketsRef = useRef<WebSocket[]>([]);
+    const reconnectRef = useRef<number[]>([]);
 
     useEffect(() => {
-        if (activePage !== "sim") {
-            if (wsRef.current) {
-                wsRef.current.close();
-                wsRef.current = null;
+        function closeAll() {
+            for (const id of reconnectRef.current) clearTimeout(id);
+            reconnectRef.current = [];
+            for (const ws of socketsRef.current) {
+                ws.onmessage = null;
+                ws.onclose = null;
+                ws.onerror = null;
+                try { ws.close(); } catch {}
             }
+            socketsRef.current = [];
+        }
+
+        if (activePage !== "sim") {
+            closeAll();
             return;
         }
 
-        function connect() {
-            const streams = SUPPORTED_SYMBOLS.map(
-                (s) => `${s.toLowerCase()}@ticker`
-            ).join("/");
-            const ws = new WebSocket(
-                `wss://stream.binance.com:9443/stream?streams=${streams}`
-            );
+        function connect(symbols: readonly string[], futures: boolean) {
+            if (!symbols.length) return;
+
+            const ws = new WebSocket(getBinanceCombinedStreamUrl(symbols, futures));
 
             ws.onmessage = (ev: MessageEvent<string>) => {
                 try {
@@ -51,8 +66,11 @@ export function useSimPriceStream() {
             };
 
             ws.onclose = () => {
+                socketsRef.current = socketsRef.current.filter((s) => s !== ws);
                 if (activePage === "sim") {
-                    reconnectRef.current = window.setTimeout(connect, 3000);
+                    reconnectRef.current.push(
+                        window.setTimeout(() => connect(symbols, futures), 3000),
+                    );
                 }
             };
 
@@ -60,25 +78,14 @@ export function useSimPriceStream() {
                 try { ws.close(); } catch {}
             };
 
-            wsRef.current = ws;
+            socketsRef.current.push(ws);
         }
 
-        connect();
+        connect(SPOT_SYMBOLS, false);
+        connect(FUTURES_SYMBOLS, true);
 
-        return () => {
-            if (reconnectRef.current) {
-                clearTimeout(reconnectRef.current);
-                reconnectRef.current = null;
-            }
-            if (wsRef.current) {
-                wsRef.current.onmessage = null;
-                wsRef.current.onclose = null;
-                wsRef.current.onerror = null;
-                wsRef.current.close();
-                wsRef.current = null;
-            }
-        };
-    }, [activePage, setPrices]);
+        return closeAll;
+    }, [activePage, setPrices, setChanges]);
 
     return { prices, currentPrice: prices[simSymbol] ?? 0 };
 }

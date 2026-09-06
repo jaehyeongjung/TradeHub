@@ -20,7 +20,6 @@ type Props = {
     lockedMarginMode: MarginMode | null;
     positionCount: number;
     orderCount: number;
-    isEn: boolean;
     /** 호가에서 가격을 탭했을 때 열리는 방향. null이면 닫힘. */
     openSide: PositionSide | null;
     onOpenChange: (side: PositionSide | null) => void;
@@ -54,7 +53,7 @@ function fmtUsd(n: number) {
 export function MobileOrderBar({
     account, totalUnrealizedPnl, totalPositionMargin, loading,
     onSubmit, onReset, clickedPrice, lockedMarginMode,
-    positionCount, orderCount, isEn, openSide, onOpenChange,
+    positionCount, orderCount, openSide, onOpenChange,
 }: Props) {
     const { t } = useMobileCopy();
     const [mounted, setMounted] = useState(false);
@@ -159,7 +158,6 @@ export function MobileOrderBar({
                                         lockedMarginMode={lockedMarginMode}
                                         positionCount={positionCount}
                                         orderCount={orderCount}
-                                        isEn={isEn}
                                     />
                                 </div>
                             </motion.div>

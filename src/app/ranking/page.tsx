@@ -40,10 +40,6 @@ export async function generateMetadata(): Promise<Metadata> {
         ],
         alternates: {
             canonical: "https://www.tradehub.kr/ranking",
-            languages: {
-                "ko": "https://www.tradehub.kr/ranking",
-                "en": "https://www.tradehub.kr/en/ranking",
-            },
         },
         openGraph: {
             title,

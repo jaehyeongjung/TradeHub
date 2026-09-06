@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { supabase } from "@/shared/lib/supabase-browser";
 import type { PostgrestSingleResponse } from "@supabase/supabase-js";
@@ -55,18 +54,18 @@ const REACTION_HINT_KEY = "th-chat-reaction-hint";
     뒤 7개는 코인·주식 밈이라 이모지만 봐선 뜻을 모른다. 라벨을 같이 들고
     다니면서 title/aria-label로 붙인다 (🦢가 흑두루미인 걸 알 방법이 없다). */
 const REACTIONS = [
-    { emoji: "👍", ko: "좋아요", en: "Like" },
-    { emoji: "❤️", ko: "하트", en: "Love" },
-    { emoji: "🚀", ko: "떡상", en: "To the moon" },
-    { emoji: "😂", ko: "웃김", en: "Funny" },
-    { emoji: "🔥", ko: "불장", en: "Fire" },
-    { emoji: "🐮", ko: "흑우", en: "Bagholder" },
-    { emoji: "🦢", ko: "흑두루미", en: "Mega bagholder" },
-    { emoji: "🐋", ko: "고래", en: "Whale" },
-    { emoji: "💎", ko: "다이아손", en: "Diamond hands" },
-    { emoji: "🤡", ko: "광대", en: "Clown" },
-    { emoji: "📉", ko: "떡락", en: "Dump" },
-    { emoji: "🫡", ko: "존버", en: "HODL" },
+    { emoji: "👍", ko: "좋아요" },
+    { emoji: "❤️", ko: "하트" },
+    { emoji: "🚀", ko: "떡상" },
+    { emoji: "😂", ko: "웃김" },
+    { emoji: "🔥", ko: "불장" },
+    { emoji: "🐮", ko: "흑우" },
+    { emoji: "🦢", ko: "흑두루미" },
+    { emoji: "🐋", ko: "고래" },
+    { emoji: "💎", ko: "다이아손" },
+    { emoji: "🤡", ko: "광대" },
+    { emoji: "📉", ko: "떡락" },
+    { emoji: "🫡", ko: "존버" },
 ] as const;
 
 const REACTION_EMOJIS: readonly string[] = REACTIONS.map((r) => r.emoji);
@@ -83,8 +82,8 @@ const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min)
 
 /** 이모지 → 라벨. 키를 string으로 넓혀둔다 — DB에서 올라온 이모지는
     REACTIONS의 리터럴 유니언이 아니라 그냥 string이다. */
-const REACTION_BY_EMOJI: ReadonlyMap<string, { ko: string; en: string }> = new Map(
-    REACTIONS.map((r) => [r.emoji as string, { ko: r.ko, en: r.en }]),
+const REACTION_BY_EMOJI: ReadonlyMap<string, { ko: string }> = new Map(
+    REACTIONS.map((r) => [r.emoji as string, { ko: r.ko }]),
 );
 
 /** 같은 사람이 5분 안에 연달아 보낸 말은 한 묶음으로 본다 */
@@ -193,8 +192,6 @@ export function Chat({
     const [mounted, setMounted] = useState(false);
     // 네트워크와 무관하게 반드시 실행된다 — 이 값으로만 표시 여부를 정한다
     useEffect(() => { setMounted(true); }, []);
-    const pathname = usePathname();
-    const isEn = pathname.startsWith("/en/");
     const inputRef = useRef<HTMLInputElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
     const userIdRef = useRef<string | null>(null);
@@ -430,12 +427,12 @@ export function Chat({
                 m,
                 showDate,
                 dateLabel: day === today
-                    ? (isEn ? "Today" : "오늘")
+                    ? ("오늘")
                     : DATE_FMT.format(new Date(m.created_at)),
                 grouped: !showDate && prev?.user_id === m.user_id && gap < GROUP_WINDOW_MS,
             };
         });
-    }, [msgs, isEn]);
+    }, [msgs]);
 
     const handleScroll = () => {
         if (!listRef.current) return;
@@ -574,8 +571,8 @@ export function Chat({
                           >
                               {/* 한 줄로 늘어놓으면 채팅 폭을 넘는다. 6칸씩 끊는다 */}
                               <div className="grid grid-cols-6 gap-0.5">
-                                  {REACTIONS.map(({ emoji, ko, en }) => {
-                                      const label = isEn ? en : ko;
+                                  {REACTIONS.map(({ emoji, ko }) => {
+                                      const label = ko;
                                       return (
                                           <button
                                               key={emoji}
@@ -606,15 +603,11 @@ export function Chat({
                                       <>
                                           <span className="text-[13px] leading-none">{hoverEmoji}</span>
                                           <span className="truncate text-caption font-medium text-[var(--text-secondary)]">
-                                              {isEn
-                                                  ? REACTION_BY_EMOJI.get(hoverEmoji)?.en
-                                                  : REACTION_BY_EMOJI.get(hoverEmoji)?.ko}
+                                              {REACTION_BY_EMOJI.get(hoverEmoji)?.ko}
                                           </span>
                                       </>
                                   ) : (
-                                      <span className="text-caption text-[var(--text-disabled)]">
-                                          {isEn ? "Pick a reaction" : "반응 고르기"}
-                                      </span>
+                                      <span className="text-caption text-[var(--text-disabled)]">반응 고르기</span>
                                   )}
                               </div>
                           </motion.div>
@@ -632,9 +625,9 @@ export function Chat({
             <div className={`mb-2 rounded-card p-3 2xl:p-4 ${headerBg}`}>
                 <div className="flex items-center justify-between mb-2.5">
                     <div className="flex items-center gap-2">
-                        <span className={`text-caption font-medium ${labelColor}`}>{isEn ? "Position" : "포지션"}</span>
+                        <span className={`text-caption font-medium ${labelColor}`}>포지션</span>
                         {loadingChoice && userId ? (
-                            <span className={`text-caption px-2 py-0.5 rounded-full ${pillBg}`}>{isEn ? "Loading…" : "로딩 중"}</span>
+                            <span className={`text-caption px-2 py-0.5 rounded-full ${pillBg}`}>로딩 중</span>
                         ) : myChoice ? (
                             <span
                                 className="text-caption font-bold px-2 py-0.5 rounded-full flex items-center gap-1"
@@ -652,18 +645,18 @@ export function Chat({
                                 {myChoice === "long" ? "LONG" : "SHORT"}
                                 <button
                                     onClick={() => setMyChoice(null)}
-                                    aria-label={isEn ? "Clear position" : "포지션 지우기"}
+                                    aria-label="포지션 지우기"
                                     className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer ml-0.5"
                                 >
                                     <X size={9} strokeWidth={3} />
                                 </button>
                             </span>
                         ) : (
-                            <span className={`text-caption px-2 py-0.5 rounded-full ${pillBg}`}>{isEn ? "Not voted" : "미참여"}</span>
+                            <span className={`text-caption px-2 py-0.5 rounded-full ${pillBg}`}>미참여</span>
                         )}
                     </div>
                     <span className={`text-caption 2xl:text-caption ${labelColor}`}>
-                        {isEn ? `${ratio.total} participants` : `총 ${ratio.total}명 참여`}
+                        {`총 ${ratio.total}명 참여`}
                     </span>
                 </div>
 
@@ -748,7 +741,7 @@ export function Chat({
                                     <span className="shrink-0">
                                         <button
                                             onClick={(e) => openPicker(m.id, isPickerOpen, e.currentTarget)}
-                                            aria-label={isEn ? "Add reaction" : "반응 남기기"}
+                                            aria-label="반응 남기기"
                                             aria-expanded={isPickerOpen}
                                             className={`grid h-7 w-7 place-items-center rounded-full transition-colors cursor-pointer ${
                                                 isPickerOpen
@@ -780,7 +773,7 @@ export function Chat({
                                                     <span className="text-footnote">{emoji}</span>
                                                     {/* 칩에도 이름을 단다. 피커를 열어본 사람만 뜻을 아는 건
                                                         의미가 없다 — 남의 반응을 보는 쪽이 훨씬 많다. */}
-                                                    <span>{isEn ? REACTION_BY_EMOJI.get(emoji)?.en : REACTION_BY_EMOJI.get(emoji)?.ko}</span>
+                                                    <span>{REACTION_BY_EMOJI.get(emoji)?.ko}</span>
                                                     <span className="font-bold tabular-nums">{r.count}</span>
                                                 </button>
                                             );
@@ -874,11 +867,7 @@ export function Chat({
                                 <MessageSquare size={20} strokeWidth={1.8} />
                             </span>
                             <p className="text-center text-footnote leading-relaxed text-[var(--text-muted)]">
-                                {isEn ? (
-                                    <>No messages yet.<br />Be the first to say something.</>
-                                ) : (
-                                    <>아직 아무도 말을 걸지 않았어요.<br />첫 마디를 남겨보세요.</>
-                                )}
+                                <>아직 아무도 말을 걸지 않았어요.<br />첫 마디를 남겨보세요.</>
                             </p>
                         </div>
                     )}
@@ -897,7 +886,7 @@ export function Chat({
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                             </svg>
-                            {unreadCount > 0 ? (isEn ? `${unreadCount} new` : `새 메시지 ${unreadCount}개`) : (isEn ? "Latest" : "최신으로")}
+                            {unreadCount > 0 ? (`새 메시지 ${unreadCount}개`) : ("최신으로")}
                         </motion.button>
                     )}
                 </AnimatePresence>
@@ -907,15 +896,11 @@ export function Chat({
                 {showReactionHint && msgs.length > 0 && (
                     <div className="mb-2 flex items-center gap-2 rounded-control bg-surface-input px-3 py-2">
                         <SmilePlus size={13} strokeWidth={1.9} className="shrink-0 text-text-muted" />
-                        <span className="min-w-0 flex-1 text-caption leading-snug text-text-tertiary">
-                            {isEn
-                                ? "Tap the icon beside a message to react"
-                                : "메시지 옆 아이콘을 누르면 이모지로 반응할 수 있어요"}
-                        </span>
+                        <span className="min-w-0 flex-1 text-caption leading-snug text-text-tertiary">메시지 옆 아이콘을 누르면 이모지로 반응할 수 있어요</span>
                         <button
                             type="button"
                             onClick={dismissReactionHint}
-                            aria-label={isEn ? "Dismiss" : "닫기"}
+                            aria-label="닫기"
                             className="shrink-0 rounded-md p-1 text-text-muted hover:bg-surface-hover hover:text-text-secondary transition-colors cursor-pointer"
                         >
                             <X size={12} strokeWidth={2.2} />
@@ -936,7 +921,7 @@ export function Chat({
                         }}
                         onKeyDown={onKeyDown}
                         className={`h-11 min-w-0 flex-1 rounded-full px-4 text-[16px] sm:text-label focus:outline-none transition-all duration-150 ${inputBg}`}
-                        placeholder={isEn ? "Chat anonymously" : "익명으로도 채팅 가능"}
+                        placeholder="익명으로도 채팅 가능"
                         maxLength={2000}
                         disabled={!userId}
                     />
@@ -945,7 +930,7 @@ export function Chat({
                     <button
                         type="button"
                         onClick={send}
-                        aria-label={isEn ? "Send" : "전송"}
+                        aria-label="전송"
                         className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-all active:scale-95 ${
                             userId && hasText
                                 ? "bg-[var(--color-brand-strong)] text-[var(--text-on-fill)] hover:opacity-92 cursor-pointer"
