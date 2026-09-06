@@ -3,6 +3,9 @@ import { AnalysisPage } from "@/widgets/analysis/AnalysisPage";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 import { PageExplainer } from "@/widgets/shared-modals/PageExplainer";
 import { MobileNav } from "@/widgets/mobile/MobileNav";
+import { AnalysisSnapshot } from "@/widgets/analysis/AnalysisSnapshot";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
     title: "코인 선물 차트 분석 · 손절가·진입가·손익비 자동계산 | TradeHub",
@@ -23,10 +26,6 @@ export const metadata: Metadata = {
     ],
     alternates: {
         canonical: "https://www.tradehub.kr/analysis",
-        languages: {
-            "ko": "https://www.tradehub.kr/analysis",
-            "en": "https://www.tradehub.kr/en/analysis",
-        },
     },
     openGraph: {
         title: "코인 선물 차트 분석 · 손절가·진입가·손익비 자동계산",
@@ -50,6 +49,7 @@ export default function Page() {
             <main>
                 <AnalysisPage />
             </main>
+            <AnalysisSnapshot />
             <PageExplainer
                 heading="차트 분석 도구, 어떻게 읽나요?"
                 lead="이 화면은 캔들 차트에서 반복적으로 눌리거나 튕긴 가격대를 자동으로 찾아 선으로 그려주고, 그 선을 기준으로 진입가·손절가를 잡았을 때 손익비가 얼마가 되는지를 레버리지별로 계산합니다. 매수·매도 신호를 주는 도구가 아니라, 이미 세운 계획의 숫자를 확인하는 계산기에 가깝습니다."

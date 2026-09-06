@@ -11,6 +11,19 @@ import { treemapOpenAtom, loginDrawerOpenAtom } from "@/shared/store/atoms";
 export function FloatingLoginSidebar() {
     const [open, setOpen] = useAtom(loginDrawerOpenAtom);
     const [isDark, setIsDark] = useState(false);
+    /**
+     * 로그인 폼을 처음 열기 전까지 DOM에 넣지 않는다.
+     *
+     * 드로어는 모든 페이지에 깔려 있어서, 폼을 항상 렌더하면 아무도 열지 않은 모달의
+     * 문구("Welcome 계정에 로그인하거나… 스팸함도 확인해주세요")가 전 페이지 HTML에
+     * 60어절씩 박힌다. 도구 페이지 본문이 250어절 남짓이라 그 25%가 이 텍스트였고,
+     * 애드센스가 본 "본문"을 그만큼 묽게 만들었다.
+     *
+     * 껍데기(aside)는 계속 두고 내용물만 미룬다 — 껍데기까지 같이 마운트하면
+     * 첫 열림에서 translate 전환이 걸릴 프레임이 없어 슬라이드 없이 튀어나온다.
+     * 한 번 열고 나면 계속 남겨둔다. 닫는 애니메이션 도중 내용이 사라지면 안 된다.
+     */
+    const [everOpened, setEverOpened] = useState(false);
     const [showTreemap, setShowTreemap] = useAtom(treemapOpenAtom);
     const pathname = usePathname();
     const closeBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -25,6 +38,7 @@ export function FloatingLoginSidebar() {
 
     useEffect(() => {
         if (open) {
+            setEverOpened(true);
             lastFocusRef.current = document.activeElement as HTMLElement | null;
             document.body.classList.add("overflow-hidden");
             const t = setTimeout(() => closeBtnRef.current?.focus(), 0);
@@ -82,7 +96,7 @@ export function FloatingLoginSidebar() {
                         </button>
                     </div>
                     <div className="h-[calc(100%-49px)] overflow-y-auto p-4">
-                        <AuthBox isDark={isDark} />
+                        {everOpened && <AuthBox isDark={isDark} />}
                     </div>
                 </aside>
             </div>

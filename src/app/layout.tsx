@@ -35,11 +35,6 @@ export const metadata: Metadata = {
     ],
     alternates: {
         canonical: "/",
-        languages: {
-            "ko": "https://www.tradehub.kr",
-            "en": "https://www.tradehub.kr/en",
-            "x-default": "https://www.tradehub.kr",
-        },
     },
     openGraph: {
         type: "website",

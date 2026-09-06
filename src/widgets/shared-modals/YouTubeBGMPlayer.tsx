@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
-import { usePathname } from "next/navigation";
 
 interface YTPlayer {
     playVideo: () => void;
@@ -69,11 +68,9 @@ export function YouTubeBGMPlayer({
     const playerRef = useRef<YTPlayer | null>(null);
     const rootRef = useRef<HTMLDivElement>(null);
     const playerHostRef = useRef<HTMLDivElement>(null);
-    const pathname = usePathname();
-    const isEn = pathname.startsWith("/en/");
 
     const current = tracks[currentIndex] ?? tracks[0];
-    const titleOf = (t: BGMTrack) => (isEn ? t.titleEn ?? t.title : t.title);
+    const titleOf = (t: BGMTrack) => (t.title);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -230,7 +227,7 @@ export function YouTubeBGMPlayer({
                     type="button"
                     onClick={toggleMute}
                     disabled={!isReady}
-                    aria-label={isMuted ? (isEn ? "Play" : "재생") : (isEn ? "Stop" : "정지")}
+                    aria-label={isMuted ? ("재생") : ("정지")}
                     className={`relative flex items-center justify-center w-7 h-7 rounded-xl transition-colors shrink-0 ${
                         isReady ? "cursor-pointer" : "opacity-50 cursor-not-allowed"
                     } ${
@@ -274,7 +271,7 @@ export function YouTubeBGMPlayer({
                         ? isLight ? "text-neutral-400" : "text-neutral-500"
                         : "text-emerald-500"
                     }`}>
-                        {isMuted ? (isEn ? "Click to play" : "클릭하여 켜기") : (isEn ? "Playing" : "재생 중")}
+                        {isMuted ? ("클릭하여 켜기") : ("재생 중")}
                     </p>
                 </button>
 
@@ -283,7 +280,7 @@ export function YouTubeBGMPlayer({
                     type="button"
                     onClick={toggleMute}
                     disabled={!isReady}
-                    aria-label={isMuted ? (isEn ? "Play" : "재생") : (isEn ? "Stop" : "정지")}
+                    aria-label={isMuted ? ("재생") : ("정지")}
                     className={`shrink-0 w-8 h-5 rounded-full p-0.5 transition-colors ${
                         isReady ? "cursor-pointer" : "opacity-50 cursor-not-allowed"
                     } ${

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
-import { usePathname } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { useVisibilityPolling } from "@/shared/hooks/useVisibilityPolling";
@@ -24,8 +23,6 @@ export function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } = {}) {
     const [connected, setConnected] = useState<boolean>(false);
     const isLight = useTheme();
     const isTreemapOpen = useAtomValue(treemapOpenAtom);
-    const pathname = usePathname();
-    const isEn = pathname.startsWith("/en/");
 
     const today = new Date().toISOString().slice(0, 10);
 
@@ -67,14 +64,12 @@ export function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } = {}) {
             style={{ transitionDelay: `${fadeDelay}ms`, transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
         >
             <div>
-                <div className={`text-[10px] 2xl:text-[11px] font-medium mb-0.5 ${labelColor}`}>
-                    {isEn ? "Viewing now" : "지금 함께 보는 중"}
-                </div>
+                <div className={`text-[10px] 2xl:text-[11px] font-medium mb-0.5 ${labelColor}`}>지금 함께 보는 중</div>
                 <div className="flex items-baseline gap-1">
                     <span className={`text-2xl 2xl:text-3xl font-bold leading-none ${numColor}`}>
                         <SlotNumber value={onlineNow} />
                     </span>
-                    <span className={`text-xs 2xl:text-sm font-medium ${unitColor}`}>{isEn ? "online" : "명"}</span>
+                    <span className={`text-xs 2xl:text-sm font-medium ${unitColor}`}>명</span>
                 </div>
             </div>
 
@@ -84,9 +79,7 @@ export function LiveStatsBox({ fadeDelay = 0 }: { fadeDelay?: number } = {}) {
                     LIVE
                 </span>
             ) : (
-                <span className={`text-[9px] font-medium px-2 py-1 rounded-full ${isLight ? "bg-neutral-100 text-neutral-400" : "bg-surface-input text-text-muted"}`}>
-                    {isEn ? "Connecting…" : "연결 중"}
-                </span>
+                <span className={`text-[9px] font-medium px-2 py-1 rounded-full ${isLight ? "bg-neutral-100 text-neutral-400" : "bg-surface-input text-text-muted"}`}>연결 중</span>
             )}
         </div>
     );

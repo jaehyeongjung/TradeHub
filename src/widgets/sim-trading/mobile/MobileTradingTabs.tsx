@@ -18,7 +18,6 @@ type Props = {
     orders: SimOrder[];
     trades: SimTrade[];
     userId: string | null;
-    isEn: boolean;
     onClosePosition: (positionId: string, closePrice: number) => Promise<unknown>;
     onUpdateTpSl: (positionId: string, tp: number | null, sl: number | null) => Promise<void>;
     onCancelOrder: (orderId: string) => Promise<void>;
@@ -30,7 +29,7 @@ type Props = {
  * 하나씩 갈아끼운다. 호가를 첫 탭으로 두는 건 주문 직전에 보는 화면이라서다.
  */
 export function MobileTradingTabs({
-    tab, onTabChange, positions, orders, trades, userId, isEn,
+    tab, onTabChange, positions, orders, trades, userId,
     onClosePosition, onUpdateTpSl, onCancelOrder, onPriceClick,
 }: Props) {
     const { t } = useMobileCopy();
@@ -90,22 +89,22 @@ export function MobileTradingTabs({
                 )}
                 {tab === "positions" && (
                     <div className="p-2.5">
-                        <SimPositions positions={positions} onClose={onClosePosition} onUpdateTpSl={onUpdateTpSl} isEn={isEn} mobile />
+                        <SimPositions positions={positions} onClose={onClosePosition} onUpdateTpSl={onUpdateTpSl} mobile />
                     </div>
                 )}
                 {tab === "orders" && (
                     <div className="p-2.5">
-                        <SimOrders orders={orders} onCancel={onCancelOrder} isEn={isEn} />
+                        <SimOrders orders={orders} onCancel={onCancelOrder} />
                     </div>
                 )}
                 {tab === "history" && (
                     <div className="max-h-[420px] overflow-y-auto p-2.5">
-                        <SimTradeHistory trades={trades} isEn={isEn} mobile />
+                        <SimTradeHistory trades={trades} mobile />
                     </div>
                 )}
                 {tab === "ranking" && (
                     <div className="max-h-[520px] overflow-y-auto p-2.5">
-                        <SimLeaderboard userId={userId} isEn={isEn} />
+                        <SimLeaderboard userId={userId} />
                     </div>
                 )}
             </div>

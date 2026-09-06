@@ -34,10 +34,9 @@ type Props = {
     /** 문단 하나로 마무리할 내용 (읽는 법, 주의점 등) */
     closing?: string;
     /** 가이드 링크 문구. 영어 페이지에서 쓴다. */
-    isEn?: boolean;
 };
 
-export function PageExplainer({ heading, lead, items, closing, isEn = false }: Props) {
+export function PageExplainer({ heading, lead, items, closing }: Props) {
     return (
         <section className="mx-auto max-w-2xl px-4 pt-12 pb-8 sm:px-5">
             <h2 className="text-title3 font-bold tracking-tight text-text-primary">{heading}</h2>
@@ -64,9 +63,7 @@ export function PageExplainer({ heading, lead, items, closing, isEn = false }: P
                             <Link
                                 href={`/guide/${item.guide}`}
                                 className="flex items-center justify-between gap-2 border-t border-border-subtle px-4 py-3 text-label font-bold text-[var(--color-accent-text)] transition-colors active:bg-surface-hover"
-                            >
-                                {isEn ? "Read the guide" : "자세히 보기"}
-                                <svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden="true">
+                            >자세히 보기<svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden="true">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                                 </svg>
                             </Link>

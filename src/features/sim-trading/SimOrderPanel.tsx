@@ -23,13 +23,12 @@ interface Props {
     /** 초기화 시 사라지는 항목 수 — 확인 모달에서 무엇을 잃는지 보여주는 데 쓴다. */
     positionCount?: number;
     orderCount?: number;
-    isEn?: boolean;
     /** 진입 방향 초기값. 모바일은 하단 롱/숏 버튼으로 시트를 열기 때문에
         어느 쪽을 눌렀는지가 패널에 그대로 반영돼야 한다. 기본값은 기존과 같은 LONG. */
     defaultSide?: PositionSide;
 }
 
-export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode, positionCount = 0, orderCount = 0, isEn = false, defaultSide = "LONG" }: Props) {
+export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin, loading, onSubmit, onReset, clickedPrice, lockedMarginMode, positionCount = 0, orderCount = 0, defaultSide = "LONG" }: Props) {
     const isLight = useTheme();
     const simSymbol = useAtomValue(simSymbolAtom);
     const prices = useAtomValue(simPricesAtom);
@@ -90,7 +89,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
             await onReset();
             setResetOpen(false);
         } catch (e) {
-            setResetError(e instanceof Error ? e.message : (isEn ? "Reset failed" : "초기화에 실패했습니다"));
+            setResetError(e instanceof Error ? e.message : ("초기화에 실패했습니다"));
         }
         setResetting(false);
     };
@@ -127,31 +126,31 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
 
     const handleSubmit = async () => {
         setError("");
-        if (!currentPrice) { setError(isEn ? "Loading price data…" : "가격 정보를 불러오는 중입니다"); return; }
+        if (!currentPrice) { setError("가격 정보를 불러오는 중입니다"); return; }
         if (amount <= 0) {
             setAmountError(true);
             amountInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
             amountInputRef.current?.focus();
             return;
         }
-        if (orderType !== "MARKET" && (!limitPrice || parseFloat(limitPrice) <= 0)) { setError(isEn ? "Enter limit price" : "지정가를 입력하세요"); return; }
+        if (orderType !== "MARKET" && (!limitPrice || parseFloat(limitPrice) <= 0)) { setError("지정가를 입력하세요"); return; }
         // 서버는 margin + fee로 검사한다. 여기서도 같이 봐야 통과시켜놓고 서버에서 튕기지 않는다.
-        if (margin + fee > balance) { setError(isEn ? "Insufficient balance" : "잔고가 부족합니다"); return; }
+        if (margin + fee > balance) { setError("잔고가 부족합니다"); return; }
         const tp = tpPrice ? parseFloat(tpPrice) : null;
         const sl = slPrice ? parseFloat(slPrice) : null;
         if (side === "LONG") {
-            if (tp !== null && tp <= price) { setError(isEn ? "Long TP must be above entry" : "롱 TP는 진입가보다 높아야 합니다"); return; }
-            if (sl !== null && sl >= price) { setError(isEn ? "Long SL must be below entry" : "롱 SL은 진입가보다 낮아야 합니다"); return; }
+            if (tp !== null && tp <= price) { setError("롱 TP는 진입가보다 높아야 합니다"); return; }
+            if (sl !== null && sl >= price) { setError("롱 SL은 진입가보다 낮아야 합니다"); return; }
         } else {
-            if (tp !== null && tp >= price) { setError(isEn ? "Short TP must be below entry" : "숏 TP는 진입가보다 낮아야 합니다"); return; }
-            if (sl !== null && sl <= price) { setError(isEn ? "Short SL must be above entry" : "숏 SL은 진입가보다 높아야 합니다"); return; }
+            if (tp !== null && tp >= price) { setError("숏 TP는 진입가보다 낮아야 합니다"); return; }
+            if (sl !== null && sl <= price) { setError("숏 SL은 진입가보다 높아야 합니다"); return; }
         }
         setSubmitting(true);
         try {
             await onSubmit({ symbol: simSymbol, side, orderType, price, quantityUsdt: amount, leverage, tpPrice: tpPrice ? parseFloat(tpPrice) : undefined, slPrice: slPrice ? parseFloat(slPrice) : undefined, marginMode });
             setAmountUsdt(""); setLimitPrice(""); setTpPrice(""); setSlPrice(""); setError("");
         } catch (e: unknown) {
-            setError(e instanceof Error ? e.message : (isEn ? "Order failed" : "주문 실패"));
+            setError(e instanceof Error ? e.message : ("주문 실패"));
         }
         setSubmitting(false);
     };
@@ -182,9 +181,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                         aria-haspopup="dialog"
                         aria-expanded={resetOpen}
                         className={`text-[10px] px-2.5 py-1 rounded-lg border ${border} ${textTertiary} hover:text-red-400 hover:border-red-400/30 transition-all cursor-pointer`}
-                    >
-                        {isEn ? "Reset" : "초기화"}
-                    </button>
+                    >초기화</button>
                 </div>
 
                 <div className="flex items-end justify-between mt-2 mb-4">
@@ -199,7 +196,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                 />
                             </div>
                         )}
-                        <div className={`text-[10px] ${textTertiary} mt-1`}>{isEn ? "Total Equity (USDT)" : "총 자산 (USDT)"}</div>
+                        <div className={`text-[10px] ${textTertiary} mt-1`}>총 자산 (USDT)</div>
                     </div>
                     {!loading && (
                         <div className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl ${roe >= 0 ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
@@ -216,9 +213,9 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                 {!loading && (
                     <div className="grid grid-cols-3 gap-1.5">
                         {[
-                            { label: isEn ? "Available" : "가용잔고", value: balance.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: textPrimary },
-                            { label: isEn ? "Margin Used" : "사용증거금", value: totalPositionMargin.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: "text-[var(--color-accent-text)]" },
-                            { label: isEn ? "Unreal. PnL" : "미실현 PnL", value: `${totalUnrealizedPnl >= 0 ? "+" : ""}${totalUnrealizedPnl.toFixed(1)}`, color: totalUnrealizedPnl >= 0 ? "text-emerald-500" : "text-red-500" },
+                            { label: "가용잔고", value: balance.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: textPrimary },
+                            { label: "사용증거금", value: totalPositionMargin.toLocaleString(undefined, { maximumFractionDigits: 0 }), color: "text-[var(--color-accent-text)]" },
+                            { label: "미실현 PnL", value: `${totalUnrealizedPnl >= 0 ? "+" : ""}${totalUnrealizedPnl.toFixed(1)}`, color: totalUnrealizedPnl >= 0 ? "text-emerald-500" : "text-red-500" },
                         ].map(({ label, value, color }) => (
                             <div key={label} className={`${cardBg} rounded-xl px-2.5 py-2 border ${border}`}>
                                 <div className={`text-[9px] ${textTertiary} mb-0.5`}>{label}</div>
@@ -264,7 +261,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                     orderType === t ? pillActive : pillInactive
                                 }`}
                             >
-                                {t === "MARKET" ? (isEn ? "Market" : "시장가") : (isEn ? "Limit" : "지정가")}
+                                {t === "MARKET" ? ("시장가") : ("지정가")}
                             </button>
                         ))}
                     </div>
@@ -282,13 +279,13 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                         : pillInactive
                                 }`}
                             >
-                                {mode === "CROSS" ? (isEn ? "Cross" : "교차") : (isEn ? "Isolated" : "격리")}
+                                {mode === "CROSS" ? ("교차") : ("격리")}
                             </button>
                         ))}
                     </div>
                 </div>
                 {lockedMarginMode && (
-                    <p className={`text-[9px] ${textTertiary} -mt-1 pl-0.5`}>{isEn ? "Cannot change margin mode with open position" : "포지션 보유 중 마진 모드 변경 불가"}</p>
+                    <p className={`text-[9px] ${textTertiary} -mt-1 pl-0.5`}>포지션 보유 중 마진 모드 변경 불가</p>
                 )}
 
                 {orderType === "LIMIT" && (
@@ -297,7 +294,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                             type="number"
                             value={limitPrice}
                             onChange={(e) => setLimitPrice(e.target.value)}
-                            placeholder={isEn ? `Limit price${currentPrice > 0 ? ` ≈ ${currentPrice.toLocaleString()}` : ""}` : `지정가 ${currentPrice > 0 ? `≈ ${currentPrice.toLocaleString()}` : ""}`}
+                            placeholder={`지정가 ${currentPrice > 0 ? `≈ ${currentPrice.toLocaleString()}` : ""}`}
                             className={`w-full text-[12px] rounded-xl px-3.5 py-2.5 border outline-none focus:border-zinc-500 transition-colors pr-14 ${inputBg}`}
                         />
                         <span className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] ${textTertiary} font-medium`}>USDT</span>
@@ -306,7 +303,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
 
                 <div className={`${cardBg} rounded-2xl px-3.5 py-3 border ${border}`}>
                     <div className="flex items-center justify-between mb-3">
-                        <span className={`text-[11px] ${textSecondary} font-medium`}>{isEn ? "Leverage" : "레버리지"}</span>
+                        <span className={`text-[11px] ${textSecondary} font-medium`}>레버리지</span>
                         <span className={`text-[15px] font-bold font-mono tabular-nums ${
                             leverage >= 50 ? "text-red-500" : leverage >= 20 ? (isLight ? "text-amber-600" : "text-amber-400") : textPrimary
                         }`}>
@@ -362,7 +359,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                             type="number"
                             value={amountUsdt}
                             onChange={(e) => { setAmountUsdt(e.target.value); setAmountError(false); }}
-                            placeholder={isEn ? "Order amount (USDT)" : "주문 금액 (USDT)"}
+                            placeholder="주문 금액 (USDT)"
                             className={`w-full text-[13px] rounded-xl px-3.5 py-3 border outline-none transition-colors pr-16 ${
                                 amountError
                                     ? isLight
@@ -374,16 +371,14 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                         <span className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] ${amountError ? "text-red-400" : textTertiary} font-medium`}>USDT</span>
                     </div>
                     {amountError && (
-                        <p className="text-[10px] text-red-500 mb-1.5 pl-1">
-                            {isEn ? "Please enter an order amount" : "주문 금액을 입력해 주세요"}
-                        </p>
+                        <p className="text-[10px] text-red-500 mb-1.5 pl-1">주문 금액을 입력해 주세요</p>
                     )}
                     <div className="grid grid-cols-4 gap-1.5">
                         {[
                             { pct: 0.25, label: "25%" },
                             { pct: 0.5, label: "50%" },
                             { pct: 0.75, label: "75%" },
-                            { pct: 1, label: isEn ? "Max" : "최대" },
+                            { pct: 1, label: "최대" },
                         ].map(({ pct, label }) => (
                             <button
                                 key={pct}
@@ -408,11 +403,9 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                         <span className={`flex items-center gap-1.5 transition-colors ${showTpSl ? textSecondary : `${textTertiary} group-hover:${textSecondary}`}`}>
                             <svg className={`w-3.5 h-3.5 transition-transform duration-200 ${showTpSl ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                            {isEn ? "Take Profit / Stop Loss (TP/SL)" : "익절 / 손절 (TP/SL)"}
-                        </span>
+                            </svg>익절 / 손절 (TP/SL)</span>
                         {(tpPrice || slPrice) && !showTpSl && (
-                            <span className="text-[9px] px-2 py-0.5 bg-[var(--color-accent-muted)] rounded-full font-medium text-[var(--color-accent-text)]">{isEn ? "Set" : "설정됨"}</span>
+                            <span className="text-[9px] px-2 py-0.5 bg-[var(--color-accent-muted)] rounded-full font-medium text-[var(--color-accent-text)]">설정됨</span>
                         )}
                     </button>
 
@@ -422,7 +415,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                 <input
                                     type="number" value={tpPrice}
                                     onChange={(e) => setTpPrice(e.target.value)}
-                                    placeholder={isEn ? "Take Profit (TP)" : "익절가 (TP)"}
+                                    placeholder="익절가 (TP)"
                                     className={`flex-1 text-[11px] rounded-xl px-3 py-2.5 border outline-none focus:border-emerald-500/40 transition-colors text-emerald-500 ${
                                         isLight ? "bg-white border-neutral-200 placeholder:text-neutral-400" : "bg-neutral-900 border-zinc-800 placeholder:text-neutral-700"
                                     }`}
@@ -430,7 +423,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                 <input
                                     type="number" value={slPrice}
                                     onChange={(e) => setSlPrice(e.target.value)}
-                                    placeholder={isEn ? "Stop Loss (SL)" : "손절가 (SL)"}
+                                    placeholder="손절가 (SL)"
                                     className={`flex-1 text-[11px] rounded-xl px-3 py-2.5 border outline-none focus:border-red-500/40 transition-colors text-red-500 ${
                                         isLight ? "bg-white border-neutral-200 placeholder:text-neutral-400" : "bg-neutral-900 border-zinc-800 placeholder:text-neutral-700"
                                     }`}
@@ -443,10 +436,10 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                 {amount > 0 && (
                     <div className={`space-y-2 pt-2.5 border-t ${border}`}>
                         {[
-                            { label: isEn ? "Required Margin" : "필요 증거금", value: `${margin.toFixed(2)} USDT`, color: textSecondary },
-                            { label: isEn ? "Quantity" : "거래 수량", value: `${coinQty.toFixed(6)} ${simSymbol.replace("USDT", "")}`, color: textTertiary },
-                            { label: isEn ? "Est. Liq. Price" : "예상 청산가", value: estLiqPrice > 0 ? `$${estLiqPrice.toFixed(2)}` : "—", color: "text-orange-500" },
-                            { label: isEn ? "Trading Fee" : "거래 수수료", value: `${fee.toFixed(3)} USDT`, color: textTertiary },
+                            { label: "필요 증거금", value: `${margin.toFixed(2)} USDT`, color: textSecondary },
+                            { label: "거래 수량", value: `${coinQty.toFixed(6)} ${simSymbol.replace("USDT", "")}`, color: textTertiary },
+                            { label: "예상 청산가", value: estLiqPrice > 0 ? `$${estLiqPrice.toFixed(2)}` : "—", color: "text-orange-500" },
+                            { label: "거래 수수료", value: `${fee.toFixed(3)} USDT`, color: textTertiary },
                         ].map(({ label, value, color }) => (
                             <div key={label} className="flex items-center justify-between">
                                 <span className={`text-[10px] ${textTertiary}`}>{label}</span>
@@ -491,11 +484,9 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                             <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                            {isEn ? "Processing…" : "처리 중…"}
-                        </span>
+                            </svg>처리 중…</span>
                     ) : (
-                        isLong ? (isEn ? "Buy / Long" : "매수 (Long)") : (isEn ? "Sell / Short" : "매도 (Short)")
+                        isLong ? ("매수 (Long)") : ("매도 (Short)")
                     )}
                 </button>
             </div>
@@ -518,45 +509,39 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                 className={`w-[340px] rounded-2xl border p-5 space-y-4 ${isLight ? "bg-white border-neutral-200" : "bg-neutral-900 border-zinc-800"}`}
                             >
                                 <div className="flex items-center justify-between">
-                                    <p id="sim-reset-title" className={`text-[14px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>
-                                        {isEn ? "Reset Account" : "계정 초기화"}
-                                    </p>
+                                    <p id="sim-reset-title" className={`text-[14px] font-bold ${isLight ? "text-neutral-900" : "text-white"}`}>계정 초기화</p>
                                     <button
                                         onClick={() => setResetOpen(false)}
                                         disabled={resetting}
-                                        aria-label={isEn ? "Close" : "닫기"}
+                                        aria-label="닫기"
                                         className={`text-[18px] leading-none cursor-pointer disabled:opacity-30 ${isLight ? "text-neutral-400" : "text-neutral-500"}`}
                                     >
                                         ×
                                     </button>
                                 </div>
 
-                                <p className={`text-[13px] leading-relaxed ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>
-                                    {isEn
-                                        ? "This cannot be undone. The following will happen:"
-                                        : "되돌릴 수 없어요. 아래 내용이 실행됩니다."}
-                                </p>
+                                <p className={`text-[13px] leading-relaxed ${isLight ? "text-neutral-600" : "text-neutral-400"}`}>되돌릴 수 없어요. 아래 내용이 실행됩니다.</p>
 
                                 <div className={`rounded-xl px-4 py-3 space-y-2 ${isLight ? "bg-neutral-50 border border-neutral-200" : "bg-neutral-800/60 border border-zinc-700/50"}`}>
                                     <div className="flex justify-between items-center text-[12px]">
-                                        <span className={isLight ? "text-neutral-500" : "text-neutral-400"}>{isEn ? "Open positions" : "보유 포지션"}</span>
+                                        <span className={isLight ? "text-neutral-500" : "text-neutral-400"}>보유 포지션</span>
                                         <span className={`font-mono font-bold tabular-nums ${positionCount > 0 ? "text-red-500" : (isLight ? "text-neutral-400" : "text-neutral-600")}`}>
                                             {positionCount > 0
-                                                ? (isEn ? `${positionCount} closed` : `${positionCount}개 청산`)
-                                                : (isEn ? "none" : "없음")}
+                                                ? (`${positionCount}개 청산`)
+                                                : ("없음")}
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center text-[12px]">
-                                        <span className={isLight ? "text-neutral-500" : "text-neutral-400"}>{isEn ? "Pending orders" : "미체결 주문"}</span>
+                                        <span className={isLight ? "text-neutral-500" : "text-neutral-400"}>미체결 주문</span>
                                         <span className={`font-mono font-bold tabular-nums ${orderCount > 0 ? "text-red-500" : (isLight ? "text-neutral-400" : "text-neutral-600")}`}>
                                             {orderCount > 0
-                                                ? (isEn ? `${orderCount} cancelled` : `${orderCount}개 취소`)
-                                                : (isEn ? "none" : "없음")}
+                                                ? (`${orderCount}개 취소`)
+                                                : ("없음")}
                                         </span>
                                     </div>
                                     <div className={`h-px ${isLight ? "bg-neutral-200" : "bg-zinc-700/50"}`} />
                                     <div className="flex justify-between items-center text-[12px]">
-                                        <span className={isLight ? "text-neutral-500" : "text-neutral-400"}>{isEn ? "Total equity" : "총 자산"}</span>
+                                        <span className={isLight ? "text-neutral-500" : "text-neutral-400"}>총 자산</span>
                                         <span className="font-mono font-bold tabular-nums flex items-center gap-1.5">
                                             <span className={isLight ? "text-neutral-400" : "text-neutral-500"}>
                                                 ${equity.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -567,9 +552,7 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                     </div>
                                 </div>
 
-                                <p className={`text-[11px] ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>
-                                    {isEn ? "Your trade history is kept." : "거래 내역은 그대로 남아요."}
-                                </p>
+                                <p className={`text-[11px] ${isLight ? "text-neutral-400" : "text-neutral-600"}`}>거래 내역은 그대로 남아요.</p>
 
                                 {resetError && (
                                     <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-red-500/8 border border-red-500/15">
@@ -591,20 +574,16 @@ export function SimOrderPanel({ account, totalUnrealizedPnl, totalPositionMargin
                                                 <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                                </svg>
-                                                {isEn ? "Resetting…" : "초기화 중…"}
-                                            </span>
+                                                </svg>초기화 중…</span>
                                         ) : (
-                                            isEn ? "Reset" : "초기화"
+                                            "초기화"
                                         )}
                                     </button>
                                     <button
                                         onClick={() => setResetOpen(false)}
                                         disabled={resetting}
                                         className={`px-5 py-2.5 text-[12px] rounded-xl cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isLight ? "text-neutral-500 hover:text-neutral-700" : "text-neutral-500 hover:text-neutral-300"}`}
-                                    >
-                                        {isEn ? "Cancel" : "취소"}
-                                    </button>
+                                    >취소</button>
                                 </div>
                             </motion.div>
                         </motion.div>

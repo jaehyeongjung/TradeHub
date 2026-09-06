@@ -3,8 +3,11 @@ import Script from "next/script";
 import TradingClient from "./TradingClient";
 import { SeoFooter } from "@/widgets/shared-modals/SeoFooter";
 import { PageExplainer } from "@/widgets/shared-modals/PageExplainer";
+import { TradingSnapshot } from "@/widgets/sim-trading/TradingSnapshot";
 
 const SITE = "https://www.tradehub.kr";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
     title: "코인 선물 모의투자 — 무료 비트코인 선물 거래 연습 | TradeHub",
@@ -19,10 +22,6 @@ export const metadata: Metadata = {
     ],
     alternates: {
         canonical: "https://www.tradehub.kr/trading",
-        languages: {
-            "ko": "https://www.tradehub.kr/trading",
-            "en": "https://www.tradehub.kr/en/trading",
-        },
     },
     openGraph: {
         type: "website",
@@ -137,6 +136,7 @@ export default function TradingPage() {
                 {JSON.stringify(BREADCRUMB_JSONLD)}
             </Script>
             <TradingClient />
+            <TradingSnapshot />
             <PageExplainer
                 heading="모의투자, 무엇을 연습하는 건가요?"
                 lead="가상의 잔고로 바이낸스 실시간 시세를 보며 선물 거래를 연습하는 기능입니다. 실제 주문이 나가지 않고 돈도 오가지 않습니다. 선물 거래는 청산을 한 번 겪어보기 전에는 감이 잡히지 않는데, 그걸 실제 돈으로 배우면 대가가 너무 큽니다."
