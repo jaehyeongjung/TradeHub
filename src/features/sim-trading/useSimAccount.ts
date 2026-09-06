@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtomValue } from "jotai";
 import { activePageAtom, simPricesAtom } from "@/shared/store/atoms";
 import { supabase } from "@/shared/lib/supabase-browser";
+import { useAnonUserId } from "@/shared/hooks/useAnonUserId";
 import {
     getOrCreateAccount,
     resetAccount,
@@ -36,7 +37,20 @@ export function useSimAccount() {
     const activePage = useAtomValue(activePageAtom);
     const prices = useAtomValue(simPricesAtom);
 
-    const [userId, setUserId] = useState<string | null>(null);
+    /**
+     * 익명 로그인까지 책임지는 전역 스토어를 쓴다.
+     *
+     * 전에는 여기서 getSession/onAuthStateChange를 직접 걸고 세션을 "읽기만" 했다.
+     * 그런데 익명 로그인을 트리거하는 건 Chat이 얹힌 화면(/dashboard·/stocks)뿐이라,
+     * 검색으로 /trading에 바로 들어온 사람은 세션이 없어서 잔고가 0으로 뜨고
+     * 주문을 누르는 순간에야 "로그인이 필요합니다"를 만났다.
+     * (2026-09-06 재현: 신규 프로필로 /trading 직행 → localStorage에 sb-auth 없음.
+     *  /dashboard를 거치면 is_anonymous:true 세션이 생긴다.)
+     *
+     * useAnonUserId는 앱 전체에 구독을 하나만 두므로, 여기서 쓰면 중복 구독도 사라진다
+     * — onAuthStateChange가 둘 이상이면 auth 락이 엉켜 화면이 조용히 멈추는 일이 있었다.
+     */
+    const userId = useAnonUserId();
     const [account, setAccount] = useState<SimAccount | null>(null);
     const [positions, setPositions] = useState<SimPosition[]>([]);
     const [orders, setOrders] = useState<SimOrder[]>([]);
@@ -44,16 +58,6 @@ export function useSimAccount() {
     const [loading, setLoading] = useState(true);
 
     const checkingRef = useRef(false);
-
-    useEffect(() => {
-        supabase.auth.getSession().then(({ data }) => {
-            setUserId(data.session?.user?.id ?? null);
-        });
-        const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-            setUserId(s?.user?.id ?? null);
-        });
-        return () => sub.subscription.unsubscribe();
-    }, []);
 
     const loadAll = useCallback(async () => {
         if (!userId) {

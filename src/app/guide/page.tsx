@@ -61,10 +61,9 @@ const BREADCRUMB_JSONLD = {
 };
 
 export default function GuidesIndex() {
-  const grouped = categoryOrder.map((cat) => ({
-    category: cat,
-    items: guides.filter((g) => g.category === cat),
-  }));
+  const grouped = categoryOrder
+    .map((cat) => ({ category: cat, items: guides.filter((g) => g.category === cat) }))
+    .filter(({ items }) => items.length > 0);
 
   return (
     <>
@@ -74,43 +73,61 @@ export default function GuidesIndex() {
       <Script id="ld-guide-bc" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify(BREADCRUMB_JSONLD)}
       </Script>
-    <main className="mx-auto max-w-3xl px-5 py-16 text-white">
-      <h1 className="text-3xl font-extrabold tracking-tight">투자 가이드</h1>
-      <p className="mt-3 text-zinc-400">
-        코인 투자에 필요한 핵심 개념과 전략을 쉽게 설명합니다.
-      </p>
 
-      {grouped.map(({ category, items }) => (
-        <section key={category} className="mt-12">
-          <h2 className="text-lg font-bold text-[#02C076]">{category}</h2>
-          <ul className="mt-4 space-y-3">
-            {items.map((g) => (
-              <li key={g.slug}>
-                <Link
-                  href={`/guide/${g.slug}`}
-                  className="group flex items-start gap-4 rounded-xl bg-zinc-900/60 p-5 ring-1 ring-zinc-800 transition-colors hover:ring-[#02C076]/50"
-                >
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-white group-hover:text-[#02C076] transition-colors">
-                      {g.title}
-                    </h3>
-                    <p className="mt-1 text-sm text-zinc-400 line-clamp-2">
-                      {g.description}
-                    </p>
-                    <span className="mt-2 inline-block text-xs text-zinc-500">
-                      {g.readingTime}분 읽기
-                    </span>
-                  </div>
-                  <span className="mt-1 text-zinc-600 group-hover:text-[#02C076] transition-colors">
-                    →
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
-    </main>
+      <main className="mx-auto w-full max-w-3xl px-4 pt-6 pb-20 sm:px-6 sm:pt-8 xl:pt-20">
+        {/* globals.css가 좁은 화면에서 <header>를 싸잡아 감춘다 — div로 둔다 */}
+        <div>
+          <h1 className="text-title2 font-extrabold tracking-tight text-text-primary sm:text-title1">
+            투자 가이드
+          </h1>
+          <p className="mt-3 text-body text-text-secondary">
+            코인 선물거래와 시장 지표를 처음 보는 사람도 이해할 수 있게 정리했습니다.
+            화면에 뜨는 숫자가 무슨 뜻인지부터, 그 숫자를 보고 무엇을 판단할 수 있는지까지.
+          </p>
+          <p className="mt-3 text-footnote text-text-tertiary">
+            전체 {guides.length}편
+          </p>
+        </div>
+
+        {grouped.map(({ category, items }) => (
+          <section key={category} className="mt-12">
+            {/* 카테고리 제목을 카드 위에 그냥 얹으면 목록이 길어질수록
+                어디서 갈리는지 안 보인다. 줄을 하나 그어 구간을 만든다. */}
+            <h2 className="flex items-center gap-3 text-caption font-bold tracking-wide text-text-tertiary">
+              {category}
+              <span className="h-px flex-1 bg-border-subtle" aria-hidden="true" />
+              <span className="tabular-nums font-normal">{items.length}</span>
+            </h2>
+
+            <ul className="mt-4 space-y-2.5">
+              {items.map((g) => (
+                <li key={g.slug}>
+                  <Link
+                    href={`/guide/${g.slug}`}
+                    className="group flex items-start gap-4 rounded-card border border-border-subtle bg-surface-card px-4 py-4 transition-colors hover:border-border-default hover:bg-surface-hover sm:px-5"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-headline font-bold text-text-primary">{g.title}</h3>
+                      <p className="mt-1.5 text-label leading-[1.7] text-text-secondary">
+                        {g.description}
+                      </p>
+                      <span className="mt-2.5 inline-block text-footnote text-text-tertiary">
+                        {g.readingTime}분 읽기
+                      </span>
+                    </div>
+                    <svg
+                      className="mt-1 h-4 w-4 shrink-0 text-text-tertiary transition-colors group-hover:text-[var(--color-accent-text)]"
+                      fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden="true"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </main>
     </>
   );
 }
