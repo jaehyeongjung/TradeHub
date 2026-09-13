@@ -1,11 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "@/shared/hooks/useTheme";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
 import { Chat } from "@/features/chat/Chat";
-import { PostBoard, PostBoardHandle } from "@/features/post/PostBoard";
 import { LiveStatsBox } from "@/entities/coin/LiveStatsBox";
 import { FearGreedCard } from "@/entities/market/FearGreedWidget";
 import { YouTubeBGMPlayer } from "@/widgets/shared-modals/YouTubeBGMPlayer";
@@ -14,132 +11,49 @@ import { KimchiWidget } from "@/entities/market/KimchiWidget";
 import { HotSymbolsTicker } from "@/entities/coin/HotCoin";
 import { MarketIndicesWidget } from "@/entities/market/MarketIndicesWidget";
 
-type TabKey = "board" | "news";
-
 export const DashBoard = () => {
-    const postRef = useRef<PostBoardHandle>(null);
     const [mounted, setMounted] = useState(false);
     const isLight = useTheme();
 
     useEffect(() => { setMounted(true); }, []);
 
-    const router = useRouter();
-
-    const pathname = usePathname() ?? "/";
-    const sp = useSearchParams();
-    const paramsForRead = sp ?? new URLSearchParams();
-    const paramsForWrite = new URLSearchParams(sp?.toString() ?? "");
-
-    const raw = paramsForRead.get("tab");
-    const activeTab: TabKey = raw === "board" ? "board" : "news";
-
-    const tabOrder: Record<TabKey, number> = { news: 0, board: 1 };
-    const [direction, setDirection] = useState(0);
-    const prevTabRef = useRef(activeTab);
-
-    const switchTab = (next: TabKey) => {
-        if (next === activeTab) return;
-        setDirection(tabOrder[next] > tabOrder[prevTabRef.current] ? 1 : -1);
-        prevTabRef.current = next;
-        if (next === "news") {
-            paramsForWrite.delete("tab");
-        } else {
-            paramsForWrite.set("tab", "board");
-        }
-        const qs = paramsForWrite.toString();
-        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-    };
-
     return (
         <section
-            aria-label="커뮤니티 게시판 및 채팅"
+            aria-label="뉴스 및 채팅"
             className="flex gap-3 2xl:gap-5 mt-3 2xl:mt-5 flex-1 min-h-0 overflow-hidden"
         >
                 <article className="min-w-150 w-full h-full  rounded-2xl flex flex-col gap-3 p-3 bg-surface-card border border-border-subtle">
                     <div className={`relative z-20 flex items-center gap-3 px-2 2xl:py-2 2xl:min-h-14 transition-[opacity,transform] duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: "50ms", transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-                        <div className={`inline-flex items-center rounded-xl p-1 shrink-0 ${isLight ? "bg-neutral-100 border border-neutral-200" : "bg-surface-input/60 border border-border-subtle"}`}>
-                            <button
-                                onClick={() => switchTab("board")}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg cursor-pointer transition-all ${
-                                    activeTab === "board"
-                                        ? isLight
-                                            ? "bg-white text-neutral-800 shadow-sm border border-neutral-200"
-                                            : "bg-surface-hover text-white shadow-sm"
-                                        : isLight
-                                            ? "text-neutral-500 hover:text-neutral-700"
-                                            : "text-text-muted hover:text-text-secondary"
-                                }`}
-                            >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <span className="whitespace-nowrap">게시판</span>
-                            </button>
-                            <button
-                                onClick={() => switchTab("news")}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
-                                    activeTab === "news"
-                                        ? isLight
-                                            ? "bg-white text-neutral-800 shadow-sm border border-neutral-200"
-                                            : "bg-surface-hover text-white shadow-sm"
-                                        : isLight
-                                            ? "text-neutral-500 hover:text-neutral-700"
-                                            : "text-text-muted hover:text-text-secondary"
-                                }`}
-                            >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
-                                </svg>
-                                <span className="whitespace-nowrap">뉴스</span>
-                            </button>
+                    {/* 뉴스는 하루 한 번 수집된다 (vercel.json cron "0 3 * * *" = UTC 03:00 = KST 정오).
+                        언제 새 글이 오는지 모르면 "안 바뀌는 패널"로 읽히므로 hover로 알려준다. */}
+                    <div className="group relative shrink-0">
+                        <div
+                            tabIndex={0}
+                            aria-describedby="news-schedule-tip"
+                            className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium cursor-help outline-none ${isLight ? "bg-neutral-100 border border-neutral-200 text-neutral-800" : "bg-surface-input/60 border border-border-subtle text-white"}`}
+                        >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
+                            </svg>
+                            <span className="whitespace-nowrap">뉴스</span>
                         </div>
+
+                        <div
+                            id="news-schedule-tip"
+                            role="tooltip"
+                            className="pointer-events-none absolute left-0 top-full z-30 mt-1.5 w-max max-w-70 rounded-lg bg-surface-elevated px-2.5 py-1.5 text-caption text-text-secondary shadow-lg ring-1 ring-[var(--border-default)] opacity-0 translate-y-[-2px] transition-[opacity,transform] duration-150 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0"
+                        >
+                            <span className="font-semibold text-text-primary">매일 낮 12시</span>에 새 뉴스가 올라옵니다
+                        </div>
+                    </div>
 
                         <div className="flex-1 min-w-0">
                             <HotSymbolsTicker fadeDelay={150} />
                         </div>
-
-                        <div className="ml-auto shrink-0 mr-1">
-                            {activeTab === "board" && (
-                                <button
-                                    onClick={() => postRef.current?.openWrite()}
-                                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium shadow-sm transition-all cursor-pointer active:scale-[0.98] ${
-                                        isLight
-                                            ? "bg-emerald-500 text-white hover:bg-emerald-600 active:bg-emerald-700"
-                                            : "bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700"
-                                    }`}
-                                >
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    <span className="whitespace-nowrap">글쓰기</span>
-                                </button>
-                            )}
-                        </div>
                     </div>
 
                     <div className="relative z-10 flex-1 min-h-0 overflow-hidden">
-                        <AnimatePresence initial={false} custom={direction} mode="wait">
-                            <motion.div
-                                key={activeTab}
-                                custom={direction}
-                                variants={{
-                                    enter: (d: number) => ({ x: d > 0 ? "40%" : "-40%", opacity: 0 }),
-                                    center: { x: 0, opacity: 1 },
-                                    exit: (d: number) => ({ x: d > 0 ? "-40%" : "40%", opacity: 0 }),
-                                }}
-                                initial="enter"
-                                animate="center"
-                                exit="exit"
-                                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                                className="h-full"
-                            >
-                                {activeTab === "board" ? (
-                                    <PostBoard ref={postRef} fadeDelay={0} />
-                                ) : (
-                                    <NewsPanel roomId="lobby" fadeDelay={0} />
-                                )}
-                            </motion.div>
-                        </AnimatePresence>
+                        <NewsPanel roomId="lobby" fadeDelay={0} />
                     </div>
                 </article>
 
