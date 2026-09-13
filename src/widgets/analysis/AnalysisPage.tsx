@@ -43,9 +43,11 @@ const TIER_CONFIG: Record<LeverageTier, {
     },
 };
 
-const TIER_ORDER: LeverageTier[] = ["high", "mid", "low"];
+/* 왼쪽에서 오른쪽으로 갈수록 봉이 짧아진다(1d → 4h → 1h).
+   기간이 긴 쪽을 먼저 보여주는 편이 "넓게 보고 좁혀 들어간다"는 순서와 맞는다. */
+const TIER_ORDER: LeverageTier[] = ["low", "mid", "high"];
 const DEFAULT_SYMBOL = "BTCUSDT";
-const DEFAULT_TIER: LeverageTier = "mid";
+const DEFAULT_TIER: LeverageTier = "low";
 
 type ViewTab = "chart" | "analysis";
 
@@ -207,14 +209,14 @@ const CHART_LEGEND = {
 
 const TIER_GUIDE = {
     ko: [
-        { tier: "high" as LeverageTier, label: "고배율", range: "10~20x", interval: "1h", sub: "단기 스캘핑" },
-        { tier: "mid"  as LeverageTier, label: "중배율", range: "5~10x",  interval: "4h", sub: "스윙 트레이딩" },
         { tier: "low"  as LeverageTier, label: "저배율", range: "3~5x",   interval: "1d", sub: "포지션 트레이딩" },
+        { tier: "mid"  as LeverageTier, label: "중배율", range: "5~10x",  interval: "4h", sub: "스윙 트레이딩" },
+        { tier: "high" as LeverageTier, label: "고배율", range: "10~20x", interval: "1h", sub: "단기 스캘핑" },
     ],
     en: [
-        { tier: "high" as LeverageTier, label: "High", range: "10~20x", interval: "1h", sub: "Scalping" },
-        { tier: "mid"  as LeverageTier, label: "Mid",  range: "5~10x",  interval: "4h", sub: "Swing" },
         { tier: "low"  as LeverageTier, label: "Low",  range: "3~5x",   interval: "1d", sub: "Position" },
+        { tier: "mid"  as LeverageTier, label: "Mid",  range: "5~10x",  interval: "4h", sub: "Swing" },
+        { tier: "high" as LeverageTier, label: "High", range: "10~20x", interval: "1h", sub: "Scalping" },
     ],
 };
 

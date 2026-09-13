@@ -14,12 +14,16 @@ import { analyzeMarketStructure } from "@/shared/lib/technical-analysis/market-s
 import { detectCandlestickPatterns } from "@/shared/lib/technical-analysis/candlestick-patterns";
 import { getBinanceRestBase } from "@/shared/lib/binance";
 
+/* 지지·저항은 "예전에 몇 번 부딪혔던 가격"에서 나온다. 창이 짧으면 직전 사이클의
+   고점·저점이 아예 후보에 안 들어온다. 그래서 봉마다 넉넉히 가져온다.
+   오래된 레벨이 결과를 지배할 걱정은 없다 — detectSRLevels가 recency 가중치를 준다.
+   바이낸스는 요청당 1000개가 상한이라 그 위는 endTime으로 페이지를 넘긴다. */
 const FETCH_TOTAL: Partial<Record<Interval, number>> = {
-    "15m": 2000,
-    "1h":  2000,
-    "4h":  1000,
-    "1d":  500,
-    "1w":  200,
+    "15m": 6000,   //  62일
+    "1h":  6000,   // 250일  ≈ 8.2개월   (요청 6회)
+    "4h":  4000,   // 666일  ≈ 1년 10개월 (요청 4회)
+    "1d":  2000,   // 2000일 ≈ 5년 6개월  (요청 2회)
+    "1w":  800,    // 5600일 ≈ 15년 (상장 이후 전체)
 };
 const MAX_PER_PAGE = 1000;
 
