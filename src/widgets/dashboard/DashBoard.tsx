@@ -160,7 +160,8 @@ export const DashBoard = () => {
                         className="border border-border-subtle rounded-2xl flex-1 bg-surface-card overflow-hidden flex flex-col"
                     >
                         <div className="flex-1 min-h-0">
-                            <Chat fadeDelay={350} />
+                            {/* 롱·숏 투표 패널은 쓰지 않는다 — header를 넘기면 그 패널과 관련 구독·쿼리가 함께 꺼진다 */}
+                            <Chat fadeDelay={350} header={null} />
                         </div>
                     </aside>
                 </div>
