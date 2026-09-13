@@ -356,10 +356,10 @@ export function SymbolPickerModal({
                             {showStockIndices && !search.trim() && (
                                 <div className="mb-5">
                                     <div className="flex items-center gap-2 mb-3">
-                                        <svg className="w-3 h-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                         </svg>
-                                        <span className="text-[11px] font-semibold text-blue-400 tracking-wider uppercase">주가 지수</span>
+                                        <span className="text-[11px] font-semibold text-emerald-400 tracking-wider uppercase">주가 지수</span>
                                     </div>
                                     <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
                                         {STOCK_INDICES.map((idx) => {
@@ -370,7 +370,7 @@ export function SymbolPickerModal({
                                                     onClick={() => handleSelect(idx.symbol)}
                                                     className={`flex-shrink-0 flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-2xl border transition-all cursor-pointer ${
                                                         isActive
-                                                            ? "bg-blue-500/15 border-blue-500/40 text-blue-400"
+                                                            ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
                                                             : isLight
                                                                 ? "bg-neutral-50 border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-100"
                                                                 : "bg-neutral-900 border-zinc-800 text-neutral-300 hover:border-zinc-600 hover:bg-neutral-800/60"
@@ -393,10 +393,10 @@ export function SymbolPickerModal({
                             {popularFiltered.length > 0 && (
                                 <div className="mb-5">
                                     <div className="flex items-center gap-2 mb-3">
-                                        <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                         </svg>
-                                        <span className="text-[11px] font-semibold text-amber-400 tracking-wider uppercase">인기</span>
+                                        <span className="text-[11px] font-semibold text-emerald-400 tracking-wider uppercase">인기</span>
                                     </div>
                                     <div
                                         ref={popRef}
@@ -416,7 +416,7 @@ export function SymbolPickerModal({
                                                     onClick={() => handleSelect(s)}
                                                     className={`flex-shrink-0 flex items-center gap-2 pl-2 pr-3.5 py-2 rounded-2xl border transition-all cursor-pointer ${
                                                         isActive
-                                                            ? "bg-amber-500/15 border-amber-500/40 text-amber-500"
+                                                            ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-500"
                                                             : isLight
                                                                 ? "bg-neutral-50 border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-100"
                                                                 : "bg-neutral-900 border-zinc-800 text-neutral-300 hover:border-zinc-600 hover:bg-neutral-800/60"
@@ -475,7 +475,7 @@ export function SymbolPickerModal({
                                                     onClick={() => handleSelect(s)}
                                                     className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-all cursor-pointer ${
                                                         isActive
-                                                            ? "bg-amber-500/8 border border-amber-500/20"
+                                                            ? "bg-emerald-500/8 border border-emerald-500/20"
                                                             : isLight
                                                                 ? "border border-transparent hover:bg-neutral-50"
                                                                 : "border border-transparent hover:bg-neutral-900"
@@ -493,14 +493,14 @@ export function SymbolPickerModal({
                                                         />
                                                     </div>
                                                     <div className="flex-1 text-left min-w-0">
-                                                        <div className={`text-[14px] font-semibold leading-tight ${isActive ? "text-amber-500" : isLight ? "text-neutral-900" : "text-white"}`}>
+                                                        <div className={`text-[14px] font-semibold leading-tight ${isActive ? "text-emerald-500" : isLight ? "text-neutral-900" : "text-white"}`}>
                                                             {base}
                                                         </div>
                                                         {name && <div className="text-[11px] text-neutral-500 mt-0.5 truncate">{name}</div>}
                                                     </div>
                                                     {isActive ? (
-                                                        <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                                                            <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                                        <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                                                            <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                                                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                                             </svg>
                                                         </div>
@@ -541,7 +541,7 @@ export function SymbolPickerModal({
                                     </div>
                                 )}
                                 <span className="text-[12px] text-neutral-500">현재 선택</span>
-                                <span className={`text-[12px] font-semibold ${selected.startsWith("^") ? "text-blue-400" : "text-amber-500"}`}>
+                                <span className={`text-[12px] font-semibold ${selected.startsWith("^") ? "text-emerald-400" : "text-emerald-500"}`}>
                                     {selected.startsWith("^") ? (findStockIndex(selected)?.name ?? selected.toUpperCase()) : selected.replace("usdt", "").toUpperCase()}
                                 </span>
                                 {!selected.startsWith("^") && SYMBOL_NAMES[selected] && (

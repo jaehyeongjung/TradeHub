@@ -847,12 +847,12 @@ body {
    보여야 한다. 나머지 탭이 전부 무채색이라 파랑 하나로 충분히 갈린다.
    호버까지 CSS로 잡으려고 클래스로 뺐다 — 인라인 style로는 :hover를 못 건다. */
 .nav-stocks {
-    color: var(--color-brand-text);
-    background: color-mix(in srgb, var(--color-brand) 10%, transparent);
+    color: var(--color-accent-text);
+    background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 .nav-stocks:hover {
-    background: color-mix(in srgb, var(--color-brand) 18%, transparent);
+    background: color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 
 /* Tailwind v4에는 break-anywhere가 없다. 채팅 본문의 긴 URL이 레이아웃을 밀어내지

@@ -538,9 +538,9 @@ export function Chat({
     const inputBg =
         [
         "bg-[var(--surface-input)] text-[var(--text-primary)] placeholder-[var(--text-muted)]",
-        "caret-[var(--color-brand)] ring-1 ring-transparent",
+        "caret-[var(--color-accent)] ring-1 ring-transparent",
         "hover:ring-[var(--border-default)]",
-        "focus:ring-2 focus:ring-[var(--color-brand)] focus:hover:ring-[var(--color-brand)]",
+        "focus:ring-2 focus:ring-[var(--color-accent)] focus:hover:ring-[var(--color-accent)]",
         "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:ring-transparent",
     ].join(" ");
     const msgAreaBg = "bg-[var(--surface-sunken)]";
@@ -584,7 +584,7 @@ export function Chat({
                                               className="grid h-9 w-9 place-items-center rounded-control text-[17px] transition-transform cursor-pointer hover:scale-125 active:scale-110 hover:bg-[var(--surface-hover)]"
                                               style={
                                                   openMsgReactions[emoji]?.mine
-                                                      ? { background: tintOf("var(--color-brand)", 18) }
+                                                      ? { background: tintOf("var(--color-accent)", 18) }
                                                       : undefined
                                               }
                                           >
@@ -730,7 +730,7 @@ export function Chat({
 
                                 // 꼬리는 말풍선 묶음의 첫 장에만 — 카톡·당근이 쓰는 규칙
                                 const bubble = isMe
-                                    ? `bg-[var(--color-brand-strong)] text-[var(--text-on-fill)] ${grouped ? "rounded-card" : "rounded-card rounded-tr-tail"}`
+                                    ? `bg-[var(--color-accent)] text-[var(--text-on-fill)] ${grouped ? "rounded-card" : "rounded-card rounded-tr-tail"}`
                                     : `bg-[var(--surface-input)] text-[var(--text-primary)] ${grouped ? "rounded-card" : "rounded-card rounded-tl-tail"}`;
 
                                 /* 피커 자체는 여기서 그리지 않는다. 이 자리는 스크롤 컨테이너
@@ -765,10 +765,10 @@ export function Chat({
                                                     aria-pressed={r.mine}
                                                     className={`flex items-center gap-1 rounded-chip px-2 py-[3px] text-caption ring-1 transition-colors cursor-pointer active:scale-95 ${
                                                         r.mine
-                                                            ? "ring-[var(--color-brand)]/40 text-[var(--color-brand)]"
+                                                            ? "ring-[var(--color-accent)]/40 text-[var(--color-accent)]"
                                                             : "bg-[var(--surface-input)] ring-transparent text-[var(--text-tertiary)] hover:ring-[var(--border-default)]"
                                                     }`}
-                                                    style={r.mine ? { background: tintOf("var(--color-brand)", 14) } : undefined}
+                                                    style={r.mine ? { background: tintOf("var(--color-accent)", 14) } : undefined}
                                                 >
                                                     <span className="text-footnote">{emoji}</span>
                                                     {/* 칩에도 이름을 단다. 피커를 열어본 사람만 뜻을 아는 건
@@ -933,7 +933,7 @@ export function Chat({
                         aria-label="전송"
                         className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-all active:scale-95 ${
                             userId && hasText
-                                ? "bg-[var(--color-brand-strong)] text-[var(--text-on-fill)] hover:opacity-92 cursor-pointer"
+                                ? "bg-[var(--color-accent)] text-[var(--text-on-fill)] hover:opacity-92 cursor-pointer"
                                 : "bg-[var(--surface-hover)] text-[var(--text-muted)] ring-1 ring-[var(--border-default)] cursor-not-allowed active:scale-100"
                         }`}
                         disabled={!userId || !hasText}

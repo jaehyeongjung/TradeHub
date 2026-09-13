@@ -18,7 +18,7 @@ export const BUTTON_VARIANT: Record<ButtonVariant, string> = {
     // `html.light .text-white { !important }` 규칙이 예외 목록에 없는 배경에서
     // 글자를 검정으로 바꿔버린다.
     primary:
-        "bg-[var(--color-brand-strong)] text-[var(--text-on-fill)] hover:opacity-92 active:opacity-85",
+        "bg-[var(--color-accent)] text-[var(--text-on-fill)] hover:opacity-92 active:opacity-85",
     secondary:
         "bg-[var(--surface-input)] text-[var(--text-primary)] hover:bg-[var(--surface-hover)]",
     ghost:
@@ -36,7 +36,7 @@ export const BUTTON_BASE = [
     "transition-[opacity,background-color,transform] duration-150",
     // 눌리는 느낌은 크게 주면 장난스러워진다. 1.5%면 충분하다.
     "active:scale-[0.985]",
-    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]",
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]",
 ].join(" ");
 
 export function buttonClasses({

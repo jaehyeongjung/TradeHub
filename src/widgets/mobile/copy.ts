@@ -11,7 +11,7 @@ const KO = {
     navTrading: "모의투자",
     navRanking: "코인랭킹",
     navAnalysis: "차트분석",
-    navStocks: "주식",
+    navStocks: "실시간 주식 토큰",
     navStocksHint: "24시간 시세",
 
     hotCoins: "실시간 핫코인",
