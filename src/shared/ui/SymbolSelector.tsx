@@ -187,7 +187,7 @@ export function SymbolSelector({
                             <button
                                 key={sym}
                                 onClick={() => { onChange(sym); setOpen(false); }}
-                                className={`w-full flex items-center gap-3 px-4 py-2.5 transition-colors ${itemHover} ${isActive ? (isLight ? "bg-amber-50" : "bg-amber-500/5") : ""}`}
+                                className={`w-full flex items-center gap-3 px-4 py-2.5 transition-colors ${itemHover} ${isActive ? "bg-emerald-500/8" : ""}`}
                             >
                                 <Image
                                     src={getCoinLogoUrl(sym)}
@@ -201,7 +201,7 @@ export function SymbolSelector({
                                 />
                                 <div className="flex-1 text-left min-w-0">
                                     <div className="flex items-center gap-1.5">
-                                        <span className={`text-[13px] font-semibold ${isActive ? "text-amber-500" : labelColor}`}>
+                                        <span className={`text-[13px] font-semibold ${isActive ? "text-emerald-500" : labelColor}`}>
                                             {base}
                                         </span>
                                         <span className="text-[10px] text-neutral-500">/ USDT</span>
@@ -225,7 +225,7 @@ export function SymbolSelector({
                                     </div>
                                 )}
                                 {isActive && (
-                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0 ml-1" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0 ml-1" />
                                 )}
                             </button>
                         );
