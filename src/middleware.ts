@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { REMOVED_STOCK_SLUGS } from "@/shared/constants/removed-paths";
+
+const removedStockPaths = new Set<string>(REMOVED_STOCK_SLUGS.map((slug) => `/stocks/${slug}`));
 
 export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
@@ -15,7 +18,8 @@ export function middleware(req: NextRequest) {
         pathname.startsWith("/news") ||
         pathname.startsWith("/posts") ||
         pathname === "/en" ||
-        pathname.startsWith("/en/")
+        pathname.startsWith("/en/") ||
+        removedStockPaths.has(pathname)
     ) {
         return new NextResponse(
             `<!doctype html><meta charset="utf-8"><title>삭제된 페이지</title><p>삭제된 페이지입니다. <a href="/">TradeHub 홈으로</a></p>`,

@@ -26,7 +26,8 @@ export default function robots(): MetadataRoute.Robots {
                 crawlDelay: 1,
             },
         ],
-        sitemap: "https://www.tradehub.kr/sitemap.xml",
+        // sitemap-removed.xml은 삭제한 URL의 재크롤을 재촉하는 임시 사이트맵이다. 색인이 정리되면 뺀다.
+        sitemap: ["https://www.tradehub.kr/sitemap.xml", "https://www.tradehub.kr/sitemap-removed.xml"],
         host: "https://www.tradehub.kr",
     };
 }

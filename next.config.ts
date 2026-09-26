@@ -46,6 +46,13 @@ const nextConfig: NextConfig = {
                 destination: "https://www.tradehub.kr/:path*",
                 permanent: true,
             },
+            // 루트는 자체 본문이 없는 입구라 대시보드로 영구 이동시킨다.
+            // app/page.tsx의 redirect()는 307(임시)이라 구글·애드센스가 루트를 빈 페이지로 봤다.
+            {
+                source: "/",
+                destination: "/dashboard",
+                permanent: true,
+            },
             // 잘못된 URL 정리
             {
                 source: "/&",
