@@ -13,7 +13,7 @@ export const SUPPORTED_SYMBOLS = [
     "KAVAUSDT",  "IMXUSDT",   "SANDUSDT",  "MANAUSDT",  "GALAUSDT",
     "AXSUSDT",   "ENJUSDT",   "SEIUSDT",   "TIAUSDT",   "WLDUSDT",
     "ORDIUSDT",  "JUPUSDT",   "FETUSDT",   "STXUSDT",   "WIFUSDT",
-    "HYPEUSDT",
+    "HYPEUSDT",  "ARKUSDT",
 ] as const;
 
 export const SYMBOL_NAMES: Record<string, string> = {
@@ -34,6 +34,7 @@ export const SYMBOL_NAMES: Record<string, string> = {
     SEIUSDT: "Sei",               TIAUSDT: "Celestia",          WLDUSDT: "Worldcoin",
     ORDIUSDT: "ORDI",             JUPUSDT: "Jupiter",           FETUSDT: "Fetch.ai",
     STXUSDT: "Stacks",            WIFUSDT: "dogwifhat",         HYPEUSDT: "Hyperliquid",
+    ARKUSDT: "Ark",
 };
 
 export const LEVERAGE_PRESETS = [1, 2, 5, 10, 20, 50, 75, 100, 125] as const;
