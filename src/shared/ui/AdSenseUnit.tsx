@@ -9,6 +9,14 @@ declare global {
     }
 }
 
+/**
+ * 애드센스 승인 전까지 광고 유닛을 끈다.
+ * 승인 전에는 광고가 채워지지 않아 첫 렌더에 빈 박스가 떴다가 접히는 깜빡임만 남는다.
+ * 사이트 확인용 로더 스크립트(layout.tsx <head>)와 ads.txt는 심사에 필요하므로 그대로 둔다.
+ * 승인되면 true로 바꾸면 세 페이지의 유닛이 다시 켜진다.
+ */
+const ADSENSE_APPROVED = false;
+
 interface AdSenseUnitProps {
     slot: string;
     format?: "auto" | "rectangle" | "horizontal" | "vertical";
@@ -29,7 +37,7 @@ export function AdSenseUnit({ slot, format = "auto", className = "" }: AdSenseUn
     const [enabled, setEnabled] = useState(false);
 
     useEffect(() => {
-        if (/(^|\.)tradehub\.kr$/.test(window.location.hostname)) setEnabled(true);
+        if (ADSENSE_APPROVED && /(^|\.)tradehub\.kr$/.test(window.location.hostname)) setEnabled(true);
     }, []);
 
     // ins가 DOM에 올라온 뒤에 push해야 AdSense가 슬롯을 인식한다.
