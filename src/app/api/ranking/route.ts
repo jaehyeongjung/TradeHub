@@ -22,7 +22,7 @@ export async function GET() {
 
     try {
         const r = await fetch(url, {
-            next: { revalidate: 60 },
+            next: { revalidate: 300 }, // Demo 키 월 1만 회 한도 안에 들어오도록 5분
             headers: cgHeaders(),
         });
 
@@ -32,7 +32,7 @@ export async function GET() {
 
         const data = (await r.json()) as RankingCoin[];
         return NextResponse.json(data, {
-            headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" },
+            headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
         });
     } catch {
         return NextResponse.json({ error: "fetch failed" }, { status: 500 });

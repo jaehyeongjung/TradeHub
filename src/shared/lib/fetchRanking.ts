@@ -7,7 +7,7 @@ const CG_URL =
 export async function fetchRankingData(): Promise<RankingCoin[] | null> {
     try {
         const r = await fetch(CG_URL, {
-            next: { revalidate: 60 },
+            next: { revalidate: 300 }, // Demo 키 월 1만 회 한도 안에 들어오도록 5분
             headers: cgHeaders(),
         });
         if (!r.ok) return null;

@@ -306,11 +306,17 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                             {activeTab.desc}
                         </p>
                     </div>
-                    {updatedAt && (
-                        <span className={`text-[11px] ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
-                            {`${updatedAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 업데이트`}
-                        </span>
-                    )}
+                    <div className={`flex flex-col items-end gap-0.5 text-[11px] ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
+                        {updatedAt && (
+                            <span>
+                                {`${updatedAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} 업데이트`}
+                            </span>
+                        )}
+                        {/* CoinGecko Demo API 이용 조건(Attribution required) */}
+                        <a href="https://www.coingecko.com" target="_blank" rel="noopener noreferrer" className="underline-offset-2 hover:underline">
+                            Data provided by CoinGecko
+                        </a>
+                    </div>
                 </div>
 
                 {/* Tabs */}
