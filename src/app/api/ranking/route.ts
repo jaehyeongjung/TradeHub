@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cgHeaders } from "@/shared/lib/coingecko";
 
 export type RankingCoin = {
     id: string;
@@ -22,7 +23,7 @@ export async function GET() {
     try {
         const r = await fetch(url, {
             next: { revalidate: 60 },
-            headers: { Accept: "application/json" },
+            headers: cgHeaders(),
         });
 
         if (!r.ok) {
