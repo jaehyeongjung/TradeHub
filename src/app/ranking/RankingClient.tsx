@@ -254,9 +254,15 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
 
     useEffect(() => {
         if (initialData && initialData.length > 0) { setUpdatedAt(new Date()); return; }
+        // 업스트림(CoinGecko)이 막히면 /api/ranking은 { error } 객체를 502로 돌려준다.
+        // 그걸 그대로 coins에 넣으면 useMemo의 [...coins]에서 "not iterable"로 페이지 전체가 죽는다.
         fetch("/api/ranking")
             .then((r) => r.json())
-            .then((data: RankingCoin[]) => { setCoins(data); setUpdatedAt(new Date()); })
+            .then((data: unknown) => {
+                if (!Array.isArray(data)) throw new Error("ranking unavailable");
+                setCoins(data as RankingCoin[]);
+                setUpdatedAt(new Date());
+            })
             .catch((e) => console.error("[RankingClient] fetch error:", e))
             .finally(() => setLoading(false));
     }, [initialData]);
@@ -426,6 +432,12 @@ export default function RankingClient({ initialData }: { initialData?: RankingCo
                                     <span className="w-1 h-1 rounded-full bg-current animate-bounce [animation-delay:300ms]" />
                                 </span>
                             </div>
+                        )}
+
+                        {!loading && sorted.length === 0 && (
+                            <p className={`py-16 text-center text-sm ${isLight ? "text-neutral-400" : "text-text-muted"}`}>
+                                시세 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+                            </p>
                         )}
 
                         {/* Mobile sim trading CTA */}
