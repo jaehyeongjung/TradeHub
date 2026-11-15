@@ -15,7 +15,7 @@ export const preferredRegion = "icn1";
 
 const SITE = "https://www.tradehub.kr";
 
-const TITLE = "삼전·하이닉스·현대차 24시간 실시간 가격 — 장 마감 후 야간 시세";
+const TITLE = "삼전·하이닉스 24시간 실시간 가격 — 장 마감 후 야간 시세";
 
 /** "7월 29일 11:24" (KST). 시세 페이지의 신선도 신호. */
 function kstStamp(d: Date): string {
@@ -37,12 +37,6 @@ const KEYWORDS = [
     "삼성전자 토큰",
     "하이닉스 실시간가격",
     "SK하이닉스 야간",
-    "현대차 실시간가격",
-    "삼성전기 실시간가격",
-    "한미반도체 실시간가격",
-    "LG전자 실시간가격",
-    "네이버 주가 실시간",
-    "코스피200 야간",
     "주식 토큰",
     "토큰화 주식",
     "24시간 주식 거래",
@@ -58,8 +52,8 @@ export async function generateMetadata(): Promise<Metadata> {
     const bySymbol = new Map(rows.map((r) => [r.base, r]));
 
     // 검색 결과에 실제 숫자가 보이면 시세 질의에서 클릭률이 크게 오른다.
-    // 설명 길이 제한이 있어 대표 3종만 넣는다 — 늘리면 뒤가 잘린다.
-    const highlights = ["SAMSUNG", "SKHYNIX", "HYUNDAI"]
+    // 설명 길이 제한이 있어 두 종목만 넣는다 — 늘리면 뒤가 잘린다.
+    const highlights = ["SAMSUNG", "SKHYNIX"]
         .map((sym) => {
             const row = bySymbol.get(sym);
             if (!row) return null;
@@ -72,7 +66,7 @@ export async function generateMetadata(): Promise<Metadata> {
         highlights.length > 0
             ? `${kstStamp(new Date())} 기준 ${highlights.join(", ")}.`
             : null,
-        "삼성전자·SK하이닉스·현대차·삼성전기·한미반도체·LG전자·NAVER·KODEX 200의 24시간 실시간 가격을 원화로 확인하세요. KRX 정규장이 끝난 저녁과 새벽, 주말에도 가격이 계속 움직입니다. 미국 반도체 섹터가 움직이는 밤 시간대의 흐름을 다음 날 시초가 전에 미리 볼 수 있습니다.",
+        "삼성전자·SK하이닉스의 24시간 실시간 가격을 원화로 확인하세요. KRX 정규장이 끝난 저녁과 새벽, 주말에도 가격이 계속 움직입니다. 미국 반도체 섹터가 움직이는 밤 시간대의 흐름을 다음 날 시초가 전에 미리 볼 수 있습니다.",
     ]
         .filter(Boolean)
         .join(" ");
@@ -295,11 +289,7 @@ export default async function StocksHubPage() {
                     <Link href="/stocks/sk-hynix" className="font-medium text-[var(--color-up-text)] hover:underline">
                         하이닉스 실시간 가격
                     </Link>
-                    에 가장 먼저 드러납니다. 관세·환율 뉴스에 민감한{" "}
-                    <Link href="/stocks/hyundai" className="font-medium text-[var(--color-up-text)] hover:underline">
-                        현대차 실시간 가격
-                    </Link>
-                    도 워싱턴발 발표가 나오는 새벽에 먼저 움직입니다.
+                    에 가장 먼저 드러납니다.
                 </p>
             </section>
 

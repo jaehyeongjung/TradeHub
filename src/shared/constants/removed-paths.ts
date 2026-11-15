@@ -4,4 +4,6 @@ export const REMOVED_STOCK_SLUGS = [
     "koru", "ewy", "sandisk", "micron", "nvidia", "intel", "amd", "marvell", "tesla",
     "apple", "microsoft", "alphabet", "amazon", "meta", "coinbase", "microstrategy",
     "palantir", "spacex", "soxl", "soxs", "qqq",
+    // 2026-11-15 한국 종목도 삼성전자·SK하이닉스 두 개만 남기고 정리
+    "hyundai", "samsung-electro-mechanics", "hanmi-semiconductor", "lg-electronics", "naver", "kodex-200",
 ] as const;
