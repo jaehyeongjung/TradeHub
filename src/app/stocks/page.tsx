@@ -160,10 +160,11 @@ export default async function StocksHubPage() {
     const now = new Date();
     const stamp = kstStamp(now);
 
-    // 한국 3종만 다룬다. 해외 종목은 개별 페이지도 목록도 두지 않는다 —
-    // 이름만 바뀐 템플릿 페이지가 24개 쌓여 애드센스 "가치가 별로 없는 콘텐츠"
-    // 지적을 받았고, 실제 방문도 한국 종목에만 몰려 있었다.
+    // 개별 페이지가 있는 종목만 카드로 보여준다. 예전에 이름만 바뀐 템플릿 페이지가
+    // 24개 쌓여 애드센스 "가치가 별로 없는 콘텐츠" 지적을 받았으므로, 페이지 없는
+    // 해외 종목(바이낸스 목록에만 있는 것)은 그대로 숨긴다.
     const korean = rows.filter((r) => r.isKorean);
+    const overseas = rows.filter((r) => !r.isKorean && r.slug);
 
     // 시세 페이지는 "언제 기준 숫자인가"가 곧 품질이다
     const webPage = {
@@ -263,6 +264,17 @@ export default async function StocksHubPage() {
                         갱신됩니다.
                     </p>
                     <CardGrid rows={korean} usdKrw={usdKrw} />
+                </section>
+            )}
+
+            {overseas.length > 0 && (
+                <section className="mt-12">
+                    <h2 className="text-lg font-bold tracking-tight">해외 주식·ETF 토큰</h2>
+                    <p className="mt-1.5 text-label leading-relaxed text-[var(--text-tertiary)]">
+                        미국 정규장은 {usStatus.hours}입니다. 한국 낮 시간과 주말에도 아래 가격은
+                        갱신됩니다.
+                    </p>
+                    <CardGrid rows={overseas} usdKrw={usdKrw} />
                 </section>
             )}
 
