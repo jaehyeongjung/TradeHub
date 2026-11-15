@@ -18,17 +18,18 @@ import { StockRoom } from "@/features/floors/StockRoom";
 import { StockLiveData } from "./StockLiveData";
 import { MarketStatusNote } from "./MarketStatusNote";
 
-// 첫 요청 때 렌더하고 15분간 캐시한다(ISR).
+// 첫 요청 때 렌더하고 1시간 캐시한다(ISR).
 //
 // 60초였을 땐 종목 8개가 분마다 다시 렌더되고, 그때마다 안쪽 fetch 캐시(시세·OI·환율 등)도
 // 따로 ISR Write로 잡혀서 Hobby 한도(Active CPU 4h, ISR Writes 20만)를 넘겨 사이트가 402로 멈췄다.
+// 종목이 9개로 늘어 15분으로도 ISR Writes가 한도 근처까지 갈 수 있어 1시간으로 늘렸다.
 // 화면의 시세는 StockLiveData가 클라이언트에서 실시간으로 덮어쓰므로 HTML은 크롤러용 스냅샷이면 된다.
 //
 // generateStaticParams로 빌드 때 미리 만들면 안 된다 — 빌드는 미국 빌드 머신에서 돌고
 // 바이낸스는 그 IP를 451로 차단하므로, 가격이 빈 HTML이 그대로 굳는다. 트래픽이 없는
 // 종목은 구글봇이 첫 방문자가 되어 그 빈 HTML을 색인해 간다.
 // 서울 리전(vercel.json regions)에서 요청 시점에 렌더하면 시세가 HTML에 박힌다.
-export const revalidate = 900;
+export const revalidate = 3600;
 export const preferredRegion = "icn1";
 
 const SITE = "https://www.tradehub.kr";
@@ -59,7 +60,7 @@ function tickerOf(token: StockToken): string | null {
 
 /**
  * 제목 앞머리에 검색어(줄임말 + "실시간 가격")와 현재가를 함께 넣는다.
- * 가격이 제목에 있으면 시세 질의에서 클릭률이 오르고, 15분마다 갱신돼 신선도 신호도 된다.
+ * 가격이 제목에 있으면 시세 질의에서 클릭률이 오르고, 1시간마다 갱신돼 신선도 신호도 된다.
  */
 function pageTitle(token: StockToken, priceLabel: string | null) {
     const name = searchName(token);
