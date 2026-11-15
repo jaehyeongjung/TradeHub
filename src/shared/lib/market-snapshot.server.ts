@@ -108,7 +108,7 @@ export type Kimchi = {
 };
 
 /**
- * BTC 기준 김치프리미엄. api/kimchi 라우트와 같은 계산이지만 여기선 페이지 ISR에 맞춰 캐시한다.
+ * BTC 기준 김치프리미엄. shared/lib/kimchi.ts와 같은 계산이지만 여기선 페이지 ISR에 맞춰 캐시한다.
  * 세 값 중 하나라도 빠지면 null — 환율을 못 구한 채로 프리미엄을 내보내면 숫자가 틀린다.
  */
 export async function getKimchiPremium(revalidate = 300): Promise<Kimchi | null> {

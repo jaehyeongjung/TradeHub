@@ -1,5 +1,5 @@
 // USD/KRW 환율. 주식 토큰 가격을 원화로 환산해 보여주는 데 쓴다.
-// kimchi 라우트와 같은 소스를 쓰되, 여기선 페이지 ISR에 맞춰 캐시한다.
+// shared/lib/kimchi.ts와 같은 소스를 쓰되, 여기선 페이지 ISR에 맞춰 캐시한다.
 
 const UA = { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" };
 

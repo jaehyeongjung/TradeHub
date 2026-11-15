@@ -89,7 +89,11 @@ async function fetchYahooQuote(symbol: string): Promise<{
 
 let lastGood: MarketIndicesResponse | null = null;
 let lastUpdated = 0;
-const CACHE_TTL_MS = 30_000;
+const CACHE_TTL_MS = 60_000;
+
+// 접속자가 몇 명이든 야후 호출과 함수 실행이 분당 한 번으로 묶이도록 CDN에서 캐시한다.
+// no-store였을 땐 대시보드 탭마다 30초에 한 번씩 함수가 돌았다.
+const CDN_CACHE = "public, s-maxage=60, stale-while-revalidate=300";
 
 export async function GET() {
     try {
@@ -97,7 +101,7 @@ export async function GET() {
 
         if (lastGood && now - lastUpdated < CACHE_TTL_MS) {
             return NextResponse.json(lastGood, {
-                headers: { "Cache-Control": "no-store, must-revalidate" },
+                headers: { "Cache-Control": CDN_CACHE },
             });
         }
 
@@ -129,7 +133,7 @@ export async function GET() {
         }
 
         return NextResponse.json(response, {
-            headers: { "Cache-Control": "no-store, must-revalidate" },
+            headers: { "Cache-Control": degraded ? "no-store, must-revalidate" : CDN_CACHE },
         });
     } catch {
         if (lastGood) {

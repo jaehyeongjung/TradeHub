@@ -21,7 +21,7 @@ const UA = { "User-Agent": "TradeHub/1.0 (+https://www.tradehub.kr)" };
  *
  * @param revalidate 초 단위. 거의 안 바뀌는 exchangeInfo는 길게 준다.
  */
-async function fapi<T>(path: string, revalidate = 60): Promise<T | null> {
+async function fapi<T>(path: string, revalidate = 300): Promise<T | null> {
     for (const host of FAPI_HOSTS) {
         try {
             const res = await fetch(`https://${host}/fapi/v1${path}`, {

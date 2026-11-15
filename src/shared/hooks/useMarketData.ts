@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/shared/lib/supabase-browser";
 import { useVisibilityPolling } from "@/shared/hooks/useVisibilityPolling";
-import type { KimchiResponse } from "@/app/api/kimchi/route";
+import { fetchKimchi, type KimchiResponse } from "@/shared/lib/kimchi";
 
 /* ─────────────────────────── 핫코인 ─────────────────────────── */
 
@@ -72,14 +72,9 @@ export function useKimchi(symbol = "BTC", pollMs = 10_000) {
     const [data, setData] = useState<KimchiResponse | null>(null);
 
     const load = useCallback(async () => {
-        try {
-            const r = await fetch(`/api/kimchi?symbol=${encodeURIComponent(symbol)}`, { cache: "no-store" });
-            if (!r.ok) return;
-            const j = (await r.json()) as KimchiResponse;
-            if (typeof j.symbol === "string") setData(j);
-        } catch {
-            // 직전 값을 그대로 둔다 — 깜빡이는 것보다 낫다.
-        }
+        const j = await fetchKimchi(symbol);
+        // 실패하면 직전 값을 그대로 둔다 — 깜빡이는 것보다 낫다.
+        if (!j.degraded) setData(j);
     }, [symbol]);
 
     useVisibilityPolling({ interval: pollMs, onPoll: load });

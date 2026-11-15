@@ -73,7 +73,7 @@ function IndexItem({ index, isLight }: { index: MarketIndex; isLight: boolean })
     );
 }
 
-export function MarketIndicesWidget({ pollMs = 30000, fadeDelay = 0 }: { pollMs?: number; fadeDelay?: number }) {
+export function MarketIndicesWidget({ pollMs = 60_000, fadeDelay = 0 }: { pollMs?: number; fadeDelay?: number }) {
     const [data, setData] = useState<MarketIndicesResponse | null>(null);
     const isLight = useTheme();
     const abortRef = useRef<AbortController | null>(null);

@@ -8,7 +8,8 @@ import { getMarketStatus } from "@/shared/lib/market-hours";
 import { StocksFallbackGrid } from "./StocksFallbackGrid";
 import { AdSenseUnit } from "@/shared/ui/AdSenseUnit";
 
-export const revalidate = 60;
+// 60초였을 때 종목 페이지들과 함께 Vercel Hobby 한도를 넘겼다. [slug]/page.tsx 참고.
+export const revalidate = 300;
 // 바이낸스는 미국 IP를 지역 차단한다. 서울 리전에서 실행해 시세 fetch가 막히지 않게 한다.
 export const preferredRegion = "icn1";
 
@@ -232,7 +233,7 @@ export default async function StocksHubPage() {
                     </strong>
                 </p>
                 <p className="mt-2 text-caption text-[var(--text-muted)]">
-                    {stamp} 기준 시세로 페이지를 만들었고, 아래 목록은 60초마다 갱신됩니다.
+                    {stamp} 기준 시세로 페이지를 만들었고, 아래 목록은 5분마다 갱신됩니다.
                 </p>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">

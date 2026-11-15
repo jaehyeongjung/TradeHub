@@ -125,7 +125,10 @@ export async function GET(req: NextRequest) {
 
         const out = mapping.bucketSec ? bucketBars(bars, mapping.bucketSec) : bars;
 
-        return NextResponse.json({ bars: out }, { headers: { "Cache-Control": "no-store, must-revalidate" } });
+        // 같은 종목·간격을 보는 사람끼리 CDN 캐시를 나눠 쓴다. 차트가 30초마다 마지막 봉을 다시 받는다.
+        return NextResponse.json({ bars: out }, {
+            headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
+        });
     } catch (e) {
         return NextResponse.json({ bars: [], error: String(e) }, { status: 500 });
     }

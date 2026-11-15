@@ -6,35 +6,18 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAtomValue } from "jotai";
 import { useVisibilityPolling } from "@/shared/hooks/useVisibilityPolling";
 import { treemapOpenAtom } from "@/shared/store/atoms";
-import type { KimchiResponse } from "@/app/api/kimchi/route";
+import { fetchKimchi, type KimchiResponse } from "@/shared/lib/kimchi";
 
 type Data = KimchiResponse;
 
-async function fetchKimchiOnce(symbol: string, signal?: AbortSignal): Promise<Data> {
-    const r = await fetch(`/api/kimchi?symbol=${encodeURIComponent(symbol)}`, {
-        cache: "no-store",
-        signal,
-    });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const j = (await r.json()) as Data;
-    if (typeof j.symbol !== "string") throw new Error("Invalid payload: symbol");
-    return j;
-}
-
 async function fetchKimchiWithRetry(symbol: string, signal?: AbortSignal): Promise<Data> {
     const delays = [300, 800];
-    let attempt = 0;
-    while (attempt <= delays.length) {
-        try {
-            return await fetchKimchiOnce(symbol, signal);
-        } catch (e) {
-            if (signal?.aborted) throw e;
-            if (attempt === delays.length) break;
-            await new Promise((res) => setTimeout(res, delays[attempt]));
-            attempt++;
-        }
+    for (let attempt = 0; ; attempt++) {
+        const d = await fetchKimchi(symbol, signal);
+        if (signal?.aborted) throw new Error("aborted");
+        if (!d.degraded || attempt === delays.length) return d;
+        await new Promise((res) => setTimeout(res, delays[attempt]));
     }
-    throw new Error("fetch failed");
 }
 
 export function KimchiWidget({
@@ -63,6 +46,8 @@ export function KimchiWidget({
             abortRef.current = ctrl;
             const d = await fetchKimchiWithRetry(symbol, ctrl.signal);
             if (ctrl.signal.aborted) return;
+            // 한 번이라도 값을 받았으면 실패한 응답으로 덮어쓰지 않는다.
+            if (d.degraded && prevPctRef.current != null) return;
             const newPct = d.premium != null ? d.premium * 100 : null;
             if (newPct != null && prevPctRef.current != null && Math.abs(newPct - prevPctRef.current) > 0.001) {
                 setFlash(newPct > prevPctRef.current ? "up" : "down");
