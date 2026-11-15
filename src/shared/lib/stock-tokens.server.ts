@@ -91,6 +91,8 @@ type ExchangeInfo = {
  * 바이낸스 주식 토큰(TRADIFI_PERPETUAL) 전 종목을 거래대금 순으로.
  * stockTokens에 없는 종목도 심볼 그대로 노출한다 — 기초자산을 확정 못 한 것들이 섞여 있어
  * 개별 페이지는 만들지 않지만 목록에서는 시세를 볼 수 있게 한다.
+ * 단, 한국 종목(KR_EQUITY)은 페이지를 둔 것만 보여준다 — 페이지를 정리한 종목이
+ * NAVER·HANMI 같은 영문 심볼로 표에 남아 있었다.
  */
 export async function getAllTradfiRows(): Promise<TradfiRow[]> {
     const [info, tickers] = await Promise.all([
@@ -109,6 +111,10 @@ export async function getAllTradfiRows(): Promise<TradfiRow[]> {
 
     return tickers
         .filter((t) => tradfi.has(t.symbol))
+        .filter((t) => {
+            const isKorean = tradfi.get(t.symbol)?.underlyingType === "KR_EQUITY";
+            return !isKorean || bySymbol.has(t.symbol.replace(/USDT$/, ""));
+        })
         .map((t) => {
             const base = t.symbol.replace(/USDT$/, "");
             const meta = bySymbol.get(base);
